@@ -373,13 +373,27 @@ export default function Index() {
 
               <TabsContent value="catalog">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredWorks.map((work, index) => (
+                  {filteredWorks.map((work, index) => {
+                    const isAffordable = work.price <= userBalance;
+                    return (
                     <Card 
                       key={work.id} 
-                      className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/30 animate-fade-in overflow-hidden"
+                      className={`group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 animate-fade-in overflow-hidden ${
+                        isAffordable 
+                          ? 'border-green-500/30 bg-green-50/50 hover:border-green-500/50' 
+                          : 'hover:border-primary/30 opacity-75'
+                      }`}
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
-                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                      <div className={`absolute top-0 left-0 w-full h-1 bg-gradient-to-r transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ${
+                        isAffordable ? 'from-green-500 to-green-400' : 'from-primary to-primary/50'
+                      }`}></div>
+                      {isAffordable && (
+                        <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
+                          <Icon name="CheckCircle" size={14} />
+                          Доступно
+                        </div>
+                      )}
                       
                       <CardHeader>
                         <div className="flex justify-between items-start mb-3">
@@ -433,7 +447,8 @@ export default function Index() {
                         </Button>
                       </CardFooter>
                     </Card>
-                  ))}
+                  )}
+                  )}
                 </div>
 
                 {filteredWorks.length === 0 && (

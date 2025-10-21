@@ -175,39 +175,39 @@ export default function Index() {
                     <div className="grid gap-4 py-4">
                       <Button onClick={() => handleBuyPoints(100)} className="justify-between h-auto py-4 gradient-purple-blue animate-gradient hover:shadow-lg transition-all duration-300">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                            <Icon name="Coins" size={24} className="text-primary" />
+                          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <Icon name="Coins" size={24} className="text-white" />
                           </div>
                           <div className="text-left">
-                            <p className="font-bold text-lg">100 баллов</p>
-                            <p className="text-sm text-muted-foreground">Стартовый пакет</p>
+                            <p className="font-bold text-lg text-white">100 баллов</p>
+                            <p className="text-sm text-white/80">1 балл = 5 ₽</p>
                           </div>
                         </div>
-                        <span className="text-xl font-bold">500 ₽</span>
+                        <span className="text-xl font-bold text-white">500 ₽</span>
                       </Button>
                       <Button onClick={() => handleBuyPoints(300)} className="justify-between h-auto py-4 gradient-purple-blue animate-gradient hover:shadow-lg transition-all duration-300">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                            <Icon name="Coins" size={24} className="text-primary" />
+                          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <Icon name="Coins" size={24} className="text-white" />
                           </div>
                           <div className="text-left">
-                            <p className="font-bold text-lg">300 баллов</p>
-                            <p className="text-sm text-muted-foreground">Базовый пакет</p>
+                            <p className="font-bold text-lg text-white">300 баллов</p>
+                            <p className="text-sm text-white/80">1 балл = 5 ₽</p>
                           </div>
                         </div>
-                        <span className="text-xl font-bold">1500 ₽</span>
+                        <span className="text-xl font-bold text-white">1500 ₽</span>
                       </Button>
                       <Button onClick={() => handleBuyPoints(500)} className="justify-between h-auto py-4 gradient-purple-pink animate-gradient hover:shadow-lg transition-all duration-300">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
-                            <Icon name="Coins" size={24} className="text-primary" />
+                          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <Icon name="Coins" size={24} className="text-white" />
                           </div>
                           <div className="text-left">
-                            <p className="font-bold text-lg">500 баллов</p>
-                            <p className="text-sm text-muted-foreground">Популярный</p>
+                            <p className="font-bold text-lg text-white">500 баллов</p>
+                            <p className="text-sm text-white/80">1 балл = 5 ₽</p>
                           </div>
                         </div>
-                        <span className="text-xl font-bold">2500 ₽</span>
+                        <span className="text-xl font-bold text-white">2500 ₽</span>
                       </Button>
                       <Button onClick={() => handleBuyPoints(1000)} className="justify-between h-auto py-4 gradient-premium animate-gradient hover:shadow-2xl transition-all duration-300 ring-2 ring-blue-400/50">
                         <div className="flex items-center gap-3">
@@ -215,11 +215,11 @@ export default function Index() {
                             <Icon name="Zap" size={24} className="text-white" />
                           </div>
                           <div className="text-left">
-                            <p className="font-bold text-lg">1000 баллов</p>
-                            <p className="text-sm opacity-90">Максимум выгоды</p>
+                            <p className="font-bold text-lg text-white">1000 баллов</p>
+                            <p className="text-sm text-white/90">1 балл = 5 ₽</p>
                           </div>
                         </div>
-                        <span className="text-xl font-bold">5000 ₽</span>
+                        <span className="text-xl font-bold text-white">5000 ₽</span>
                       </Button>
                     </div>
                   </DialogContent>
@@ -257,7 +257,7 @@ export default function Index() {
               </h2>
               
               <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto animate-fade-in">
-                Покупай качественные материалы или продавай свои — всё в одном месте
+                Готовые курсовые, дипломы и чертежи для студентов технических специальностей
               </p>
               
               <div className="max-w-2xl mx-auto relative animate-fade-in">

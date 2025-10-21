@@ -68,8 +68,7 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
     setLoading(true);
 
     try {
-      const funcUrls = await import('../../backend/func2url.json');
-      const response = await fetch(funcUrls.works, {
+      const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

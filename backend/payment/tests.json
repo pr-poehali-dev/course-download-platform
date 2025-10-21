@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Get payment config",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "public_id": "string",
+        "ready": "boolean"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Payment check callback",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "type": "check",
+        "TransactionId": 12345,
+        "Amount": 500,
+        "Currency": "RUB"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "code": 0
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

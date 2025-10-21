@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -95,6 +95,26 @@ export default function Index() {
   const availableWorks = MOCK_WORKS.filter(work => work.price <= userBalance).length;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [realWorks, setRealWorks] = useState<any[]>([]);
+  const [worksLoading, setWorksLoading] = useState(true);
+
+  useEffect(() => {
+    const loadWorks = async () => {
+      try {
+        const funcUrls = await import('../backend/func2url.json');
+        const response = await fetch(funcUrls.works);
+        const data = await response.json();
+        if (data.works) {
+          setRealWorks(data.works);
+        }
+      } catch (error) {
+        console.error('Failed to load works:', error);
+      } finally {
+        setWorksLoading(false);
+      }
+    };
+    loadWorks();
+  }, []);
 
   const handleShowTerms = (user: string, userEmail: string) => {
     setPendingUser({ username: user, email: userEmail });
@@ -144,10 +164,16 @@ export default function Index() {
     setUserBalance(userBalance + amount);
   };
 
-  const filteredWorks = MOCK_WORKS.filter((work) => {
+  const worksToDisplay = realWorks.length > 0 ? realWorks : MOCK_WORKS.map(w => ({
+    ...w,
+    work_type: w.type
+  }));
+
+  const filteredWorks = worksToDisplay.filter((work) => {
     const matchesSearch = work.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       work.subject.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || work.type === selectedCategory;
+    const workType = work.work_type || work.type;
+    const matchesCategory = selectedCategory === 'all' || workType === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
@@ -337,7 +363,9 @@ export default function Index() {
               <TabsContent value="catalog">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredWorks.map((work, index) => {
-                    const isAffordable = work.price <= userBalance;
+                    const price = work.price_points || work.price;
+                    const workType = work.work_type || work.type;
+                    const isAffordable = price <= userBalance;
                     return (
                     <Card 
                       key={work.id} 
@@ -360,7 +388,7 @@ export default function Index() {
                       
                       <CardHeader>
                         <div className="flex justify-between items-start mb-3">
-                          <Badge variant="secondary" className="font-medium">{work.type}</Badge>
+                          <Badge variant="secondary" className="font-medium">{workType}</Badge>
                           <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-full">
                             <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
                             <span className="text-sm font-bold text-yellow-700">{work.rating}</span>
@@ -397,12 +425,12 @@ export default function Index() {
                             <Icon name="Coins" size={20} className="text-primary" />
                           </div>
                           <div>
-                            <p className="text-2xl font-bold">{work.price}</p>
+                            <p className="text-2xl font-bold">{price}</p>
                             <p className="text-xs text-muted-foreground">баллов</p>
                           </div>
                         </div>
                         <Button 
-                          onClick={() => handleBuyWork(work.price, work.title)}
+                          onClick={() => handleBuyWork(price, work.title)}
                           className="group-hover:scale-105 transition-transform"
                         >
                           <Icon name="ShoppingCart" size={16} className="mr-2" />

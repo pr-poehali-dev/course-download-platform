@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import WorkManager from '@/components/WorkManager';
 
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
 
@@ -141,10 +142,14 @@ export default function AdminPanel() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Обзор
+          </TabsTrigger>
+          <TabsTrigger value="add-work">
+            <Icon name="Plus" size={18} className="mr-2" />
+            Добавить работу
           </TabsTrigger>
           <TabsTrigger value="sales">
             <Icon name="TrendingUp" size={18} className="mr-2" />
@@ -155,6 +160,10 @@ export default function AdminPanel() {
             Активность
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="add-work" className="space-y-6">
+          <WorkManager adminEmail={ADMIN_EMAIL} />
+        </TabsContent>
 
         <TabsContent value="overview" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

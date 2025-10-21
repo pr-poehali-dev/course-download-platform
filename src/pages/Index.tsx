@@ -205,49 +205,109 @@ export default function Index() {
           </div>
         </header>
 
-        <section className="py-16 bg-gradient-to-b from-primary/5 to-transparent">
-          <div className="container mx-auto px-4 text-center">
-            <h2 className="text-5xl font-bold mb-6">Твоя база знаний</h2>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Находи готовые работы или зарабатывай на своих материалах
-            </p>
-            
-            <div className="max-w-2xl mx-auto relative">
-              <Icon name="Search" size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Поиск по курсовым, дипломам, чертежам..."
-                className="pl-12 h-14 text-lg"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+        <section className="relative py-24 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDMiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-4xl mx-auto text-center mb-12">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-6 animate-fade-in">
+                <Icon name="Zap" size={16} className="text-primary" />
+                <span className="text-sm font-medium">600+ готовых работ</span>
+              </div>
+              
+              <h2 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent animate-fade-in">
+                Учись эффективнее
+              </h2>
+              
+              <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto animate-fade-in">
+                Находи готовые работы за секунды или зарабатывай на своих материалах
+              </p>
+              
+              <div className="max-w-2xl mx-auto relative animate-fade-in">
+                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
+                <div className="relative bg-white/80 backdrop-blur-md rounded-2xl p-2 shadow-2xl border-2 border-primary/20">
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Icon name="Search" size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        placeholder="Курсовая по экономике, диплом по программированию..."
+                        className="pl-12 h-14 text-lg border-0 bg-transparent focus-visible:ring-0"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                    <Button size="lg" className="h-14 px-8">
+                      <Icon name="Search" size={20} className="mr-2" />
+                      Найти
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-3 justify-center mt-8 flex-wrap animate-fade-in">
+                <Badge 
+                  variant={selectedCategory === 'all' ? 'default' : 'outline'} 
+                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
+                  onClick={() => setSelectedCategory('all')}>
+                  <Icon name="BookOpen" size={14} className="mr-2" />
+                  Все работы
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === 'Курсовая работа' ? 'default' : 'outline'} 
+                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
+                  onClick={() => setSelectedCategory('Курсовая работа')}>
+                  <Icon name="FileText" size={14} className="mr-2" />
+                  Курсовые
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === 'Дипломная работа' ? 'default' : 'outline'} 
+                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
+                  onClick={() => setSelectedCategory('Дипломная работа')}>
+                  <Icon name="Award" size={14} className="mr-2" />
+                  Дипломные
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === 'Практическая работа' ? 'default' : 'outline'} 
+                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
+                  onClick={() => setSelectedCategory('Практическая работа')}>
+                  <Icon name="Lightbulb" size={14} className="mr-2" />
+                  Практические
+                </Badge>
+                <Badge 
+                  variant={selectedCategory === 'Чертеж' ? 'default' : 'outline'} 
+                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
+                  onClick={() => setSelectedCategory('Чертеж')}>
+                  <Icon name="Ruler" size={14} className="mr-2" />
+                  Чертежи
+                </Badge>
+              </div>
             </div>
 
-            <div className="flex gap-2 justify-center mt-6 flex-wrap">
-              <Badge variant={selectedCategory === 'all' ? 'default' : 'outline'} 
-                className="cursor-pointer px-4 py-2" 
-                onClick={() => setSelectedCategory('all')}>
-                Все работы
-              </Badge>
-              <Badge variant={selectedCategory === 'Курсовая работа' ? 'default' : 'outline'} 
-                className="cursor-pointer px-4 py-2" 
-                onClick={() => setSelectedCategory('Курсовая работа')}>
-                Курсовые
-              </Badge>
-              <Badge variant={selectedCategory === 'Дипломная работа' ? 'default' : 'outline'} 
-                className="cursor-pointer px-4 py-2" 
-                onClick={() => setSelectedCategory('Дипломная работа')}>
-                Дипломные
-              </Badge>
-              <Badge variant={selectedCategory === 'Практическая работа' ? 'default' : 'outline'} 
-                className="cursor-pointer px-4 py-2" 
-                onClick={() => setSelectedCategory('Практическая работа')}>
-                Практические
-              </Badge>
-              <Badge variant={selectedCategory === 'Чертеж' ? 'default' : 'outline'} 
-                className="cursor-pointer px-4 py-2" 
-                onClick={() => setSelectedCategory('Чертеж')}>
-                Чертежи
-              </Badge>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mt-16">
+              <div className="text-center animate-fade-in">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Icon name="Clock" size={32} className="text-primary" />
+                </div>
+                <h3 className="text-4xl font-bold mb-2">24/7</h3>
+                <p className="text-sm text-muted-foreground">Доступ к материалам</p>
+              </div>
+              
+              <div className="text-center animate-fade-in">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Icon name="Users" size={32} className="text-primary" />
+                </div>
+                <h3 className="text-4xl font-bold mb-2">5000+</h3>
+                <p className="text-sm text-muted-foreground">Студентов с нами</p>
+              </div>
+              
+              <div className="text-center animate-fade-in">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Icon name="Star" size={32} className="text-primary" />
+                </div>
+                <h3 className="text-4xl font-bold mb-2">4.8</h3>
+                <p className="text-sm text-muted-foreground">Средний рейтинг работ</p>
+              </div>
             </div>
           </div>
         </section>
@@ -268,40 +328,63 @@ export default function Index() {
 
               <TabsContent value="catalog">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredWorks.map((work) => (
-                    <Card key={work.id} className="hover:shadow-lg transition-all hover:scale-[1.02] animate-fade-in">
+                  {filteredWorks.map((work, index) => (
+                    <Card 
+                      key={work.id} 
+                      className="group hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border-2 hover:border-primary/30 animate-fade-in overflow-hidden"
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary/50 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+                      
                       <CardHeader>
-                        <div className="flex justify-between items-start mb-2">
-                          <Badge variant="secondary">{work.type}</Badge>
-                          <div className="flex items-center gap-1">
-                            <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
-                            <span className="text-sm font-semibold">{work.rating}</span>
+                        <div className="flex justify-between items-start mb-3">
+                          <Badge variant="secondary" className="font-medium">{work.type}</Badge>
+                          <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-full">
+                            <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
+                            <span className="text-sm font-bold text-yellow-700">{work.rating}</span>
                           </div>
                         </div>
-                        <CardTitle className="text-xl">{work.title}</CardTitle>
-                        <CardDescription className="flex items-center gap-2">
-                          <Icon name="BookMarked" size={14} />
-                          {work.subject}
+                        <CardTitle className="text-xl group-hover:text-primary transition-colors line-clamp-2">
+                          {work.title}
+                        </CardTitle>
+                        <CardDescription className="flex items-center gap-2 mt-2">
+                          <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <Icon name="BookMarked" size={16} className="text-primary" />
+                          </div>
+                          <span className="font-medium">{work.subject}</span>
                         </CardDescription>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
+                        <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
                           {work.preview}
                         </p>
-                        <div className="flex items-center gap-4 mt-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Icon name="Download" size={14} />
-                            {work.downloads}
+                        <div className="flex items-center gap-4 mt-4 pt-4 border-t">
+                          <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                            <Icon name="Download" size={16} className="text-primary" />
+                            <span className="font-medium">{work.downloads}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm text-green-600">
+                            <Icon name="TrendingUp" size={16} />
+                            <span className="font-medium">Популярно</span>
                           </div>
                         </div>
                       </CardContent>
-                      <CardFooter className="flex justify-between items-center">
+                      <CardFooter className="flex justify-between items-center bg-muted/30 group-hover:bg-primary/5 transition-colors">
                         <div className="flex items-center gap-2">
-                          <Icon name="Coins" size={18} className="text-primary" />
-                          <span className="text-2xl font-bold">{work.price}</span>
+                          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                            <Icon name="Coins" size={20} className="text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-2xl font-bold">{work.price}</p>
+                            <p className="text-xs text-muted-foreground">баллов</p>
+                          </div>
                         </div>
-                        <Button onClick={() => handleBuyWork(work.price, work.title)}>
-                          Скачать
+                        <Button 
+                          onClick={() => handleBuyWork(work.price, work.title)}
+                          className="group-hover:scale-105 transition-transform"
+                        >
+                          <Icon name="ShoppingCart" size={16} className="mr-2" />
+                          Купить
                         </Button>
                       </CardFooter>
                     </Card>
@@ -392,51 +475,78 @@ export default function Index() {
           </div>
         </section>
 
-        <section id="about" className="py-16 bg-muted/30">
-          <div className="container mx-auto px-4">
-            <h2 className="text-4xl font-bold text-center mb-12">Как это работает</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <Card className="text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon name="Search" size={32} className="text-primary" />
-                  </div>
-                  <CardTitle>Найди работу</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Используй поиск и фильтры, чтобы найти нужную курсовую, диплом или чертёж
-                  </p>
-                </CardContent>
-              </Card>
+        <section id="about" className="py-20 bg-gradient-to-b from-muted/50 to-background relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDIiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
+          
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="text-center mb-16">
+              <Badge variant="outline" className="mb-4 px-4 py-2">
+                <Icon name="Sparkles" size={14} className="mr-2" />
+                Простой процесс
+              </Badge>
+              <h2 className="text-5xl font-bold mb-4">Как это работает</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Всего три простых шага до нужного материала
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <div className="relative">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                  1
+                </div>
+                <Card className="text-center pt-8 hover:shadow-xl transition-all hover:-translate-y-1 border-2 hover:border-primary/30">
+                  <CardHeader>
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform">
+                      <Icon name="Search" size={40} className="text-primary" />
+                    </div>
+                    <CardTitle className="text-2xl">Найди работу</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Используй умный поиск и фильтры по категориям, чтобы найти нужную курсовую, диплом или чертёж
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
 
-              <Card className="text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon name="Coins" size={32} className="text-primary" />
-                  </div>
-                  <CardTitle>Купи баллы</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Пополни баланс баллами и используй их для покупки работ
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="relative">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                  2
+                </div>
+                <Card className="text-center pt-8 hover:shadow-xl transition-all hover:-translate-y-1 border-2 hover:border-primary/30">
+                  <CardHeader>
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform">
+                      <Icon name="Coins" size={40} className="text-primary" />
+                    </div>
+                    <CardTitle className="text-2xl">Купи баллы</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Пополни баланс баллами удобным способом и используй их для покупки любых работ
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
 
-              <Card className="text-center">
-                <CardHeader>
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Icon name="Download" size={32} className="text-primary" />
-                  </div>
-                  <CardTitle>Скачай материал</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Получи мгновенный доступ к работе и скачай файл в удобном формате
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="relative">
+                <div className="absolute -top-4 -left-4 w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                  3
+                </div>
+                <Card className="text-center pt-8 hover:shadow-xl transition-all hover:-translate-y-1 border-2 hover:border-primary/30">
+                  <CardHeader>
+                    <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform">
+                      <Icon name="Download" size={40} className="text-primary" />
+                    </div>
+                    <CardTitle className="text-2xl">Скачай материал</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Получи мгновенный доступ к работе и скачай файл в удобном формате прямо сейчас
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </section>

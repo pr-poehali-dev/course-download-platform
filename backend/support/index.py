@@ -85,6 +85,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         user_email = body_data.get('email', '').strip()
         subject = body_data.get('subject', '').strip()
         message = body_data.get('message', '').strip()
+        attachment_url = body_data.get('attachment_url', '').strip()
         
         if not user_email or not subject or not message:
             return {
@@ -97,8 +98,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         cur.execute(
-            "INSERT INTO support_tickets (user_email, subject, message, status) VALUES (%s, %s, %s, 'new') RETURNING id",
-            (user_email, subject, message)
+            "INSERT INTO support_tickets (user_email, subject, message, attachment_url, status) VALUES (%s, %s, %s, %s, 'new') RETURNING id",
+            (user_email, subject, message, attachment_url if attachment_url else None)
         )
         ticket_id = cur.fetchone()[0]
         
@@ -121,7 +122,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         if admin_email == 'rekrutiw@yandex.ru':
             cur.execute("""
-                SELECT id, user_email, subject, message, status, admin_response, 
+                SELECT id, user_email, subject, message, attachment_url, status, admin_response, 
                        created_at, updated_at 
                 FROM support_tickets 
                 ORDER BY created_at DESC
@@ -135,7 +136,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Email обязателен'})
                 }
             cur.execute("""
-                SELECT id, user_email, subject, message, status, admin_response, 
+                SELECT id, user_email, subject, message, attachment_url, status, admin_response, 
                        created_at, updated_at 
                 FROM support_tickets 
                 WHERE user_email = %s
@@ -153,6 +154,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'user_email': ticket['user_email'],
                 'subject': ticket['subject'],
                 'message': ticket['message'],
+                'attachment_url': ticket['attachment_url'],
                 'status': ticket['status'],
                 'admin_response': ticket['admin_response'],
                 'created_at': ticket['created_at'].isoformat() if ticket['created_at'] else None,

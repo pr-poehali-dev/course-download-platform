@@ -17,6 +17,7 @@ interface Ticket {
   user_email: string;
   subject: string;
   message: string;
+  attachment_url?: string | null;
   status: 'new' | 'in_progress' | 'answered' | 'closed';
   admin_response: string | null;
   created_at: string;
@@ -317,6 +318,23 @@ export default function AdminPanel() {
               <div className="bg-muted p-4 rounded-lg">
                 <p className="whitespace-pre-line text-sm">{selectedTicket?.message}</p>
               </div>
+              {selectedTicket?.attachment_url && (
+                <div className="mt-3">
+                  <Label className="text-sm font-semibold mb-2 block">Прикрепленное изображение:</Label>
+                  <a 
+                    href={selectedTicket.attachment_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-block"
+                  >
+                    <img
+                      src={selectedTicket.attachment_url}
+                      alt="Прикрепленное изображение"
+                      className="max-w-md rounded-lg border-2 border-primary/20 hover:border-primary/50 transition-colors cursor-pointer"
+                    />
+                  </a>
+                </div>
+              )}
             </div>
 
             <div>

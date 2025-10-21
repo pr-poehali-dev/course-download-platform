@@ -15,6 +15,7 @@ interface Ticket {
   user_email: string;
   subject: string;
   message: string;
+  attachment_url?: string | null;
   status: 'new' | 'in_progress' | 'answered' | 'closed';
   admin_response: string | null;
   created_at: string;
@@ -25,6 +26,9 @@ export default function SupportPage() {
   const [email, setEmail] = useState('');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [attachmentFile, setAttachmentFile] = useState<File | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'form' | 'tickets'>('form');
@@ -43,6 +47,41 @@ export default function SupportPage() {
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      toast({
+        title: 'Ошибка',
+        description: 'Разрешены только JPG и PNG файлы',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: 'Ошибка',
+        description: 'Размер файла не должен превышать 5 МБ',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    setAttachmentFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAttachmentPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeAttachment = () => {
+    setAttachmentFile(null);
+    setAttachmentPreview('');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -58,6 +97,27 @@ export default function SupportPage() {
     setLoading(true);
 
     try {
+      let attachmentUrl = '';
+
+      if (attachmentFile) {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('file', attachmentFile);
+
+        const uploadResponse = await fetch('https://api.poehali.dev/upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Ошибка загрузки файла');
+        }
+
+        const uploadData = await uploadResponse.json();
+        attachmentUrl = uploadData.url;
+        setUploading(false);
+      }
+
       const response = await fetch(SUPPORT_API, {
         method: 'POST',
         headers: {
@@ -66,7 +126,8 @@ export default function SupportPage() {
         body: JSON.stringify({
           email,
           subject,
-          message
+          message,
+          attachment_url: attachmentUrl
         })
       });
 
@@ -79,6 +140,7 @@ export default function SupportPage() {
         });
         setSubject('');
         setMessage('');
+        removeAttachment();
         loadTickets(email);
         setViewMode('tickets');
       } else {
@@ -92,6 +154,7 @@ export default function SupportPage() {
       });
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -205,8 +268,48 @@ export default function SupportPage() {
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
+              <div className="space-y-2">
+                <Label htmlFor="attachment">Прикрепить изображение (JPG, PNG)</Label>
+                <div className="flex items-center gap-3">
+                  <Input
+                    id="attachment"
+                    type="file"
+                    accept="image/jpeg,image/png"
+                    onChange={handleFileChange}
+                    className="cursor-pointer"
+                  />
+                  {attachmentFile && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={removeAttachment}
+                    >
+                      <Icon name="X" size={16} />
+                    </Button>
+                  )}
+                </div>
+                {attachmentPreview && (
+                  <div className="mt-3 relative inline-block">
+                    <img
+                      src={attachmentPreview}
+                      alt="Предпросмотр"
+                      className="max-w-xs rounded-lg border-2 border-primary/20"
+                    />
+                    <Badge className="absolute top-2 right-2 bg-primary">
+                      {attachmentFile?.name}
+                    </Badge>
+                  </div>
+                )}
+              </div>
+
+              <Button type="submit" className="w-full" disabled={loading || uploading}>
+                {uploading ? (
+                  <>
+                    <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                    Загрузка файла...
+                  </>
+                ) : loading ? (
                   <>
                     <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
                     Отправка...
@@ -264,6 +367,22 @@ export default function SupportPage() {
                     <p className="text-sm text-muted-foreground whitespace-pre-line bg-muted p-3 rounded-lg">
                       {ticket.message}
                     </p>
+                    {ticket.attachment_url && (
+                      <div className="mt-3">
+                        <a 
+                          href={ticket.attachment_url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-block"
+                        >
+                          <img
+                            src={ticket.attachment_url}
+                            alt="Прикрепленное изображение"
+                            className="max-w-sm rounded-lg border-2 border-primary/20 hover:border-primary/50 transition-colors cursor-pointer"
+                          />
+                        </a>
+                      </div>
+                    )}
                   </div>
 
                   {ticket.admin_response && (

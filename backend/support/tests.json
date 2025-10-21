@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "name": "Создание нового тикета",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "email": "user@example.com",
+        "subject": "Тестовый вопрос",
+        "message": "Это тестовое сообщение"
+      },
+      "expectedStatus": 200
+    }
+  ]
+}

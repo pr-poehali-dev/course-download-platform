@@ -12,6 +12,8 @@ import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import AuthDialog from '@/components/AuthDialog';
 import ProfileDialog from '@/components/ProfileDialog';
+import SupportPage from '@/components/SupportPage';
+import AdminPanel from '@/components/AdminPanel';
 
 const MOCK_WORKS = [
   {
@@ -150,6 +152,8 @@ export default function Index() {
               
               <nav className="hidden md:flex items-center gap-6">
                 <a href="#catalog" className="hover:text-primary transition-colors">Каталог</a>
+                <a href="#support" className="hover:text-primary transition-colors">Поддержка</a>
+                <a href="#admin" className="hover:text-primary transition-colors">Админка</a>
                 <a href="#about" className="hover:text-primary transition-colors">О платформе</a>
                 <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
               </nav>
@@ -609,6 +613,14 @@ export default function Index() {
               </div>
             </div>
           </div>
+        </section>
+
+        <section id="support" className="py-16 bg-muted/30">
+          <SupportPage />
+        </section>
+
+        <section id="admin" className="py-16">
+          <AdminPanel />
         </section>
 
         <section id="faq" className="py-16">

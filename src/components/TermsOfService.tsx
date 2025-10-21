@@ -220,17 +220,7 @@ export default function TermsOfService() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-muted-foreground">
-            <p>По всем вопросам, связанным с работой Платформы, обращайтесь:</p>
-            <ul className="list-none space-y-2">
-              <li className="flex items-center gap-2">
-                <Icon name="Mail" size={16} className="text-primary" />
-                Email: rekrutiw@yandex.ru
-              </li>
-              <li className="flex items-center gap-2">
-                <Icon name="MessageSquare" size={16} className="text-primary" />
-                Техническая поддержка на сайте
-              </li>
-            </ul>
+            <p>По всем вопросам, связанным с работой Платформы, обращайтесь через форму поддержки на сайте.</p>
           </CardContent>
         </Card>
       </div>

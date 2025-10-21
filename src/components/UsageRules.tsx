@@ -316,11 +316,8 @@ export default function UsageRules() {
 
         <div className="text-center p-6 bg-muted rounded-lg">
           <Icon name="Mail" size={32} className="mx-auto text-primary mb-3" />
-          <p className="text-muted-foreground mb-4">
-            Остались вопросы? Мы всегда готовы помочь!
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Свяжитесь с нами: <a href="mailto:rekrutiw@yandex.ru" className="text-primary hover:underline">rekrutiw@yandex.ru</a>
+          <p className="text-muted-foreground">
+            Остались вопросы? Свяжитесь с нами через форму поддержки на сайте.
           </p>
         </div>
       </div>

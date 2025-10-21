@@ -143,7 +143,7 @@ export default function PrivacyPolicy() {
               <li>Получить копию данных в машиночитаемом формате</li>
             </ul>
             <p className="mt-4">
-              Для реализации своих прав, пожалуйста, свяжитесь с нами по email: rekrutiw@yandex.ru
+              Для реализации своих прав, пожалуйста, свяжитесь с нами через форму поддержки на сайте.
             </p>
           </CardContent>
         </Card>
@@ -199,18 +199,8 @@ export default function PrivacyPolicy() {
           </CardHeader>
           <CardContent className="space-y-3 text-muted-foreground">
             <p>
-              По всем вопросам, связанным с обработкой персональных данных, вы можете обратиться:
+              По всем вопросам, связанным с обработкой персональных данных, вы можете обратиться через форму поддержки на сайте.
             </p>
-            <ul className="list-none space-y-2">
-              <li className="flex items-center gap-2">
-                <Icon name="Mail" size={16} className="text-primary" />
-                Email: rekrutiw@yandex.ru
-              </li>
-              <li className="flex items-center gap-2">
-                <Icon name="MessageSquare" size={16} className="text-primary" />
-                Форма обратной связи на сайте
-              </li>
-            </ul>
           </CardContent>
         </Card>
       </div>

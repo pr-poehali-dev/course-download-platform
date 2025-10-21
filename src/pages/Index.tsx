@@ -84,6 +84,8 @@ export default function Index() {
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   
   const [userBalance, setUserBalance] = useState(320);
+  
+  const availableWorks = MOCK_WORKS.filter(work => work.price <= userBalance).length;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -153,9 +155,16 @@ export default function Index() {
               </nav>
 
               <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
-                  <Icon name="Coins" size={20} className="text-primary" />
-                  <span className="font-semibold">{userBalance}</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+                    <Icon name="Coins" size={20} className="text-primary" />
+                    <span className="font-semibold">{userBalance}</span>
+                    <span className="text-xs text-muted-foreground">баллов</span>
+                  </div>
+                  <div className="text-xs text-center text-muted-foreground">
+                    <Icon name="CheckCircle" size={12} className="inline mr-1 text-green-600" />
+                    {availableWorks} работ доступно
+                  </div>
                 </div>
                 
                 <Dialog>

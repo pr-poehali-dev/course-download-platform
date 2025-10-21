@@ -165,10 +165,10 @@ export default function AdminPanel() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card className="gradient-purple-blue">
                   <CardHeader className="pb-2">
-                    <CardDescription className="text-white/80 flex items-center gap-2">
+                    <div className="text-white/80 flex items-center gap-2 text-sm">
                       <Icon name="FileText" size={18} />
                       Всего работ
-                    </CardDescription>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="text-4xl font-bold text-white mb-1">
@@ -182,10 +182,10 @@ export default function AdminPanel() {
 
                 <Card className="gradient-green-yellow">
                   <CardHeader className="pb-2">
-                    <CardDescription className="text-white/80 flex items-center gap-2">
+                    <div className="text-white/80 flex items-center gap-2 text-sm">
                       <Icon name="Users" size={18} />
                       Пользователи
-                    </CardDescription>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="text-4xl font-bold text-white mb-1">

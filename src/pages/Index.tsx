@@ -132,7 +132,7 @@ export default function Index() {
 
   return (
     <div className="min-h-screen" style={{
-      backgroundImage: `url('https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/430aec0a-67df-4312-9dec-dfd23d13d0d8.jpg')`,
+      backgroundImage: `url('https://cdn.poehali.dev/files/b1077a7b-9e1f-4fde-8ee3-c49a7a6cb6a0.PNG')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
@@ -173,17 +173,53 @@ export default function Index() {
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
-                      <Button onClick={() => handleBuyPoints(100)} className="justify-between">
-                        <span>100 баллов</span>
-                        <span>100 ₽</span>
+                      <Button onClick={() => handleBuyPoints(100)} className="justify-between h-auto py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                            <Icon name="Coins" size={24} className="text-primary" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-bold text-lg">100 баллов</p>
+                            <p className="text-sm text-muted-foreground">Стартовый пакет</p>
+                          </div>
+                        </div>
+                        <span className="text-xl font-bold">500 ₽</span>
                       </Button>
-                      <Button onClick={() => handleBuyPoints(500)} className="justify-between">
-                        <span>500 баллов</span>
-                        <span>450 ₽</span>
+                      <Button onClick={() => handleBuyPoints(300)} className="justify-between h-auto py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                            <Icon name="Coins" size={24} className="text-primary" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-bold text-lg">300 баллов</p>
+                            <p className="text-sm text-muted-foreground">Базовый пакет</p>
+                          </div>
+                        </div>
+                        <span className="text-xl font-bold">1500 ₽</span>
                       </Button>
-                      <Button onClick={() => handleBuyPoints(1000)} className="justify-between">
-                        <span>1000 баллов</span>
-                        <span>800 ₽</span>
+                      <Button onClick={() => handleBuyPoints(500)} className="justify-between h-auto py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                            <Icon name="Coins" size={24} className="text-primary" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-bold text-lg">500 баллов</p>
+                            <p className="text-sm text-muted-foreground">Популярный</p>
+                          </div>
+                        </div>
+                        <span className="text-xl font-bold">2500 ₽</span>
+                      </Button>
+                      <Button onClick={() => handleBuyPoints(1000)} className="justify-between h-auto py-4 bg-gradient-to-r from-primary to-primary/80">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                            <Icon name="Zap" size={24} className="text-white" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-bold text-lg">1000 баллов</p>
+                            <p className="text-sm opacity-90">Максимум выгоды</p>
+                          </div>
+                        </div>
+                        <span className="text-xl font-bold">5000 ₽</span>
                       </Button>
                     </div>
                   </DialogContent>

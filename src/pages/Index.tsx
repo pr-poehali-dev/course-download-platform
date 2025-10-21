@@ -14,6 +14,9 @@ import AuthDialog from '@/components/AuthDialog';
 import ProfileDialog from '@/components/ProfileDialog';
 import SupportPage from '@/components/SupportPage';
 import AdminPanel from '@/components/AdminPanel';
+import PrivacyPolicy from '@/components/PrivacyPolicy';
+import TermsOfService from '@/components/TermsOfService';
+import UsageRules from '@/components/UsageRules';
 
 const MOCK_WORKS = [
   {
@@ -623,6 +626,18 @@ export default function Index() {
           <AdminPanel />
         </section>
 
+        <section id="usage-rules" className="py-16 bg-muted/30">
+          <UsageRules />
+        </section>
+
+        <section id="privacy-policy" className="py-16">
+          <PrivacyPolicy />
+        </section>
+
+        <section id="terms-of-service" className="py-16 bg-muted/30">
+          <TermsOfService />
+        </section>
+
         <section id="faq" className="py-16">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="text-4xl font-bold text-center mb-12">Вопросы и ответы</h2>
@@ -713,16 +728,16 @@ export default function Index() {
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li><a href="#about" className="hover:text-primary transition-colors">О платформе</a></li>
                   <li><a href="#faq" className="hover:text-primary transition-colors">Вопросы и ответы</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Правила использования</a></li>
+                  <li><a href="#usage-rules" className="hover:text-primary transition-colors">Правила использования</a></li>
                 </ul>
               </div>
 
               <div>
                 <h4 className="font-semibold mb-4">Поддержка</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#" className="hover:text-primary transition-colors">Связаться с нами</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Политика конфиденциальности</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Пользовательское соглашение</a></li>
+                  <li><a href="#support" className="hover:text-primary transition-colors">Связаться с нами</a></li>
+                  <li><a href="#privacy-policy" className="hover:text-primary transition-colors">Политика конфиденциальности</a></li>
+                  <li><a href="#terms-of-service" className="hover:text-primary transition-colors">Пользовательское соглашение</a></li>
                 </ul>
               </div>
             </div>

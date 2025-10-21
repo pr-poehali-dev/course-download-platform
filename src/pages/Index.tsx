@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import AuthDialog from '@/components/AuthDialog';
+import ProfileDialog from '@/components/ProfileDialog';
 
 const MOCK_WORKS = [
   {
@@ -75,9 +77,27 @@ const MOCK_WORKS = [
 ];
 
 export default function Index() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  
   const [userBalance, setUserBalance] = useState(320);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const handleLogin = (user: string, userEmail: string) => {
+    setIsLoggedIn(true);
+    setUsername(user);
+    setEmail(userEmail);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setUsername('');
+    setEmail('');
+  };
 
   const handleBuyWork = (price: number, title: string) => {
     if (userBalance >= price) {
@@ -169,10 +189,17 @@ export default function Index() {
                   </DialogContent>
                 </Dialog>
 
-                <Button size="sm">
-                  <Icon name="User" size={16} className="mr-2" />
-                  Кабинет
-                </Button>
+                {isLoggedIn ? (
+                  <Button size="sm" onClick={() => setProfileDialogOpen(true)}>
+                    <Icon name="User" size={16} className="mr-2" />
+                    {username}
+                  </Button>
+                ) : (
+                  <Button size="sm" onClick={() => setAuthDialogOpen(true)}>
+                    <Icon name="LogIn" size={16} className="mr-2" />
+                    Войти
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -524,6 +551,21 @@ export default function Index() {
           </div>
         </footer>
       </div>
+
+      <AuthDialog 
+        open={authDialogOpen} 
+        onOpenChange={setAuthDialogOpen}
+        onLogin={handleLogin}
+      />
+
+      <ProfileDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        username={username}
+        email={email}
+        balance={userBalance}
+        onLogout={handleLogout}
+      />
     </div>
   );
 }

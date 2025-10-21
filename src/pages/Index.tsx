@@ -209,7 +209,7 @@ export default function Index() {
                         </div>
                         <span className="text-xl font-bold">2500 ₽</span>
                       </Button>
-                      <Button onClick={() => handleBuyPoints(1000)} className="justify-between h-auto py-4 gradient-premium animate-gradient hover:shadow-2xl transition-all duration-300 ring-2 ring-yellow-500/50">
+                      <Button onClick={() => handleBuyPoints(1000)} className="justify-between h-auto py-4 gradient-premium animate-gradient hover:shadow-2xl transition-all duration-300 ring-2 ring-blue-400/50">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
                             <Icon name="Zap" size={24} className="text-white" />

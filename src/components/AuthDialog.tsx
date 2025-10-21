@@ -79,7 +79,7 @@ export default function AuthDialog({ open, onOpenChange, onLogin }: AuthDialogPr
     onOpenChange(false);
     toast({
       title: 'Регистрация успешна!',
-      description: 'Добро пожаловать в StudyShare',
+      description: 'Добро пожаловать в Tech Forma',
     });
   };
 

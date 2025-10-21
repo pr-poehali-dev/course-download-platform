@@ -132,7 +132,7 @@ export default function Index() {
 
   return (
     <div className="min-h-screen" style={{
-      backgroundImage: `url('https://cdn.poehali.dev/files/3cef5c9e-1a52-48b8-8073-94b3b6c74a07.PNG')`,
+      backgroundImage: `url('https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/430aec0a-67df-4312-9dec-dfd23d13d0d8.jpg')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
@@ -142,8 +142,8 @@ export default function Index() {
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Icon name="GraduationCap" size={32} className="text-primary" />
-                <h1 className="text-2xl font-bold">StudyShare</h1>
+                <Icon name="Cpu" size={32} className="text-primary" />
+                <h1 className="text-2xl font-bold">Tech Forma</h1>
               </div>
               
               <nav className="hidden md:flex items-center gap-6">
@@ -509,11 +509,11 @@ export default function Index() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <Icon name="GraduationCap" size={28} className="text-primary" />
-                  <h3 className="font-bold text-lg">StudyShare</h3>
+                  <Icon name="Cpu" size={28} className="text-primary" />
+                  <h3 className="font-bold text-lg">Tech Forma</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Образовательная платформа для обмена студенческими работами
+                  Технологичная платформа для обмена студенческими работами
                 </p>
               </div>
 
@@ -546,7 +546,7 @@ export default function Index() {
             </div>
 
             <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
-              <p>© 2024 StudyShare. Все материалы предоставлены в ознакомительных целях.</p>
+              <p>© 2024 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
             </div>
           </div>
         </footer>

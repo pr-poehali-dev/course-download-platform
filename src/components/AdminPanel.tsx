@@ -199,10 +199,10 @@ export default function AdminPanel() {
 
                 <Card className="gradient-purple-pink">
                   <CardHeader className="pb-2">
-                    <CardDescription className="text-white/80 flex items-center gap-2">
+                    <div className="text-white/80 flex items-center gap-2 text-sm">
                       <Icon name="ShoppingCart" size={18} />
                       Покупки
-                    </CardDescription>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="text-4xl font-bold text-white mb-1">
@@ -216,10 +216,10 @@ export default function AdminPanel() {
 
                 <Card className="gradient-orange-red">
                   <CardHeader className="pb-2">
-                    <CardDescription className="text-white/80 flex items-center gap-2">
+                    <div className="text-white/80 flex items-center gap-2 text-sm">
                       <Icon name="Coins" size={18} />
                       Общая стоимость
-                    </CardDescription>
+                    </div>
                   </CardHeader>
                   <CardContent>
                     <div className="text-4xl font-bold text-white mb-1">

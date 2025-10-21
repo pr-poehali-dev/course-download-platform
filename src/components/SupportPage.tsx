@@ -347,7 +347,7 @@ export default function SupportPage() {
                     <CardTitle className="text-lg">{ticket.subject}</CardTitle>
                     {getStatusBadge(ticket.status)}
                   </div>
-                  <CardDescription className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Icon name="Calendar" size={14} />
                     {new Date(ticket.created_at).toLocaleDateString('ru-RU', {
                       day: 'numeric',
@@ -356,7 +356,7 @@ export default function SupportPage() {
                       hour: '2-digit',
                       minute: '2-digit'
                     })}
-                  </CardDescription>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>

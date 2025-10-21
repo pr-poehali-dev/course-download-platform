@@ -14,6 +14,7 @@ import AuthDialog from '@/components/AuthDialog';
 import ProfileDialog from '@/components/ProfileDialog';
 import SupportPage from '@/components/SupportPage';
 import AdminPanel from '@/components/AdminPanel';
+import TermsAcceptanceDialog from '@/components/TermsAcceptanceDialog';
 
 const MOCK_WORKS = [
   {
@@ -84,12 +85,30 @@ export default function Index() {
   const [email, setEmail] = useState('');
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
+  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+  const [pendingUser, setPendingUser] = useState({ username: '', email: '' });
   
   const [userBalance, setUserBalance] = useState(320);
   
   const availableWorks = MOCK_WORKS.filter(work => work.price <= userBalance).length;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+
+  const handleShowTerms = (user: string, userEmail: string) => {
+    setPendingUser({ username: user, email: userEmail });
+    setTermsDialogOpen(true);
+  };
+
+  const handleAcceptTerms = () => {
+    setIsLoggedIn(true);
+    setUsername(pendingUser.username);
+    setEmail(pendingUser.email);
+    setTermsDialogOpen(false);
+    toast({
+      title: 'Регистрация успешна!',
+      description: 'Добро пожаловать в Tech Forma',
+    });
+  };
 
   const handleLogin = (user: string, userEmail: string) => {
     setIsLoggedIn(true);
@@ -619,11 +638,7 @@ export default function Index() {
           <SupportPage />
         </section>
 
-        <section id="admin" className="py-16">
-          <AdminPanel />
-        </section>
-
-        <section id="faq" className="py-16 bg-muted/30">
+        <section id="faq" className="py-16">
           <div className="container mx-auto px-4 max-w-3xl">
             <h2 className="text-4xl font-bold text-center mb-12">Вопросы и ответы</h2>
             <div className="space-y-4">
@@ -686,6 +701,10 @@ export default function Index() {
           </div>
         </section>
 
+        <section id="admin" className="py-16 bg-muted/30">
+          <AdminPanel />
+        </section>
+
         <footer className="bg-muted/50 py-8 border-t">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -723,6 +742,7 @@ export default function Index() {
                   <li><a href="#support" className="hover:text-primary transition-colors">Связаться с нами</a></li>
                   <li><a href="/privacy-policy" className="hover:text-primary transition-colors">Политика конфиденциальности</a></li>
                   <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Пользовательское соглашение</a></li>
+                  <li><a href="#admin" className="hover:text-primary transition-colors">Админ-панель</a></li>
                 </ul>
               </div>
             </div>
@@ -738,6 +758,12 @@ export default function Index() {
         open={authDialogOpen} 
         onOpenChange={setAuthDialogOpen}
         onLogin={handleLogin}
+        onShowTerms={(user, email) => handleShowTerms(user, email)}
+      />
+
+      <TermsAcceptanceDialog
+        open={termsDialogOpen}
+        onAccept={handleAcceptTerms}
       />
 
       <ProfileDialog

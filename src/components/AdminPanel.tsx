@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -11,51 +11,65 @@ import WorkManager from '@/components/WorkManager';
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
 
 interface StatData {
-  totalVisits: number;
-  uniqueVisitors: number;
-  registeredUsers: number;
+  totalWorks: number;
+  totalUsers: number;
   totalPurchases: number;
-  revenue: number;
+  totalRevenue: number;
   popularWorks: Array<{
     id: number;
     title: string;
     purchases: number;
     revenue: number;
   }>;
-  recentActivity: Array<{
-    id: number;
-    type: 'visit' | 'register' | 'purchase';
-    description: string;
-    timestamp: string;
-  }>;
 }
-
-const MOCK_STATS: StatData = {
-  totalVisits: 15234,
-  uniqueVisitors: 8945,
-  registeredUsers: 1204,
-  totalPurchases: 3456,
-  revenue: 892450,
-  popularWorks: [
-    { id: 1, title: 'Разработка веб-приложения на React', purchases: 234, revenue: 117000 },
-    { id: 2, title: 'Проект системы водоснабжения', purchases: 189, revenue: 37800 },
-    { id: 3, title: 'Анализ рынка криптовалют 2024', purchases: 156, revenue: 23400 },
-    { id: 4, title: 'Исследование алгоритмов машинного обучения', purchases: 142, revenue: 63900 },
-    { id: 5, title: 'Маркетинговая стратегия для стартапа', purchases: 128, revenue: 15360 },
-  ],
-  recentActivity: [
-    { id: 1, type: 'purchase', description: 'Куплена работа "React приложение"', timestamp: '2 минуты назад' },
-    { id: 2, type: 'register', description: 'Новый пользователь: user@example.com', timestamp: '15 минут назад' },
-    { id: 3, type: 'visit', description: 'Новое посещение из Москвы', timestamp: '23 минуты назад' },
-    { id: 4, type: 'purchase', description: 'Куплена работа "Проект водоснабжения"', timestamp: '1 час назад' },
-    { id: 5, type: 'register', description: 'Новый пользователь: student@mail.ru', timestamp: '2 часа назад' },
-  ]
-};
 
 export default function AdminPanel() {
   const [adminEmail, setAdminEmail] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [stats] = useState<StatData>(MOCK_STATS);
+  const [stats, setStats] = useState<StatData>({
+    totalWorks: 0,
+    totalUsers: 0,
+    totalPurchases: 0,
+    totalRevenue: 0,
+    popularWorks: []
+  });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadStats();
+    }
+  }, [isAuthenticated]);
+
+  const loadStats = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413');
+      const data = await response.json();
+      
+      if (data.works) {
+        const totalWorks = data.works.length;
+        const totalRevenue = data.works.reduce((sum: number, w: any) => sum + (w.price || w.price_points || 0), 0);
+        
+        setStats({
+          totalWorks,
+          totalUsers: 0,
+          totalPurchases: 0,
+          totalRevenue,
+          popularWorks: data.works.slice(0, 5).map((w: any, idx: number) => ({
+            id: w.id || idx,
+            title: w.title,
+            purchases: 0,
+            revenue: w.price || w.price_points || 0
+          }))
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = () => {
     if (adminEmail === ADMIN_EMAIL) {
@@ -73,23 +87,7 @@ export default function AdminPanel() {
     }
   };
 
-  const getActivityIcon = (type: string) => {
-    switch (type) {
-      case 'purchase': return 'ShoppingCart';
-      case 'register': return 'UserPlus';
-      case 'visit': return 'Eye';
-      default: return 'Activity';
-    }
-  };
 
-  const getActivityColor = (type: string) => {
-    switch (type) {
-      case 'purchase': return 'text-green-600';
-      case 'register': return 'text-blue-600';
-      case 'visit': return 'text-purple-600';
-      default: return 'text-gray-600';
-    }
-  };
 
   if (!isAuthenticated) {
     return (
@@ -142,7 +140,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="overview">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Обзор
@@ -151,14 +149,6 @@ export default function AdminPanel() {
             <Icon name="Plus" size={18} className="mr-2" />
             Добавить работу
           </TabsTrigger>
-          <TabsTrigger value="sales">
-            <Icon name="TrendingUp" size={18} className="mr-2" />
-            Продажи
-          </TabsTrigger>
-          <TabsTrigger value="activity">
-            <Icon name="Activity" size={18} className="mr-2" />
-            Активность
-          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="add-work" className="space-y-6">
@@ -166,151 +156,109 @@ export default function AdminPanel() {
         </TabsContent>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="gradient-purple-blue">
-              <CardHeader className="pb-2">
-                <CardDescription className="text-white/80 flex items-center gap-2">
-                  <Icon name="Eye" size={18} />
-                  Всего посещений
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-1">
-                  {stats.totalVisits.toLocaleString('ru-RU')}
-                </div>
-                <p className="text-sm text-white/80">
-                  <Icon name="TrendingUp" size={14} className="inline mr-1" />
-                  +12% за месяц
-                </p>
-              </CardContent>
-            </Card>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Icon name="Loader2" size={48} className="animate-spin text-primary" />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="gradient-purple-blue">
+                  <CardHeader className="pb-2">
+                    <CardDescription className="text-white/80 flex items-center gap-2">
+                      <Icon name="FileText" size={18} />
+                      Всего работ
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-white mb-1">
+                      {stats.totalWorks}
+                    </div>
+                    <p className="text-sm text-white/80">
+                      В каталоге
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card className="gradient-green-yellow">
-              <CardHeader className="pb-2">
-                <CardDescription className="text-white/80 flex items-center gap-2">
-                  <Icon name="Users" size={18} />
-                  Уникальных посетителей
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-1">
-                  {stats.uniqueVisitors.toLocaleString('ru-RU')}
-                </div>
-                <p className="text-sm text-white/80">
-                  <Icon name="TrendingUp" size={14} className="inline mr-1" />
-                  +8% за месяц
-                </p>
-              </CardContent>
-            </Card>
+                <Card className="gradient-green-yellow">
+                  <CardHeader className="pb-2">
+                    <CardDescription className="text-white/80 flex items-center gap-2">
+                      <Icon name="Users" size={18} />
+                      Пользователи
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-white mb-1">
+                      {stats.totalUsers}
+                    </div>
+                    <p className="text-sm text-white/80">
+                      Зарегистрировано
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card className="gradient-purple-pink">
-              <CardHeader className="pb-2">
-                <CardDescription className="text-white/80 flex items-center gap-2">
-                  <Icon name="UserCheck" size={18} />
-                  Зарегистрировано
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-1">
-                  {stats.registeredUsers.toLocaleString('ru-RU')}
-                </div>
-                <p className="text-sm text-white/80">
-                  <Icon name="TrendingUp" size={14} className="inline mr-1" />
-                  +15% за месяц
-                </p>
-              </CardContent>
-            </Card>
+                <Card className="gradient-purple-pink">
+                  <CardHeader className="pb-2">
+                    <CardDescription className="text-white/80 flex items-center gap-2">
+                      <Icon name="ShoppingCart" size={18} />
+                      Покупки
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-white mb-1">
+                      {stats.totalPurchases}
+                    </div>
+                    <p className="text-sm text-white/80">
+                      Всего продано
+                    </p>
+                  </CardContent>
+                </Card>
 
-            <Card className="gradient-orange-red">
-              <CardHeader className="pb-2">
-                <CardDescription className="text-white/80 flex items-center gap-2">
-                  <Icon name="DollarSign" size={18} />
-                  Выручка
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-1">
-                  {stats.revenue.toLocaleString('ru-RU')} ₽
-                </div>
-                <p className="text-sm text-white/80">
-                  <Icon name="TrendingUp" size={14} className="inline mr-1" />
-                  +23% за месяц
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+                <Card className="gradient-orange-red">
+                  <CardHeader className="pb-2">
+                    <CardDescription className="text-white/80 flex items-center gap-2">
+                      <Icon name="Coins" size={18} />
+                      Общая стоимость
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-4xl font-bold text-white mb-1">
+                      {stats.totalRevenue}
+                    </div>
+                    <p className="text-sm text-white/80">
+                      Баллов в каталоге
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Конверсия посетителей</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Регистрация</span>
-                      <span className="text-sm text-muted-foreground">
-                        {((stats.registeredUsers / stats.uniqueVisitors) * 100).toFixed(1)}%
-                      </span>
+              {stats.popularWorks.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Работы в каталоге</CardTitle>
+                    <CardDescription>Последние добавленные работы</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {stats.popularWorks.map((work) => (
+                        <div key={work.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                              <Icon name="FileText" size={24} className="text-primary" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{work.title}</p>
+                              <p className="text-sm text-muted-foreground">{work.revenue} баллов</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all"
-                        style={{ width: `${(stats.registeredUsers / stats.uniqueVisitors) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span className="text-sm font-medium">Покупка</span>
-                      <span className="text-sm text-muted-foreground">
-                        {((stats.totalPurchases / stats.registeredUsers) * 100).toFixed(1)}%
-                      </span>
-                    </div>
-                    <div className="w-full bg-secondary rounded-full h-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full transition-all"
-                        style={{ width: `${(stats.totalPurchases / stats.registeredUsers) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Средние показатели</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Icon name="ShoppingBag" size={20} className="text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Средний чек</p>
-                        <p className="text-2xl font-bold">{Math.round(stats.revenue / stats.totalPurchases)} ₽</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <Icon name="User" size={20} className="text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground">Покупок на пользователя</p>
-                        <p className="text-2xl font-bold">{(stats.totalPurchases / stats.registeredUsers).toFixed(1)}</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                  </CardContent>
+                </Card>
+              )}
+            </>
+          )}
         </TabsContent>
 
         <TabsContent value="sales" className="space-y-6">

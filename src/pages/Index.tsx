@@ -253,11 +253,11 @@ export default function Index() {
               </div>
               
               <h2 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent animate-fade-in">
-                Учись эффективнее
+                Банк студенческих работ
               </h2>
               
               <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto animate-fade-in">
-                Находи готовые работы за секунды или зарабатывай на своих материалах
+                Покупай качественные материалы или продавай свои — всё в одном месте
               </p>
               
               <div className="max-w-2xl mx-auto relative animate-fade-in">

@@ -396,12 +396,12 @@ export default function Index() {
                         <CardTitle className="text-xl group-hover:text-primary transition-colors line-clamp-2">
                           {work.title}
                         </CardTitle>
-                        <CardDescription className="flex items-center gap-2 mt-2">
+                        <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
                           <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
                             <Icon name="BookMarked" size={16} className="text-primary" />
                           </div>
                           <span className="font-medium">{work.subject}</span>
-                        </CardDescription>
+                        </div>
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">

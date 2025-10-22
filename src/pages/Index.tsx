@@ -16,6 +16,12 @@ import SupportPage from '@/components/SupportPage';
 import AdminPanel from '@/components/AdminPanel';
 import TermsAcceptanceDialog from '@/components/TermsAcceptanceDialog';
 import PaymentDialog from '@/components/PaymentDialog';
+import CartDialog from '@/components/CartDialog';
+import FavoritesDialog from '@/components/FavoritesDialog';
+import PromoCodeDialog from '@/components/PromoCodeDialog';
+import ReferralDialog from '@/components/ReferralDialog';
+import BlogSection from '@/components/BlogSection';
+import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 
 const MOCK_WORKS = [
   {
@@ -88,7 +94,18 @@ export default function Index() {
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [cartDialogOpen, setCartDialogOpen] = useState(false);
+  const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false);
+  const [promoDialogOpen, setPromoDialogOpen] = useState(false);
+  const [referralDialogOpen, setReferralDialogOpen] = useState(false);
   const [pendingUser, setPendingUser] = useState({ username: '', email: '' });
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [favoriteItems, setFavoriteItems] = useState<any[]>([]);
+  const [purchases, setPurchases] = useState<any[]>([]);
+  const [activatedPromos, setActivatedPromos] = useState<string[]>([]);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(1000);
+  const [sortBy, setSortBy] = useState<string>('rating');
   
   const [userBalance, setUserBalance] = useState(320);
   
@@ -143,19 +160,83 @@ export default function Index() {
     setEmail('');
   };
 
-  const handleBuyWork = (price: number, title: string) => {
-    if (userBalance >= price) {
-      setUserBalance(userBalance - price);
+  const handleAddToCart = (work: any) => {
+    if (cartItems.find(item => item.id === work.id)) {
       toast({
-        title: 'Покупка успешна!',
-        description: `Работа "${title}" доступна в личном кабинете`,
-      });
-    } else {
-      toast({
-        title: 'Недостаточно баллов',
-        description: 'Пополните баланс для покупки',
+        title: 'Уже в корзине',
+        description: 'Эта работа уже добавлена в корзину',
         variant: 'destructive',
       });
+      return;
+    }
+    setCartItems([...cartItems, work]);
+    toast({
+      title: 'Добавлено в корзину',
+      description: work.title,
+    });
+  };
+
+  const handleRemoveFromCart = (id: number) => {
+    setCartItems(cartItems.filter(item => item.id !== id));
+  };
+
+  const handleCheckout = () => {
+    const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
+    if (userBalance >= totalPrice) {
+      setUserBalance(userBalance - totalPrice);
+      setPurchases([...purchases, ...cartItems.map(item => ({
+        ...item,
+        date: new Date().toLocaleDateString('ru-RU')
+      }))]);
+      
+      if (email) {
+        cartItems.forEach(item => {
+          notifyPurchaseSuccess(email, item.title);
+        });
+      }
+      
+      setCartItems([]);
+      toast({
+        title: 'Покупка успешна!',
+        description: `Куплено работ: ${cartItems.length}. Проверьте email.`,
+      });
+    }
+  };
+
+  const handleAddToFavorites = (work: any) => {
+    if (favoriteItems.find(item => item.id === work.id)) {
+      toast({
+        title: 'Уже в избранном',
+        description: 'Эта работа уже в списке избранного',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setFavoriteItems([...favoriteItems, work]);
+    toast({
+      title: 'Добавлено в избранное',
+      description: work.title,
+    });
+  };
+
+  const handleRemoveFromFavorites = (id: number) => {
+    setFavoriteItems(favoriteItems.filter(item => item.id !== id));
+  };
+
+  const handleApplyPromo = (bonus: number, code: string) => {
+    if (activatedPromos.includes(code)) {
+      toast({
+        title: 'Промокод уже использован',
+        description: 'Вы уже активировали этот промокод',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setUserBalance(userBalance + bonus);
+    setActivatedPromos([...activatedPromos, code]);
+    
+    if (email) {
+      notifyPromoActivated(email, code, bonus);
     }
   };
 
@@ -168,13 +249,22 @@ export default function Index() {
     work_type: w.type
   }));
 
-  const filteredWorks = worksToDisplay.filter((work) => {
-    const matchesSearch = work.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      work.subject.toLowerCase().includes(searchQuery.toLowerCase());
-    const workType = work.work_type || work.type;
-    const matchesCategory = selectedCategory === 'all' || workType === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredWorks = worksToDisplay
+    .filter((work) => {
+      const matchesSearch = work.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        work.subject.toLowerCase().includes(searchQuery.toLowerCase());
+      const workType = work.work_type || work.type;
+      const matchesCategory = selectedCategory === 'all' || workType === selectedCategory;
+      const matchesPrice = work.price >= minPrice && work.price <= maxPrice;
+      return matchesSearch && matchesCategory && matchesPrice;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
+      if (sortBy === 'price_asc') return a.price - b.price;
+      if (sortBy === 'price_desc') return b.price - a.price;
+      if (sortBy === 'popular') return (b.downloads || 0) - (a.downloads || 0);
+      return 0;
+    });
 
   return (
     <div className="min-h-screen" style={{
@@ -194,22 +284,44 @@ export default function Index() {
               
               <nav className="hidden md:flex items-center gap-6">
                 <a href="#catalog" className="hover:text-primary transition-colors">Каталог</a>
+                <a href="#blog" className="hover:text-primary transition-colors">Блог</a>
                 <a href="#support" className="hover:text-primary transition-colors">Поддержка</a>
                 <a href="#admin" className="hover:text-primary transition-colors">Админка</a>
-                <a href="#about" className="hover:text-primary transition-colors">О платформе</a>
-                <a href="#faq" className="hover:text-primary transition-colors">FAQ</a>
               </nav>
 
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="relative"
+                  onClick={() => setFavoritesDialogOpen(true)}
+                >
+                  <Icon name="Heart" size={20} className={favoriteItems.length > 0 ? 'text-red-500' : ''} />
+                  {favoriteItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {favoriteItems.length}
+                    </span>
+                  )}
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  className="relative"
+                  onClick={() => setCartDialogOpen(true)}
+                >
+                  <Icon name="ShoppingCart" size={20} />
+                  {cartItems.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartItems.length}
+                    </span>
+                  )}
+                </Button>
+                
                 <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full">
+                  <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full cursor-pointer" onClick={() => setPromoDialogOpen(true)}>
                     <Icon name="Coins" size={20} className="text-primary" />
                     <span className="font-semibold">{userBalance}</span>
-                    <span className="text-xs text-muted-foreground">баллов</span>
-                  </div>
-                  <div className="text-xs text-center text-muted-foreground">
-                    <Icon name="CheckCircle" size={12} className="inline mr-1 text-green-600" />
-                    {availableWorks} работ доступно
                   </div>
                 </div>
                 
@@ -360,6 +472,51 @@ export default function Index() {
               </TabsList>
 
               <TabsContent value="catalog">
+                <div className="mb-6 flex flex-wrap gap-4 items-center justify-between bg-muted/30 p-4 rounded-lg">
+                  <div className="flex gap-2 items-center">
+                    <Label className="text-sm">Сортировка:</Label>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="rating">По рейтингу</SelectItem>
+                        <SelectItem value="popular">По популярности</SelectItem>
+                        <SelectItem value="price_asc">Цена: по возрастанию</SelectItem>
+                        <SelectItem value="price_desc">Цена: по убыванию</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="flex gap-4 items-center">
+                    <div className="flex gap-2 items-center">
+                      <Label className="text-sm">Цена от:</Label>
+                      <Input 
+                        type="number" 
+                        className="w-24" 
+                        value={minPrice} 
+                        onChange={(e) => setMinPrice(Number(e.target.value))}
+                        min={0}
+                      />
+                    </div>
+                    <div className="flex gap-2 items-center">
+                      <Label className="text-sm">до:</Label>
+                      <Input 
+                        type="number" 
+                        className="w-24" 
+                        value={maxPrice} 
+                        onChange={(e) => setMaxPrice(Number(e.target.value))}
+                        min={0}
+                      />
+                    </div>
+                  </div>
+
+                  <Button variant="outline" size="sm" onClick={() => setPromoDialogOpen(true)}>
+                    <Icon name="Gift" size={16} className="mr-2" />
+                    Промокод
+                  </Button>
+                </div>
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredWorks.map((work, index) => {
                     const price = work.price_points || work.price;
@@ -428,13 +585,23 @@ export default function Index() {
                             <p className="text-xs text-muted-foreground">баллов</p>
                           </div>
                         </div>
-                        <Button 
-                          onClick={() => handleBuyWork(price, work.title)}
-                          className="group-hover:scale-105 transition-transform"
-                        >
-                          <Icon name="ShoppingCart" size={16} className="mr-2" />
-                          Купить
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button 
+                            variant="outline"
+                            size="icon"
+                            onClick={() => handleAddToFavorites(work)}
+                            className={favoriteItems.find(item => item.id === work.id) ? 'text-red-500' : ''}
+                          >
+                            <Icon name="Heart" size={16} />
+                          </Button>
+                          <Button 
+                            onClick={() => handleAddToCart(work)}
+                            className="group-hover:scale-105 transition-transform"
+                          >
+                            <Icon name="ShoppingCart" size={16} className="mr-2" />
+                            В корзину
+                          </Button>
+                        </div>
                       </CardFooter>
                     </Card>
                   )}
@@ -601,6 +768,8 @@ export default function Index() {
           </div>
         </section>
 
+        <BlogSection />
+
         <section id="support" className="py-16 bg-muted/30">
           <SupportPage />
         </section>
@@ -740,6 +909,8 @@ export default function Index() {
         email={email}
         balance={userBalance}
         onLogout={handleLogout}
+        purchases={purchases}
+        onOpenReferral={() => setReferralDialogOpen(true)}
       />
 
       <PaymentDialog
@@ -747,6 +918,35 @@ export default function Index() {
         onOpenChange={setPaymentDialogOpen}
         onSuccess={handlePaymentSuccess}
         userEmail={email}
+      />
+
+      <CartDialog
+        open={cartDialogOpen}
+        onOpenChange={setCartDialogOpen}
+        items={cartItems}
+        onRemoveItem={handleRemoveFromCart}
+        onCheckout={handleCheckout}
+        userBalance={userBalance}
+      />
+
+      <FavoritesDialog
+        open={favoritesDialogOpen}
+        onOpenChange={setFavoritesDialogOpen}
+        items={favoriteItems}
+        onRemoveItem={handleRemoveFromFavorites}
+        onAddToCart={handleAddToCart}
+      />
+
+      <PromoCodeDialog
+        open={promoDialogOpen}
+        onOpenChange={setPromoDialogOpen}
+        onApplyPromo={handleApplyPromo}
+      />
+
+      <ReferralDialog
+        open={referralDialogOpen}
+        onOpenChange={setReferralDialogOpen}
+        username={username}
       />
     </div>
   );

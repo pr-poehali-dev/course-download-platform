@@ -16,12 +16,11 @@ interface ProfileDialogProps {
   email: string;
   balance: number;
   onLogout: () => void;
+  purchases: any[];
+  onOpenReferral: () => void;
 }
 
-const MOCK_PURCHASES = [
-  { id: 1, title: 'Анализ рынка криптовалют 2024', date: '15.10.2024', price: 150 },
-  { id: 2, title: 'Расчет несущей способности балки', date: '12.10.2024', price: 80 },
-];
+
 
 const MOCK_UPLOADS = [
   { id: 1, title: 'Проектирование базы данных', downloads: 45, earned: 675 },
@@ -34,7 +33,9 @@ export default function ProfileDialog({
   username, 
   email, 
   balance,
-  onLogout 
+  onLogout,
+  purchases,
+  onOpenReferral
 }: ProfileDialogProps) {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ username, email });
@@ -67,7 +68,7 @@ export default function ProfileDialog({
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile">
               <Icon name="UserCircle" size={16} className="mr-2" />
               Профиль
@@ -79,6 +80,10 @@ export default function ProfileDialog({
             <TabsTrigger value="uploads">
               <Icon name="FileUp" size={16} className="mr-2" />
               Мои работы
+            </TabsTrigger>
+            <TabsTrigger value="referral">
+              <Icon name="Users" size={16} className="mr-2" />
+              Рефералы
             </TabsTrigger>
           </TabsList>
 
@@ -155,14 +160,20 @@ export default function ProfileDialog({
 
             <Card>
               <CardHeader>
-                <CardTitle>Безопасность</CardTitle>
-                <CardDescription>Управление паролем</CardDescription>
+                <CardTitle>Безопасность и бонусы</CardTitle>
+                <CardDescription>Управление аккаунтом</CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
-                  <Icon name="KeyRound" size={16} className="mr-2" />
-                  Изменить пароль
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button variant="outline" className="w-full">
+                    <Icon name="KeyRound" size={16} className="mr-2" />
+                    Пароль
+                  </Button>
+                  <Button variant="outline" className="w-full" onClick={onOpenReferral}>
+                    <Icon name="Users" size={16} className="mr-2" />
+                    Рефералка
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -180,10 +191,10 @@ export default function ProfileDialog({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold">История покупок</h3>
-                <Badge variant="secondary">{MOCK_PURCHASES.length} работ</Badge>
+                <Badge variant="secondary">{purchases.length} работ</Badge>
               </div>
 
-              {MOCK_PURCHASES.map((purchase) => (
+              {purchases.map((purchase) => (
                 <Card key={purchase.id}>
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
@@ -209,7 +220,7 @@ export default function ProfileDialog({
                 </Card>
               ))}
 
-              {MOCK_PURCHASES.length === 0 && (
+              {purchases.length === 0 && (
                 <div className="text-center py-12">
                   <Icon name="ShoppingBag" size={48} className="mx-auto text-muted-foreground mb-4" />
                   <p className="text-muted-foreground">Вы ещё не совершали покупок</p>
@@ -266,6 +277,24 @@ export default function ProfileDialog({
                 </div>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="referral" className="pt-4">
+            <Card className="bg-gradient-to-br from-primary/10 via-purple-500/10 to-pink-500/10">
+              <CardContent className="pt-6">
+                <div className="text-center space-y-4">
+                  <Icon name="Gift" size={48} className="mx-auto text-primary" />
+                  <h3 className="text-2xl font-bold">Реферальная программа</h3>
+                  <p className="text-muted-foreground">
+                    Приглашайте друзей и получайте <span className="font-bold text-primary">50 баллов</span> за каждого
+                  </p>
+                  <Button onClick={onOpenReferral} size="lg">
+                    <Icon name="Users" size={18} className="mr-2" />
+                    Открыть реферальную программу
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </DialogContent>

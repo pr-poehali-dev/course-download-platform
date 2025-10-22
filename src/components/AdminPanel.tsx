@@ -140,10 +140,14 @@ export default function AdminPanel() {
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="overview">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Обзор
+          </TabsTrigger>
+          <TabsTrigger value="seller-stats">
+            <Icon name="TrendingUp" size={18} className="mr-2" />
+            Статистика продавца
           </TabsTrigger>
           <TabsTrigger value="add-work">
             <Icon name="Plus" size={18} className="mr-2" />
@@ -153,6 +157,107 @@ export default function AdminPanel() {
 
         <TabsContent value="add-work" className="space-y-6">
           <WorkManager adminEmail={ADMIN_EMAIL} />
+        </TabsContent>
+
+        <TabsContent value="seller-stats" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card className="gradient-green-yellow">
+              <CardHeader className="pb-2">
+                <div className="text-white/80 flex items-center gap-2 text-sm">
+                  <Icon name="FileText" size={18} />
+                  Загружено работ
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-white mb-1">12</div>
+                <p className="text-sm text-white/80">В каталоге</p>
+              </CardContent>
+            </Card>
+
+            <Card className="gradient-purple-pink">
+              <CardHeader className="pb-2">
+                <div className="text-white/80 flex items-center gap-2 text-sm">
+                  <Icon name="Download" size={18} />
+                  Скачиваний
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-white mb-1">348</div>
+                <p className="text-sm text-white/80">Всего продаж</p>
+              </CardContent>
+            </Card>
+
+            <Card className="gradient-orange-red">
+              <CardHeader className="pb-2">
+                <div className="text-white/80 flex items-center gap-2 text-sm">
+                  <Icon name="Coins" size={18} />
+                  Заработано
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold text-white mb-1">5,220</div>
+                <p className="text-sm text-white/80">Баллов получено</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Популярные работы</CardTitle>
+              <CardDescription>Топ по количеству покупок</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {[
+                  { title: 'Проектирование базы данных', sales: 45, revenue: 675 },
+                  { title: 'Курсовая по менеджменту', sales: 38, revenue: 570 },
+                  { title: 'Анализ финансовых показателей', sales: 32, revenue: 480 },
+                  { title: 'Разработка мобильного приложения', sales: 28, revenue: 1400 }
+                ].map((work, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex-1">
+                      <p className="font-semibold">{work.title}</p>
+                      <p className="text-sm text-muted-foreground">{work.sales} продаж</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-primary flex items-center gap-1">
+                        <Icon name="Coins" size={16} />
+                        {work.revenue}
+                      </p>
+                      <p className="text-sm text-muted-foreground">баллов</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Динамика продаж</CardTitle>
+              <CardDescription>Последние 7 дней</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day, idx) => {
+                  const sales = Math.floor(Math.random() * 15) + 5;
+                  return (
+                    <div key={day} className="flex items-center gap-4">
+                      <span className="text-sm w-8 text-muted-foreground">{day}</span>
+                      <div className="flex-1 bg-muted rounded-full h-8 overflow-hidden">
+                        <div 
+                          className="bg-gradient-to-r from-primary to-purple-500 h-full flex items-center justify-end pr-2"
+                          style={{ width: `${(sales / 20) * 100}%` }}
+                        >
+                          <span className="text-xs text-white font-medium">{sales}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="overview" className="space-y-6">

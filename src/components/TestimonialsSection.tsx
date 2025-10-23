@@ -1,7 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const testimonials = [
   {
@@ -71,27 +72,25 @@ const testimonials = [
 ];
 
 export default function TestimonialsSection() {
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const cardWidth = 384;
-  const gap = 32;
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 3;
+  const totalPages = Math.ceil(testimonials.length / itemsPerPage);
 
-  useEffect(() => {
-    if (isPaused) return;
+  const displayedTestimonials = testimonials.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
 
-    const interval = setInterval(() => {
-      setScrollPosition(prev => {
-        const maxScroll = testimonials.length * (cardWidth + gap);
-        const newPosition = prev + 1;
-        return newPosition >= maxScroll ? 0 : newPosition;
-      });
-    }, 30);
+  const handleNext = () => {
+    setCurrentPage((prev) => (prev + 1) % totalPages);
+  };
 
-    return () => clearInterval(interval);
-  }, [isPaused]);
+  const handlePrev = () => {
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+  };
 
   return (
-    <section className="py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden">
+    <section className="py-20 bg-gradient-to-b from-muted/30 to-background">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <Badge variant="outline" className="mb-4 px-4 py-2">
@@ -104,53 +103,75 @@ export default function TestimonialsSection() {
           </p>
         </div>
 
-        <div 
-          className="relative"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          <div 
-            className="flex gap-8 transition-transform"
-            style={{ 
-              transform: `translateX(-${scrollPosition}px)`,
-              width: `${testimonials.length * 2 * (cardWidth + gap)}px`
-            }}
-          >
-            {[...testimonials, ...testimonials].map((testimonial, index) => (
-              <Card 
-                key={`${testimonial.id}-${index}`}
-                className="border-2 hover:border-primary/30 hover:shadow-xl transition-all hover:-translate-y-2 flex-shrink-0"
-                style={{ width: `${cardWidth}px` }}
-              >
-                <CardContent className="pt-6">
-                  <div className="flex items-center gap-1 mb-4">
-                    {Array.from({ length: testimonial.rating }).map((_, i) => (
-                      <Icon key={i} name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
-                    ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          {displayedTestimonials.map((testimonial, index) => (
+            <Card 
+              key={testimonial.id}
+              className="border-2 hover:border-primary/30 hover:shadow-xl transition-all hover:-translate-y-2 animate-fade-in"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-1 mb-4">
+                  {Array.from({ length: testimonial.rating }).map((_, i) => (
+                    <Icon key={i} name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
+                  ))}
+                </div>
+                
+                <p className="text-muted-foreground leading-relaxed mb-6 italic">
+                  "{testimonial.content}"
+                </p>
+                
+                <div className="flex items-center gap-3 pt-4 border-t">
+                  <img 
+                    src={testimonial.avatar} 
+                    alt={testimonial.name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                  <div>
+                    <p className="font-semibold">{testimonial.name}</p>
+                    <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                   </div>
-                  
-                  <p className="text-muted-foreground leading-relaxed mb-6 italic">
-                    "{testimonial.content}"
-                  </p>
-                  
-                  <div className="flex items-center gap-3 pt-4 border-t">
-                    <img 
-                      src={testimonial.avatar} 
-                      alt={testimonial.name}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div>
-                      <p className="font-semibold">{testimonial.name}</p>
-                      <p className="text-sm text-muted-foreground">{testimonial.role}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        <div className="text-center mt-12">
+        <div className="flex items-center justify-center gap-4 mt-12">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handlePrev}
+            className="rounded-full"
+          >
+            <Icon name="ChevronLeft" size={20} />
+          </Button>
+          
+          <div className="flex gap-2">
+            {Array.from({ length: totalPages }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentPage(index)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentPage 
+                    ? 'bg-primary w-8' 
+                    : 'bg-muted-foreground/30 hover:bg-muted-foreground/50'
+                }`}
+              />
+            ))}
+          </div>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleNext}
+            className="rounded-full"
+          >
+            <Icon name="ChevronRight" size={20} />
+          </Button>
+        </div>
+
+        <div className="text-center mt-8">
           <p className="text-muted-foreground">
             <Icon name="Users" size={16} className="inline mr-2" />
             Присоединяйся к растущему сообществу студентов

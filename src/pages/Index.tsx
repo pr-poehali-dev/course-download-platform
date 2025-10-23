@@ -288,7 +288,6 @@ export default function Index() {
                 <a href="#catalog" className="hover:text-primary transition-colors">Каталог</a>
                 <a href="#blog" className="hover:text-primary transition-colors">Блог</a>
                 <a href="#support" className="hover:text-primary transition-colors">Поддержка</a>
-                <a href="#admin" className="hover:text-primary transition-colors">Админка</a>
               </nav>
 
               <div className="flex items-center gap-2">
@@ -851,10 +850,6 @@ export default function Index() {
               </Card>
             </div>
           </div>
-        </section>
-
-        <section id="admin" className="py-16 bg-muted/30">
-          <AdminPanel />
         </section>
 
         <footer className="bg-muted/50 py-8 border-t">

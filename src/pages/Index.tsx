@@ -21,6 +21,8 @@ import FavoritesDialog from '@/components/FavoritesDialog';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
 import ReferralDialog from '@/components/ReferralDialog';
 import BlogSection from '@/components/BlogSection';
+import AboutSection from '@/components/AboutSection';
+import TestimonialsSection from '@/components/TestimonialsSection';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 
 const MOCK_WORKS = [
@@ -99,6 +101,7 @@ export default function Index() {
   const [promoDialogOpen, setPromoDialogOpen] = useState(false);
   const [referralDialogOpen, setReferralDialogOpen] = useState(false);
   const [pendingUser, setPendingUser] = useState({ username: '', email: '' });
+  const [isOriginalWork, setIsOriginalWork] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<any[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
@@ -679,9 +682,32 @@ export default function Index() {
                         </p>
                       </div>
                     </div>
+
+                    <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-lg border-2 border-primary/20">
+                      <input
+                        type="checkbox"
+                        id="original-work"
+                        checked={isOriginalWork}
+                        onChange={(e) => setIsOriginalWork(e.target.checked)}
+                        className="mt-1 w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
+                      />
+                      <div className="flex-1">
+                        <Label htmlFor="original-work" className="cursor-pointer font-semibold">
+                          Подтверждаю оригинальность работы
+                        </Label>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Я подтверждаю, что загружаемая работа является оригинальной и выполнена мной лично. 
+                          Работа не содержит плагиата и не нарушает авторские права третьих лиц.
+                        </p>
+                      </div>
+                    </div>
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full" size="lg">
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      disabled={!isOriginalWork}
+                    >
                       <Icon name="Upload" size={18} className="mr-2" />
                       Загрузить работу
                     </Button>
@@ -692,7 +718,9 @@ export default function Index() {
           </div>
         </section>
 
-        <section id="about" className="py-20 bg-gradient-to-b from-muted/50 to-background relative overflow-hidden">
+        <AboutSection />
+
+        <section id="how-it-works" className="py-20 bg-gradient-to-b from-muted/50 to-background relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDIiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
           
           <div className="container mx-auto px-4 relative z-10">
@@ -767,6 +795,8 @@ export default function Index() {
             </div>
           </div>
         </section>
+
+        <TestimonialsSection />
 
         <BlogSection />
 

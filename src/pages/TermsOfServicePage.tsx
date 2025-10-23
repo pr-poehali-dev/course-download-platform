@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
-import TermsOfService from '@/components/TermsOfService';
+import TermsOfService from '@/pages/TermsOfService';
 
 export default function TermsOfServicePage() {
   const navigate = useNavigate();
@@ -23,13 +23,11 @@ export default function TermsOfServicePage() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-16">
-        <TermsOfService />
-      </main>
+      <TermsOfService />
 
       <footer className="border-t py-8 mt-16">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 Студенческая биржа работ. Все права защищены.</p>
+          <p>© 2024 Tech Forma. Все права защищены.</p>
         </div>
       </footer>
     </div>

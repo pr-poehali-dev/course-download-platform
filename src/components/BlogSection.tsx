@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useNavigate } from 'react-router-dom';
 
 const BLOG_POSTS = [
   {
@@ -61,6 +62,8 @@ const BLOG_POSTS = [
 ];
 
 export default function BlogSection() {
+  const navigate = useNavigate();
+
   return (
     <section id="blog" className="py-16">
       <div className="container mx-auto px-4">
@@ -73,7 +76,11 @@ export default function BlogSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {BLOG_POSTS.map((post) => (
-            <Card key={post.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+            <Card 
+              key={post.id} 
+              className="hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => navigate(`/blog/${post.id}`)}
+            >
               <CardHeader>
                 <div className="flex items-start justify-between mb-3">
                   <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -96,7 +103,14 @@ export default function BlogSection() {
                       {post.readTime}
                     </span>
                   </div>
-                  <Button variant="ghost" size="sm">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/blog/${post.id}`);
+                    }}
+                  >
                     <Icon name="ArrowRight" size={16} />
                   </Button>
                 </div>

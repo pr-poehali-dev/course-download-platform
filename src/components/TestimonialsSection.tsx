@@ -72,10 +72,13 @@ const testimonials = [
 
 export default function TestimonialsSection() {
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const cardWidth = 384;
   const gap = 32;
 
   useEffect(() => {
+    if (isPaused) return;
+
     const interval = setInterval(() => {
       setScrollPosition(prev => {
         const maxScroll = testimonials.length * (cardWidth + gap);
@@ -85,7 +88,7 @@ export default function TestimonialsSection() {
     }, 30);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isPaused]);
 
   return (
     <section className="py-20 bg-gradient-to-b from-muted/30 to-background overflow-hidden">
@@ -101,7 +104,11 @@ export default function TestimonialsSection() {
           </p>
         </div>
 
-        <div className="relative">
+        <div 
+          className="relative"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           <div 
             className="flex gap-8 transition-transform"
             style={{ 

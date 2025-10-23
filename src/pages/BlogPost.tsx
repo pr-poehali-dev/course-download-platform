@@ -1,10 +1,8 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
 
 const BLOG_POSTS = {
   '1': {
@@ -1210,7 +1208,20 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
+      <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2">
+              <Icon name="GraduationCap" size={32} className="text-primary" />
+              <span className="text-2xl font-bold">StudHub</span>
+            </Link>
+            <Button onClick={() => navigate('/')} variant="outline">
+              <Icon name="Home" size={18} className="mr-2" />
+              На главную
+            </Button>
+          </div>
+        </div>
+      </header>
       
       <main className="container mx-auto px-4 py-12 max-w-4xl">
         <Button 
@@ -1254,7 +1265,18 @@ export default function BlogPost() {
         </div>
       </main>
 
-      <Footer />
+      <footer className="border-t py-8 bg-secondary/20">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-sm text-muted-foreground">
+            <p>© 2024 StudHub. Все права защищены</p>
+            <div className="flex justify-center gap-6 mt-4">
+              <Link to="/privacy-policy" className="hover:text-primary">Политика конфиденциальности</Link>
+              <Link to="/terms-of-service" className="hover:text-primary">Пользовательское соглашение</Link>
+              <Link to="/usage-rules" className="hover:text-primary">Правила использования</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

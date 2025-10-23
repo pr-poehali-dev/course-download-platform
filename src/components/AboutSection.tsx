@@ -68,12 +68,12 @@ export default function AboutSection() {
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
                 <Icon name="Coins" size={32} className="text-primary" />
               </div>
-              <CardTitle className="text-2xl">Честная монетизация</CardTitle>
+              <CardTitle className="text-2xl">Система обмена</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
                 Загружай свои качественные работы и получай баллы за каждое скачивание. 
-                Используй баллы для покупки других материалов или выводи их.
+                Используй заработанные баллы для доступа к другим материалам на платформе.
               </p>
             </CardContent>
           </Card>

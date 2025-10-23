@@ -683,18 +683,10 @@ export default function Index() {
 
 
                   </CardContent>
-                  <CardFooter className="flex-col gap-3">
-                    <div className="w-full p-4 bg-orange-50 border-l-4 border-orange-500 rounded text-sm">
-                      <p className="font-semibold text-orange-800 mb-2">⚠️ Юридическое предупреждение</p>
-                      <p className="text-orange-700 text-xs leading-relaxed">
-                        Загружая работу, вы принимаете на себя полную юридическую и финансовую ответственность 
-                        за её содержание согласно разделу 3 Пользовательского соглашения. Нарушение авторских прав 
-                        влечёт уголовную ответственность по ст. 146 УК РФ (до 6 лет лишения свободы).
-                      </p>
-                    </div>
+                  <CardFooter>
                     <Button className="w-full" size="lg">
                       <Icon name="Upload" size={18} className="mr-2" />
-                      Загрузить работу под своей ответственностью
+                      Загрузить работу
                     </Button>
                   </CardFooter>
                 </Card>

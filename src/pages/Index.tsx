@@ -101,7 +101,6 @@ export default function Index() {
   const [promoDialogOpen, setPromoDialogOpen] = useState(false);
   const [referralDialogOpen, setReferralDialogOpen] = useState(false);
   const [pendingUser, setPendingUser] = useState({ username: '', email: '' });
-  const [isOriginalWork, setIsOriginalWork] = useState(false);
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<any[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
@@ -683,33 +682,20 @@ export default function Index() {
                       </div>
                     </div>
 
-                    <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-lg border-2 border-primary/20">
-                      <input
-                        type="checkbox"
-                        id="original-work"
-                        checked={isOriginalWork}
-                        onChange={(e) => setIsOriginalWork(e.target.checked)}
-                        className="mt-1 w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"
-                      />
-                      <div className="flex-1">
-                        <Label htmlFor="original-work" className="cursor-pointer font-semibold">
-                          Подтверждаю оригинальность работы
-                        </Label>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          Я подтверждаю, что загружаемая работа является оригинальной и выполнена мной лично. 
-                          Работа не содержит плагиата и не нарушает авторские права третьих лиц.
-                        </p>
-                      </div>
-                    </div>
+
                   </CardContent>
-                  <CardFooter>
-                    <Button 
-                      className="w-full" 
-                      size="lg"
-                      disabled={!isOriginalWork}
-                    >
+                  <CardFooter className="flex-col gap-3">
+                    <div className="w-full p-4 bg-orange-50 border-l-4 border-orange-500 rounded text-sm">
+                      <p className="font-semibold text-orange-800 mb-2">⚠️ Юридическое предупреждение</p>
+                      <p className="text-orange-700 text-xs leading-relaxed">
+                        Загружая работу, вы принимаете на себя полную юридическую и финансовую ответственность 
+                        за её содержание согласно разделу 3 Пользовательского соглашения. Нарушение авторских прав 
+                        влечёт уголовную ответственность по ст. 146 УК РФ (до 6 лет лишения свободы).
+                      </p>
+                    </div>
+                    <Button className="w-full" size="lg">
                       <Icon name="Upload" size={18} className="mr-2" />
-                      Загрузить работу
+                      Загрузить работу под своей ответственностью
                     </Button>
                   </CardFooter>
                 </Card>

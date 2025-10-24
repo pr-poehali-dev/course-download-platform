@@ -36,6 +36,7 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
   const [files, setFiles] = useState<string[]>([]);
   const [currentFileUrl, setCurrentFileUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [confirmAuthorship, setConfirmAuthorship] = useState(false);
 
   const handleAddFile = () => {
     if (currentFileUrl.trim()) {
@@ -60,6 +61,15 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
       toast({
         title: 'Ошибка',
         description: 'Заполните все обязательные поля',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (!confirmAuthorship) {
+      toast({
+        title: 'Подтвердите авторство',
+        description: 'Необходимо подтвердить, что вы являетесь автором работы',
         variant: 'destructive'
       });
       return;
@@ -98,6 +108,7 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
           price_points: ''
         });
         setFiles([]);
+        setConfirmAuthorship(false);
         
         if (onWorkAdded) {
           onWorkAdded();
@@ -233,6 +244,22 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
                 ))}
               </div>
             )}
+          </div>
+
+          <div className="flex items-start gap-2 py-2 px-4 bg-primary/5 rounded-lg border border-primary/20">
+            <input
+              type="checkbox"
+              id="authorship-checkbox"
+              checked={confirmAuthorship}
+              onChange={(e) => setConfirmAuthorship(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-gray-300"
+            />
+            <label htmlFor="authorship-checkbox" className="text-sm leading-tight">
+              Я подтверждаю, что являюсь автором этой работы и несу ответственность за её содержание согласно{' '}
+              <a href="/terms-of-service" target="_blank" className="text-primary hover:underline font-medium">
+                Пользовательскому соглашению
+              </a>
+            </label>
           </div>
 
           <Button type="submit" className="w-full h-12 text-lg gradient-purple-blue" disabled={loading}>

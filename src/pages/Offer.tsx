@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 export default function Offer() {
@@ -7,6 +8,15 @@ export default function Offer() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16 max-w-4xl">
         <div className="mb-8">
+          <Button 
+            variant="ghost" 
+            className="mb-4"
+            onClick={() => window.history.back()}
+          >
+            <Icon name="ArrowLeft" size={18} className="mr-2" />
+            Назад
+          </Button>
+          
           <Badge variant="outline" className="mb-4">
             <Icon name="FileText" size={14} className="mr-2" />
             Договор-оферта

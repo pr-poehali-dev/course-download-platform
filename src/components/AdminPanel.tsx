@@ -7,6 +7,11 @@ import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import WorkManager from '@/components/WorkManager';
+import WorksManagement from '@/components/WorksManagement';
+import UsersManagement from '@/components/UsersManagement';
+import FinanceManagement from '@/components/FinanceManagement';
+import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import PlatformSettings from '@/components/PlatformSettings';
 
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
 const ADMIN_PASSWORD = 'stas221974';
@@ -152,24 +157,56 @@ export default function AdminPanel() {
         </Button>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">
+      <Tabs defaultValue="analytics" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="analytics">
             <Icon name="BarChart3" size={18} className="mr-2" />
-            Обзор
+            Аналитика
           </TabsTrigger>
-          <TabsTrigger value="seller-stats">
-            <Icon name="TrendingUp" size={18} className="mr-2" />
-            Статистика продавца
+          <TabsTrigger value="works">
+            <Icon name="FileText" size={18} className="mr-2" />
+            Работы
+          </TabsTrigger>
+          <TabsTrigger value="users">
+            <Icon name="Users" size={18} className="mr-2" />
+            Пользователи
+          </TabsTrigger>
+          <TabsTrigger value="finance">
+            <Icon name="Coins" size={18} className="mr-2" />
+            Финансы
           </TabsTrigger>
           <TabsTrigger value="add-work">
             <Icon name="Plus" size={18} className="mr-2" />
-            Добавить работу
+            Добавить
+          </TabsTrigger>
+          <TabsTrigger value="settings">
+            <Icon name="Settings" size={18} className="mr-2" />
+            Настройки
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="analytics" className="space-y-6">
+          <AnalyticsDashboard />
+        </TabsContent>
+
+        <TabsContent value="works" className="space-y-6">
+          <WorksManagement />
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-6">
+          <UsersManagement />
+        </TabsContent>
+
+        <TabsContent value="finance" className="space-y-6">
+          <FinanceManagement />
+        </TabsContent>
+
         <TabsContent value="add-work" className="space-y-6">
           <WorkManager adminEmail={ADMIN_EMAIL} />
+        </TabsContent>
+
+        <TabsContent value="settings" className="space-y-6">
+          <PlatformSettings />
         </TabsContent>
 
         <TabsContent value="seller-stats" className="space-y-6">

@@ -22,7 +22,7 @@ def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
 def get_yandex_disk_folders(public_key: str) -> List[Dict[str, Any]]:
-    """Получить список папок без загрузки файлов (быстрый импорт)"""
+    """Получить список папок с прямыми ссылками для скачивания"""
     url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
     params = {'public_key': public_key, 'limit': 1000}
     
@@ -36,10 +36,12 @@ def get_yandex_disk_folders(public_key: str) -> List[Dict[str, Any]]:
         for item in data['_embedded']['items']:
             if item['type'] == 'dir':
                 folder_name = item['name']
+                folder_public_url = item.get('public_url', '')
                 print(f"📁 Добавляю папку: {folder_name}")
                 
                 folders.append({
-                    'name': folder_name
+                    'name': folder_name,
+                    'public_url': folder_public_url
                 })
     
     print(f"📊 Итого папок для импорта: {len(folders)}")
@@ -171,8 +173,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if work_id:
                 cur.execute("""
                     SELECT id, title, work_type, subject, description, composition, 
-                           price_points, rating, downloads, created_at
-                    FROM works WHERE id = %s
+                           price_points, rating, downloads, created_at, yandex_disk_link
+                    FROM t_p63326274_course_download_plat.works WHERE id = %s
                 """, (work_id,))
                 row = cur.fetchone()
                 
@@ -193,12 +195,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'price_points': row[6],
                     'rating': float(row[7]) if row[7] else 0,
                     'downloads': row[8],
-                    'created_at': row[9].isoformat() if row[9] else None
+                    'created_at': row[9].isoformat() if row[9] else None,
+                    'yandex_disk_link': row[10]
                 }
                 
                 cur.execute("""
                     SELECT file_url, file_type, display_order
-                    FROM work_files WHERE work_id = %s ORDER BY display_order
+                    FROM t_p63326274_course_download_plat.work_files WHERE work_id = %s ORDER BY display_order
                 """, (work_id,))
                 
                 work['files'] = [
@@ -215,7 +218,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute("""
                     SELECT id, title, work_type, subject, description, 
                            price_points, rating, downloads
-                    FROM works ORDER BY created_at DESC
+                    FROM t_p63326274_course_download_plat.works ORDER BY created_at DESC
                 """)
                 
                 works = []
@@ -277,6 +280,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             try:
                 for folder in folders:
                     folder_name = folder['name']
+                    yandex_disk_link = folder.get('public_url', '')
                     
                     parsed = parse_work_title_and_type(folder_name)
                     title = parsed['title']
@@ -289,19 +293,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     try:
                         cur.execute("""
-                            INSERT INTO works (title, work_type, subject, description, composition, price_points)
-                            VALUES (%s, %s, %s, %s, %s, %s)
+                            INSERT INTO works (title, work_type, subject, description, composition, price_points, yandex_disk_link)
+                            VALUES (%s, %s, %s, %s, %s, %s, %s)
                             RETURNING id
-                        """, (title, work_type, subject, description, composition, price_points))
+                        """, (title, work_type, subject, description, composition, price_points, yandex_disk_link))
                         
                         work_id = cur.fetchone()[0]
                         conn.commit()
                         
                         print(f"✅ Создана работа ID={work_id}: {title}")
-                        
-
-                        
-                        conn.commit()
                         
                         imported.append({
                             'filename': folder_name,

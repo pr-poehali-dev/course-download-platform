@@ -12,6 +12,7 @@ from typing import Dict, Any
 
 PUBLIC_ID = os.environ.get('CLOUDPAYMENTS_PUBLIC_ID', '')
 API_SECRET = os.environ.get('CLOUDPAYMENTS_API_SECRET', '')
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')

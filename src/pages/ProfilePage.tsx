@@ -27,6 +27,7 @@ interface Purchase {
   price: number;
   date: string;
   downloadUrl: string;
+  yandexDiskLink?: string;
 }
 
 interface Upload {
@@ -380,10 +381,19 @@ export default function ProfilePage() {
                           </span>
                         </div>
                       </div>
-                      <Button size="sm">
-                        <Icon name="Download" size={16} className="mr-2" />
-                        Скачать
-                      </Button>
+                      {purchase.yandexDiskLink ? (
+                        <Button size="sm" asChild>
+                          <a href={purchase.yandexDiskLink} target="_blank" rel="noopener noreferrer">
+                            <Icon name="Download" size={16} className="mr-2" />
+                            Скачать с Яндекс.Диска
+                          </a>
+                        </Button>
+                      ) : (
+                        <Button size="sm" disabled>
+                          <Icon name="Download" size={16} className="mr-2" />
+                          Ссылка недоступна
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>

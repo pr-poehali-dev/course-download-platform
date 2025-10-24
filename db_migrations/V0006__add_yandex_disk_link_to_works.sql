@@ -1,0 +1,1 @@
+ALTER TABLE works ADD COLUMN yandex_disk_link TEXT;

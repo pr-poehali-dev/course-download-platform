@@ -66,7 +66,7 @@ export default function PrivacyPolicy() {
                   <Icon name="User" size={16} className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-foreground">Регистрационные данные</p>
-                    <p className="text-sm">Имя пользователя, адрес электронной почты, пароль (в зашифрованном виде)</p>
+                    <p className="text-sm">Никнейм пользователя, адрес электронной почты, пароль (в зашифрованном виде)</p>
                   </div>
                 </div>
                 
@@ -74,7 +74,7 @@ export default function PrivacyPolicy() {
                   <Icon name="CreditCard" size={16} className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-foreground">Платежная информация</p>
-                    <p className="text-sm">Данные о транзакциях, история покупок баллов (данные карт обрабатываются платежными системами)</p>
+                    <p className="text-sm">Данные о транзакциях, история покупок баллов. Данные банковских карт НЕ хранятся на наших серверах и обрабатываются только платежной системой CloudPayments</p>
                   </div>
                 </div>
                 
@@ -90,7 +90,7 @@ export default function PrivacyPolicy() {
                   <Icon name="Laptop" size={16} className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-foreground">Технические данные</p>
-                    <p className="text-sm">IP-адрес, тип браузера, операционная система, данные cookies</p>
+                    <p className="text-sm">IP-адрес, тип браузера, операционная система, данные cookies (для работы сайта)</p>
                   </div>
                 </div>
               </div>

@@ -34,22 +34,22 @@ def get_yandex_disk_folders(public_key: str) -> List[Dict[str, Any]]:
         for item in data['_embedded']['items']:
             if item['type'] == 'dir':
                 folder_name = item['name']
-                folder_key = item['public_key']
+                folder_path = item['path']
                 
-                folder_files = get_files_in_folder(folder_key)
+                folder_files = get_files_in_folder(public_key, folder_path)
                 
                 folders.append({
                     'name': folder_name,
-                    'public_key': folder_key,
+                    'path': folder_path,
                     'files': folder_files
                 })
     
     return folders
 
-def get_files_in_folder(folder_public_key: str) -> List[Dict[str, Any]]:
-    """Получить все файлы из конкретной папки"""
+def get_files_in_folder(public_key: str, folder_path: str) -> List[Dict[str, Any]]:
+    """Получить все файлы из конкретной папки по пути"""
     url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
-    params = {'public_key': folder_public_key, 'limit': 1000}
+    params = {'public_key': public_key, 'path': folder_path, 'limit': 1000}
     
     response = requests.get(url, params=params)
     data = response.json()
@@ -58,19 +58,23 @@ def get_files_in_folder(folder_public_key: str) -> List[Dict[str, Any]]:
     if '_embedded' in data and 'items' in data['_embedded']:
         for item in data['_embedded']['items']:
             if item['type'] == 'file':
-                file_url = item.get('file')
-                if not file_url:
-                    download_url = f"https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key={folder_public_key}&path={item['path']}"
-                    dl_response = requests.get(download_url)
+                file_path = item['path']
+                download_url_endpoint = f"https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key={public_key}&path={file_path}"
+                
+                try:
+                    dl_response = requests.get(download_url_endpoint)
                     dl_data = dl_response.json()
                     file_url = dl_data.get('href', '')
-                
-                files.append({
-                    'name': item['name'],
-                    'download_url': file_url,
-                    'mime_type': item.get('mime_type', ''),
-                    'size': item.get('size', 0)
-                })
+                    
+                    if file_url:
+                        files.append({
+                            'name': item['name'],
+                            'download_url': file_url,
+                            'mime_type': item.get('mime_type', ''),
+                            'size': item.get('size', 0)
+                        })
+                except Exception as e:
+                    pass
     
     return files
 

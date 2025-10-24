@@ -12,6 +12,10 @@ import UsersManagement from '@/components/UsersManagement';
 import FinanceManagement from '@/components/FinanceManagement';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import PlatformSettings from '@/components/PlatformSettings';
+import YandexDiskImport from '@/components/YandexDiskImport';
+import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import PlatformSettings from '@/components/PlatformSettings';
+import YandexDiskImport from '@/components/YandexDiskImport';
 
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
 const ADMIN_PASSWORD = 'stas221974';
@@ -158,7 +162,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs defaultValue="analytics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="analytics">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Аналитика
@@ -166,6 +170,10 @@ export default function AdminPanel() {
           <TabsTrigger value="works">
             <Icon name="FileText" size={18} className="mr-2" />
             Работы
+          </TabsTrigger>
+          <TabsTrigger value="import">
+            <Icon name="CloudDownload" size={18} className="mr-2" />
+            Импорт
           </TabsTrigger>
           <TabsTrigger value="users">
             <Icon name="Users" size={18} className="mr-2" />
@@ -191,6 +199,10 @@ export default function AdminPanel() {
 
         <TabsContent value="works" className="space-y-6">
           <WorksManagement />
+        </TabsContent>
+
+        <TabsContent value="import" className="space-y-6">
+          <YandexDiskImport />
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">

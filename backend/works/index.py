@@ -278,7 +278,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     title = parsed['title']
                     work_type = parsed['work_type']
                     
-                    docx_files = [f for f in folder_files if f['name'].lower().endswith('.docx')]
+                    docx_files = [f for f in folder_files if f['name'].lower().endswith(('.docx', '.doc'))]
                     image_files = [f for f in folder_files if f['name'].lower().endswith(('.jpg', '.jpeg', '.png'))]
                     pdf_files = [f for f in folder_files if f['name'].lower().endswith('.pdf')]
                     dwg_files = [f for f in folder_files if f['name'].lower().endswith('.dwg')]

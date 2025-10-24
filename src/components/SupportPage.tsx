@@ -32,6 +32,7 @@ export default function SupportPage() {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'form' | 'tickets'>('form');
+  const [agreeToPrivacy, setAgreeToPrivacy] = useState(false);
 
   const loadTickets = async (userEmail: string) => {
     if (!userEmail) return;
@@ -94,6 +95,15 @@ export default function SupportPage() {
       return;
     }
 
+    if (!agreeToPrivacy) {
+      toast({
+        title: 'Ошибка',
+        description: 'Необходимо согласие на обработку персональных данных',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -140,6 +150,7 @@ export default function SupportPage() {
         });
         setSubject('');
         setMessage('');
+        setAgreeToPrivacy(false);
         removeAttachment();
         loadTickets(email);
         setViewMode('tickets');
@@ -301,6 +312,22 @@ export default function SupportPage() {
                     </Badge>
                   </div>
                 )}
+              </div>
+
+              <div className="flex items-start gap-2 py-2">
+                <input
+                  type="checkbox"
+                  id="support-privacy-checkbox"
+                  checked={agreeToPrivacy}
+                  onChange={(e) => setAgreeToPrivacy(e.target.checked)}
+                  className="mt-1 h-4 w-4 rounded border-gray-300"
+                />
+                <label htmlFor="support-privacy-checkbox" className="text-xs text-muted-foreground leading-tight">
+                  Я согласен на обработку персональных данных в соответствии с{' '}
+                  <a href="/privacy-policy" target="_blank" className="text-primary hover:underline">
+                    Политикой конфиденциальности
+                  </a>
+                </label>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading || uploading}>

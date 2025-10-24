@@ -11,9 +11,9 @@ export default function AboutSection() {
             <Icon name="Info" size={14} className="mr-2" />
             О платформе
           </Badge>
-          <h2 className="text-5xl font-bold mb-4">Tech Forma — платформа для студентов</h2>
+          <h2 className="text-5xl font-bold mb-4">Платформа обмена знаниями</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Мы создали экосистему, где студенты могут обмениваться качественными работами и зарабатывать на своих знаниях
+            Студенты помогают друг другу — делятся работами и получают доступ к материалам для обучения
           </p>
         </div>
 
@@ -27,8 +27,8 @@ export default function AboutSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
-                Сделать качественные образовательные материалы доступными каждому студенту. 
-                Мы верим, что взаимопомощь и обмен знаниями — ключ к успешному обучению.
+                Помогать студентам учиться эффективнее через обмен материалами. 
+                Платформа работает как база референсных работ для обучения.
               </p>
             </CardContent>
           </Card>
@@ -72,8 +72,8 @@ export default function AboutSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
-                Загружай свои качественные работы и получай баллы за каждое скачивание. 
-                Используй заработанные баллы для доступа к другим материалам на платформе.
+                Поделись работой — получи баллы. Или купи баллы, чтобы получить 
+                доступ к материалам других студентов для обучения.
               </p>
             </CardContent>
           </Card>

@@ -365,11 +365,11 @@ export default function Index() {
               </div>
               
               <h2 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent animate-fade-in">
-                Банк студенческих работ
+                Обмен студенческими работами
               </h2>
               
               <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto animate-fade-in">
-                Готовые курсовые, дипломы и чертежи для студентов технических специальностей
+                Делись работами и получай доступ к материалам других студентов
               </p>
               
               <div className="max-w-2xl mx-auto relative animate-fade-in">
@@ -737,11 +737,11 @@ export default function Index() {
                     <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform">
                       <Icon name="Search" size={40} className="text-primary" />
                     </div>
-                    <CardTitle className="text-2xl">Найди работу</CardTitle>
+                    <CardTitle className="text-2xl">Найди нужное</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground leading-relaxed">
-                      Используй умный поиск и фильтры по категориям, чтобы найти нужную курсовую, диплом или чертёж
+                      Используй поиск по предмету и типу работы — найди материалы для обучения
                     </p>
                   </CardContent>
                 </Card>
@@ -756,11 +756,11 @@ export default function Index() {
                     <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform">
                       <Icon name="Coins" size={40} className="text-primary" />
                     </div>
-                    <CardTitle className="text-2xl">Купи баллы</CardTitle>
+                    <CardTitle className="text-2xl">Получи баллы</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground leading-relaxed">
-                      Пополни баланс баллами удобным способом и используй их для покупки любых работ
+                      Загрузи свою работу или купи баллы — используй для доступа к материалам
                     </p>
                   </CardContent>
                 </Card>
@@ -775,11 +775,11 @@ export default function Index() {
                     <div className="w-20 h-20 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center mx-auto mb-4 transform hover:scale-110 transition-transform">
                       <Icon name="Download" size={40} className="text-primary" />
                     </div>
-                    <CardTitle className="text-2xl">Скачай материал</CardTitle>
+                    <CardTitle className="text-2xl">Используй материалы</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground leading-relaxed">
-                      Получи мгновенный доступ к работе и скачай файл в удобном формате прямо сейчас
+                      Получи доступ к работе за баллы и используй для обучения
                     </p>
                   </CardContent>
                 </Card>
@@ -809,7 +809,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Баллы используются для доступа к работам. Чем больше баллов, тем больше качественных материалов вы сможете изучить и использовать для своих проектов.
+                    Загрузи свою работу — получи баллы бесплатно. Или купи баллы, чтобы получить доступ к материалам других студентов для обучения.
                   </p>
                 </CardContent>
               </Card>
@@ -837,7 +837,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Перейдите на вкладку "Загрузить работу", заполните информацию, установите цену и загрузите файл. После модерации работа появится в каталоге.
+                    Нажми "Загрузить работу", заполни описание, выбери цену в баллах и загрузи файл. После проверки работа станет доступна другим студентам.
                   </p>
                 </CardContent>
               </Card>

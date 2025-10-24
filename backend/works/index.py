@@ -16,19 +16,42 @@ from io import BytesIO
 from PIL import Image
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
-YANDEX_DISK_TOKEN = os.environ.get('YANDEX_DISK_TOKEN', '')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
-def get_yandex_disk_files(public_key: str) -> List[Dict[str, Any]]:
-    """Получить список файлов из публичной папки Яндекс.Диска"""
+def get_yandex_disk_folders(public_key: str) -> List[Dict[str, Any]]:
+    """Рекурсивно получить все папки и файлы из публичной папки Яндекс.Диска"""
     url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
-    headers = {'Authorization': f'OAuth {YANDEX_DISK_TOKEN}'}
     params = {'public_key': public_key, 'limit': 1000}
     
-    response = requests.get(url, headers=headers, params=params)
+    response = requests.get(url, params=params)
+    data = response.json()
+    
+    folders = []
+    if '_embedded' in data and 'items' in data['_embedded']:
+        for item in data['_embedded']['items']:
+            if item['type'] == 'dir':
+                folder_name = item['name']
+                folder_key = item['public_key']
+                
+                folder_files = get_files_in_folder(folder_key)
+                
+                folders.append({
+                    'name': folder_name,
+                    'public_key': folder_key,
+                    'files': folder_files
+                })
+    
+    return folders
+
+def get_files_in_folder(public_key: str) -> List[Dict[str, Any]]:
+    """Получить все файлы из конкретной папки"""
+    url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
+    params = {'public_key': public_key, 'limit': 1000}
+    
+    response = requests.get(url, params=params)
     data = response.json()
     
     files = []
@@ -37,13 +60,38 @@ def get_yandex_disk_files(public_key: str) -> List[Dict[str, Any]]:
             if item['type'] == 'file':
                 files.append({
                     'name': item['name'],
-                    'path': item['path'],
                     'download_url': item['file'],
                     'mime_type': item.get('mime_type', ''),
                     'size': item.get('size', 0)
                 })
     
     return files
+
+def parse_work_title_and_type(folder_name: str) -> Dict[str, str]:
+    """Извлечь название и тип работы из названия папки"""
+    work_type_map = {
+        'курсовая': 'курсовая',
+        'диплом': 'диплом',
+        'реферат': 'реферат',
+        'чертеж': 'чертеж',
+        'лабораторная': 'лабораторная',
+        'контрольная': 'контрольная'
+    }
+    
+    match = re.search(r'\(([^)]+)\)', folder_name)
+    work_type = 'другое'
+    
+    if match:
+        type_text = match.group(1).lower()
+        for key, value in work_type_map.items():
+            if key in type_text:
+                work_type = value
+                break
+        title = folder_name.replace(match.group(0), '').strip()
+    else:
+        title = folder_name
+    
+    return {'title': title, 'work_type': work_type}
 
 def download_file(url: str) -> bytes:
     """Скачать файл по URL"""
@@ -53,58 +101,35 @@ def download_file(url: str) -> bytes:
 def extract_text_from_docx(content: bytes) -> str:
     """Извлечь текст из DOCX файла"""
     doc = Document(BytesIO(content))
-    text = '\n'.join([para.text for para in doc.paragraphs])
+    text = '\n'.join([para.text for para in doc.paragraphs if para.text.strip()])
     return text
 
-def generate_description(text: str, filename: str) -> Dict[str, Any]:
+def generate_description_from_text(text: str, title: str, work_type: str) -> Dict[str, Any]:
     """Сгенерировать описание работы через OpenAI"""
     client = OpenAI(api_key=OPENAI_API_KEY)
     
     prompt = f"""Проанализируй студенческую работу и верни JSON:
 {{
-  "title": "краткое название работы",
-  "work_type": "реферат/курсовая/диплом/чертеж/лабораторная",
-  "subject": "предмет (физика, математика и т.д.)",
-  "description": "описание 2-3 предложения",
-  "composition": "состав работы (введение, главы, заключение)",
-  "price_points": число от 50 до 800 (баллы за работу)
+  "subject": "предмет работы (физика, математика, программирование и т.д.)",
+  "description": "описание работы 2-3 предложения о чем работа",
+  "composition": "состав работы (введение, главы, заключение, список литературы и т.д.)",
+  "price_points": число от 50 до 800 (баллы за работу в зависимости от объема и сложности)
 }}
 
-Файл: {filename}
-Текст: {text[:3000]}
+Название: {title}
+Тип работы: {work_type}
+Текст работы (начало): {text[:3000]}
 """
     
     response = client.chat.completions.create(
-        model='gpt-3.5-turbo',
+        model='gpt-4o-mini',
         messages=[{'role': 'user', 'content': prompt}],
-        temperature=0.7
+        temperature=0.7,
+        response_format={"type": "json_object"}
     )
     
     result = json.loads(response.choices[0].message.content)
     return result
-
-def process_image(content: bytes, filename: str) -> Dict[str, Any]:
-    """Обработать изображение чертежа"""
-    img = Image.open(BytesIO(content))
-    
-    work_type = 'чертеж'
-    subject = 'инженерная графика'
-    
-    if 'электр' in filename.lower():
-        subject = 'электротехника'
-    elif 'машин' in filename.lower() or 'механ' in filename.lower():
-        subject = 'машиностроение'
-    elif 'строит' in filename.lower():
-        subject = 'строительство'
-    
-    return {
-        'title': filename.replace('.jpg', '').replace('.png', '').replace('_', ' '),
-        'work_type': work_type,
-        'subject': subject,
-        'description': f'Чертеж {subject}. Формат: {img.format}, Размер: {img.size[0]}x{img.size[1]}px',
-        'composition': 'Чертеж в графическом формате',
-        'price_points': 100
-    }
 
 def save_file_to_storage(content: bytes, filename: str) -> str:
     """Сохранить файл (заглушка - в реальности загрузка в S3)"""
@@ -220,9 +245,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         action = body_data.get('action')
         
         if action == 'import':
-            public_key = body_data.get('public_key', 'https://disk.yandex.ru/d/dQBBqvLRShUD6A')
+            public_key = body_data.get('public_key')
             
-            files = get_yandex_disk_files(public_key)
+            if not public_key:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'public_key required'})
+                }
+            
+            folders = get_yandex_disk_folders(public_key)
             
             imported = []
             errors = []
@@ -231,55 +263,82 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur = conn.cursor()
             
             try:
-                for file_info in files:
-                    try:
-                        content = download_file(file_info['download_url'])
-                        
-                        if file_info['mime_type'].startswith('application/vnd.openxmlformats'):
+                for folder in folders:
+                    folder_name = folder['name']
+                    folder_files = folder['files']
+                    
+                    parsed = parse_work_title_and_type(folder_name)
+                    title = parsed['title']
+                    work_type = parsed['work_type']
+                    
+                    docx_files = [f for f in folder_files if f['name'].endswith('.docx')]
+                    image_files = [f for f in folder_files if f['name'].lower().endswith(('.jpg', '.jpeg', '.png'))]
+                    
+                    if not docx_files:
+                        errors.append({
+                            'filename': folder_name,
+                            'error': 'Нет DOCX файлов в папке'
+                        })
+                        continue
+                    
+                    all_text = ''
+                    for docx_file in docx_files:
+                        try:
+                            content = download_file(docx_file['download_url'])
                             text = extract_text_from_docx(content)
-                            work_data = generate_description(text, file_info['name'])
-                            file_url = save_file_to_storage(content, file_info['name'])
-                            file_type = 'document'
-                        elif file_info['mime_type'].startswith('image/'):
-                            work_data = process_image(content, file_info['name'])
-                            file_url = save_file_to_storage(content, file_info['name'])
-                            file_type = 'image'
-                        else:
-                            continue
+                            all_text += text + '\n\n'
+                        except Exception as e:
+                            pass
+                    
+                    if not all_text.strip():
+                        errors.append({
+                            'filename': folder_name,
+                            'error': 'Не удалось извлечь текст из DOCX'
+                        })
+                        continue
+                    
+                    try:
+                        ai_data = generate_description_from_text(all_text, title, work_type)
+                        
+                        subject = ai_data.get('subject', 'общий')
+                        description = ai_data.get('description', '')
+                        composition = ai_data.get('composition', '')
+                        price_points = ai_data.get('price_points', 100)
                         
                         cur.execute("""
                             INSERT INTO works (title, work_type, subject, description, composition, price_points)
                             VALUES (%s, %s, %s, %s, %s, %s)
                             RETURNING id
-                        """, (
-                            work_data['title'],
-                            work_data['work_type'],
-                            work_data['subject'],
-                            work_data['description'],
-                            work_data['composition'],
-                            work_data['price_points']
-                        ))
+                        """, (title, work_type, subject, description, composition, price_points))
                         
                         work_id = cur.fetchone()[0]
                         
-                        cur.execute("""
-                            INSERT INTO work_files (work_id, file_url, file_type, display_order)
-                            VALUES (%s, %s, %s, %s)
-                        """, (work_id, file_url, file_type, 0))
+                        for idx, img_file in enumerate(image_files[:5]):
+                            try:
+                                img_content = download_file(img_file['download_url'])
+                                file_url = save_file_to_storage(img_content, img_file['name'])
+                                
+                                cur.execute("""
+                                    INSERT INTO work_files (work_id, file_url, file_type, display_order)
+                                    VALUES (%s, %s, %s, %s)
+                                """, (work_id, file_url, 'preview', idx))
+                            except Exception as e:
+                                pass
+                        
+                        conn.commit()
                         
                         imported.append({
-                            'filename': file_info['name'],
+                            'filename': folder_name,
                             'work_id': work_id,
-                            'title': work_data['title']
+                            'title': title
                         })
                         
                     except Exception as e:
                         errors.append({
-                            'filename': file_info['name'],
+                            'filename': folder_name,
                             'error': str(e)
                         })
-                
-                conn.commit()
+                        conn.rollback()
                 
                 return {
                     'statusCode': 200,
@@ -288,72 +347,51 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'success': True,
                         'imported': len(imported),
                         'errors': len(errors),
-                        'details': {'imported': imported, 'errors': errors}
+                        'details': {
+                            'imported': imported,
+                            'errors': errors
+                        }
                     })
-                }
-                
-            except Exception as e:
-                conn.rollback()
-                return {
-                    'statusCode': 500,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': str(e)})
                 }
             finally:
                 cur.close()
                 conn.close()
         
-        else:
-            title = body_data.get('title')
-            work_type = body_data.get('work_type')
-            subject = body_data.get('subject')
-            description = body_data.get('description')
-            composition = body_data.get('composition', '')
-            price_points = body_data.get('price_points')
-            files = body_data.get('files', [])
+        title = body_data.get('title')
+        work_type = body_data.get('work_type')
+        subject = body_data.get('subject')
+        description = body_data.get('description')
+        composition = body_data.get('composition')
+        price_points = body_data.get('price_points', 100)
+        
+        if not all([title, work_type, subject]):
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Missing required fields'})
+            }
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            cur.execute("""
+                INSERT INTO works (title, work_type, subject, description, composition, price_points)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                RETURNING id
+            """, (title, work_type, subject, description, composition, price_points))
             
-            if not all([title, work_type, subject, description, price_points]):
-                return {
-                    'statusCode': 400,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Missing required fields'})
-                }
+            work_id = cur.fetchone()[0]
+            conn.commit()
             
-            conn = get_db_connection()
-            cur = conn.cursor()
-            
-            try:
-                cur.execute("""
-                    INSERT INTO works (title, work_type, subject, description, composition, price_points)
-                    VALUES (%s, %s, %s, %s, %s, %s)
-                    RETURNING id
-                """, (title, work_type, subject, description, composition, price_points))
-                
-                work_id = cur.fetchone()[0]
-                
-                for idx, file_url in enumerate(files):
-                    cur.execute("""
-                        INSERT INTO work_files (work_id, file_url, file_type, display_order)
-                        VALUES (%s, %s, %s, %s)
-                    """, (work_id, file_url, 'image', idx))
-                
-                conn.commit()
-                
-                return {
-                    'statusCode': 201,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'success': True, 'work_id': work_id})
-                }
-            except Exception as e:
-                conn.rollback()
-                return {
-                    'statusCode': 500,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': str(e)})
-                }
-            finally:
-                cur.close()
-                conn.close()
+            return {
+                'statusCode': 201,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'id': work_id, 'message': 'Work created'})
+            }
+        finally:
+            cur.close()
+            conn.close()
     
     return {
         'statusCode': 405,

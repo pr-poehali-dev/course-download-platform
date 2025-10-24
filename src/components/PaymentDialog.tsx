@@ -27,8 +27,8 @@ interface PaymentPackage {
 
 const PACKAGES: PaymentPackage[] = [
   { points: 100, price: 500, bonus: 0 },
-  { points: 500, price: 2500, bonus: 0, popular: true },
-  { points: 5000, price: 5000, bonus: 0 },
+  { points: 500, price: 2500, bonus: 100, popular: true },
+  { points: 5000, price: 5000, bonus: 2000 },
 ];
 
 declare global {

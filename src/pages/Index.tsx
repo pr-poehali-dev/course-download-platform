@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { authService, User } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -91,9 +92,10 @@ const MOCK_WORKS = [
 ];
 
 export default function Index() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const isLoggedIn = !!currentUser;
+  const username = currentUser?.username || '';
+  const email = currentUser?.email || '';
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
   const [termsDialogOpen, setTermsDialogOpen] = useState(false);
@@ -102,7 +104,7 @@ export default function Index() {
   const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false);
   const [promoDialogOpen, setPromoDialogOpen] = useState(false);
   const [referralDialogOpen, setReferralDialogOpen] = useState(false);
-  const [pendingUser, setPendingUser] = useState({ username: '', email: '' });
+  const [pendingUser, setPendingUser] = useState({ username: '', email: '', password: '' });
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<any[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
@@ -111,13 +113,21 @@ export default function Index() {
   const [maxPrice, setMaxPrice] = useState<number>(1000);
   const [sortBy, setSortBy] = useState<string>('rating');
   
-  const [userBalance, setUserBalance] = useState(320);
+  const userBalance = currentUser?.balance || 0;
   
   const availableWorks = MOCK_WORKS.filter(work => work.price <= userBalance).length;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [realWorks, setRealWorks] = useState<any[]>([]);
   const [worksLoading, setWorksLoading] = useState(true);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const user = await authService.verify();
+      setCurrentUser(user);
+    };
+    initAuth();
+  }, []);
 
   useEffect(() => {
     const loadWorks = async () => {
@@ -136,32 +146,60 @@ export default function Index() {
     loadWorks();
   }, []);
 
-  const handleShowTerms = (user: string, userEmail: string) => {
-    setPendingUser({ username: user, email: userEmail });
+  const handleShowTerms = (user: string, userEmail: string, password: string) => {
+    setPendingUser({ username: user, email: userEmail, password });
     setTermsDialogOpen(true);
   };
 
-  const handleAcceptTerms = () => {
-    setIsLoggedIn(true);
-    setUsername(pendingUser.username);
-    setEmail(pendingUser.email);
-    setTermsDialogOpen(false);
-    toast({
-      title: 'Регистрация успешна!',
-      description: 'Добро пожаловать в Tech Forma',
-    });
+  const handleAcceptTerms = async () => {
+    try {
+      const data = await authService.register(
+        pendingUser.username,
+        pendingUser.email,
+        (pendingUser as any).password
+      );
+      setCurrentUser(data.user);
+      setTermsDialogOpen(false);
+      setAuthDialogOpen(false);
+      setPendingUser({ username: '', email: '', password: '' });
+      toast({
+        title: 'Регистрация успешна!',
+        description: `Добро пожаловать, ${data.user.username}! Вам начислено 100 баллов.`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка регистрации',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
-  const handleLogin = (user: string, userEmail: string) => {
-    setIsLoggedIn(true);
-    setUsername(user);
-    setEmail(userEmail);
+  const handleLogin = async (user: string, password: string) => {
+    try {
+      const data = await authService.login(user, password);
+      setCurrentUser(data.user);
+      setAuthDialogOpen(false);
+      toast({
+        title: 'Вход выполнен',
+        description: `С возвращением, ${data.user.username}!`,
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка входа',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
-    setUsername('');
-    setEmail('');
+    authService.logout();
+    setCurrentUser(null);
+    toast({
+      title: 'Выход выполнен',
+      description: 'До встречи!',
+    });
   };
 
   const handleAddToCart = (work: any) => {

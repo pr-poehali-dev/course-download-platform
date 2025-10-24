@@ -10,8 +10,8 @@ import { toast } from '@/components/ui/use-toast';
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onLogin: (username: string, email: string) => void;
-  onShowTerms?: (username: string, email: string) => void;
+  onLogin: (username: string, password: string) => void;
+  onShowTerms?: (username: string, email: string, password: string) => void;
 }
 
 export default function AuthDialog({ open, onOpenChange, onLogin, onShowTerms }: AuthDialogProps) {
@@ -39,12 +39,7 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onShowTerms }:
       return;
     }
 
-    onLogin('Пользователь', loginData.email);
-    onOpenChange(false);
-    toast({
-      title: 'Добро пожаловать!',
-      description: 'Вы успешно вошли в систему',
-    });
+    onLogin(loginData.email, loginData.password);
   };
 
   const handleRegister = (e: React.FormEvent) => {
@@ -86,9 +81,8 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onShowTerms }:
       return;
     }
 
-    onOpenChange(false);
     if (onShowTerms) {
-      onShowTerms(registerData.username, registerData.email);
+      onShowTerms(registerData.username, registerData.email, registerData.password);
     }
   };
 

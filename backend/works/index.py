@@ -22,7 +22,7 @@ def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
 def get_yandex_disk_folders(public_key: str) -> List[Dict[str, Any]]:
-    """Рекурсивно получить все папки и файлы из публичной папки Яндекс.Диска"""
+    """Получить список папок без загрузки файлов (быстрый импорт)"""
     url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
     params = {'public_key': public_key, 'limit': 1000}
     
@@ -36,16 +36,10 @@ def get_yandex_disk_folders(public_key: str) -> List[Dict[str, Any]]:
         for item in data['_embedded']['items']:
             if item['type'] == 'dir':
                 folder_name = item['name']
-                folder_path = item['path']
-                
-                print(f"📁 Обрабатываю папку: {folder_name} (путь: {folder_path})")
-                folder_files = get_files_in_folder(public_key, folder_path)
-                print(f"   └─ Найдено файлов: {len(folder_files)}")
+                print(f"📁 Добавляю папку: {folder_name}")
                 
                 folders.append({
-                    'name': folder_name,
-                    'path': folder_path,
-                    'files': folder_files
+                    'name': folder_name
                 })
     
     print(f"📊 Итого папок для импорта: {len(folders)}")
@@ -278,20 +272,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             conn = get_db_connection()
             cur = conn.cursor()
             
+            print(f"🚀 Начинаю импорт {len(folders)} работ...")
+            
             try:
                 for folder in folders:
                     folder_name = folder['name']
-                    folder_files = folder['files']
                     
                     parsed = parse_work_title_and_type(folder_name)
                     title = parsed['title']
                     work_type = parsed['work_type']
-                    
-                    docx_files = [f for f in folder_files if f['name'].lower().endswith(('.docx', '.doc'))]
-                    image_files = [f for f in folder_files if f['name'].lower().endswith(('.jpg', '.jpeg', '.png'))]
-                    pdf_files = [f for f in folder_files if f['name'].lower().endswith('.pdf')]
-                    dwg_files = [f for f in folder_files if f['name'].lower().endswith('.dwg')]
-                    ppt_files = [f for f in folder_files if f['name'].lower().endswith(('.ppt', '.pptx'))]
                     
                     subject = 'общий'
                     description = f'Работа по теме: {title}. Тип работы: {work_type}.'
@@ -306,6 +295,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         """, (title, work_type, subject, description, composition, price_points))
                         
                         work_id = cur.fetchone()[0]
+                        conn.commit()
                         
                         print(f"✅ Создана работа ID={work_id}: {title}")
                         

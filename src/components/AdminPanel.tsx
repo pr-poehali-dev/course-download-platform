@@ -13,9 +13,6 @@ import FinanceManagement from '@/components/FinanceManagement';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import PlatformSettings from '@/components/PlatformSettings';
 import YandexDiskImport from '@/components/YandexDiskImport';
-import AnalyticsDashboard from '@/components/AnalyticsDashboard';
-import PlatformSettings from '@/components/PlatformSettings';
-import YandexDiskImport from '@/components/YandexDiskImport';
 
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
 const ADMIN_PASSWORD = 'stas221974';

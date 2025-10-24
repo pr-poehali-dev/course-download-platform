@@ -9,6 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import WorkManager from '@/components/WorkManager';
 
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
+const ADMIN_PASSWORD = 'stas221974';
 
 interface StatData {
   totalWorks: number;
@@ -25,6 +26,7 @@ interface StatData {
 
 export default function AdminPanel() {
   const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [stats, setStats] = useState<StatData>({
     totalWorks: 0,
@@ -72,7 +74,7 @@ export default function AdminPanel() {
   };
 
   const handleLogin = () => {
-    if (adminEmail === ADMIN_EMAIL) {
+    if (adminEmail === ADMIN_EMAIL && adminPassword === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       toast({
         title: 'Вход выполнен',
@@ -81,7 +83,7 @@ export default function AdminPanel() {
     } else {
       toast({
         title: 'Ошибка доступа',
-        description: 'Неверный email администратора',
+        description: 'Неверный email или пароль',
         variant: 'destructive'
       });
     }
@@ -112,6 +114,17 @@ export default function AdminPanel() {
                   placeholder="admin@example.com"
                   value={adminEmail}
                   onChange={(e) => setAdminEmail(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="admin-password">Пароль</Label>
+                <Input
+                  id="admin-password"
+                  type="password"
+                  placeholder="Введите пароль"
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
                 />
               </div>

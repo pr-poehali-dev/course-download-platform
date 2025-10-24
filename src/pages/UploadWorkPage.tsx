@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import PlagiarismChecker from '@/components/PlagiarismChecker';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,6 +19,8 @@ import {
 export default function UploadWorkPage() {
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
+  const [showPlagiarismCheck, setShowPlagiarismCheck] = useState(false);
+  const [plagiarismResult, setPlagiarismResult] = useState<any>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -53,7 +56,7 @@ export default function UploadWorkPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCheckBeforeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.title || !formData.description || !formData.category || !formData.price || !formData.file) {
@@ -65,13 +68,35 @@ export default function UploadWorkPage() {
       return;
     }
 
+    setShowPlagiarismCheck(true);
+  };
+
+  const handleSubmit = async () => {
+    if (!plagiarismResult) {
+      toast({
+        title: 'Ошибка',
+        description: 'Сначала проверьте работу на уникальность',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (plagiarismResult.status === 'rejected') {
+      toast({
+        title: 'Низкая уникальность',
+        description: 'Работа не может быть опубликована из-за плагиата',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setUploading(true);
 
     setTimeout(() => {
       setUploading(false);
       toast({
         title: 'Работа загружена!',
-        description: 'Ваша работа отправлена на модерацию. Обычно проверка занимает до 24 часов.'
+        description: `Уникальность: ${plagiarismResult.uniqueness_percent.toFixed(1)}%. Работа отправлена на модерацию.`
       });
       navigate('/profile');
     }, 2000);
@@ -92,7 +117,7 @@ export default function UploadWorkPage() {
           <p className="text-muted-foreground">Поделитесь своей работой и начните зарабатывать баллы</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleCheckBeforeSubmit} className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Информация о работе</CardTitle>
@@ -264,32 +289,54 @@ export default function UploadWorkPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" size="lg" disabled={uploading}>
-                {uploading ? (
-                  <>
-                    <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                    Загрузка...
-                  </>
-                ) : (
-                  <>
-                    <Icon name="Upload" size={18} className="mr-2" />
-                    Загрузить работу на модерацию
-                  </>
-                )}
-              </Button>
-
-              <p className="text-xs text-muted-foreground text-center mt-4">
-                Нажимая кнопку, вы соглашаетесь с{' '}
-                <Link to="/terms-of-service" className="underline">
-                  правилами публикации
-                </Link>{' '}
-                и{' '}
-                <Link to="/usage-rules" className="underline">
-                  условиями использования
-                </Link>
-              </p>
+              {!showPlagiarismCheck ? (
+                <Button type="submit" className="w-full" size="lg">
+                  <Icon name="Shield" size={18} className="mr-2" />
+                  Проверить на плагиат
+                </Button>
+              ) : (
+                <Button 
+                  type="button" 
+                  className="w-full" 
+                  size="lg" 
+                  disabled={uploading || !plagiarismResult}
+                  onClick={handleSubmit}
+                >
+                  {uploading ? (
+                    <>
+                      <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                      Загрузка...
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="Upload" size={18} className="mr-2" />
+                      Загрузить работу на модерацию
+                    </>
+                  )}
+                </Button>
+              )}
             </CardContent>
           </Card>
+
+          {showPlagiarismCheck && (
+            <PlagiarismChecker
+              textContent={formData.description}
+              onCheckComplete={(result) => setPlagiarismResult(result)}
+            />
+          )}
+
+          <div className="text-center">
+            <p className="text-xs text-muted-foreground">
+              Нажимая кнопку, вы соглашаетесь с{' '}
+              <Link to="/terms-of-service" className="underline">
+                правилами публикации
+              </Link>{' '}
+              и{' '}
+              <Link to="/usage-rules" className="underline">
+                условиями использования
+              </Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>

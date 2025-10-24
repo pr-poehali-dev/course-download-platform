@@ -337,17 +337,12 @@ export default function Index() {
                   Пополнить
                 </Button>
 
-                {isLoggedIn ? (
-                  <Button size="sm" onClick={() => setProfileDialogOpen(true)}>
+                <Button size="sm" asChild>
+                  <a href="/profile">
                     <Icon name="User" size={16} className="mr-2" />
-                    {username}
-                  </Button>
-                ) : (
-                  <Button size="sm" onClick={() => setAuthDialogOpen(true)}>
-                    <Icon name="LogIn" size={16} className="mr-2" />
-                    Войти
-                  </Button>
-                )}
+                    Профиль
+                  </a>
+                </Button>
               </div>
             </div>
           </div>

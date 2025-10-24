@@ -23,6 +23,8 @@ import ReferralDialog from '@/components/ReferralDialog';
 import BlogSection from '@/components/BlogSection';
 import AboutSection from '@/components/AboutSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
+import AgeBadge from '@/components/AgeBadge';
+import CookieBanner from '@/components/CookieBanner';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 
 const MOCK_WORKS = [
@@ -588,6 +590,19 @@ export default function Index() {
                         </div>
                         <div className="flex gap-2">
                           <Button 
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              toast({
+                                title: 'Жалоба принята',
+                                description: 'Мы проверим работу в течение 24 часов',
+                              });
+                            }}
+                            title="Пожаловаться на работу"
+                          >
+                            <Icon name="Flag" size={16} />
+                          </Button>
+                          <Button 
                             variant="outline"
                             size="icon"
                             onClick={() => handleAddToFavorites(work)}
@@ -974,6 +989,9 @@ export default function Index() {
         onOpenChange={setReferralDialogOpen}
         username={username}
       />
+
+      <AgeBadge />
+      <CookieBanner />
     </div>
   );
 }

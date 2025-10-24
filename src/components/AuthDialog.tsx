@@ -23,7 +23,8 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onShowTerms }:
     username: '', 
     email: '', 
     password: '', 
-    confirmPassword: '' 
+    confirmPassword: '',
+    agreeToPrivacy: false
   });
 
   const handleLogin = (e: React.FormEvent) => {
@@ -53,6 +54,15 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onShowTerms }:
       toast({
         title: 'Ошибка',
         description: 'Заполните все поля',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!registerData.agreeToPrivacy) {
+      toast({
+        title: 'Ошибка',
+        description: 'Необходимо согласие на обработку персональных данных',
         variant: 'destructive',
       });
       return;
@@ -247,6 +257,26 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onShowTerms }:
                   value={registerData.confirmPassword}
                   onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                 />
+              </div>
+
+              <div className="flex items-start gap-2 py-2">
+                <input
+                  type="checkbox"
+                  id="privacy-checkbox"
+                  checked={registerData.agreeToPrivacy}
+                  onChange={(e) => setRegisterData({ ...registerData, agreeToPrivacy: e.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-gray-300"
+                />
+                <label htmlFor="privacy-checkbox" className="text-xs text-muted-foreground leading-tight">
+                  Я согласен на обработку персональных данных в соответствии с{' '}
+                  <a href="/privacy-policy" target="_blank" className="text-primary hover:underline">
+                    Политикой конфиденциальности
+                  </a>
+                  {' '}и принимаю условия{' '}
+                  <a href="/terms-of-service" target="_blank" className="text-primary hover:underline">
+                    Пользовательского соглашения
+                  </a>
+                </label>
               </div>
 
               <Button type="submit" className="w-full">

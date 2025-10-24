@@ -287,7 +287,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     if not docx_files:
                         errors.append({
                             'filename': folder_name,
-                            'error': 'Нет DOCX файлов в папке'
+                            'error': f'Нет DOCX файлов в папке. Найдено файлов: {len(folder_files)}. Имена: {[f["name"] for f in folder_files[:3]]}'
                         })
                         continue
                     

@@ -293,22 +293,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     dwg_files = [f for f in folder_files if f['name'].lower().endswith('.dwg')]
                     ppt_files = [f for f in folder_files if f['name'].lower().endswith(('.ppt', '.pptx'))]
                     
-                    if not docx_files:
-                        errors.append({
-                            'filename': folder_name,
-                            'error': f'Нет DOCX файлов в папке. Найдено файлов: {len(folder_files)}. Имена: {[f["name"] for f in folder_files[:3]]}'
-                        })
-                        continue
-                    
-                    all_text = ''
-                    for docx_file in docx_files:
-                        try:
-                            content = download_file(docx_file['download_url'])
-                            text = extract_text_from_docx(content)
-                            all_text += text + '\n\n'
-                        except Exception as e:
-                            pass
-                    
                     subject = 'общий'
                     description = f'Работа по теме: {title}. Тип работы: {work_type}.'
                     composition = 'Документация и файлы'
@@ -324,22 +308,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         work_id = cur.fetchone()[0]
                         
                         print(f"✅ Создана работа ID={work_id}: {title}")
-                        
-                        display_order = 0
-                        
-                        for img_file in image_files[:3]:
-                            try:
-                                img_content = download_file(img_file['download_url'])
-                                file_url = save_file_to_storage(img_content, img_file['name'])
-                                
-                                cur.execute("""
-                                    INSERT INTO work_files (work_id, file_url, file_type, display_order)
-                                    VALUES (%s, %s, %s, %s)
-                                """, (work_id, file_url, 'preview', display_order))
-                                display_order += 1
-                                print(f"   └─ Добавлено изображение: {img_file['name']}")
-                            except Exception as e:
-                                print(f"   └─ Ошибка изображения {img_file['name']}: {e}")
                         
 
                         

@@ -44,7 +44,7 @@ export default function Requisites() {
                   <Icon name="User" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">ФИО:</p>
-                    <p className="text-sm text-muted-foreground">[ВАШЕ ФИО]</p>
+                    <p className="text-sm text-muted-foreground">Гагарская Елизавета Александровна</p>
                   </div>
                 </div>
                 
@@ -52,7 +52,7 @@ export default function Requisites() {
                   <Icon name="Hash" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">ИНН:</p>
-                    <p className="text-sm text-muted-foreground">[ВАШ ИНН]</p>
+                    <p className="text-sm text-muted-foreground">7710140679</p>
                   </div>
                 </div>
                 
@@ -60,23 +60,7 @@ export default function Requisites() {
                   <Icon name="Mail" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Email:</p>
-                    <p className="text-sm text-muted-foreground">[ВАШ EMAIL]</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-2">
-                  <Icon name="Phone" size={16} className="mt-1 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Телефон:</p>
-                    <p className="text-sm text-muted-foreground">[ВАШ ТЕЛЕФОН]</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-2">
-                  <Icon name="MapPin" size={16} className="mt-1 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Адрес:</p>
-                    <p className="text-sm text-muted-foreground">[ВАШ АДРЕС]</p>
+                    <p className="text-sm text-muted-foreground">gagarskaal@gmail.com</p>
                   </div>
                 </div>
               </div>

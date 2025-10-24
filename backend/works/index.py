@@ -309,21 +309,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         except Exception as e:
                             pass
                     
-                    if not all_text.strip():
-                        errors.append({
-                            'filename': folder_name,
-                            'error': 'Не удалось извлечь текст из DOCX'
-                        })
-                        continue
+                    subject = 'общий'
+                    description = f'Работа по теме: {title}. Тип работы: {work_type}.'
+                    composition = 'Документация и файлы'
+                    price_points = 150
                     
                     try:
-                        ai_data = generate_description_from_text(all_text, title, work_type)
-                        
-                        subject = ai_data.get('subject', 'общий')
-                        description = ai_data.get('description', '')
-                        composition = ai_data.get('composition', '')
-                        price_points = ai_data.get('price_points', 100)
-                        
                         cur.execute("""
                             INSERT INTO works (title, work_type, subject, description, composition, price_points)
                             VALUES (%s, %s, %s, %s, %s, %s)
@@ -332,9 +323,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         
                         work_id = cur.fetchone()[0]
                         
+                        print(f"✅ Создана работа ID={work_id}: {title}")
+                        
                         display_order = 0
                         
-                        for img_file in image_files:
+                        for img_file in image_files[:3]:
                             try:
                                 img_content = download_file(img_file['download_url'])
                                 file_url = save_file_to_storage(img_content, img_file['name'])
@@ -344,47 +337,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                     VALUES (%s, %s, %s, %s)
                                 """, (work_id, file_url, 'preview', display_order))
                                 display_order += 1
+                                print(f"   └─ Добавлено изображение: {img_file['name']}")
                             except Exception as e:
-                                pass
+                                print(f"   └─ Ошибка изображения {img_file['name']}: {e}")
                         
-                        for pdf_file in pdf_files:
-                            try:
-                                pdf_content = download_file(pdf_file['download_url'])
-                                file_url = save_file_to_storage(pdf_content, pdf_file['name'])
-                                
-                                cur.execute("""
-                                    INSERT INTO work_files (work_id, file_url, file_type, display_order)
-                                    VALUES (%s, %s, %s, %s)
-                                """, (work_id, file_url, 'document', display_order))
-                                display_order += 1
-                            except Exception as e:
-                                pass
-                        
-                        for dwg_file in dwg_files:
-                            try:
-                                dwg_content = download_file(dwg_file['download_url'])
-                                file_url = save_file_to_storage(dwg_content, dwg_file['name'])
-                                
-                                cur.execute("""
-                                    INSERT INTO work_files (work_id, file_url, file_type, display_order)
-                                    VALUES (%s, %s, %s, %s)
-                                """, (work_id, file_url, 'drawing', display_order))
-                                display_order += 1
-                            except Exception as e:
-                                pass
-                        
-                        for ppt_file in ppt_files:
-                            try:
-                                ppt_content = download_file(ppt_file['download_url'])
-                                file_url = save_file_to_storage(ppt_content, ppt_file['name'])
-                                
-                                cur.execute("""
-                                    INSERT INTO work_files (work_id, file_url, file_type, display_order)
-                                    VALUES (%s, %s, %s, %s)
-                                """, (work_id, file_url, 'presentation', display_order))
-                                display_order += 1
-                            except Exception as e:
-                                pass
+
                         
                         conn.commit()
                         

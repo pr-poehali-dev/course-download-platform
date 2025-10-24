@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { Link } from 'react-router-dom';
 
 export default function PrivacyPolicy() {
   return (
@@ -11,10 +12,12 @@ export default function PrivacyPolicy() {
           <Button 
             variant="ghost" 
             className="mb-4"
-            onClick={() => window.history.back()}
+            asChild
           >
-            <Icon name="ArrowLeft" size={18} className="mr-2" />
-            Назад
+            <Link to="/">
+              <Icon name="Home" size={18} className="mr-2" />
+              На главную
+            </Link>
           </Button>
           
           <Badge variant="outline" className="mb-4">

@@ -26,17 +26,21 @@ def get_yandex_disk_folders(public_key: str) -> List[Dict[str, Any]]:
     url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
     params = {'public_key': public_key, 'limit': 1000}
     
+    print(f"🔍 Получаю список папок из Яндекс.Диска: {public_key}")
     response = requests.get(url, params=params)
     data = response.json()
     
     folders = []
     if '_embedded' in data and 'items' in data['_embedded']:
+        print(f"✅ Найдено элементов в корне: {len(data['_embedded']['items'])}")
         for item in data['_embedded']['items']:
             if item['type'] == 'dir':
                 folder_name = item['name']
                 folder_path = item['path']
                 
+                print(f"📁 Обрабатываю папку: {folder_name} (путь: {folder_path})")
                 folder_files = get_files_in_folder(public_key, folder_path)
+                print(f"   └─ Найдено файлов: {len(folder_files)}")
                 
                 folders.append({
                     'name': folder_name,
@@ -44,6 +48,7 @@ def get_yandex_disk_folders(public_key: str) -> List[Dict[str, Any]]:
                     'files': folder_files
                 })
     
+    print(f"📊 Итого папок для импорта: {len(folders)}")
     return folders
 
 def get_files_in_folder(public_key: str, folder_path: str) -> List[Dict[str, Any]]:

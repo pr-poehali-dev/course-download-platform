@@ -59,21 +59,22 @@ export default function YandexDiskImport() {
       if (data.success) {
         setResult(data);
         toast({
-          title: 'Импорт завершен!',
-          description: `Загружено работ: ${data.imported}. Ошибок: ${data.errors}`
+          title: '✅ ИМПОРТ УСПЕШНО ЗАВЕРШЕН!',
+          description: `Загружено работ: ${data.imported}. Ошибок: ${data.errors}`,
+          duration: 999999
         });
       } else {
         throw new Error(data.error || 'Ошибка импорта');
       }
     } catch (error: any) {
       toast({
-        title: 'Ошибка импорта',
+        title: '❌ ОШИБКА ИМПОРТА',
         description: error.message,
-        variant: 'destructive'
+        variant: 'destructive',
+        duration: 999999
       });
     } finally {
       setImporting(false);
-      setTimeout(() => setProgress(0), 1000);
     }
   };
 

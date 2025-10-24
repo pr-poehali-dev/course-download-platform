@@ -897,33 +897,14 @@ export default function Index() {
                   <li><a href="/privacy-policy" className="hover:text-primary transition-colors">Политика конфиденциальности</a></li>
                   <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Пользовательское соглашение</a></li>
                   <li><a href="/offer" className="hover:text-primary transition-colors">Договор-оферта</a></li>
+                  <li><a href="/requisites" className="hover:text-primary transition-colors">Реквизиты</a></li>
                   <li><a href="#admin" className="hover:text-primary transition-colors">Админ-панель</a></li>
                 </ul>
               </div>
             </div>
 
             <div className="border-t mt-8 pt-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
-                <div>
-                  <h4 className="font-semibold mb-3 text-sm">Реквизиты Исполнителя</h4>
-                  <div className="space-y-1 text-xs text-muted-foreground">
-                    <p><strong>ФИО:</strong> [ВАШЕ ФИО]</p>
-                    <p><strong>ИНН:</strong> [ВАШ ИНН]</p>
-                    <p><strong>Email:</strong> [ВАШ EMAIL]</p>
-                    <p><strong>Телефон:</strong> [ВАШ ТЕЛЕФОН]</p>
-                    <p><strong>Адрес:</strong> [ВАШ АДРЕС]</p>
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  <p className="mb-2">
-                    Платформа Tech Forma предоставляет информационные услуги по обмену учебными материалами между студентами.
-                  </p>
-                  <p>
-                    Исполнитель — самозанятый гражданин, зарегистрированный в соответствии с ФЗ-422 «О проведении эксперимента по установлению специального налогового режима "Налог на профессиональный доход"».
-                  </p>
-                </div>
-              </div>
-              <div className="text-center text-sm text-muted-foreground border-t pt-6">
+              <div className="text-center text-sm text-muted-foreground">
                 <p>© 2024 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
               </div>
             </div>

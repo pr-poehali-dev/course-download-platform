@@ -16,9 +16,7 @@ interface Work {
   price: number;
   previewUrl: string | null;
   yandexDiskLink: string;
-  pageCount?: number;
   fileFormats?: string[];
-  chapters?: string[];
 }
 
 export default function WorkDetailPage() {
@@ -63,6 +61,97 @@ export default function WorkDetailPage() {
     if (/гидравлик|гидро/.test(t)) return 'гидравлика';
     
     return 'общая инженерия';
+  };
+
+  const determineUniversities = (subject: string): string[] => {
+    switch(subject) {
+      case 'электроэнергетика':
+        return [
+          'МЭИ (Национальный исследовательский университет «МЭИ»)',
+          'Санкт-Петербургский политехнический университет Петра Великого',
+          'Новосибирский государственный технический университет',
+          'Уральский федеральный университет',
+          'Казанский государственный энергетический университет'
+        ];
+      case 'автоматизация':
+        return [
+          'МГТУ им. Н.Э. Баумана',
+          'МИФИ (Национальный исследовательский ядерный университет «МИФИ»)',
+          'Санкт-Петербургский политехнический университет Петра Великого',
+          'Томский политехнический университет',
+          'Пермский национальный исследовательский политехнический университет'
+        ];
+      case 'строительство':
+        return [
+          'НИУ МГСУ (Московский государственный строительный университет)',
+          'СПбГАСУ (Санкт-Петербургский архитектурно-строительный университет)',
+          'Казанский государственный архитектурно-строительный университет',
+          'Уральский федеральный университет',
+          'Сибирский федеральный университет'
+        ];
+      case 'механика':
+        return [
+          'МГТУ им. Н.Э. Баумана',
+          'Санкт-Петербургский политехнический университет Петра Великого',
+          'МАМИ (Московский политехнический университет)',
+          'Южно-Уральский государственный университет',
+          'Самарский университет'
+        ];
+      case 'газоснабжение':
+        return [
+          'РГУ нефти и газа им. И.М. Губкина',
+          'Уфимский государственный нефтяной технический университет',
+          'Тюменский индустриальный университет',
+          'Санкт-Петербургский горный университет',
+          'Томский политехнический университет'
+        ];
+      case 'программирование':
+        return [
+          'МГУ им. М.В. Ломоносова',
+          'МФТИ (Московский физико-технический институт)',
+          'НИУ ВШЭ (Национальный исследовательский университет «Высшая школа экономики»)',
+          'ИТМО (Университет ИТМО)',
+          'Санкт-Петербургский государственный университет'
+        ];
+      case 'безопасность':
+        return [
+          'МГТУ им. Н.Э. Баумана',
+          'Академия ГПС МЧС России',
+          'Санкт-Петербургский университет ГПС МЧС России',
+          'Уральский институт ГПС МЧС России',
+          'Ивановская пожарно-спасательная академия ГПС МЧС России'
+        ];
+      case 'теплоснабжение':
+        return [
+          'МЭИ (Национальный исследовательский университет «МЭИ»)',
+          'Санкт-Петербургский политехнический университет Петра Великого',
+          'Казанский государственный энергетический университет',
+          'Уральский федеральный университет',
+          'Новосибирский государственный технический университет'
+        ];
+      case 'транспорт':
+        return [
+          'МАДИ (Московский автомобильно-дорожный государственный технический университет)',
+          'МИИТ (Российский университет транспорта)',
+          'ПГУПС (Петербургский государственный университет путей сообщения)',
+          'СибАДИ (Сибирский государственный автомобильно-дорожный университет)',
+          'Самарский государственный университет путей сообщения'
+        ];
+      case 'гидравлика':
+        return [
+          'МГСУ (Московский государственный строительный университет)',
+          'СПбГАСУ (Санкт-Петербургский архитектурно-строительный университет)',
+          'Санкт-Петербургский политехнический университет Петра Великого',
+          'Томский политехнический университет',
+          'Новосибирский государственный технический университет'
+        ];
+      default:
+        return [
+          'Технические университеты России',
+          'Политехнические институты',
+          'Инженерные вузы'
+        ];
+    }
   };
 
   const determinePrice = (workType: string, title: string): number => {
@@ -167,16 +256,15 @@ export default function WorkDetailPage() {
             const price = determinePrice(workType, title);
             const universities = extractUniversity(title);
             const composition = determineComposition(workType, title);
+            const universitiesList = determineUniversities(subject);
             
             // Формируем прямую ссылку на папку работы
             const folderPublicUrl = `${YANDEX_DISK_URL}:${item.path}`;
 
             let previewUrl = null;
             let fileFormats: string[] = [];
-            let pageCount: number | null = null;
             let parsedDescription: string | null = null;
             let parsedComposition: string[] = composition;
-            let chapters: string[] = [];
             
             // Get preview image
             try {
@@ -214,20 +302,12 @@ export default function WorkDetailPage() {
                   fileFormats = parserData.fileFormats;
                 }
                 
-                if (parserData.pageCount) {
-                  pageCount = parserData.pageCount;
-                }
-                
                 if (parserData.description) {
                   parsedDescription = parserData.description;
                 }
                 
                 if (parserData.composition && parserData.composition.length > 0) {
                   parsedComposition = parserData.composition;
-                }
-                
-                if (parserData.chapters && parserData.chapters.length > 0) {
-                  chapters = parserData.chapters;
                 }
               }
             } catch (error) {
@@ -243,13 +323,11 @@ export default function WorkDetailPage() {
               subject,
               description: detailedDescription,
               composition: parsedComposition,
-              universities,
+              universities: universitiesList.join(', '),
               price,
               previewUrl,
               yandexDiskLink: folderPublicUrl,
-              pageCount: pageCount,
-              fileFormats: fileFormats.length > 0 ? fileFormats : undefined,
-              chapters: chapters.length > 0 ? chapters : undefined
+              fileFormats: fileFormats.length > 0 ? fileFormats : undefined
             });
           } else {
             navigate('/catalog');
@@ -422,45 +500,15 @@ export default function WorkDetailPage() {
                 </div>
               </div>
 
-              {work.chapters && work.chapters.length > 0 && (
+              {work.fileFormats && work.fileFormats.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Структура работы</h2>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <ul className="space-y-2">
-                      {work.chapters.map((chapter, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <Icon name="ChevronRight" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
-                          <span className="text-gray-700 text-sm">{chapter}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Форматы файлов</h2>
+                  <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
+                    <Icon name="FileType" size={20} className="flex-shrink-0 text-gray-400" />
+                    <div className="text-sm font-medium text-gray-900">{work.fileFormats.join(', ')}</div>
                   </div>
                 </div>
               )}
-
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Дополнительная информация</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {work.pageCount && (
-                    <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-                      <Icon name="FileText" size={20} className="flex-shrink-0 text-gray-400" />
-                      <div>
-                        <div className="text-xs text-gray-500 mb-0.5">Объем работы</div>
-                        <div className="text-sm font-medium text-gray-900">{work.pageCount} {work.pageCount > 50 ? 'стр.' : 'страниц'}</div>
-                      </div>
-                    </div>
-                  )}
-                  {work.fileFormats && work.fileFormats.length > 0 && (
-                    <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
-                      <Icon name="FileType" size={20} className="flex-shrink-0 text-gray-400" />
-                      <div>
-                        <div className="text-xs text-gray-500 mb-0.5">Форматы файлов</div>
-                        <div className="text-sm font-medium text-gray-900">{work.fileFormats.join(', ')}</div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">Предметная область</h2>
@@ -474,12 +522,16 @@ export default function WorkDetailPage() {
 
               {work.universities && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Организация</h2>
-                  <div className="flex items-start gap-3">
-                    <Icon name="Building2" size={20} className="mt-1 flex-shrink-0 text-gray-400" />
-                    <p className="text-gray-700">
-                      {work.universities}
-                    </p>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Подходит для университетов</h2>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <ul className="space-y-2.5">
+                      {work.universities.split(', ').map((uni, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <Icon name="GraduationCap" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
+                          <span className="text-gray-700">{uni}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               )}

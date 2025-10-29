@@ -27,6 +27,7 @@ export default function CatalogPage() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [loadingPreviews, setLoadingPreviews] = useState(false);
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
@@ -208,10 +209,92 @@ export default function CatalogPage() {
       setFilteredWorks(allWorks);
       setLoadingProgress(100);
       setLoading(false);
+      
+      loadPreviews(allWorks);
     };
 
     fetchWorks();
   }, []);
+
+  const loadPreviews = async (worksList: Work[]) => {
+    setLoadingPreviews(true);
+    const PREVIEW_CACHE_KEY = 'catalog_previews_cache';
+    
+    const loadPreviewCache = (): Record<string, string> => {
+      try {
+        const cached = localStorage.getItem(PREVIEW_CACHE_KEY);
+        return cached ? JSON.parse(cached) : {};
+      } catch {
+        return {};
+      }
+    };
+
+    const savePreviewCache = (cache: Record<string, string>) => {
+      try {
+        localStorage.setItem(PREVIEW_CACHE_KEY, JSON.stringify(cache));
+      } catch (error) {
+        console.error('Preview cache save error:', error);
+      }
+    };
+
+    const previewCache = loadPreviewCache();
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    
+    const updatedWorks = [...worksList];
+    let hasUpdates = false;
+
+    for (let i = 0; i < updatedWorks.length; i++) {
+      const work = updatedWorks[i];
+      
+      if (previewCache[work.id]) {
+        updatedWorks[i] = { ...work, previewUrl: previewCache[work.id] };
+        hasUpdates = true;
+        continue;
+      }
+
+      await sleep(300);
+
+      try {
+        const folderName = work.title + ' (' + work.workType + ')';
+        const response = await fetch(
+          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + folderName)}&limit=20`
+        );
+        
+        if (!response.ok) continue;
+        
+        const data = await response.json();
+        
+        if (data._embedded && data._embedded.items) {
+          const previewFile = data._embedded.items.find((file: any) => 
+            file.name.toLowerCase().includes('preview') && 
+            (file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.jpg'))
+          );
+          
+          if (previewFile && previewFile.file) {
+            updatedWorks[i] = { ...work, previewUrl: previewFile.file };
+            previewCache[work.id] = previewFile.file;
+            hasUpdates = true;
+            
+            if (i % 10 === 0) {
+              setWorks([...updatedWorks]);
+              setFilteredWorks([...updatedWorks]);
+              savePreviewCache(previewCache);
+            }
+          }
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+
+    if (hasUpdates) {
+      setWorks([...updatedWorks]);
+      setFilteredWorks([...updatedWorks]);
+      savePreviewCache(previewCache);
+    }
+    
+    setLoadingPreviews(false);
+  };
 
   useEffect(() => {
     let filtered = works;
@@ -286,8 +369,16 @@ export default function CatalogPage() {
             </div>
           </div>
 
-          <div className="text-sm text-gray-600">
-            Найдено работ: <span className="font-semibold">{filteredWorks.length}</span>
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Найдено работ: <span className="font-semibold">{filteredWorks.length}</span>
+            </div>
+            {loadingPreviews && (
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
+                <span>Загружаются изображения...</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -328,8 +419,15 @@ export default function CatalogPage() {
                       loading="lazy"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Icon name="FileText" className="text-gray-300" size={56} />
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                      {loadingPreviews ? (
+                        <>
+                          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600"></div>
+                          <span className="text-xs text-gray-400">Загрузка...</span>
+                        </>
+                      ) : (
+                        <Icon name="FileText" className="text-gray-300" size={56} />
+                      )}
                     </div>
                   )}
                 </div>

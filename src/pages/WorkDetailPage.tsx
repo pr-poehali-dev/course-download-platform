@@ -18,6 +18,7 @@ interface Work {
   yandexDiskLink: string;
   pageCount?: number;
   fileFormats?: string[];
+  chapters?: string[];
 }
 
 export default function WorkDetailPage() {
@@ -28,6 +29,7 @@ export default function WorkDetailPage() {
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
+  const WORK_PARSER_URL = 'https://functions.poehali.dev/9899633c-f583-430f-aac2-e02cdad0cda5';
 
   const extractWorkInfo = (folderName: string) => {
     const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
@@ -166,7 +168,11 @@ export default function WorkDetailPage() {
             let previewUrl = null;
             let fileFormats: string[] = [];
             let pageCount: number | null = null;
+            let parsedDescription: string | null = null;
+            let parsedComposition: string[] = composition;
+            const chapters: string[] = [];
             
+            // Get preview image
             try {
               const folderResponse = await fetch(
                 `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=100`
@@ -174,64 +180,55 @@ export default function WorkDetailPage() {
               const folderData = await folderResponse.json();
               
               if (folderData._embedded && folderData._embedded.items) {
-                const fileExtensions = new Set<string>();
-                let wordFile: any = null;
-                
                 for (const file of folderData._embedded.items) {
                   const fileName = file.name.toLowerCase();
                   
-                  // Extract preview
                   if (fileName.includes('preview') && 
                       (fileName.endsWith('.png') || fileName.endsWith('.jpg')) && 
                       file.file && !previewUrl) {
                     previewUrl = file.file;
+                    break;
                   }
-                  
-                  // Skip preview files for format extraction
-                  if (fileName.includes('preview')) continue;
-                  
-                  // Extract file extensions
-                  const ext = fileName.split('.').pop()?.toUpperCase();
-                  if (ext) {
-                    const formatMap: Record<string, string> = {
-                      'DOCX': 'DOCX', 'DOC': 'DOC',
-                      'PDF': 'PDF',
-                      'DWG': 'DWG', 'CDW': 'CDW',
-                      'FRW': 'FRW', 'KOMPAS-3D': 'FRW',
-                      'M3D': 'M3D', 'A3D': 'A3D',
-                      'PY': 'Python',
-                      'XLSX': 'XLSX', 'XLS': 'XLS',
-                      'PNG': 'PNG', 'JPG': 'JPG', 'JPEG': 'JPG',
-                      'RAR': 'RAR', 'ZIP': 'ZIP',
-                      'TXT': 'TXT'
-                    };
-                    
-                    if (formatMap[ext]) {
-                      fileExtensions.add(formatMap[ext]);
-                    }
-                    
-                    // Find Word file for page count
-                    if ((ext === 'DOCX' || ext === 'DOC') && !wordFile && 
-                        (fileName.includes('пз') || fileName.includes('записка'))) {
-                      wordFile = file;
-                    }
-                  }
-                }
-                
-                fileFormats = Array.from(fileExtensions).sort();
-                
-                // Estimate page count from Word file size
-                if (wordFile && wordFile.size) {
-                  const sizeKB = wordFile.size / 1024;
-                  // Rough estimate: 1 page ≈ 2-3 KB
-                  pageCount = Math.max(10, Math.round(sizeKB / 2.5));
                 }
               }
             } catch (error) {
-              console.log('Error fetching folder details:', error);
+              console.log('Error fetching preview:', error);
             }
 
-            const detailedDescription = generateDetailedDescription(workType, title, subject);
+            // Parse work details from backend
+            try {
+              const parserResponse = await fetch(
+                `${WORK_PARSER_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`
+              );
+              
+              if (parserResponse.ok) {
+                const parserData = await parserResponse.json();
+                
+                if (parserData.fileFormats && parserData.fileFormats.length > 0) {
+                  fileFormats = parserData.fileFormats;
+                }
+                
+                if (parserData.pageCount) {
+                  pageCount = parserData.pageCount;
+                }
+                
+                if (parserData.description) {
+                  parsedDescription = parserData.description;
+                }
+                
+                if (parserData.composition && parserData.composition.length > 0) {
+                  parsedComposition = parserData.composition;
+                }
+                
+                if (parserData.chapters && parserData.chapters.length > 0) {
+                  chapters = parserData.chapters;
+                }
+              }
+            } catch (error) {
+              console.log('Error parsing work details:', error);
+            }
+
+            const detailedDescription = parsedDescription || generateDetailedDescription(workType, title, subject);
             
             setWork({
               id: item.resource_id,
@@ -239,13 +236,14 @@ export default function WorkDetailPage() {
               workType,
               subject,
               description: detailedDescription,
-              composition,
+              composition: parsedComposition,
               universities,
               price,
               previewUrl,
               yandexDiskLink: item.public_url || YANDEX_DISK_URL,
               pageCount: pageCount,
-              fileFormats: fileFormats.length > 0 ? fileFormats : undefined
+              fileFormats: fileFormats.length > 0 ? fileFormats : undefined,
+              chapters: chapters.length > 0 ? chapters : undefined
             });
           } else {
             navigate('/catalog');
@@ -342,6 +340,22 @@ export default function WorkDetailPage() {
                 </div>
               </div>
 
+              {work.chapters && work.chapters.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Структура работы</h2>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <ul className="space-y-2">
+                      {work.chapters.map((chapter, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <Icon name="ChevronRight" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
+                          <span className="text-gray-700 text-sm">{chapter}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">Дополнительная информация</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -350,7 +364,7 @@ export default function WorkDetailPage() {
                       <Icon name="FileText" size={20} className="flex-shrink-0 text-gray-400" />
                       <div>
                         <div className="text-xs text-gray-500 mb-0.5">Объем работы</div>
-                        <div className="text-sm font-medium text-gray-900">~{work.pageCount} страниц</div>
+                        <div className="text-sm font-medium text-gray-900">{work.pageCount} {work.pageCount > 50 ? 'стр.' : 'страниц'}</div>
                       </div>
                     </div>
                   )}

@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Parse work with Word file",
+      "method": "GET",
+      "path": "/?workId=423440157:a2b9becdff39c1687fd0bd253644c89ecba7a83d4536e76c160b6fa1507fc069",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "fileFormats": "array",
+        "composition": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Missing workId",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

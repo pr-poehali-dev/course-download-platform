@@ -32,6 +32,7 @@ export default function WorkDetailPage() {
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
   const WORK_PARSER_URL = 'https://functions.poehali.dev/9899633c-f583-430f-aac2-e02cdad0cda5';
   const DOWNLOAD_WORK_URL = 'https://functions.poehali.dev/5898b2f2-c4d9-4ff7-bd15-9600829fed08';
+  const PURCHASE_WORK_URL = 'https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9';
 
   const extractWorkInfo = (folderName: string) => {
     const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
@@ -265,20 +266,56 @@ export default function WorkDetailPage() {
     fetchWork();
   }, [workId, navigate]);
 
-  const handleDownload = async () => {
+  const handlePurchaseAndDownload = async () => {
     if (!workId || !work) return;
+    
+    // Получаем userId из localStorage (предполагается, что пользователь авторизован)
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      alert('Войдите в систему для покупки работы');
+      navigate('/login');
+      return;
+    }
+    
+    const user = JSON.parse(userStr);
+    const userId = user.id;
     
     setDownloading(true);
     try {
-      const response = await fetch(
+      // Шаг 1: Покупка работы
+      const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': String(userId)
+        },
+        body: JSON.stringify({
+          workId: workId,
+          userId: userId,
+          price: work.price
+        })
+      });
+      
+      const purchaseData = await purchaseResponse.json();
+      
+      if (!purchaseResponse.ok) {
+        if (purchaseData.error === 'Insufficient balance') {
+          alert(`Недостаточно баллов. У вас: ${purchaseData.balance}, нужно: ${purchaseData.required}`);
+          return;
+        }
+        throw new Error(purchaseData.error || 'Ошибка покупки');
+      }
+      
+      // Шаг 2: Скачивание архива
+      const downloadResponse = await fetch(
         `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`
       );
       
-      if (!response.ok) {
+      if (!downloadResponse.ok) {
         throw new Error('Ошибка скачивания');
       }
       
-      const blob = await response.blob();
+      const blob = await downloadResponse.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -287,9 +324,19 @@ export default function WorkDetailPage() {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      
+      // Обновляем баланс пользователя в localStorage
+      user.balance = purchaseData.newBalance;
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      alert(purchaseData.alreadyPurchased 
+        ? 'Работа уже была куплена ранее. Начинается скачивание...' 
+        : `Покупка успешна! Списано ${work.price} баллов. Новый баланс: ${purchaseData.newBalance}`
+      );
+      
     } catch (error) {
-      console.error('Download error:', error);
-      alert('Ошибка при скачивании архива. Попробуйте позже.');
+      console.error('Purchase/Download error:', error);
+      alert(error instanceof Error ? error.message : 'Ошибка при покупке или скачивании');
     } finally {
       setDownloading(false);
     }
@@ -452,7 +499,7 @@ export default function WorkDetailPage() {
               <Button 
                 size="lg"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-12 rounded-md mb-4"
-                onClick={handleDownload}
+                onClick={handlePurchaseAndDownload}
                 disabled={downloading}
               >
                 {downloading ? (

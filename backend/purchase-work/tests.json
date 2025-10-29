@@ -1,0 +1,20 @@
+{
+  "tests": [
+    {
+      "name": "Missing parameters",
+      "method": "POST",
+      "path": "/",
+      "body": {"userId": 1},
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "workId, userId and price required"
+      }
+    },
+    {
+      "name": "OPTIONS request",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

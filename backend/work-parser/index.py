@@ -114,24 +114,37 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         description = None
         chapters = []
         
+        print(f"[DEBUG] word_download_url={word_download_url}")
+        
         if word_download_url:
+            print(f"[DEBUG] Starting Word file download and parsing")
             try:
+                print(f"[DEBUG] Downloading file from {word_download_url[:100]}...")
                 doc_data = download_file(word_download_url)
+                print(f"[DEBUG] Downloaded {len(doc_data)} bytes")
+                
                 doc = Document(BytesIO(doc_data))
+                print(f"[DEBUG] Document parsed successfully")
                 
                 full_text = '\n'.join([para.text for para in doc.paragraphs if para.text.strip()])
+                print(f"[DEBUG] Extracted text length: {len(full_text)} chars")
                 
                 paragraph_count = len([p for p in doc.paragraphs if p.text.strip()])
                 page_count = max(10, int(paragraph_count / 15))
+                print(f"[DEBUG] Calculated page_count={page_count}")
                 
                 description = extract_description(full_text)
+                print(f"[DEBUG] Extracted description: {description[:100] if description else 'None'}")
+                
                 chapters = extract_chapters(doc)
+                print(f"[DEBUG] Extracted {len(chapters)} chapters")
                     
             except Exception as e:
-                print(f"Error parsing Word file: {e}")
+                print(f"[ERROR] Error parsing Word file: {type(e).__name__}: {str(e)}")
                 if word_file and word_file.get('size'):
                     kb = word_file['size'] / 1024
                     page_count = max(10, int(kb / 2.5))
+                    print(f"[DEBUG] Fallback page_count from file size: {page_count}")
         
         if any(f in formats for f in ['DOCX', 'DOC', 'PDF']):
             composition.append('Пояснительная записка')
@@ -170,12 +183,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 def get_download_url(public_key: str, file_path: str) -> Optional[str]:
     try:
         download_url = f"https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key={urllib.parse.quote(public_key)}&path={urllib.parse.quote(file_path)}"
+        print(f"[DEBUG] Requesting download URL: {download_url}")
         req = urllib.request.Request(download_url)
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
-            return data.get('href')
+            href = data.get('href')
+            print(f"[DEBUG] Got download href: {href[:100] if href else 'None'}")
+            return href
     except Exception as e:
-        print(f"Error getting download URL: {e}")
+        print(f"[ERROR] Error getting download URL: {type(e).__name__}: {str(e)}")
         return None
 
 

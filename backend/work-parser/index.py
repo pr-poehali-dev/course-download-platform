@@ -110,7 +110,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         formats.add(ext_map[ext])
                     
                     is_docx = ext == 'DOCX'
-                    has_keywords = 'пз' in name or 'записка' in name or 'отчет' in name
+                    has_keywords = any(kw in name for kw in ['пз', 'записка', 'отчет', 'эксплуатац', 'курсов', 'диплом', 'введение', 'заключение'])
                     print(f"[DEBUG] File {name}: is_docx={is_docx}, has_keywords={has_keywords}, word_file_exists={word_file is not None}")
                     
                     if is_docx and not word_file and has_keywords:

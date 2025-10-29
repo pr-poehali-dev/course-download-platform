@@ -170,7 +170,7 @@ export default function WorkDetailPage() {
             let pageCount: number | null = null;
             let parsedDescription: string | null = null;
             let parsedComposition: string[] = composition;
-            const chapters: string[] = [];
+            let chapters: string[] = [];
             
             // Get preview image
             try {

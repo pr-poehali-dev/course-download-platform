@@ -407,17 +407,20 @@ export default function CatalogPage() {
             {filteredWorks.map((work) => (
               <div 
                 key={work.id} 
-                className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
                 onClick={() => window.location.href = `/work-detail/${work.id}`}
               >
-                <div className="relative bg-gray-50 aspect-[4/3] overflow-hidden border-b border-gray-100">
+                <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
                   {work.previewUrl ? (
-                    <img 
-                      src={work.previewUrl} 
-                      alt={work.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
+                    <>
+                      <img 
+                        src={work.previewUrl} 
+                        alt={work.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                       {loadingPreviews ? (
@@ -426,52 +429,55 @@ export default function CatalogPage() {
                           <span className="text-xs text-gray-400">Загрузка...</span>
                         </>
                       ) : (
-                        <Icon name="FileText" className="text-gray-300" size={56} />
+                        <Icon name="FileText" className="text-gray-300 group-hover:text-gray-400 transition-colors" size={56} />
                       )}
                     </div>
                   )}
+                  
+                  <div className="absolute top-3 right-3">
+                    <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                      {work.price.toLocaleString()} ₽
+                    </div>
+                  </div>
                 </div>
 
                 <div className="p-5">
                   <div className="mb-3">
-                    <Badge className="bg-gray-100 text-gray-700 text-[11px] font-medium px-2.5 py-1 rounded-sm border-0">
+                    <Badge className="bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 text-[11px] font-semibold px-3 py-1 rounded-full border-0">
                       {work.workType}
                     </Badge>
                   </div>
 
-                  <h3 className="font-semibold text-[15px] text-gray-900 mb-3 line-clamp-3 leading-snug min-h-[63px]">
+                  <h3 className="font-bold text-[15px] text-gray-900 mb-3 line-clamp-3 leading-snug min-h-[63px] group-hover:text-blue-600 transition-colors">
                     {work.title}
                   </h3>
                   
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-start gap-2 text-[13px] text-gray-600">
-                      <Icon name="Package" size={16} className="mt-0.5 flex-shrink-0 text-gray-400" />
-                      <span className="line-clamp-2">{work.composition}</span>
+                  <div className="space-y-2.5 mb-4">
+                    <div className="flex items-start gap-2.5 text-[13px] text-gray-600">
+                      <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Icon name="Package" size={14} className="text-blue-600" />
+                      </div>
+                      <span className="line-clamp-2 leading-relaxed">{work.composition}</span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-[13px] text-gray-600">
-                      <Icon name="Tag" size={16} className="flex-shrink-0 text-gray-400" />
-                      <span>{work.subject}</span>
+                    <div className="flex items-center gap-2.5 text-[13px] text-gray-600">
+                      <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                        <Icon name="Tag" size={14} className="text-purple-600" />
+                      </div>
+                      <span className="font-medium">{work.subject}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                    <div>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-3xl font-bold text-gray-900">{work.price.toLocaleString()}</span>
-                        <span className="text-base text-gray-500 font-medium">баллов</span>
-                      </div>
-                    </div>
-                    
+                  <div className="pt-4 border-t border-gray-100">
                     <Button 
-                      size="sm"
-                      className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-5 rounded font-medium shadow-sm"
+                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white h-11 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
                       onClick={(e) => {
                         e.stopPropagation();
-                        window.open(work.yandexDiskLink, '_blank');
+                        window.location.href = `/work-detail/${work.id}`;
                       }}
                     >
-                      Купить
+                      <Icon name="ShoppingCart" size={18} className="mr-2" />
+                      Купить сейчас
                     </Button>
                   </div>
                 </div>

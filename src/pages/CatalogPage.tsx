@@ -114,43 +114,57 @@ export default function CatalogPage() {
   };
 
   useEffect(() => {
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const CACHE_KEY = 'catalog_works_cache';
+    const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-    const fetchPreviewForItem = async (item: any): Promise<string | null> => {
+    const loadFromCache = (): Work[] | null => {
       try {
-        await sleep(50);
-        const folderResponse = await fetch(
-          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=20`
-        );
-        
-        if (!folderResponse.ok) return null;
-        
-        const folderData = await folderResponse.json();
-        
-        if (folderData._embedded && folderData._embedded.items) {
-          const previewFile = folderData._embedded.items.find((file: any) => 
-            file.name.toLowerCase().includes('preview') && 
-            (file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.jpg'))
-          );
-          
-          if (previewFile && previewFile.file) {
-            return previewFile.file;
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            return data;
           }
         }
       } catch (error) {
-        return null;
+        console.error('Cache load error:', error);
       }
       return null;
     };
 
+    const saveToCache = (data: Work[]) => {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          data,
+          timestamp: Date.now()
+        }));
+      } catch (error) {
+        console.error('Cache save error:', error);
+      }
+    };
+
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
     const fetchWorks = async () => {
       setLoading(true);
+      
+      const cachedWorks = loadFromCache();
+      if (cachedWorks) {
+        setWorks(cachedWorks);
+        setFilteredWorks(cachedWorks);
+        setLoadingProgress(100);
+        setLoading(false);
+        return;
+      }
+
       const allWorks: Work[] = [];
 
       const totalBatches = 5;
       for (let i = 0; i < totalBatches; i++) {
         const offset = i * 100;
         setLoadingProgress(Math.round((i / totalBatches) * 100));
+        
+        await sleep(200);
         
         try {
           const response = await fetch(
@@ -178,8 +192,7 @@ export default function CatalogPage() {
                 universities,
                 price,
                 previewUrl: null,
-                yandexDiskLink: item.public_url || YANDEX_DISK_URL,
-                _item: item
+                yandexDiskLink: item.public_url || YANDEX_DISK_URL
               };
             });
 
@@ -190,23 +203,11 @@ export default function CatalogPage() {
         }
       }
 
+      saveToCache(allWorks);
       setWorks(allWorks);
       setFilteredWorks(allWorks);
       setLoadingProgress(100);
       setLoading(false);
-
-      for (let i = 0; i < allWorks.length; i++) {
-        const work = allWorks[i];
-        if ((work as any)._item) {
-          const previewUrl = await fetchPreviewForItem((work as any)._item);
-          if (previewUrl) {
-            const updatedWorks = [...allWorks];
-            updatedWorks[i] = { ...work, previewUrl };
-            setWorks([...updatedWorks]);
-            setFilteredWorks([...updatedWorks]);
-          }
-        }
-      }
     };
 
     fetchWorks();

@@ -539,46 +539,60 @@ export default function WorkDetailPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-gray-50 rounded-lg p-6 sticky top-20">
-              <div className="mb-6">
-                <div className="text-sm text-gray-600 mb-2">Стоимость</div>
-                <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-bold text-gray-900">{work.price.toLocaleString()}</span>
-                  <span className="text-lg text-gray-600 font-medium">баллов</span>
+            <div className="bg-gradient-to-br from-white to-gray-50 rounded-2xl p-8 sticky top-20 border border-gray-200 shadow-lg">
+              <div className="mb-8">
+                <div className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wide">Стоимость</div>
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl p-5 text-center">
+                  <div className="flex items-baseline justify-center gap-2">
+                    <span className="text-5xl font-bold text-white">{work.price.toLocaleString()}</span>
+                    <span className="text-xl text-blue-100 font-semibold">баллов</span>
+                  </div>
                 </div>
               </div>
 
               <Button 
                 size="lg"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-12 rounded-md mb-4"
+                className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold h-14 rounded-xl mb-6 shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
                 onClick={handlePurchaseAndDownload}
                 disabled={downloading}
               >
                 {downloading ? (
                   <>
-                    <Icon name="Loader2" size={20} className="mr-2 animate-spin" />
+                    <Icon name="Loader2" size={22} className="mr-2 animate-spin" />
                     Скачивание...
                   </>
                 ) : (
                   <>
-                    <Icon name="Download" size={20} className="mr-2" />
+                    <Icon name="ShoppingCart" size={22} className="mr-2" />
                     Купить и скачать
                   </>
                 )}
               </Button>
 
-              <div className="space-y-3 pt-4 border-t border-gray-200">
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <Icon name="Shield" size={18} className="text-green-600" />
-                  <span>Гарантия качества</span>
+              <div className="space-y-4 pt-6 border-t-2 border-gray-200">
+                <div className="flex items-center gap-3.5 p-3 bg-green-50 rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Shield" size={20} className="text-green-600" />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-800">Гарантия качества</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <Icon name="Download" size={18} className="text-blue-600" />
-                  <span>Мгновенная загрузка</span>
+                <div className="flex items-center gap-3.5 p-3 bg-blue-50 rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Zap" size={20} className="text-blue-600" />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-800">Мгновенная загрузка</span>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-600">
-                  <Icon name="FileCheck" size={18} className="text-purple-600" />
-                  <span>Проверенные материалы</span>
+                <div className="flex items-center gap-3.5 p-3 bg-purple-50 rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <Icon name="FileCheck" size={20} className="text-purple-600" />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-800">Проверенные материалы</span>
+                </div>
+                <div className="flex items-center gap-3.5 p-3 bg-amber-50 rounded-lg">
+                  <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Lock" size={20} className="text-amber-600" />
+                  </div>
+                  <span className="text-sm font-semibold text-gray-800">Безопасная оплата</span>
                 </div>
               </div>
             </div>

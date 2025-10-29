@@ -435,8 +435,8 @@ export default function CatalogPage() {
                   )}
                   
                   <div className="absolute top-3 right-3">
-                    <div className="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                      {work.price.toLocaleString()} ₽
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
+                      {work.price.toLocaleString()} б.
                     </div>
                   </div>
                 </div>

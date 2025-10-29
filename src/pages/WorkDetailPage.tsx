@@ -164,24 +164,71 @@ export default function WorkDetailPage() {
             const composition = determineComposition(workType, title);
 
             let previewUrl = null;
+            let fileFormats: string[] = [];
+            let pageCount: number | null = null;
+            
             try {
               const folderResponse = await fetch(
-                `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=20`
+                `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=100`
               );
               const folderData = await folderResponse.json();
               
               if (folderData._embedded && folderData._embedded.items) {
-                const previewFile = folderData._embedded.items.find((file: any) => 
-                  file.name.toLowerCase().includes('preview') && 
-                  (file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.jpg'))
-                );
+                const fileExtensions = new Set<string>();
+                let wordFile: any = null;
                 
-                if (previewFile && previewFile.file) {
-                  previewUrl = previewFile.file;
+                for (const file of folderData._embedded.items) {
+                  const fileName = file.name.toLowerCase();
+                  
+                  // Extract preview
+                  if (fileName.includes('preview') && 
+                      (fileName.endsWith('.png') || fileName.endsWith('.jpg')) && 
+                      file.file && !previewUrl) {
+                    previewUrl = file.file;
+                  }
+                  
+                  // Skip preview files for format extraction
+                  if (fileName.includes('preview')) continue;
+                  
+                  // Extract file extensions
+                  const ext = fileName.split('.').pop()?.toUpperCase();
+                  if (ext) {
+                    const formatMap: Record<string, string> = {
+                      'DOCX': 'DOCX', 'DOC': 'DOC',
+                      'PDF': 'PDF',
+                      'DWG': 'DWG', 'CDW': 'CDW',
+                      'FRW': 'FRW', 'KOMPAS-3D': 'FRW',
+                      'M3D': 'M3D', 'A3D': 'A3D',
+                      'PY': 'Python',
+                      'XLSX': 'XLSX', 'XLS': 'XLS',
+                      'PNG': 'PNG', 'JPG': 'JPG', 'JPEG': 'JPG',
+                      'RAR': 'RAR', 'ZIP': 'ZIP',
+                      'TXT': 'TXT'
+                    };
+                    
+                    if (formatMap[ext]) {
+                      fileExtensions.add(formatMap[ext]);
+                    }
+                    
+                    // Find Word file for page count
+                    if ((ext === 'DOCX' || ext === 'DOC') && !wordFile && 
+                        (fileName.includes('пз') || fileName.includes('записка'))) {
+                      wordFile = file;
+                    }
+                  }
+                }
+                
+                fileFormats = Array.from(fileExtensions).sort();
+                
+                // Estimate page count from Word file size
+                if (wordFile && wordFile.size) {
+                  const sizeKB = wordFile.size / 1024;
+                  // Rough estimate: 1 page ≈ 2-3 KB
+                  pageCount = Math.max(10, Math.round(sizeKB / 2.5));
                 }
               }
             } catch (error) {
-              console.log('No preview available');
+              console.log('Error fetching folder details:', error);
             }
 
             const detailedDescription = generateDetailedDescription(workType, title, subject);
@@ -197,8 +244,8 @@ export default function WorkDetailPage() {
               price,
               previewUrl,
               yandexDiskLink: item.public_url || YANDEX_DISK_URL,
-              pageCount: workType.toLowerCase().includes('дипломная') ? 80 : 40,
-              fileFormats: ['PDF', 'DOCX']
+              pageCount: pageCount,
+              fileFormats: fileFormats.length > 0 ? fileFormats : undefined
             });
           } else {
             navigate('/catalog');

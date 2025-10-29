@@ -85,10 +85,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         composition = []
         
         if '_embedded' in folder_data and 'items' in folder_data['_embedded']:
+            print(f"[DEBUG] Found {len(folder_data['_embedded']['items'])} files in folder")
             for file in folder_data['_embedded']['items']:
                 name = file.get('name', '').lower()
+                print(f"[DEBUG] Checking file: {name}")
                 
                 if 'preview' in name:
+                    print(f"[DEBUG] Skipping preview file")
                     continue
                 
                 if '.' in name:
@@ -106,7 +109,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     if ext in ext_map:
                         formats.add(ext_map[ext])
                     
-                    if ext == 'DOCX' and not word_file and ('пз' in name or 'записка' in name or 'отчет' in name):
+                    is_docx = ext == 'DOCX'
+                    has_keywords = 'пз' in name or 'записка' in name or 'отчет' in name
+                    print(f"[DEBUG] File {name}: is_docx={is_docx}, has_keywords={has_keywords}, word_file_exists={word_file is not None}")
+                    
+                    if is_docx and not word_file and has_keywords:
+                        print(f"[DEBUG] Found Word file candidate: {name}")
                         word_file = file
                         word_download_url = get_download_url(public_key, folder_path + '/' + file.get('name'))
         

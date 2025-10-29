@@ -164,6 +164,13 @@ export default function WorkDetailPage() {
             const price = determinePrice(workType, title);
             const universities = extractUniversity(title);
             const composition = determineComposition(workType, title);
+            
+            console.log('Item data:', {
+              name: item.name,
+              public_url: item.public_url,
+              file: item.file,
+              path: item.path
+            });
 
             let previewUrl = null;
             let fileFormats: string[] = [];

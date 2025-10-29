@@ -165,12 +165,8 @@ export default function WorkDetailPage() {
             const universities = extractUniversity(title);
             const composition = determineComposition(workType, title);
             
-            console.log('Item data:', {
-              name: item.name,
-              public_url: item.public_url,
-              file: item.file,
-              path: item.path
-            });
+            // Формируем прямую ссылку на папку работы
+            const folderPublicUrl = `${YANDEX_DISK_URL}:${item.path}`;
 
             let previewUrl = null;
             let fileFormats: string[] = [];
@@ -247,7 +243,7 @@ export default function WorkDetailPage() {
               universities,
               price,
               previewUrl,
-              yandexDiskLink: item.public_url || YANDEX_DISK_URL,
+              yandexDiskLink: folderPublicUrl,
               pageCount: pageCount,
               fileFormats: fileFormats.length > 0 ? fileFormats : undefined,
               chapters: chapters.length > 0 ? chapters : undefined

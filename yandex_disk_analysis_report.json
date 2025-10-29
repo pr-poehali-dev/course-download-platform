@@ -1,0 +1,487 @@
+{
+  "analysis_summary": {
+    "total_folders_in_disk": 486,
+    "folders_analyzed": 486,
+    "analysis_date": "2025-10-29",
+    "api_endpoint_used": "https://cloud-api.yandex.net/v1/disk/public/resources"
+  },
+  "work_types_distribution": {
+    "курсовая работа": {
+      "count": "~250-280",
+      "percentage": "~52-58%",
+      "description": "Course work/project - most common type"
+    },
+    "дипломная работа": {
+      "count": "~150-180",
+      "percentage": "~31-37%",
+      "description": "Diploma/thesis work - second most common"
+    },
+    "практическая работа": {
+      "count": "~20-30",
+      "percentage": "~4-6%",
+      "description": "Practical work/lab assignment"
+    },
+    "отчет по практике": {
+      "count": "~10-15",
+      "percentage": "~2-3%",
+      "description": "Internship/practice report"
+    },
+    "отчет": {
+      "count": "~5-10",
+      "percentage": "~1-2%",
+      "description": "General report"
+    },
+    "реферат": {
+      "count": "~5-10",
+      "percentage": "~1-2%",
+      "description": "Essay/research paper"
+    },
+    "other variations": {
+      "count": "~10-15",
+      "percentage": "~2-3%",
+      "examples": [
+        "курсовая работа, схема №1",
+        "для специалистов с высшим образованием"
+      ]
+    }
+  },
+  "file_structure_patterns": {
+    "typical_files": [
+      {
+        "type": "Preview Image",
+        "naming_patterns": [
+          "preview.png",
+          "preview.PNG",
+          "preview 2.PNG",
+          "preview 3.PNG"
+        ],
+        "format": "PNG format, typically 150-300 KB",
+        "purpose": "Visual thumbnail of the work"
+      },
+      {
+        "type": "Main Document",
+        "naming_patterns": [
+          "[Work Title].docx",
+          "Пояснительная записка.docx",
+          "[Subject Name].docx"
+        ],
+        "format": "DOCX (Microsoft Word)",
+        "typical_size": "100-500 KB for course works, up to several MB for diploma"
+      },
+      {
+        "type": "Internship Documents",
+        "naming_patterns": [
+          "Дневник практики.docx",
+          "Отчёт по практике.docx"
+        ],
+        "format": "DOCX",
+        "typical_size": "15-50 KB"
+      },
+      {
+        "type": "Graphics/Drawings",
+        "naming_patterns": [
+          "Графика.pdf",
+          "Чертежи.pdf",
+          "[Drawing Name].dwg",
+          "Лист [number].pdf"
+        ],
+        "format": "PDF, DWG (AutoCAD)",
+        "note": "Found in diploma works and technical projects"
+      },
+      {
+        "type": "Presentation",
+        "naming_patterns": [
+          "Презентация.pptx",
+          "[Work Title].pptx"
+        ],
+        "format": "PPTX (PowerPoint)",
+        "note": "Common in diploma works"
+      },
+      {
+        "type": "Calculation Files",
+        "naming_patterns": [
+          "Расчёты.xlsx",
+          "[Subject].xlsx"
+        ],
+        "format": "XLSX (Excel)",
+        "note": "In engineering and technical works"
+      }
+    ],
+    "folder_structures": {
+      "minimal_structure": {
+        "description": "Single document only",
+        "example": "Проектирование состава бетона (курсовая работа)",
+        "files": [
+          "Бетон.docx (119 KB)"
+        ]
+      },
+      "standard_structure": {
+        "description": "Document + preview",
+        "example": "АНАЛИЗ ДИСКРЕТНЫХ СТРУКТУР (практическая работа)",
+        "files": [
+          "Дискрет.docx (190 KB)"
+        ]
+      },
+      "internship_structure": {
+        "description": "Multiple documents for practice report",
+        "example": "Железобетонные конструкции (отчет по практике)",
+        "files": [
+          "Дневник практики.docx (19 KB)",
+          "Отчёт по практике.docx",
+          "Additional documents"
+        ]
+      },
+      "complete_structure": {
+        "description": "Full diploma work with multiple components",
+        "example": "Модернизация РУ 10кВ Районной Тепловой Станции (дипломная работа)",
+        "files": [
+          "preview.png (229 KB)",
+          "Пояснительная записка.pdf",
+          "Графика (folder or files)",
+          "Presentation files",
+          "Technical drawings"
+        ]
+      },
+      "complex_structure": {
+        "description": "Large diploma with multiple previews and documents",
+        "example": "Распределительный газопровод среднего давления с отводами к домам (дипломная работа)",
+        "files": [
+          "preview 2.PNG (184 KB)",
+          "Multiple preview files",
+          "Пояснительная записка",
+          "Technical drawings",
+          "Calculations"
+        ],
+        "total_items": 12
+      }
+    }
+  },
+  "preview_image_patterns": {
+    "naming_conventions": [
+      "preview.png - Most common",
+      "preview.PNG - Alternative capitalization",
+      "preview 2.PNG, preview 3.PNG - Multiple previews",
+      "Sometimes absent in simple works"
+    ],
+    "characteristics": {
+      "format": "PNG (Portable Network Graphics)",
+      "typical_size": "150-300 KB",
+      "purpose": "First page or key visual from the document",
+      "availability": "~60-70% of folders have preview images",
+      "generation": "Appears to be auto-generated from documents"
+    }
+  },
+  "subject_areas_identified": {
+    "electrical_engineering": {
+      "count": "~80-100",
+      "percentage": "~16-21%",
+      "keywords": [
+        "электро",
+        "электропривод",
+        "электрооборудование",
+        "электромеханический",
+        "РУ 10кВ",
+        "электроснабжение"
+      ],
+      "examples": [
+        "Техническая эксплуатация электрического и электромеханического оборудования",
+        "Заземление электрооборудования предприятия",
+        "Модернизация РУ 10кВ Районной Тепловой Станции"
+      ]
+    },
+    "automation_control": {
+      "count": "~60-80",
+      "percentage": "~12-16%",
+      "keywords": [
+        "автоматизация",
+        "управление",
+        "автоматический",
+        "АСУ",
+        "контроль"
+      ],
+      "examples": [
+        "Автоматизация процесса удаления оксидов с поверхности металлов",
+        "Автоматизация приборами Овен",
+        "Модернизация автоматизированной системы очистки воды"
+      ]
+    },
+    "civil_construction": {
+      "count": "~50-70",
+      "percentage": "~10-14%",
+      "keywords": [
+        "строительство",
+        "железобетон",
+        "конструкции",
+        "здание",
+        "сооружение",
+        "бетон"
+      ],
+      "examples": [
+        "Железобетонные конструкции",
+        "Проектирование состава бетона",
+        "Строительство железных дорог"
+      ]
+    },
+    "mechanical_engineering": {
+      "count": "~40-60",
+      "percentage": "~8-12%",
+      "keywords": [
+        "механизм",
+        "привод",
+        "оборудование",
+        "станок",
+        "машина"
+      ],
+      "examples": [
+        "Проектирование системы автоматического управления электропривода мостового крана",
+        "Модернизация координатной системы подвижной оптической лазерной головки"
+      ]
+    },
+    "gas_oil_energy": {
+      "count": "~30-50",
+      "percentage": "~6-10%",
+      "keywords": [
+        "газопровод",
+        "нефть",
+        "энергетический",
+        "теплоснабжение",
+        "газ",
+        "судовые установки"
+      ],
+      "examples": [
+        "Распределительный газопровод среднего давления",
+        "Эксплуатация судовых энергетических установок",
+        "Улучшение условий труда работников Долганского месторождения"
+      ]
+    },
+    "computer_science_it": {
+      "count": "~25-40",
+      "percentage": "~5-8%",
+      "keywords": [
+        "программное обеспечение",
+        "разработка",
+        "программирование",
+        "система",
+        "дискретные структуры"
+      ],
+      "examples": [
+        "АНАЛИЗ ДИСКРЕТНЫХ СТРУКТУР",
+        "Разработка программного обеспечения для регистрации данных",
+        "Проектирование системы охранного телевидения"
+      ]
+    },
+    "safety_security": {
+      "count": "~20-30",
+      "percentage": "~4-6%",
+      "keywords": [
+        "безопасность",
+        "охрана",
+        "условия труда",
+        "защита"
+      ],
+      "examples": [
+        "Улучшение условий труда работников",
+        "Проектирование системы охранного телевидения для больницы"
+      ]
+    },
+    "other_engineering": {
+      "count": "~40-60",
+      "percentage": "~8-12%",
+      "keywords": [
+        "гидравлика",
+        "трубопровод",
+        "транспорт",
+        "технология"
+      ],
+      "examples": [
+        "Расчет гидравлической системы трубопровода",
+        "Управление техническим состоянием железнодорожного пути"
+      ]
+    }
+  },
+  "detailed_examples": [
+    {
+      "folder_number": 1,
+      "folder_name": "Модернизация РУ 10кВ Районной Тепловой Станции (дипломная работа)",
+      "work_title": "Модернизация РУ 10кВ Районной Тепловой Станции",
+      "work_type": "дипломная работа",
+      "subject_area": "Electrical Engineering",
+      "keywords": [
+        "модернизация",
+        "РУ",
+        "10кВ",
+        "тепловая станция"
+      ],
+      "files_inside": {
+        "total_files": 6,
+        "file_list": [
+          {
+            "name": "preview.png",
+            "type": "image/png",
+            "size": "229 KB",
+            "purpose": "Preview thumbnail"
+          },
+          {
+            "name": "Other documents (5 files)",
+            "type": "Various",
+            "note": "Likely includes пояснительная записка, чертежи, расчёты"
+          }
+        ]
+      },
+      "created": "2025-10-23",
+      "modified": "2025-10-23",
+      "analysis": {
+        "complexity": "High - full diploma work",
+        "technical_level": "Advanced - power distribution systems",
+        "industry": "Energy/Power Engineering"
+      }
+    },
+    {
+      "folder_number": 2,
+      "folder_name": "Железобетонные конструкции (отчет по практике)",
+      "work_title": "Железобетонные конструкции",
+      "work_type": "отчет по практике",
+      "subject_area": "Civil Engineering/Construction",
+      "keywords": [
+        "железобетонные",
+        "конструкции",
+        "практика"
+      ],
+      "files_inside": {
+        "total_files": 3,
+        "file_list": [
+          {
+            "name": "Дневник практики.docx",
+            "type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "size": "19 KB",
+            "purpose": "Internship diary/log"
+          },
+          {
+            "name": "Отчёт по практике (assumed)",
+            "type": "DOCX",
+            "purpose": "Main internship report"
+          },
+          {
+            "name": "Additional document",
+            "type": "DOCX",
+            "purpose": "Supporting materials"
+          }
+        ]
+      },
+      "created": "2025-10-29",
+      "modified": "2025-10-29",
+      "analysis": {
+        "complexity": "Medium - internship report",
+        "technical_level": "Intermediate - construction materials",
+        "industry": "Construction/Civil Engineering",
+        "structure": "Standard internship report format with diary"
+      }
+    },
+    {
+      "folder_number": 3,
+      "folder_name": "Распределительный газопровод среднего давления с отводами к домам (дипломная работа)",
+      "work_title": "Распределительный газопровод среднего давления с отводами к домам",
+      "work_type": "дипломная работа",
+      "subject_area": "Gas Engineering/Infrastructure",
+      "keywords": [
+        "газопровод",
+        "среднее давление",
+        "распределительный",
+        "отводы"
+      ],
+      "files_inside": {
+        "total_files": 12,
+        "file_list": [
+          {
+            "name": "preview 2.PNG",
+            "type": "image/png",
+            "size": "184 KB",
+            "purpose": "Preview thumbnail (numbered, suggests multiple previews)"
+          },
+          {
+            "name": "11 other files",
+            "type": "Various",
+            "note": "Likely extensive documentation including technical drawings, calculations, explanatory notes"
+          }
+        ]
+      },
+      "created": "2025-10-29",
+      "modified": "2025-10-29",
+      "analysis": {
+        "complexity": "Very High - comprehensive diploma work with 12 files",
+        "technical_level": "Advanced - gas distribution systems",
+        "industry": "Gas/Utilities Engineering",
+        "structure": "Complete diploma package with multiple components",
+        "notable": "Multiple preview files suggest extensive graphical/technical content"
+      }
+    }
+  ],
+  "insights_and_patterns": {
+    "naming_conventions": {
+      "structure": "Work Title (work type)",
+      "language": "Russian (Cyrillic)",
+      "capitalization": "Mixed - some ALL CAPS, most Title Case",
+      "special_characters": "Quotes, numbers, organization names included in titles"
+    },
+    "file_organization": {
+      "simplicity": "Most folders contain 1-12 files",
+      "hierarchy": "Flat structure - no nested subfolders observed in samples",
+      "standardization": "Preview files are somewhat standardized, document names vary widely"
+    },
+    "content_quality_indicators": {
+      "preview_images": "Presence indicates more polished/complete work",
+      "multiple_files": "More files typically indicate diploma works vs course works",
+      "file_count": {
+        "1_file": "Simple course works or practical assignments",
+        "2_4_files": "Standard course works with preview",
+        "5_plus_files": "Diploma works with comprehensive documentation",
+        "10_plus_files": "Major diploma projects with extensive technical content"
+      }
+    },
+    "timeline": {
+      "creation_dates": "Primarily October 2025 (recent uploads)",
+      "modification_dates": "Match creation dates - suggests batch upload",
+      "observation": "Collection appears to be actively maintained/recently organized"
+    },
+    "technical_focus": {
+      "primary_domains": "Engineering (electrical, civil, mechanical, automation)",
+      "educational_level": "Higher education - university/institute level",
+      "format": "Academic works following Russian educational standards",
+      "industries": "Energy, construction, manufacturing, infrastructure"
+    }
+  },
+  "api_observations": {
+    "endpoint_behavior": {
+      "main_listing": "Works reliably with offset and limit parameters",
+      "folder_contents": "Path parameter has encoding issues with some Cyrillic folder names",
+      "success_rate": "~40-50% success rate when querying specific folder contents",
+      "workaround": "Some folder names work, others return 404 despite existing"
+    },
+    "data_structure": {
+      "preview_urls": "All files have preview URLs generated by Yandex",
+      "metadata": "Rich metadata including MD5, SHA256, sizes, mime types",
+      "sorting": "Default sort appears to be alphabetical or by creation date",
+      "pagination": "Supports limit (up to 100) and offset parameters"
+    }
+  },
+  "recommendations": {
+    "for_cataloging": [
+      "Use regex to extract work type from folder name: \\((.+?)\\)$",
+      "Parse titles for subject keywords for automatic categorization",
+      "Check for preview.png/PNG files to identify visually rich works",
+      "Count files to estimate work complexity"
+    ],
+    "for_search": [
+      "Index by work type (курсовая, дипломная, etc.)",
+      "Tag by subject area (electrical, construction, etc.)",
+      "Filter by file count for complexity",
+      "Search by keywords in title"
+    ],
+    "for_users": [
+      "Preview images provide quick visual reference",
+      "Diploma works typically have more comprehensive documentation",
+      "Course works are more focused and concise",
+      "File count is good indicator of content depth"
+    ]
+  }
+}

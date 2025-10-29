@@ -17,6 +17,7 @@ import ProfilePage from "./pages/ProfilePage";
 import BuyPointsPage from "./pages/BuyPointsPage";
 import UploadWorkPage from "./pages/UploadWorkPage";
 import WorkDetailPage from "./pages/WorkDetailPage";
+import CatalogPage from "./pages/CatalogPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/buy-points" element={<BuyPointsPage />} />
           <Route path="/upload" element={<UploadWorkPage />} />
           <Route path="/work/:id" element={<WorkDetailPage />} />
+          <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

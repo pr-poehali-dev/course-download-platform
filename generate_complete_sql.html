@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate SQL for 486 Works</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Yandex Disk SQL Generator</h1>
+    <button onclick="fetchAndGenerate()">Fetch All 486 Works & Generate SQL</button>
+    <div id="status"></div>
+    <textarea id="output" style="width:100%; height:500px; font-family:monospace; font-size:12px;"></textarea>
+    <button onclick="downloadSQL()">Download SQL File</button>
+
+<script>
+const API_BASE = "https://cloud-api.yandex.net/v1/disk/public/resources";
+const PUBLIC_KEY = "https://disk.yandex.ru/d/usjmeUqnkY9IfQ";
+const BASE_URL = "https://yadi.sk/d/usjmeUqnkY9IfQ";
+
+function extractWorkInfo(folderName) {
+    const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
+    if (match) {
+        return {
+            title: match[1].trim(),
+            workType: match[2].trim()
+        };
+    }
+    return {
+        title: folderName,
+        workType: "неизвестный тип"
+    };
+}
+
+function determineSubject(title) {
+    const t = title.toLowerCase();
+    
+    if (/электро|электри|энергет|эу|ру/.test(t)) return 'электроэнергетика';
+    if (/автоматиз|управлен|асу|контрол|регулир/.test(t)) return 'автоматизация';
+    if (/строител|бетон|конструк|здание|сооружен/.test(t)) return 'строительство';
+    if (/механ|привод|станок|оборудован/.test(t)) return 'механика';
+    if (/газ|газопровод|нефт/.test(t)) return 'газоснабжение';
+    if (/програм|по|software|алгоритм|дискрет/.test(t)) return 'программирование';
+    if (/безопасн|охран|труд|защит/.test(t)) return 'безопасность';
+    if (/тепло|водоснабжен|вентиляц|отоплен/.test(t)) return 'теплоснабжение';
+    if (/транспорт|дорог|судов|автомобил|локомотив/.test(t)) return 'транспорт';
+    if (/гидравлик|гидро/.test(t)) return 'гидравлика';
+    
+    return 'общая инженерия';
+}
+
+function determinePrice(workType, title) {
+    const wt = workType.toLowerCase();
+    const t = title.toLowerCase();
+    
+    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 1000;
+    if (/отчет.*практ/.test(wt)) return 1500;
+    if (/курсовая|курсовой/.test(wt)) {
+        if (/проектирование|расчет|модернизация|разработка/.test(t)) return 2200;
+        return 1800;
+    }
+    if (/дипломная|диплом/.test(wt)) {
+        if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 6000;
+        return 5000;
+    }
+    if (/реферат/.test(wt)) return 1200;
+    if (/контрольная/.test(wt)) return 1500;
+    
+    return 1500;
+}
+
+function extractUniversity(title) {
+    const match = title.match(/(ООО|ПАО|ОАО|АО|ЗАО)\s+[«"]?([^»"()]+)[»"]?/);
+    if (match) {
+        return `${match[1]} ${match[2].trim()}`;
+    }
+    return null;
+}
+
+function determineComposition(workType, title) {
+    const wt = workType.toLowerCase();
+    const t = title.toLowerCase();
+    
+    if (/дипломная/.test(wt)) {
+        if (/газопровод|электро|система|модернизация/.test(t)) {
+            return 'Пояснительная записка, графика, чертежи';
+        }
+        return 'Пояснительная записка, графика';
+    }
+    if (/курсовая/.test(wt)) {
+        if (/проектирование|расчет|схема/.test(t)) {
+            return 'Пояснительная записка, чертежи';
+        }
+        return 'Пояснительная записка';
+    }
+    if (/отчет/.test(wt)) {
+        return 'Отчёт, дневник практики';
+    }
+    
+    return 'Пояснительная записка';
+}
+
+function escapeSql(str) {
+    if (!str) return 'NULL';
+    return "'" + str.replace(/'/g, "''").replace(/\\/g, "\\\\") + "'";
+}
+
+function generateInsert(folderName) {
+    const {title, workType} = extractWorkInfo(folderName);
+    const subject = determineSubject(title);
+    const price = determinePrice(workType, title);
+    const university = extractUniversity(title);
+    const composition = determineComposition(workType, title);
+    const description = `Работа по теме: ${title}`;
+    
+    return `INSERT INTO t_p63326274_course_download_plat.works 
+(title, work_type, subject, description, composition, universities, price_points, yandex_disk_link)
+VALUES 
+(${escapeSql(title)}, ${escapeSql(workType)}, ${escapeSql(subject)}, ${escapeSql(description)}, ${escapeSql(composition)}, ${escapeSql(university)}, ${price}, ${escapeSql(BASE_URL)});
+`;
+}
+
+async function fetchBatch(offset) {
+    const url = `${API_BASE}?public_key=${encodeURIComponent(PUBLIC_KEY)}&limit=100&offset=${offset}`;
+    const response = await fetch(url);
+    return await response.json();
+}
+
+async function fetchAndGenerate() {
+    const statusEl = document.getElementById('status');
+    const outputEl = document.getElementById('output');
+    
+    statusEl.innerHTML = 'Fetching data...';
+    
+    let allSql = [];
+    allSql.push('-- SQL INSERT statements for all 486 works from Yandex Disk');
+    allSql.push('-- Generated automatically from API data');
+    allSql.push('-- Source: https://disk.yandex.ru/d/usjmeUqnkY9IfQ');
+    allSql.push('-- Total works: 486');
+    allSql.push('-- Date: 2025-10-29');
+    allSql.push('');
+    allSql.push('-- Price ranges:');
+    allSql.push('-- Практическая работа: 800-1200 points');
+    allSql.push('-- Курсовая работа: 1500-2500 points');
+    allSql.push('-- Отчет по практике: 1200-1800 points');
+    allSql.push('-- Дипломная работа: 4000-7000 points');
+    allSql.push('');
+    
+    let totalCount = 0;
+    
+    for (let offset of [0, 100, 200, 300, 400]) {
+        statusEl.innerHTML = `Fetching offset ${offset}...`;
+        
+        try {
+            const data = await fetchBatch(offset);
+            
+            if (data._embedded && data._embedded.items) {
+                for (let item of data._embedded.items) {
+                    if (item.type === 'dir') {
+                        const sql = generateInsert(item.name);
+                        allSql.push(sql);
+                        totalCount++;
+                    }
+                }
+            }
+            
+            statusEl.innerHTML = `Processed ${totalCount} works...`;
+        } catch (error) {
+            statusEl.innerHTML += `<br>Error at offset ${offset}: ${error.message}`;
+        }
+    }
+    
+    const finalSql = allSql.join('\n');
+    outputEl.value = finalSql;
+    statusEl.innerHTML = `✓ Complete! Generated SQL for ${totalCount} works.`;
+}
+
+function downloadSQL() {
+    const text = document.getElementById('output').value;
+    const blob = new Blob([text], {type: 'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'insert_all_486_works.sql';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
+</body>
+</html>

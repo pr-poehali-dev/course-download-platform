@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "name": "Import works endpoint",
+      "method": "POST",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "total_imported": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -325,7 +325,8 @@ export default function Index() {
               </div>
               
               <nav className="hidden md:flex items-center gap-6">
-                <a href="#catalog" className="hover:text-primary transition-colors">Каталог</a>
+                <a href="/" className="hover:text-primary transition-colors">Главная</a>
+                <a href="/catalog" className="hover:text-primary transition-colors">Каталог</a>
                 <a href="#blog" className="hover:text-primary transition-colors">Блог</a>
                 <a href="#support" className="hover:text-primary transition-colors">Поддержка</a>
               </nav>

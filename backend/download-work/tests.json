@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "name": "Missing workId",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "workId required"
+      }
+    },
+    {
+      "name": "OPTIONS request",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

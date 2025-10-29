@@ -26,10 +26,12 @@ export default function WorkDetailPage() {
   const navigate = useNavigate();
   const [work, setWork] = useState<Work | null>(null);
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
   const WORK_PARSER_URL = 'https://functions.poehali.dev/9899633c-f583-430f-aac2-e02cdad0cda5';
+  const DOWNLOAD_WORK_URL = 'https://functions.poehali.dev/5898b2f2-c4d9-4ff7-bd15-9600829fed08';
 
   const extractWorkInfo = (folderName: string) => {
     const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
@@ -263,6 +265,36 @@ export default function WorkDetailPage() {
     fetchWork();
   }, [workId, navigate]);
 
+  const handleDownload = async () => {
+    if (!workId || !work) return;
+    
+    setDownloading(true);
+    try {
+      const response = await fetch(
+        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`
+      );
+      
+      if (!response.ok) {
+        throw new Error('Ошибка скачивания');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${work.title.substring(0, 50)}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Ошибка при скачивании архива. Попробуйте позже.');
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -420,9 +452,20 @@ export default function WorkDetailPage() {
               <Button 
                 size="lg"
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-12 rounded-md mb-4"
-                onClick={() => window.open(work.yandexDiskLink, '_blank')}
+                onClick={handleDownload}
+                disabled={downloading}
               >
-                Купить работу
+                {downloading ? (
+                  <>
+                    <Icon name="Loader2" size={20} className="mr-2 animate-spin" />
+                    Скачивание...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="Download" size={20} className="mr-2" />
+                    Купить и скачать
+                  </>
+                )}
               </Button>
 
               <div className="space-y-3 pt-4 border-t border-gray-200">

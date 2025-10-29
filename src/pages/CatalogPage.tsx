@@ -27,6 +27,7 @@ export default function CatalogPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
@@ -118,7 +119,11 @@ export default function CatalogPage() {
       setLoading(true);
       const allWorks: Work[] = [];
 
-      for (let offset = 0; offset < 500; offset += 100) {
+      const totalBatches = 5;
+      for (let i = 0; i < totalBatches; i++) {
+        const offset = i * 100;
+        setLoadingProgress(Math.round((i / totalBatches) * 100));
+        
         try {
           const response = await fetch(
             `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&limit=100&offset=${offset}`
@@ -126,15 +131,37 @@ export default function CatalogPage() {
           const data = await response.json();
 
           if (data._embedded && data._embedded.items) {
-            for (const item of data._embedded.items) {
-              if (item.type === 'dir') {
+            const workPromises = data._embedded.items
+              .filter((item: any) => item.type === 'dir')
+              .map(async (item: any) => {
                 const { title, workType } = extractWorkInfo(item.name);
                 const subject = determineSubject(title);
                 const price = determinePrice(workType, title);
                 const universities = extractUniversity(title);
                 const composition = determineComposition(workType, title);
 
-                allWorks.push({
+                let previewUrl = null;
+                try {
+                  const folderResponse = await fetch(
+                    `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=20`
+                  );
+                  const folderData = await folderResponse.json();
+                  
+                  if (folderData._embedded && folderData._embedded.items) {
+                    const previewFile = folderData._embedded.items.find((file: any) => 
+                      file.name.toLowerCase().includes('preview') && 
+                      (file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.jpg'))
+                    );
+                    
+                    if (previewFile && previewFile.file) {
+                      previewUrl = previewFile.file;
+                    }
+                  }
+                } catch (previewError) {
+                  console.log(`No preview for ${item.name}`);
+                }
+
+                return {
                   id: item.resource_id,
                   title,
                   workType,
@@ -143,11 +170,13 @@ export default function CatalogPage() {
                   composition,
                   universities,
                   price,
-                  previewUrl: null,
+                  previewUrl,
                   yandexDiskLink: item.public_url || YANDEX_DISK_URL
-                });
-              }
-            }
+                };
+              });
+
+            const batchWorks = await Promise.all(workPromises);
+            allWorks.push(...batchWorks);
           }
         } catch (error) {
           console.error(`Error fetching offset ${offset}:`, error);
@@ -156,6 +185,7 @@ export default function CatalogPage() {
 
       setWorks(allWorks);
       setFilteredWorks(allWorks);
+      setLoadingProgress(100);
       setLoading(false);
     };
 
@@ -245,13 +275,35 @@ export default function CatalogPage() {
 
           {loading ? (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              <p className="mt-4 text-muted-foreground">Загрузка каталога...</p>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+              <p className="text-muted-foreground mb-2">Загрузка каталога...</p>
+              <div className="max-w-md mx-auto">
+                <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-primary h-full transition-all duration-300"
+                    style={{ width: `${loadingProgress}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-muted-foreground mt-2">{loadingProgress}%</p>
+              </div>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredWorks.map(work => (
-                <Card key={work.id} className="flex flex-col hover:shadow-lg transition-shadow">
+                <Card key={work.id} className="flex flex-col hover:shadow-lg transition-shadow overflow-hidden">
+                  {work.previewUrl && (
+                    <div className="relative h-48 bg-muted overflow-hidden">
+                      <img 
+                        src={work.previewUrl} 
+                        alt={work.title}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+                  
                   <CardHeader>
                     <div className="flex justify-between items-start gap-2 mb-2">
                       <Badge variant="secondary">{work.workType}</Badge>

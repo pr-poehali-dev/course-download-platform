@@ -11,11 +11,13 @@ interface Work {
   workType: string;
   subject: string;
   description: string;
-  composition: string;
+  composition: string[];
   universities: string | null;
   price: number;
   previewUrl: string | null;
   yandexDiskLink: string;
+  pageCount?: number;
+  fileFormats?: string[];
 }
 
 export default function WorkDetailPage() {
@@ -86,27 +88,56 @@ export default function WorkDetailPage() {
     return null;
   };
 
-  const determineComposition = (workType: string, title: string): string => {
+  const determineComposition = (workType: string, title: string): string[] => {
     const wt = workType.toLowerCase();
     const t = title.toLowerCase();
     
     if (/дипломная/.test(wt)) {
       if (/газопровод|электро|система|модернизация/.test(t)) {
-        return 'Пояснительная записка, графика, чертежи';
+        return ['Пояснительная записка', 'Графическая часть (чертежи)', 'Презентация', 'Раздаточный материал'];
       }
-      return 'Пояснительная записка, графика';
+      return ['Пояснительная записка', 'Графическая часть', 'Презентация'];
     }
     if (/курсовая/.test(wt)) {
       if (/проектирование|расчет|схема/.test(t)) {
-        return 'Пояснительная записка, чертежи';
+        return ['Пояснительная записка', 'Чертежи (графическая часть)', 'Расчеты'];
       }
-      return 'Пояснительная записка';
+      return ['Пояснительная записка', 'Расчеты'];
     }
     if (/отчет/.test(wt)) {
-      return 'Отчёт, дневник практики';
+      return ['Отчёт по практике', 'Дневник практики', 'Характеристика'];
     }
     
-    return 'Пояснительная записка';
+    return ['Пояснительная записка'];
+  };
+
+  const generateDetailedDescription = (workType: string, title: string, subject: string): string => {
+    const wt = workType.toLowerCase();
+    
+    let description = `Готовая работа по теме: "${title}".\n\n`;
+    
+    if (/дипломная/.test(wt)) {
+      description += `Дипломная работа выполнена в полном соответствии с требованиями ГОСТ. `;
+      description += `Включает в себя подробную пояснительную записку с теоретической и практической частями, `;
+      description += `графическую часть с чертежами и схемами, а также презентацию для защиты.\n\n`;
+      description += `Работа содержит актуальные данные, расчеты и обоснования принятых решений. `;
+      description += `Все источники оформлены согласно ГОСТ Р 7.0.100-2018.`;
+    } else if (/курсовая/.test(wt)) {
+      description += `Курсовая работа выполнена по всем требованиям методических указаний. `;
+      description += `Включает теоретическую часть с обзором литературы, практическую часть с расчетами, `;
+      description += `а также графическую часть (при необходимости).\n\n`;
+      description += `В работе представлены актуальные данные, произведены необходимые расчеты и сделаны обоснованные выводы. `;
+      description += `Список литературы оформлен по ГОСТ.`;
+    } else if (/отчет.*практ/.test(wt)) {
+      description += `Отчет по практике составлен в соответствии с программой практики и методическими указаниями. `;
+      description += `Содержит описание предприятия, выполненных работ и заданий, а также дневник практики.\n\n`;
+      description += `Отчет дополнен характеристикой от руководителя практики.`;
+    } else {
+      description += `Работа выполнена в соответствии с методическими требованиями. `;
+      description += `Содержит необходимые расчеты, обоснования и выводы.`;
+    }
+    
+    return description;
   };
 
   useEffect(() => {
@@ -153,17 +184,21 @@ export default function WorkDetailPage() {
               console.log('No preview available');
             }
 
+            const detailedDescription = generateDetailedDescription(workType, title, subject);
+            
             setWork({
               id: item.resource_id,
               title,
               workType,
               subject,
-              description: `Работа по теме: ${title}`,
+              description: detailedDescription,
               composition,
               universities,
               price,
               previewUrl,
-              yandexDiskLink: item.public_url || YANDEX_DISK_URL
+              yandexDiskLink: item.public_url || YANDEX_DISK_URL,
+              pageCount: workType.toLowerCase().includes('дипломная') ? 80 : 40,
+              fileFormats: ['PDF', 'DOCX']
             });
           } else {
             navigate('/catalog');
@@ -240,19 +275,47 @@ export default function WorkDetailPage() {
 
             <div className="space-y-6">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Описание</h2>
-                <p className="text-gray-700 leading-relaxed">
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Описание работы</h2>
+                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
                   {work.description}
-                </p>
+                </div>
               </div>
 
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Состав работы</h2>
-                <div className="flex items-start gap-3">
-                  <Icon name="Package" size={20} className="mt-1 flex-shrink-0 text-gray-400" />
-                  <p className="text-gray-700">
-                    {work.composition}
-                  </p>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Содержание архива</h2>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <ul className="space-y-2.5">
+                    {work.composition.map((item, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <Icon name="FileText" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
+                        <span className="text-gray-700">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Дополнительная информация</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {work.pageCount && (
+                    <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
+                      <Icon name="FileText" size={20} className="flex-shrink-0 text-gray-400" />
+                      <div>
+                        <div className="text-xs text-gray-500 mb-0.5">Объем работы</div>
+                        <div className="text-sm font-medium text-gray-900">~{work.pageCount} страниц</div>
+                      </div>
+                    </div>
+                  )}
+                  {work.fileFormats && work.fileFormats.length > 0 && (
+                    <div className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
+                      <Icon name="FileType" size={20} className="flex-shrink-0 text-gray-400" />
+                      <div>
+                        <div className="text-xs text-gray-500 mb-0.5">Форматы файлов</div>
+                        <div className="text-sm font-medium text-gray-900">{work.fileFormats.join(', ')}</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 

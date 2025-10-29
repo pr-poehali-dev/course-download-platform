@@ -114,6 +114,35 @@ export default function CatalogPage() {
   };
 
   useEffect(() => {
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const fetchPreviewForItem = async (item: any): Promise<string | null> => {
+      try {
+        await sleep(50);
+        const folderResponse = await fetch(
+          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=20`
+        );
+        
+        if (!folderResponse.ok) return null;
+        
+        const folderData = await folderResponse.json();
+        
+        if (folderData._embedded && folderData._embedded.items) {
+          const previewFile = folderData._embedded.items.find((file: any) => 
+            file.name.toLowerCase().includes('preview') && 
+            (file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.jpg'))
+          );
+          
+          if (previewFile && previewFile.file) {
+            return previewFile.file;
+          }
+        }
+      } catch (error) {
+        return null;
+      }
+      return null;
+    };
+
     const fetchWorks = async () => {
       setLoading(true);
       const allWorks: Work[] = [];
@@ -130,52 +159,31 @@ export default function CatalogPage() {
           const data = await response.json();
 
           if (data._embedded && data._embedded.items) {
-            const workPromises = data._embedded.items
-              .filter((item: any) => item.type === 'dir')
-              .map(async (item: any) => {
-                const { title, workType } = extractWorkInfo(item.name);
-                const subject = determineSubject(title);
-                const price = determinePrice(workType, title);
-                const universities = extractUniversity(title);
-                const composition = determineComposition(workType, title);
+            const folders = data._embedded.items.filter((item: any) => item.type === 'dir');
+            
+            const works = folders.map((item: any) => {
+              const { title, workType } = extractWorkInfo(item.name);
+              const subject = determineSubject(title);
+              const price = determinePrice(workType, title);
+              const universities = extractUniversity(title);
+              const composition = determineComposition(workType, title);
 
-                let previewUrl = null;
-                try {
-                  const folderResponse = await fetch(
-                    `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=20`
-                  );
-                  const folderData = await folderResponse.json();
-                  
-                  if (folderData._embedded && folderData._embedded.items) {
-                    const previewFile = folderData._embedded.items.find((file: any) => 
-                      file.name.toLowerCase().includes('preview') && 
-                      (file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.jpg'))
-                    );
-                    
-                    if (previewFile && previewFile.file) {
-                      previewUrl = previewFile.file;
-                    }
-                  }
-                } catch (previewError) {
-                  console.log(`No preview for ${item.name}`);
-                }
+              return {
+                id: item.resource_id,
+                title,
+                workType,
+                subject,
+                description: `Работа по теме: ${title}`,
+                composition,
+                universities,
+                price,
+                previewUrl: null,
+                yandexDiskLink: item.public_url || YANDEX_DISK_URL,
+                _item: item
+              };
+            });
 
-                return {
-                  id: item.resource_id,
-                  title,
-                  workType,
-                  subject,
-                  description: `Работа по теме: ${title}`,
-                  composition,
-                  universities,
-                  price,
-                  previewUrl,
-                  yandexDiskLink: item.public_url || YANDEX_DISK_URL
-                };
-              });
-
-            const batchWorks = await Promise.all(workPromises);
-            allWorks.push(...batchWorks);
+            allWorks.push(...works);
           }
         } catch (error) {
           console.error(`Error fetching offset ${offset}:`, error);
@@ -186,6 +194,19 @@ export default function CatalogPage() {
       setFilteredWorks(allWorks);
       setLoadingProgress(100);
       setLoading(false);
+
+      for (let i = 0; i < allWorks.length; i++) {
+        const work = allWorks[i];
+        if ((work as any)._item) {
+          const previewUrl = await fetchPreviewForItem((work as any)._item);
+          if (previewUrl) {
+            const updatedWorks = [...allWorks];
+            updatedWorks[i] = { ...work, previewUrl };
+            setWorks([...updatedWorks]);
+            setFilteredWorks([...updatedWorks]);
+          }
+        }
+      }
     };
 
     fetchWorks();

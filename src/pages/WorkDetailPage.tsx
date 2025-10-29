@@ -1,364 +1,321 @@
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
-import { toast } from '@/components/ui/use-toast';
 
-interface Review {
-  id: number;
-  author: string;
-  rating: number;
-  date: string;
-  comment: string;
+interface Work {
+  id: string;
+  title: string;
+  workType: string;
+  subject: string;
+  description: string;
+  composition: string;
+  universities: string | null;
+  price: number;
+  previewUrl: string | null;
+  yandexDiskLink: string;
 }
 
 export default function WorkDetailPage() {
-  const { id } = useParams();
-  const [isFavorite, setIsFavorite] = useState(false);
-  const [userReview, setUserReview] = useState('');
-  const [userRating, setUserRating] = useState(0);
+  const { workId } = useParams();
+  const navigate = useNavigate();
+  const [work, setWork] = useState<Work | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const work = {
-    id: parseInt(id || '1'),
-    title: 'Курсовая работа по менеджменту',
-    description: 'Полноценная курсовая работа по теме "Стратегическое планирование в современной организации". Включает в себя теоретическую и практическую части, список литературы, приложения.',
-    category: 'Менеджмент',
-    price: 150,
-    author: 'Мария Петрова',
-    authorRating: 4.9,
-    authorSales: 45,
-    rating: 4.8,
-    reviewsCount: 12,
-    pages: 45,
-    format: 'DOCX',
-    size: '2.3 МБ',
-    uploadDate: '2024-09-15',
-    sales: 28,
-    tags: ['стратегия', 'планирование', 'менеджмент', 'организация']
+  const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
+  const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
+
+  const extractWorkInfo = (folderName: string) => {
+    const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
+    if (match) {
+      return {
+        title: match[1].trim(),
+        workType: match[2].trim()
+      };
+    }
+    return {
+      title: folderName,
+      workType: 'неизвестный тип'
+    };
   };
 
-  const reviews: Review[] = [
-    {
-      id: 1,
-      author: 'Александр И.',
-      rating: 5,
-      date: '2024-10-20',
-      comment: 'Отличная работа! Все требования выполнены, структура четкая, источники актуальные. Рекомендую!'
-    },
-    {
-      id: 2,
-      author: 'Елена К.',
-      rating: 5,
-      date: '2024-10-18',
-      comment: 'Качественная работа, помогла разобраться в теме. Спасибо автору!'
-    },
-    {
-      id: 3,
-      author: 'Дмитрий С.',
-      rating: 4,
-      date: '2024-10-15',
-      comment: 'Хорошая работа, но пришлось немного доработать под требования своего преподавателя.'
-    }
-  ];
-
-  const relatedWorks = [
-    {
-      id: 2,
-      title: 'Анализ финансовых показателей предприятия',
-      category: 'Экономика',
-      price: 100,
-      rating: 4.7
-    },
-    {
-      id: 3,
-      title: 'Проектирование базы данных',
-      category: 'Информатика',
-      price: 200,
-      rating: 4.9
-    }
-  ];
-
-  const handleToggleFavorite = () => {
-    setIsFavorite(!isFavorite);
-    toast({
-      title: isFavorite ? 'Удалено из избранного' : 'Добавлено в избранное',
-      description: isFavorite ? 'Работа удалена из вашего списка избранного' : 'Теперь вы можете быстро найти эту работу'
-    });
-  };
-
-  const handlePurchase = () => {
-    toast({
-      title: 'Переход к оплате',
-      description: `Покупка работы "${work.title}" за ${work.price} баллов`
-    });
-  };
-
-  const handleSubmitReview = () => {
-    if (!userReview || userRating === 0) {
-      toast({
-        title: 'Ошибка',
-        description: 'Поставьте оценку и напишите отзыв',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    toast({
-      title: 'Отзыв отправлен',
-      description: 'Спасибо за ваш отзыв!'
-    });
+  const determineSubject = (title: string): string => {
+    const t = title.toLowerCase();
     
-    setUserReview('');
-    setUserRating(0);
+    if (/электро|электри|энергет|эу|ру/.test(t)) return 'электроэнергетика';
+    if (/автоматиз|управлен|асу|контрол|регулир/.test(t)) return 'автоматизация';
+    if (/строител|бетон|конструк|здание|сооружен/.test(t)) return 'строительство';
+    if (/механ|привод|станок|оборудован/.test(t)) return 'механика';
+    if (/газ|газопровод|нефт/.test(t)) return 'газоснабжение';
+    if (/програм|по|software|алгоритм|дискрет/.test(t)) return 'программирование';
+    if (/безопасн|охран|труд|защит/.test(t)) return 'безопасность';
+    if (/тепло|водоснабжен|вентиляц|отоплен/.test(t)) return 'теплоснабжение';
+    if (/транспорт|дорог|судов|автомобил|локомотив/.test(t)) return 'транспорт';
+    if (/гидравлик|гидро/.test(t)) return 'гидравлика';
+    
+    return 'общая инженерия';
   };
 
-  const renderStars = (rating: number, interactive: boolean = false, onRate?: (rating: number) => void) => {
+  const determinePrice = (workType: string, title: string): number => {
+    const wt = workType.toLowerCase();
+    const t = title.toLowerCase();
+    
+    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 1000;
+    if (/отчет.*практ/.test(wt)) return 1500;
+    if (/курсовая|курсовой/.test(wt)) {
+      if (/проектирование|расчет|модернизация|разработка/.test(t)) return 2200;
+      return 1800;
+    }
+    if (/дипломная|диплом/.test(wt)) {
+      if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 6000;
+      return 5000;
+    }
+    if (/реферат/.test(wt)) return 1200;
+    if (/контрольная/.test(wt)) return 1500;
+    
+    return 1500;
+  };
+
+  const extractUniversity = (title: string): string | null => {
+    const match = title.match(/(ООО|ПАО|ОАО|АО|ЗАО)\s+[«"]?([^»"()]+)[»"]?/);
+    if (match) {
+      return `${match[1]} ${match[2].trim()}`;
+    }
+    return null;
+  };
+
+  const determineComposition = (workType: string, title: string): string => {
+    const wt = workType.toLowerCase();
+    const t = title.toLowerCase();
+    
+    if (/дипломная/.test(wt)) {
+      if (/газопровод|электро|система|модернизация/.test(t)) {
+        return 'Пояснительная записка, графика, чертежи';
+      }
+      return 'Пояснительная записка, графика';
+    }
+    if (/курсовая/.test(wt)) {
+      if (/проектирование|расчет|схема/.test(t)) {
+        return 'Пояснительная записка, чертежи';
+      }
+      return 'Пояснительная записка';
+    }
+    if (/отчет/.test(wt)) {
+      return 'Отчёт, дневник практики';
+    }
+    
+    return 'Пояснительная записка';
+  };
+
+  useEffect(() => {
+    const fetchWork = async () => {
+      if (!workId) {
+        navigate('/catalog');
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&limit=500`
+        );
+        const data = await response.json();
+
+        if (data._embedded && data._embedded.items) {
+          const item = data._embedded.items.find((item: any) => item.resource_id === workId);
+          
+          if (item) {
+            const { title, workType } = extractWorkInfo(item.name);
+            const subject = determineSubject(title);
+            const price = determinePrice(workType, title);
+            const universities = extractUniversity(title);
+            const composition = determineComposition(workType, title);
+
+            let previewUrl = null;
+            try {
+              const folderResponse = await fetch(
+                `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=20`
+              );
+              const folderData = await folderResponse.json();
+              
+              if (folderData._embedded && folderData._embedded.items) {
+                const previewFile = folderData._embedded.items.find((file: any) => 
+                  file.name.toLowerCase().includes('preview') && 
+                  (file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.jpg'))
+                );
+                
+                if (previewFile && previewFile.file) {
+                  previewUrl = previewFile.file;
+                }
+              }
+            } catch (error) {
+              console.log('No preview available');
+            }
+
+            setWork({
+              id: item.resource_id,
+              title,
+              workType,
+              subject,
+              description: `Работа по теме: ${title}`,
+              composition,
+              universities,
+              price,
+              previewUrl,
+              yandexDiskLink: item.public_url || YANDEX_DISK_URL
+            });
+          } else {
+            navigate('/catalog');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching work:', error);
+        navigate('/catalog');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWork();
+  }, [workId, navigate]);
+
+  if (loading) {
     return (
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Icon
-            key={star}
-            name="Star"
-            size={interactive ? 24 : 16}
-            className={`${
-              star <= rating
-                ? 'fill-yellow-500 text-yellow-500'
-                : 'text-gray-300'
-            } ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
-            onClick={() => interactive && onRate && onRate(star)}
-          />
-        ))}
+      <div className="min-h-screen bg-white">
+        <Navigation />
+        <main className="container mx-auto px-4 py-20 mt-16">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600"></div>
+            <p className="mt-4 text-gray-600">Загрузка...</p>
+          </div>
+        </main>
       </div>
     );
-  };
+  }
+
+  if (!work) {
+    return null;
+  }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16 max-w-7xl">
-        <div className="mb-8">
-          <Button variant="ghost" className="mb-4" asChild>
-            <Link to="/">
-              <Icon name="ArrowLeft" size={18} className="mr-2" />
-              Назад в каталог
-            </Link>
-          </Button>
-        </div>
+    <div className="min-h-screen bg-white">
+      <Navigation />
+      
+      <main className="container mx-auto px-4 py-6 mt-16 max-w-[1200px]">
+        <Button 
+          variant="ghost" 
+          className="mb-6 text-gray-600 hover:text-gray-900"
+          onClick={() => navigate('/catalog')}
+        >
+          <Icon name="ArrowLeft" size={20} className="mr-2" />
+          Назад к каталогу
+        </Button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <Badge className="mb-3">{work.category}</Badge>
-                    <CardTitle className="text-3xl mb-2">{work.title}</CardTitle>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        {renderStars(work.rating)}
-                        <span className="ml-1">{work.rating}</span>
-                        <span>({work.reviewsCount} отзывов)</span>
-                      </div>
-                      <span className="flex items-center gap-1">
-                        <Icon name="Download" size={14} />
-                        {work.sales} продаж
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleToggleFavorite}
-                    className={isFavorite ? 'text-red-500' : ''}
-                  >
-                    <Icon
-                      name="Heart"
-                      size={24}
-                      className={isFavorite ? 'fill-red-500' : ''}
-                    />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <h3 className="font-semibold mb-2">Описание работы</h3>
-                  <p className="text-muted-foreground">{work.description}</p>
-                </div>
+          <div className="lg:col-span-2">
+            <div className="mb-4">
+              <Badge className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-sm border-0">
+                {work.workType}
+              </Badge>
+            </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted rounded-lg">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Страниц</p>
-                    <p className="font-semibold">{work.pages}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Формат</p>
-                    <p className="font-semibold">{work.format}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Размер</p>
-                    <p className="font-semibold">{work.size}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Загружено</p>
-                    <p className="font-semibold">
-                      {new Date(work.uploadDate).toLocaleDateString('ru-RU')}
+            <h1 className="text-3xl font-bold text-gray-900 mb-6 leading-tight">
+              {work.title}
+            </h1>
+
+            <div className="bg-gray-50 rounded-lg overflow-hidden mb-8">
+              {work.previewUrl ? (
+                <img 
+                  src={work.previewUrl} 
+                  alt={work.title}
+                  className="w-full h-auto"
+                />
+              ) : (
+                <div className="w-full aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                  <Icon name="FileText" className="text-gray-300" size={80} />
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Описание</h2>
+                <p className="text-gray-700 leading-relaxed">
+                  {work.description}
+                </p>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Состав работы</h2>
+                <div className="flex items-start gap-3">
+                  <Icon name="Package" size={20} className="mt-1 flex-shrink-0 text-gray-400" />
+                  <p className="text-gray-700">
+                    {work.composition}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Предметная область</h2>
+                <div className="flex items-center gap-3">
+                  <Icon name="Tag" size={20} className="flex-shrink-0 text-gray-400" />
+                  <Badge className="bg-blue-50 text-blue-700 text-sm font-normal px-3 py-1 border-0">
+                    {work.subject}
+                  </Badge>
+                </div>
+              </div>
+
+              {work.universities && (
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Организация</h2>
+                  <div className="flex items-start gap-3">
+                    <Icon name="Building2" size={20} className="mt-1 flex-shrink-0 text-gray-400" />
+                    <p className="text-gray-700">
+                      {work.universities}
                     </p>
                   </div>
                 </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">Теги</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {work.tags.map((tag) => (
-                      <Badge key={tag} variant="outline">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Об авторе</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center">
-                    <Icon name="User" size={32} className="text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-semibold mb-1">{work.author}</h4>
-                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        {renderStars(Math.round(work.authorRating))}
-                        <span>{work.authorRating}</span>
-                      </div>
-                      <span>{work.authorSales} продаж</span>
-                    </div>
-                  </div>
-                  <Button variant="outline">
-                    Все работы автора
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Отзывы ({reviews.length})</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="border-b pb-6">
-                  <h4 className="font-semibold mb-3">Оставить отзыв</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="mb-2 block">Ваша оценка</Label>
-                      {renderStars(userRating, true, setUserRating)}
-                    </div>
-                    <Textarea
-                      placeholder="Расскажите о вашем опыте использования этой работы..."
-                      value={userReview}
-                      onChange={(e) => setUserReview(e.target.value)}
-                      rows={4}
-                    />
-                    <Button onClick={handleSubmitReview}>
-                      <Icon name="Send" size={16} className="mr-2" />
-                      Отправить отзыв
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {reviews.map((review) => (
-                    <div key={review.id} className="border-b pb-4 last:border-0">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold">{review.author}</p>
-                          {renderStars(review.rating)}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {new Date(review.date).toLocaleDateString('ru-RU')}
-                        </p>
-                      </div>
-                      <p className="text-muted-foreground">{review.comment}</p>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              )}
+            </div>
           </div>
 
-          <div className="space-y-6">
-            <Card className="sticky top-4">
-              <CardHeader>
-                <CardTitle className="text-4xl">{work.price}</CardTitle>
-                <CardDescription>баллов</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button className="w-full" size="lg" onClick={handlePurchase}>
-                  <Icon name="ShoppingCart" size={18} className="mr-2" />
-                  Купить работу
-                </Button>
-                <Button variant="outline" className="w-full" onClick={handleToggleFavorite}>
-                  <Icon name="Heart" size={18} className="mr-2" />
-                  {isFavorite ? 'В избранном' : 'Добавить в избранное'}
-                </Button>
-
-                <div className="pt-4 border-t space-y-3 text-sm">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Icon name="Shield" size={16} />
-                    <span>Безопасная сделка</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Icon name="Download" size={16} />
-                    <span>Мгновенное скачивание</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Icon name="RefreshCw" size={16} />
-                    <span>Возврат в течение 7 дней</span>
-                  </div>
+          <div className="lg:col-span-1">
+            <div className="bg-gray-50 rounded-lg p-6 sticky top-20">
+              <div className="mb-6">
+                <div className="text-sm text-gray-600 mb-2">Стоимость</div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-bold text-gray-900">{work.price.toLocaleString()}</span>
+                  <span className="text-lg text-gray-600 font-medium">баллов</span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Похожие работы</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {relatedWorks.map((relatedWork) => (
-                  <Link
-                    key={relatedWork.id}
-                    to={`/work/${relatedWork.id}`}
-                    className="block p-3 border rounded-lg hover:border-primary transition-colors"
-                  >
-                    <Badge variant="outline" className="mb-2">
-                      {relatedWork.category}
-                    </Badge>
-                    <h4 className="font-semibold mb-2 text-sm">{relatedWork.title}</h4>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-1">
-                        {renderStars(Math.round(relatedWork.rating))}
-                        <span className="text-muted-foreground ml-1">
-                          {relatedWork.rating}
-                        </span>
-                      </div>
-                      <span className="font-semibold text-primary">
-                        {relatedWork.price} б.
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-              </CardContent>
-            </Card>
+              <Button 
+                size="lg"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium h-12 rounded-md mb-4"
+                onClick={() => window.open(work.yandexDiskLink, '_blank')}
+              >
+                Купить работу
+              </Button>
+
+              <div className="space-y-3 pt-4 border-t border-gray-200">
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <Icon name="Shield" size={18} className="text-green-600" />
+                  <span>Гарантия качества</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <Icon name="Download" size={18} className="text-blue-600" />
+                  <span>Мгновенная загрузка</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-600">
+                  <Icon name="FileCheck" size={18} className="text-purple-600" />
+                  <span>Проверенные материалы</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

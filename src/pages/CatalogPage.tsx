@@ -313,7 +313,11 @@ export default function CatalogPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredWorks.map((work) => (
-              <div key={work.id} className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <div 
+                key={work.id} 
+                className="group bg-white rounded-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                onClick={() => window.location.href = `/work-detail/${work.id}`}
+              >
                 <div className="relative bg-gray-50 aspect-[4/3] overflow-hidden border-b border-gray-100">
                   {work.previewUrl ? (
                     <img 
@@ -354,16 +358,19 @@ export default function CatalogPage() {
 
                   <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                     <div>
-                      <div className="flex items-baseline gap-1">
+                      <div className="flex items-baseline gap-1.5">
                         <span className="text-3xl font-bold text-gray-900">{work.price.toLocaleString()}</span>
-                        <span className="text-base text-gray-500 font-medium">₽</span>
+                        <span className="text-base text-gray-500 font-medium">баллов</span>
                       </div>
                     </div>
                     
                     <Button 
                       size="sm"
                       className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-5 rounded font-medium shadow-sm"
-                      onClick={() => window.open(work.yandexDiskLink, '_blank')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.open(work.yandexDiskLink, '_blank');
+                      }}
                     >
                       Купить
                     </Button>

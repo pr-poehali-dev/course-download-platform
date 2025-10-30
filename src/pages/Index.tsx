@@ -112,14 +112,13 @@ export default function Index() {
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(1000);
   const [sortBy, setSortBy] = useState<string>('rating');
-  
-  const userBalance = currentUser?.balance || 0;
-  
-  const availableWorks = realWorks.filter(work => (work.price_points || work.price || 0) <= userBalance).length;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [realWorks, setRealWorks] = useState<any[]>([]);
   const [worksLoading, setWorksLoading] = useState(true);
+  
+  const userBalance = currentUser?.balance || 0;
+  const availableWorks = realWorks.filter(work => (work.price_points || work.price || 0) <= userBalance).length;
 
   useEffect(() => {
     const initAuth = async () => {

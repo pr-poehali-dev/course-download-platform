@@ -65,7 +65,10 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (data.token) {
-        await fetch('https://functions.poehali.dev/195e0d18-1732-45c7-a76b-ab9880c8793a', {
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userId', data.user.id);
+        
+        fetch('https://functions.poehali.dev/195e0d18-1732-45c7-a76b-ab9880c8793a', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -73,10 +76,7 @@ export default function RegisterPage() {
             email: formData.email,
             name: formData.name
           })
-        });
-
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userId', data.user.id);
+        }).catch(() => {});
         
         toast({
           title: 'Регистрация успешна!',

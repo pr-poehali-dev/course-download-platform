@@ -50,29 +50,44 @@ interface Transaction {
 
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile>({
-    name: 'Александр Иванов',
-    email: 'alex.ivanov@example.com',
-    balance: 350,
-    totalEarned: 1200,
-    totalSpent: 850,
-    worksUploaded: 8,
-    worksPurchased: 15,
-    rating: 4.8,
-    registrationDate: '2024-01-15'
+    name: '',
+    email: '',
+    balance: 0,
+    totalEarned: 0,
+    totalSpent: 0,
+    worksUploaded: 0,
+    worksPurchased: 0,
+    rating: 0,
+    registrationDate: ''
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const loadUserData = async () => {
+      const userData = await authService.verify();
+      if (userData) {
+        setUser({
+          name: userData.username,
+          email: userData.email,
+          balance: userData.balance,
+          totalEarned: 0,
+          totalSpent: 0,
+          worksUploaded: 0,
+          worksPurchased: 0,
+          rating: 0,
+          registrationDate: new Date().toISOString().split('T')[0]
+        });
+      }
+      setLoading(false);
+    };
+
+    loadUserData();
+
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.get('payment') === 'success') {
       toast({
         title: 'Платёж успешно обработан!',
         description: 'Баллы зачислены на ваш счёт',
-      });
-      
-      authService.verify().then((userData) => {
-        if (userData) {
-          setUser(prev => ({ ...prev, balance: userData.balance }));
-        }
       });
       
       const url = new URL(window.location.href);
@@ -81,80 +96,11 @@ export default function ProfilePage() {
     }
   }, []);
 
-  const [purchases] = useState<Purchase[]>([
-    {
-      id: 1,
-      workTitle: 'Курсовая по менеджменту',
-      price: 150,
-      date: '2024-10-20',
-      downloadUrl: '#'
-    },
-    {
-      id: 2,
-      workTitle: 'Проектирование базы данных',
-      price: 200,
-      date: '2024-10-18',
-      downloadUrl: '#'
-    },
-    {
-      id: 3,
-      workTitle: 'Анализ финансовых показателей',
-      price: 100,
-      date: '2024-10-15',
-      downloadUrl: '#'
-    }
-  ]);
+  const [purchases] = useState<Purchase[]>([]);
 
-  const [uploads] = useState<Upload[]>([
-    {
-      id: 1,
-      title: 'Разработка мобильного приложения',
-      price: 500,
-      sales: 12,
-      status: 'active',
-      uploadDate: '2024-09-15'
-    },
-    {
-      id: 2,
-      title: 'Курсовая работа по маркетингу',
-      price: 150,
-      sales: 8,
-      status: 'active',
-      uploadDate: '2024-09-10'
-    },
-    {
-      id: 3,
-      title: 'Отчет по практике',
-      price: 100,
-      sales: 0,
-      status: 'moderation',
-      uploadDate: '2024-10-22'
-    }
-  ]);
+  const [uploads] = useState<Upload[]>([]);
 
-  const [transactions] = useState<Transaction[]>([
-    {
-      id: 1,
-      type: 'sale',
-      amount: 500,
-      description: 'Продажа работы "Разработка мобильного приложения"',
-      date: '2024-10-23'
-    },
-    {
-      id: 2,
-      type: 'purchase',
-      amount: -150,
-      description: 'Покупка работы "Курсовая по менеджменту"',
-      date: '2024-10-20'
-    },
-    {
-      id: 3,
-      type: 'bonus',
-      amount: 100,
-      description: 'Бонус за регистрацию',
-      date: '2024-01-15'
-    }
-  ]);
+  const [transactions] = useState<Transaction[]>([]);
 
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState(user.name);
@@ -179,6 +125,17 @@ export default function ProfilePage() {
         return <Badge>Неизвестно</Badge>;
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <Icon name="Loader2" className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Загрузка профиля...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">

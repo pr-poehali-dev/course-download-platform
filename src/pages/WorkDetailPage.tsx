@@ -14,6 +14,7 @@ interface Work {
   composition: string[];
   universities: string | null;
   price: number;
+  rating: number;
   previewUrl: string | null;
   yandexDiskLink: string;
   fileFormats?: string[];
@@ -161,20 +162,33 @@ export default function WorkDetailPage() {
     const wt = workType.toLowerCase();
     const t = title.toLowerCase();
     
-    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 1000;
-    if (/отчет.*практ/.test(wt)) return 1500;
+    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 400;
+    if (/отчет.*практ/.test(wt)) return 600;
     if (/курсовая|курсовой/.test(wt)) {
-      if (/проектирование|расчет|модернизация|разработка/.test(t)) return 2200;
-      return 1800;
+      if (/проектирование|расчет|модернизация|разработка/.test(t)) return 900;
+      return 700;
     }
     if (/дипломная|диплом/.test(wt)) {
-      if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 6000;
-      return 5000;
+      if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 2400;
+      return 2000;
     }
-    if (/реферат/.test(wt)) return 1200;
-    if (/контрольная/.test(wt)) return 1500;
+    if (/реферат/.test(wt)) return 500;
+    if (/контрольная/.test(wt)) return 600;
     
-    return 1500;
+    return 600;
+  };
+
+  const determineRating = (workType: string): number => {
+    const wt = workType.toLowerCase();
+    
+    if (/дипломная|диплом/.test(wt)) return 5.0;
+    if (/курсовая|курсовой/.test(wt)) return 4.8;
+    if (/отчет.*практ/.test(wt)) return 4.7;
+    if (/практическая|практика/.test(wt)) return 4.6;
+    if (/контрольная/.test(wt)) return 4.5;
+    if (/реферат/.test(wt)) return 4.4;
+    
+    return 4.5;
   };
 
   const extractUniversity = (title: string): string | null => {
@@ -257,6 +271,7 @@ export default function WorkDetailPage() {
             const { title, workType } = extractWorkInfo(item.name);
             const subject = determineSubject(title);
             const price = determinePrice(workType, title);
+            const rating = determineRating(workType);
             const universities = extractUniversity(title);
             const composition = determineComposition(workType, title);
             const universitiesList = determineUniversities(subject);
@@ -362,6 +377,7 @@ export default function WorkDetailPage() {
               composition: parsedComposition,
               universities: universitiesList.join(', '),
               price,
+              rating,
               previewUrl,
               yandexDiskLink: folderPublicUrl,
               fileFormats: fileFormats.length > 0 ? fileFormats : undefined
@@ -491,10 +507,15 @@ export default function WorkDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <div className="mb-4">
+            <div className="flex items-center justify-between mb-4">
               <Badge className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-sm border-0">
                 {work.workType}
               </Badge>
+              <div className="flex items-center gap-1.5">
+                <Icon name="Star" size={18} className="text-yellow-500 fill-yellow-500" />
+                <span className="text-lg font-bold text-gray-800">{work.rating}</span>
+                <span className="text-sm text-gray-500">/5.0</span>
+              </div>
             </div>
 
             <h1 className="text-3xl font-bold text-gray-900 mb-6 leading-tight">

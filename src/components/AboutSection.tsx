@@ -57,7 +57,7 @@ export default function AboutSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
-                Более 5000 студентов уже используют платформу. Присоединяйся к сообществу активных 
+                Более 1000 студентов уже с нами. Присоединяйся к сообществу активных 
                 студентов, которые помогают друг другу учиться эффективнее.
               </p>
             </CardContent>

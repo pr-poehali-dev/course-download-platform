@@ -85,20 +85,20 @@ export default function CatalogPage() {
     const wt = workType.toLowerCase();
     const t = title.toLowerCase();
     
-    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 400;
-    if (/отчет.*практ/.test(wt)) return 600;
+    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 200;
+    if (/отчет.*практ/.test(wt)) return 300;
     if (/курсовая|курсовой/.test(wt)) {
-      if (/проектирование|расчет|модернизация|разработка/.test(t)) return 900;
-      return 700;
+      if (/проектирование|расчет|модернизация|разработка/.test(t)) return 500;
+      return 400;
     }
     if (/дипломная|диплом/.test(wt)) {
-      if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 2400;
-      return 2000;
+      if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 1200;
+      return 1000;
     }
-    if (/реферат/.test(wt)) return 500;
-    if (/контрольная/.test(wt)) return 600;
+    if (/реферат/.test(wt)) return 150;
+    if (/контрольная/.test(wt)) return 250;
     
-    return 600;
+    return 300;
   };
 
   const determineRating = (workType: string): number => {

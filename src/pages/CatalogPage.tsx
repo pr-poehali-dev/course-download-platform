@@ -36,14 +36,14 @@ export default function CatalogPage() {
     const wt = workType.toLowerCase().trim();
     
     if (/курсовая|курсовой/.test(wt)) return 'Курсовая работа';
-    if (/дипломная|диплом/.test(wt)) return 'Дипломная работа';
+    if (/дипломная|диплом(?!ная)/.test(wt) && !/часть/.test(wt)) return 'Дипломная работа';
     if (/диссертация/.test(wt)) return 'Диссертация';
     if (/реферат/.test(wt)) return 'Реферат';
-    if (/практическая/.test(wt) && !/отчет/.test(wt)) return 'Практическая';
+    if (/^практическая\s*(работа)?$/i.test(wt)) return 'Практическая';
     if (/практика|отчет.*практ/.test(wt)) return 'Практика';
-    if (/вкр|выпускная/.test(wt)) return 'Выпускная квалификационная работа';
-    if (/литературный.*обзор|обзор.*литератур/.test(wt)) return 'Литературный обзор';
-    if (/чертеж|чертежи/.test(wt)) return 'Чертежи';
+    if (/вкр|выпускная\s*квалификационная/.test(wt)) return 'Выпускная квалификационная работа';
+    if (/литературный\s*обзор/.test(wt)) return 'Литературный обзор';
+    if (/чертеж/.test(wt)) return 'Чертежи';
     
     return workType;
   };
@@ -131,8 +131,10 @@ export default function CatalogPage() {
   };
 
   useEffect(() => {
-    const CACHE_KEY = 'catalog_works_cache';
+    const CACHE_KEY = 'catalog_works_cache_v2';
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
+    
+    localStorage.removeItem('catalog_works_cache');
 
     const loadFromCache = (): Work[] | null => {
       try {
@@ -199,7 +201,7 @@ export default function CatalogPage() {
               const universities = extractUniversity(title);
               const composition = determineComposition(workType, title);
 
-              const work = {
+              return {
                 id: item.resource_id,
                 title,
                 workType,
@@ -211,9 +213,6 @@ export default function CatalogPage() {
                 previewUrl: null,
                 yandexDiskLink: item.public_url || YANDEX_DISK_URL
               };
-              
-              console.log('Loaded work:', work.title, '| Type:', work.workType);
-              return work;
             });
 
             allWorks.push(...works);
@@ -326,20 +325,7 @@ export default function CatalogPage() {
     }
 
     if (filterType !== 'all') {
-      console.log('=== FILTER DEBUG ===');
-      console.log('Selected filter:', filterType);
-      console.log('Total works:', works.length);
-      console.log('Unique work types:', Array.from(new Set(works.map(w => w.workType))));
-      
-      filtered = filtered.filter(work => {
-        const matches = work.workType === filterType;
-        if (matches) {
-          console.log('MATCH:', work.title, '| Type:', work.workType);
-        }
-        return matches;
-      });
-      
-      console.log('Filtered results:', filtered.length);
+      filtered = filtered.filter(work => work.workType === filterType);
     }
 
     if (filterSubject !== 'all') {

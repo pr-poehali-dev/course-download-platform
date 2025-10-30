@@ -8,6 +8,7 @@ import Icon from '@/components/ui/icon';
 
 interface Work {
   id: string;
+  folderName: string;
   title: string;
   workType: string;
   subject: string;
@@ -203,6 +204,7 @@ export default function CatalogPage() {
 
               return {
                 id: item.resource_id,
+                folderName: item.name,
                 title,
                 workType,
                 subject,
@@ -270,9 +272,8 @@ export default function CatalogPage() {
       await new Promise(resolve => setTimeout(resolve, 150));
 
       try {
-        const folderName = work.title + ' (' + work.workType + ')';
         const response = await fetch(
-          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + folderName)}&limit=20`
+          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + work.folderName)}&limit=20`
         );
         
         if (!response.ok) continue;

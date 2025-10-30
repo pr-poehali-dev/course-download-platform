@@ -1,0 +1,23 @@
+{
+  "tests": [
+    {
+      "name": "Test missing fields",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "title": "Test work"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Test OPTIONS for CORS",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

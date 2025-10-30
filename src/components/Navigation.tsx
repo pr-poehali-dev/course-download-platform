@@ -32,6 +32,7 @@ export default function Navigation({
           <nav className="hidden md:flex items-center gap-6">
             <a href="/" className="hover:text-primary transition-colors">Главная</a>
             <a href="/catalog" className="hover:text-primary transition-colors">Каталог</a>
+            <a href="/marketplace" className="hover:text-primary transition-colors">Авторам</a>
             <a href="/#blog" className="hover:text-primary transition-colors">Блог</a>
             <a href="/#support" className="hover:text-primary transition-colors">Поддержка</a>
           </nav>

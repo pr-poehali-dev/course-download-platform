@@ -1,4 +1,7 @@
 {
+  "get-author-earnings": "https://functions.poehali.dev/4f0f55c6-087b-4264-b6fa-5c7378337075",
+  "upload-author-work": "https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0",
+  "pdf-preview": "https://functions.poehali.dev/c40802ab-38ad-48ab-9750-03b63b2bdaca",
   "get-work-files": "https://functions.poehali.dev/ec3bbe78-f975-4ae0-9b3f-3a3fc67dd7d1",
   "purchase-work": "https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9",
   "download-work": "https://functions.poehali.dev/5898b2f2-c4d9-4ff7-bd15-9600829fed08",

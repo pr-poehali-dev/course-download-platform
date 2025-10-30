@@ -137,9 +137,37 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             commission = int(price * 0.1)
             cur.execute(
                 """INSERT INTO t_p63326274_course_download_plat.purchases 
-                (buyer_id, work_id, price_paid, commission) VALUES (%s, %s, %s, %s)""",
+                (buyer_id, work_id, price_paid, commission) VALUES (%s, %s, %s, %s) RETURNING id""",
                 (user_id, db_work_id, price, commission)
             )
+            purchase_id = cur.fetchone()[0]
+            
+            # Получаем author_id работы
+            cur.execute(
+                "SELECT author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                (db_work_id,)
+            )
+            author_result = cur.fetchone()
+            
+            # Если есть автор, начисляем ему 90%
+            if author_result and author_result[0]:
+                author_id = author_result[0]
+                author_share = int(price * 0.9)
+                platform_fee = int(price * 0.1)
+                
+                # Начисляем автору 90% на баланс
+                cur.execute(
+                    "UPDATE t_p63326274_course_download_plat.users SET balance = balance + %s WHERE id = %s",
+                    (author_share, author_id)
+                )
+                
+                # Записываем транзакцию выплаты
+                cur.execute(
+                    """INSERT INTO t_p63326274_course_download_plat.author_earnings 
+                    (author_id, work_id, purchase_id, sale_amount, author_share, platform_fee, status)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                    (author_id, db_work_id, purchase_id, price, author_share, platform_fee, 'paid')
+                )
             
             # Обновляем счётчик скачиваний
             cur.execute(

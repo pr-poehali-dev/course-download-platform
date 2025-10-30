@@ -18,6 +18,7 @@ import BuyPointsPage from "./pages/BuyPointsPage";
 import UploadWorkPage from "./pages/UploadWorkPage";
 import WorkDetailPage from "./pages/WorkDetailPage";
 import CatalogPage from "./pages/CatalogPage";
+import AuthorMarketplacePage from "./pages/AuthorMarketplacePage";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
           <Route path="/work/:id" element={<WorkDetailPage />} />
           <Route path="/work-detail/:workId" element={<WorkDetailPage />} />
           <Route path="/catalog" element={<CatalogPage />} />
+          <Route path="/marketplace" element={<AuthorMarketplacePage />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

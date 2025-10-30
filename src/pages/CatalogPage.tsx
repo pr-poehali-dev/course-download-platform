@@ -342,9 +342,14 @@ export default function CatalogPage() {
     let filtered = works;
 
     if (searchQuery) {
+      const query = searchQuery.toLowerCase().trim();
       filtered = filtered.filter(work =>
-        work.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        work.description.toLowerCase().includes(searchQuery.toLowerCase())
+        work.title.toLowerCase().includes(query) ||
+        work.workType.toLowerCase().includes(query) ||
+        work.subject.toLowerCase().includes(query) ||
+        work.description.toLowerCase().includes(query) ||
+        work.composition.toLowerCase().includes(query) ||
+        (work.universities && work.universities.toLowerCase().includes(query))
       );
     }
 
@@ -386,7 +391,7 @@ export default function CatalogPage() {
                 <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <Input
                   type="text"
-                  placeholder="Поиск работ по названию..."
+                  placeholder="Поиск по названию, предмету, университету, типу работы..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10 h-11 border-gray-300 rounded-md"

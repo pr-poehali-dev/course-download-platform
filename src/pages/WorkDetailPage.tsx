@@ -28,6 +28,9 @@ export default function WorkDetailPage() {
   const [downloading, setDownloading] = useState(false);
   const [gallery, setGallery] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<number>(0);
+  const [showingPdfPreview, setShowingPdfPreview] = useState(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [loadingPdfPreview, setLoadingPdfPreview] = useState(false);
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
@@ -35,6 +38,7 @@ export default function WorkDetailPage() {
   const DOWNLOAD_WORK_URL = 'https://functions.poehali.dev/5898b2f2-c4d9-4ff7-bd15-9600829fed08';
   const PURCHASE_WORK_URL = 'https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9';
   const GET_WORK_FILES_URL = 'https://functions.poehali.dev/ec3bbe78-f975-4ae0-9b3f-3a3fc67dd7d1';
+  const PDF_PREVIEW_URL = 'https://functions.poehali.dev/c40802ab-38ad-48ab-9750-03b63b2bdaca';
 
   const extractWorkInfo = (folderName: string) => {
     const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
@@ -473,6 +477,44 @@ export default function WorkDetailPage() {
     }
   };
 
+  const handleShowPdfPreview = async () => {
+    if (!work) return;
+    
+    setLoadingPdfPreview(true);
+    
+    try {
+      const folderName = work.title;
+      const response = await fetch(
+        `${PDF_PREVIEW_URL}?folder_name=${encodeURIComponent(folderName)}&public_key=${encodeURIComponent(YANDEX_DISK_URL)}&page_count=3`
+      );
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Не удалось загрузить превью');
+      }
+      
+      const data = await response.json();
+      
+      const binaryString = atob(data.preview);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      
+      setPdfPreviewUrl(url);
+      setShowingPdfPreview(true);
+      
+    } catch (error) {
+      console.error('PDF preview error:', error);
+      alert(error instanceof Error ? error.message : 'Не удалось загрузить превью PDF');
+    } finally {
+      setLoadingPdfPreview(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -639,7 +681,7 @@ export default function WorkDetailPage() {
 
               <Button 
                 size="default"
-                className="w-full font-semibold rounded-lg mb-5 shadow-md hover:shadow-lg transition-all duration-200 h-11"
+                className="w-full font-semibold rounded-lg mb-3 shadow-md hover:shadow-lg transition-all duration-200 h-11"
                 onClick={handlePurchaseAndDownload}
                 disabled={downloading}
               >
@@ -652,6 +694,26 @@ export default function WorkDetailPage() {
                   <>
                     <Icon name="Download" size={18} className="mr-2" />
                     Купить и скачать
+                  </>
+                )}
+              </Button>
+
+              <Button 
+                variant="outline"
+                size="default"
+                className="w-full font-semibold rounded-lg mb-5 h-11"
+                onClick={handleShowPdfPreview}
+                disabled={loadingPdfPreview}
+              >
+                {loadingPdfPreview ? (
+                  <>
+                    <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                    Загрузка...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="Eye" size={18} className="mr-2" />
+                    Посмотреть превью
                   </>
                 )}
               </Button>
@@ -693,6 +755,48 @@ export default function WorkDetailPage() {
           </div>
         </div>
       </main>
+
+      {showingPdfPreview && pdfPreviewUrl && (
+        <div 
+          className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+          onClick={() => {
+            setShowingPdfPreview(false);
+            if (pdfPreviewUrl) {
+              URL.revokeObjectURL(pdfPreviewUrl);
+              setPdfPreviewUrl(null);
+            }
+          }}
+        >
+          <div 
+            className="bg-white rounded-lg w-full max-w-4xl h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">Превью работы (первые 3 страницы)</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowingPdfPreview(false);
+                  if (pdfPreviewUrl) {
+                    URL.revokeObjectURL(pdfPreviewUrl);
+                    setPdfPreviewUrl(null);
+                  }
+                }}
+              >
+                <Icon name="X" size={20} />
+              </Button>
+            </div>
+            <div className="flex-1 overflow-auto">
+              <iframe
+                src={pdfPreviewUrl}
+                className="w-full h-full"
+                title="PDF Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -349,9 +349,15 @@ export default function CatalogPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все типы</SelectItem>
-                  {workTypes.map(type => (
-                    <SelectItem key={type} value={type}>{type}</SelectItem>
-                  ))}
+                  <SelectItem value="Курсовая работа">Курсовая работа</SelectItem>
+                  <SelectItem value="Дипломная работа">Дипломная работа</SelectItem>
+                  <SelectItem value="Диссертация">Диссертация</SelectItem>
+                  <SelectItem value="Реферат">Реферат</SelectItem>
+                  <SelectItem value="Практическая">Практическая</SelectItem>
+                  <SelectItem value="Практика">Практика</SelectItem>
+                  <SelectItem value="Выпускная квалификационная работа">Выпускная квалификационная работа</SelectItem>
+                  <SelectItem value="Литературный обзор">Литературный обзор</SelectItem>
+                  <SelectItem value="Чертежи">Чертежи</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -369,17 +375,12 @@ export default function CatalogPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              Найдено работ: <span className="font-semibold">{filteredWorks.length}</span>
+          {loadingPreviews && (
+            <div className="flex items-center gap-2 text-sm text-gray-500">
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
+              <span>Загружаются изображения...</span>
             </div>
-            {loadingPreviews && (
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
-                <span>Загружаются изображения...</span>
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         {loading ? (

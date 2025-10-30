@@ -115,7 +115,7 @@ export default function Index() {
   
   const userBalance = currentUser?.balance || 0;
   
-  const availableWorks = MOCK_WORKS.filter(work => work.price <= userBalance).length;
+  const availableWorks = realWorks.filter(work => (work.price_points || work.price || 0) <= userBalance).length;
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [realWorks, setRealWorks] = useState<any[]>([]);
@@ -223,7 +223,7 @@ export default function Index() {
   };
 
   const handleCheckout = () => {
-    const totalPrice = cartItems.reduce((sum, item) => sum + item.price, 0);
+    const totalPrice = cartItems.reduce((sum, item) => sum + (item.price_points || item.price || 0), 0);
     if (userBalance >= totalPrice) {
       setUserBalance(userBalance - totalPrice);
       setPurchases([...purchases, ...cartItems.map(item => ({
@@ -288,6 +288,7 @@ export default function Index() {
 
   const worksToDisplay = realWorks.length > 0 ? realWorks : MOCK_WORKS.map(w => ({
     ...w,
+    price_points: w.price,
     work_type: w.type
   }));
 
@@ -297,13 +298,16 @@ export default function Index() {
         work.subject.toLowerCase().includes(searchQuery.toLowerCase());
       const workType = work.work_type || work.type;
       const matchesCategory = selectedCategory === 'all' || workType === selectedCategory;
-      const matchesPrice = work.price >= minPrice && work.price <= maxPrice;
+      const price = work.price_points || work.price || 0;
+      const matchesPrice = price >= minPrice && price <= maxPrice;
       return matchesSearch && matchesCategory && matchesPrice;
     })
     .sort((a, b) => {
+      const priceA = a.price_points || a.price || 0;
+      const priceB = b.price_points || b.price || 0;
       if (sortBy === 'rating') return (b.rating || 0) - (a.rating || 0);
-      if (sortBy === 'price_asc') return a.price - b.price;
-      if (sortBy === 'price_desc') return b.price - a.price;
+      if (sortBy === 'price_asc') return priceA - priceB;
+      if (sortBy === 'price_desc') return priceB - priceA;
       if (sortBy === 'popular') return (b.downloads || 0) - (a.downloads || 0);
       return 0;
     });
@@ -431,7 +435,7 @@ export default function Index() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
                 <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
-                  <div className="text-3xl font-bold text-primary mb-1">450+</div>
+                  <div className="text-3xl font-bold text-primary mb-1">{realWorks.length > 0 ? realWorks.length : '450'}+</div>
                   <p className="text-sm text-muted-foreground">Готовых работ</p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-purple-200 hover:border-purple-400 transition-all hover:shadow-lg">
@@ -911,8 +915,20 @@ export default function Index() {
                   </Button>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredWorks.map((work, index) => {
+                {worksLoading ? (
+                  <div className="flex flex-col items-center justify-center py-16 gap-4">
+                    <Icon name="Loader2" size={48} className="animate-spin text-primary" />
+                    <p className="text-muted-foreground">Загружаем каталог работ...</p>
+                  </div>
+                ) : filteredWorks.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 gap-4">
+                    <Icon name="Search" size={48} className="text-muted-foreground" />
+                    <p className="text-lg font-semibold">Работы не найдены</p>
+                    <p className="text-muted-foreground">Попробуйте изменить параметры поиска</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredWorks.map((work, index) => {
                     const price = work.price_points || work.price;
                     const workType = work.work_type || work.type;
                     const isAffordable = price <= userBalance;
@@ -1013,13 +1029,6 @@ export default function Index() {
                     </Card>
                   )}
                   )}
-                </div>
-
-                {filteredWorks.length === 0 && (
-                  <div className="text-center py-16">
-                    <Icon name="FileQuestion" size={64} className="mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Ничего не найдено</h3>
-                    <p className="text-muted-foreground">Попробуйте изменить параметры поиска</p>
                   </div>
                 )}
               </TabsContent>

@@ -19,17 +19,17 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/YOUR_AUTH_FUNCTION_URL', {
+      const response = await fetch('https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46?action=login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, action: 'login' })
+        body: JSON.stringify({ username: email, password })
       });
 
       const data = await response.json();
 
-      if (data.success) {
+      if (data.token) {
         localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userId', data.userId);
+        localStorage.setItem('userId', data.user.id);
         
         toast({
           title: 'Добро пожаловать!',

@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/YOUR_AUTH_FUNCTION_URL', {
+      const response = await fetch('https://functions.poehali.dev/195e0d18-1732-45c7-a76b-ab9880c8793a', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

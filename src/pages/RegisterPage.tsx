@@ -52,12 +52,11 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/YOUR_AUTH_FUNCTION_URL', {
+      const response = await fetch('https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46?action=register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'register',
-          name: formData.name,
+          username: formData.name,
           email: formData.email,
           password: formData.password
         })
@@ -65,13 +64,26 @@ export default function RegisterPage() {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (data.token) {
+        await fetch('https://functions.poehali.dev/195e0d18-1732-45c7-a76b-ab9880c8793a', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'welcome',
+            email: formData.email,
+            name: formData.name
+          })
+        });
+
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userId', data.user.id);
+        
         toast({
           title: 'Регистрация успешна!',
-          description: 'Проверьте email для подтверждения аккаунта'
+          description: 'Добро пожаловать! Вам начислено 100 бонусных баллов'
         });
         
-        navigate('/login');
+        navigate('/profile');
       } else {
         toast({
           title: 'Ошибка регистрации',

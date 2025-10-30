@@ -264,7 +264,7 @@ export default function WorkDetailPage() {
             // Формируем прямую ссылку на папку работы
             const folderPublicUrl = `${YANDEX_DISK_URL}:${item.path}`;
 
-            const previewUrl = null;
+            let previewUrl: string | null = null;
             let fileFormats: string[] = [];
             let parsedDescription: string | null = null;
             let parsedComposition: string[] = composition;

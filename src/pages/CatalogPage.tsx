@@ -199,7 +199,7 @@ export default function CatalogPage() {
               const universities = extractUniversity(title);
               const composition = determineComposition(workType, title);
 
-              return {
+              const work = {
                 id: item.resource_id,
                 title,
                 workType,
@@ -211,6 +211,9 @@ export default function CatalogPage() {
                 previewUrl: null,
                 yandexDiskLink: item.public_url || YANDEX_DISK_URL
               };
+              
+              console.log('Loaded work:', work.title, '| Type:', work.workType);
+              return work;
             });
 
             allWorks.push(...works);
@@ -323,7 +326,20 @@ export default function CatalogPage() {
     }
 
     if (filterType !== 'all') {
-      filtered = filtered.filter(work => work.workType === filterType);
+      console.log('=== FILTER DEBUG ===');
+      console.log('Selected filter:', filterType);
+      console.log('Total works:', works.length);
+      console.log('Unique work types:', Array.from(new Set(works.map(w => w.workType))));
+      
+      filtered = filtered.filter(work => {
+        const matches = work.workType === filterType;
+        if (matches) {
+          console.log('MATCH:', work.title, '| Type:', work.workType);
+        }
+        return matches;
+      });
+      
+      console.log('Filtered results:', filtered.length);
     }
 
     if (filterSubject !== 'all') {

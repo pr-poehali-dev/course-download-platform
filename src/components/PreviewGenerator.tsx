@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 export default function PreviewGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [batchSize, setBatchSize] = useState(10);
+  const [batchSize, setBatchSize] = useState(50);
   const [stats, setStats] = useState({ total: 0, success: 0, failed: 0 });
 
   const generatePreviews = async () => {
@@ -18,46 +18,29 @@ export default function PreviewGenerator() {
     setStats({ total: 0, success: 0, failed: 0 });
 
     try {
-      const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413');
-      const data = await response.json();
+      const response = await fetch('https://functions.poehali.dev/c5c39645-740b-4fc3-8d3f-d4dc911fae68', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limit: batchSize })
+      });
       
-      if (!data.works || !Array.isArray(data.works)) {
-        throw new Error('Не удалось загрузить список работ');
-      }
-
-      const worksWithoutPreviews = data.works.filter((w: any) => !w.preview_image_url);
-      const worksToProcess = worksWithoutPreviews.slice(0, batchSize);
+      const result = await response.json();
       
-      setStats(prev => ({ ...prev, total: worksToProcess.length }));
-
-      for (let i = 0; i < worksToProcess.length; i++) {
-        const work = worksToProcess[i];
-        
-        try {
-          const prompt = createPrompt(
-            work.title,
-            work.work_type || 'курсовая работа',
-            work.subject || 'общая инженерия'
-          );
-
-          const imageUrl = await generateImageManual(prompt);
-          
-          await updateWorkPreview(work.id, imageUrl);
-          
-          setStats(prev => ({ ...prev, success: prev.success + 1 }));
-          setProgress(Math.round(((i + 1) / worksToProcess.length) * 100));
-          
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          
-        } catch (error) {
-          console.error(`Failed to generate preview for work ${work.id}:`, error);
-          setStats(prev => ({ ...prev, failed: prev.failed + 1 }));
-        }
+      if (result.error) {
+        throw new Error(result.error);
       }
+      
+      setStats({
+        total: result.total_processed || 0,
+        success: result.success || 0,
+        failed: result.failed || 0
+      });
+      
+      setProgress(100);
 
       toast({
-        title: 'Генерация завершена',
-        description: `Успешно: ${stats.success}, Ошибок: ${stats.failed}`
+        title: 'Синхронизация завершена',
+        description: `Успешно: ${result.success}, Ошибок: ${result.failed}`
       });
       
     } catch (error) {
@@ -71,53 +54,7 @@ export default function PreviewGenerator() {
     }
   };
 
-  const createPrompt = (title: string, workType: string, subject: string): string => {
-    const typeStyles: Record<string, string> = {
-      'курсовая работа': 'academic paper with charts and diagrams',
-      'дипломная работа': 'graduation thesis with professional design',
-      'диссертация': 'PhD dissertation with complex research visuals',
-      'чертеж': 'technical engineering blueprint with precise lines',
-      'реферат': 'research paper with text and citations',
-      'эссе': 'essay document with elegant typography',
-      'лабораторная работа': 'laboratory experiment with scientific equipment',
-      'практическая работа': 'practical work with hands-on tools',
-      'конспект': 'study notes with highlights and annotations',
-      'тесты': 'test paper with multiple choice questions',
-      'шпаргалка': 'cheat sheet with condensed information',
-      'презентация': 'presentation slides with infographics'
-    };
-    
-    const subjectThemes: Record<string, string> = {
-      'программирование': 'code on screen, algorithms, software development',
-      'экономика': 'financial charts, graphs, business analytics',
-      'маркетинг': 'marketing strategy, brand elements, analytics',
-      'сопромат': 'engineering calculations, stress diagrams, beams',
-      'физика': 'physics formulas, experiments, scientific equipment',
-      'математика': 'mathematical equations, geometric shapes, calculus',
-      'химия': 'chemical formulas, lab equipment, molecular structures',
-      'биология': 'cells, DNA, biological diagrams',
-      'история': 'historical documents, timelines, archives',
-      'право': 'legal documents, law books, scales of justice',
-      'архитектура': 'architectural drawings, building plans, 3D models',
-      'строительство': 'construction blueprints, building materials',
-      'электротехника': 'electrical circuits, diagrams, equipment',
-      'машиностроение': 'mechanical parts, CAD drawings, machinery',
-      'информатика': 'computer science, networks, data structures'
-    };
-    
-    const style = typeStyles[workType.toLowerCase()] || 'academic document with professional design';
-    const theme = subjectThemes[subject.toLowerCase()] || 'educational materials and study content';
-    
-    return `Professional academic work cover: ${style}, ${theme}, clean modern design, educational style, high quality, realistic, well-organized layout, university standard`;
-  };
 
-  const generateImageManual = async (prompt: string): Promise<string> => {
-    return `https://cdn.poehali.dev/placeholder-${Date.now()}.jpg`;
-  };
-
-  const updateWorkPreview = async (workId: number, imageUrl: string): Promise<void> => {
-    console.log(`Would update work ${workId} with preview: ${imageUrl}`);
-  };
 
   return (
     <Card>
@@ -144,7 +81,7 @@ export default function PreviewGenerator() {
             disabled={isGenerating}
           />
           <p className="text-xs text-muted-foreground">
-            Рекомендуется: 10-20 работ (каждая картинка ~2 секунды)
+            Рекомендуется: 50-100 работ за раз (быстрая синхронизация с Яндекс.Диском)
           </p>
         </div>
 
@@ -171,12 +108,12 @@ export default function PreviewGenerator() {
           {isGenerating ? (
             <>
               <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-              Генерация...
+              Синхронизация...
             </>
           ) : (
             <>
               <Icon name="Sparkles" size={18} className="mr-2" />
-              Начать генерацию
+              Синхронизировать превью
             </>
           )}
         </Button>
@@ -187,10 +124,10 @@ export default function PreviewGenerator() {
             <div className="text-sm text-blue-900">
               <p className="font-medium mb-1">Как это работает:</p>
               <ul className="space-y-1 text-xs">
-                <li>• Система анализирует тип и предмет работы</li>
-                <li>• Генерирует подходящую картинку через ИИ</li>
-                <li>• Сохраняет ссылку в базу данных</li>
-                <li>• Каждая картинка уникальна и соответствует работе</li>
+                <li>• Система находит preview.png в папках на Яндекс.Диске</li>
+                <li>• Получает прямые ссылки на файлы превью</li>
+                <li>• Сохраняет ссылки в базу данных</li>
+                <li>• Картинки мгновенно отображаются в каталоге</li>
               </ul>
             </div>
           </div>

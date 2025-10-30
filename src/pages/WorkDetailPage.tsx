@@ -25,12 +25,15 @@ export default function WorkDetailPage() {
   const [work, setWork] = useState<Work | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<number>(0);
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
   const WORK_PARSER_URL = 'https://functions.poehali.dev/9899633c-f583-430f-aac2-e02cdad0cda5';
   const DOWNLOAD_WORK_URL = 'https://functions.poehali.dev/5898b2f2-c4d9-4ff7-bd15-9600829fed08';
   const PURCHASE_WORK_URL = 'https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9';
+  const GET_WORK_FILES_URL = 'https://functions.poehali.dev/ec3bbe78-f975-4ae0-9b3f-3a3fc67dd7d1';
 
   const extractWorkInfo = (folderName: string) => {
     const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
@@ -266,7 +269,24 @@ export default function WorkDetailPage() {
             let parsedDescription: string | null = null;
             let parsedComposition: string[] = composition;
             
-            // Get preview image
+            // Get real file composition
+            try {
+              const filesResponse = await fetch(
+                `${GET_WORK_FILES_URL}?folder_name=${encodeURIComponent(item.name)}&public_key=${encodeURIComponent(YANDEX_DISK_URL)}`
+              );
+              
+              if (filesResponse.ok) {
+                const filesData = await filesResponse.json();
+                
+                if (filesData.composition && filesData.composition.length > 0) {
+                  parsedComposition = filesData.composition;
+                }
+              }
+            } catch (error) {
+              console.log('Error fetching work files:', error);
+            }
+            
+            // Get preview images and gallery
             try {
               const folderResponse = await fetch(
                 `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=100`
@@ -274,16 +294,23 @@ export default function WorkDetailPage() {
               const folderData = await folderResponse.json();
               
               if (folderData._embedded && folderData._embedded.items) {
+                const images: string[] = [];
+                
                 for (const file of folderData._embedded.items) {
                   const fileName = file.name.toLowerCase();
                   
-                  if (fileName.includes('preview') && 
-                      (fileName.endsWith('.png') || fileName.endsWith('.jpg')) && 
-                      file.file && !previewUrl) {
-                    previewUrl = file.file;
-                    break;
+                  if ((fileName.endsWith('.png') || fileName.endsWith('.jpg') || fileName.endsWith('.jpeg')) && 
+                      (fileName.includes('preview') || fileName.includes('титул') || fileName.includes('обложка') || fileName.includes('страница')) &&
+                      file.file) {
+                    images.push(file.file);
+                    
+                    if (!previewUrl) {
+                      previewUrl = file.file;
+                    }
                   }
                 }
+                
+                setGallery(images);
               }
             } catch (error) {
               console.log('Error fetching preview:', error);
@@ -464,15 +491,50 @@ export default function WorkDetailPage() {
               {work.title}
             </h1>
 
-            <div className="bg-gray-50 rounded-lg overflow-hidden mb-8">
-              {work.previewUrl ? (
-                <img 
-                  src={work.previewUrl} 
-                  alt={work.title}
-                  className="w-full h-auto"
-                />
+            <div className="space-y-4 mb-8">
+              {gallery.length > 0 ? (
+                <>
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden border-2 border-gray-200">
+                    <img 
+                      src={gallery[selectedImage]} 
+                      alt={`${work.title} - страница ${selectedImage + 1}`}
+                      className="w-full h-auto"
+                      loading="lazy"
+                    />
+                  </div>
+                  
+                  {gallery.length > 1 && (
+                    <div className="flex items-center gap-2 overflow-x-auto pb-2">
+                      {gallery.map((image, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setSelectedImage(index)}
+                          className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                            selectedImage === index 
+                              ? 'border-blue-600 ring-2 ring-blue-200' 
+                              : 'border-gray-200 hover:border-gray-400'
+                          }`}
+                        >
+                          <img 
+                            src={image} 
+                            alt={`Превью ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : work.previewUrl ? (
+                <div className="bg-gray-50 rounded-lg overflow-hidden border-2 border-gray-200">
+                  <img 
+                    src={work.previewUrl} 
+                    alt={work.title}
+                    className="w-full h-auto"
+                  />
+                </div>
               ) : (
-                <div className="w-full aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+                <div className="w-full aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg">
                   <Icon name="FileText" className="text-gray-300" size={80} />
                 </div>
               )}

@@ -206,7 +206,7 @@ export default function CatalogPage() {
                 title,
                 workType,
                 subject,
-                description: `Работа по теме: ${title}`,
+                description: `${workType} • ${subject}`,
                 composition,
                 universities,
                 price,
@@ -236,7 +236,7 @@ export default function CatalogPage() {
 
   const loadPreviews = async (worksList: Work[]) => {
     setLoadingPreviews(true);
-    const PREVIEW_CACHE_KEY = 'catalog_previews_cache';
+    const PREVIEW_CACHE_KEY = 'catalog_previews_cache_v2';
     
     const loadPreviewCache = (): Record<string, string> => {
       try {
@@ -261,7 +261,7 @@ export default function CatalogPage() {
     const updatedWorks = [...worksList];
     let hasUpdates = false;
 
-    for (let i = 0; i < updatedWorks.length; i++) {
+    for (let i = 0; i < Math.min(updatedWorks.length, 60); i++) {
       const work = updatedWorks[i];
       
       if (previewCache[work.id]) {
@@ -270,7 +270,7 @@ export default function CatalogPage() {
         continue;
       }
 
-      await sleep(300);
+      await sleep(200);
 
       try {
         const folderName = work.title + ' (' + work.workType + ')';
@@ -283,14 +283,19 @@ export default function CatalogPage() {
         const data = await response.json();
         
         if (data._embedded && data._embedded.items) {
-          const previewFile = data._embedded.items.find((file: any) => 
-            file.name.toLowerCase().includes('preview') && 
-            (file.name.toLowerCase().endsWith('.png') || file.name.toLowerCase().endsWith('.jpg'))
+          const imageFile = data._embedded.items.find((file: any) => 
+            file.type === 'file' && 
+            (file.name.toLowerCase().includes('preview') || 
+             file.name.toLowerCase().includes('титул') ||
+             file.name.toLowerCase().includes('обложка')) &&
+            (file.name.toLowerCase().endsWith('.png') || 
+             file.name.toLowerCase().endsWith('.jpg') ||
+             file.name.toLowerCase().endsWith('.jpeg'))
           );
           
-          if (previewFile && previewFile.file) {
-            updatedWorks[i] = { ...work, previewUrl: previewFile.file };
-            previewCache[work.id] = previewFile.file;
+          if (imageFile && imageFile.file) {
+            updatedWorks[i] = { ...work, previewUrl: imageFile.file };
+            previewCache[work.id] = imageFile.file;
             hasUpdates = true;
             
             if (i % 10 === 0) {
@@ -337,6 +342,16 @@ export default function CatalogPage() {
 
   const workTypes = Array.from(new Set(works.map(w => w.workType)));
   const subjects = Array.from(new Set(works.map(w => w.subject)));
+  
+  const getWorkTypeCount = (type: string) => {
+    if (type === 'all') return works.length;
+    return works.filter(w => w.workType === type).length;
+  };
+  
+  const getSubjectCount = (subject: string) => {
+    if (subject === 'all') return works.length;
+    return works.filter(w => w.subject === subject).length;
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -366,16 +381,16 @@ export default function CatalogPage() {
                   <SelectValue placeholder="Тип работы" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все типы</SelectItem>
-                  <SelectItem value="Курсовая работа">Курсовая работа</SelectItem>
-                  <SelectItem value="Дипломная работа">Дипломная работа</SelectItem>
-                  <SelectItem value="Диссертация">Диссертация</SelectItem>
-                  <SelectItem value="Реферат">Реферат</SelectItem>
-                  <SelectItem value="Практическая">Практическая</SelectItem>
-                  <SelectItem value="Практика">Практика</SelectItem>
-                  <SelectItem value="Выпускная квалификационная работа">Выпускная квалификационная работа</SelectItem>
-                  <SelectItem value="Литературный обзор">Литературный обзор</SelectItem>
-                  <SelectItem value="Чертежи">Чертежи</SelectItem>
+                  <SelectItem value="all">Все типы ({getWorkTypeCount('all')})</SelectItem>
+                  {getWorkTypeCount('Курсовая работа') > 0 && <SelectItem value="Курсовая работа">Курсовая работа ({getWorkTypeCount('Курсовая работа')})</SelectItem>}
+                  {getWorkTypeCount('Дипломная работа') > 0 && <SelectItem value="Дипломная работа">Дипломная работа ({getWorkTypeCount('Дипломная работа')})</SelectItem>}
+                  {getWorkTypeCount('Диссертация') > 0 && <SelectItem value="Диссертация">Диссертация ({getWorkTypeCount('Диссертация')})</SelectItem>}
+                  {getWorkTypeCount('Реферат') > 0 && <SelectItem value="Реферат">Реферат ({getWorkTypeCount('Реферат')})</SelectItem>}
+                  {getWorkTypeCount('Практическая') > 0 && <SelectItem value="Практическая">Практическая ({getWorkTypeCount('Практическая')})</SelectItem>}
+                  {getWorkTypeCount('Практика') > 0 && <SelectItem value="Практика">Практика ({getWorkTypeCount('Практика')})</SelectItem>}
+                  {getWorkTypeCount('Выпускная квалификационная работа') > 0 && <SelectItem value="Выпускная квалификационная работа">Выпускная квалификационная работа ({getWorkTypeCount('Выпускная квалификационная работа')})</SelectItem>}
+                  {getWorkTypeCount('Литературный обзор') > 0 && <SelectItem value="Литературный обзор">Литературный обзор ({getWorkTypeCount('Литературный обзор')})</SelectItem>}
+                  {getWorkTypeCount('Чертежи') > 0 && <SelectItem value="Чертежи">Чертежи ({getWorkTypeCount('Чертежи')})</SelectItem>}
                 </SelectContent>
               </Select>
 
@@ -384,9 +399,11 @@ export default function CatalogPage() {
                   <SelectValue placeholder="Предмет" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все предметы</SelectItem>
+                  <SelectItem value="all">Все предметы ({getSubjectCount('all')})</SelectItem>
                   {subjects.map(subject => (
-                    <SelectItem key={subject} value={subject}>{subject}</SelectItem>
+                    <SelectItem key={subject} value={subject}>
+                      {subject} ({getSubjectCount(subject)})
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>

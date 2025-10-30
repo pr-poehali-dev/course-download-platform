@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "name": "Get work files without folder_name",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

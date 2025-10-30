@@ -1,4 +1,5 @@
 {
+  "get-work-files": "https://functions.poehali.dev/ec3bbe78-f975-4ae0-9b3f-3a3fc67dd7d1",
   "purchase-work": "https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9",
   "download-work": "https://functions.poehali.dev/5898b2f2-c4d9-4ff7-bd15-9600829fed08",
   "work-parser": "https://functions.poehali.dev/9899633c-f583-430f-aac2-e02cdad0cda5",

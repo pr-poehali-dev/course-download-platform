@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
@@ -20,6 +21,8 @@ export default function Navigation({
   cartCount = 0,
   favoritesCount = 0,
 }: NavigationProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   return (
     <header className="border-b bg-white/95 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
       <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
@@ -102,8 +105,72 @@ export default function Navigation({
                 <span className="hidden md:inline">Профиль</span>
               </a>
             </Button>
+
+            <Button 
+              variant="ghost" 
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
+            </Button>
           </div>
         </div>
+
+        {mobileMenuOpen && (
+          <div className="md:hidden mt-4 pb-4 border-t pt-4">
+            <nav className="flex flex-col gap-4">
+              <a 
+                href="/" 
+                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon name="Home" size={20} className="text-primary" />
+                <span className="font-medium">Главная</span>
+              </a>
+              <a 
+                href="/catalog" 
+                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon name="BookOpen" size={20} className="text-primary" />
+                <span className="font-medium">Каталог</span>
+              </a>
+              <a 
+                href="/ai-assistant" 
+                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon name="Bot" size={20} className="text-primary" />
+                <span className="font-medium">TechMentor Pro</span>
+              </a>
+              <a 
+                href="/marketplace" 
+                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon name="Briefcase" size={20} className="text-primary" />
+                <span className="font-medium">Авторам</span>
+              </a>
+              <a 
+                href="/#blog" 
+                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon name="Newspaper" size={20} className="text-primary" />
+                <span className="font-medium">Блог</span>
+              </a>
+              <a 
+                href="/#support" 
+                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Icon name="HelpCircle" size={20} className="text-primary" />
+                <span className="font-medium">Поддержка</span>
+              </a>
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );

@@ -557,6 +557,185 @@ export default function Index() {
           </div>
         </section>
 
+        <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
+                  <Icon name="Sparkles" size={14} className="mr-1" />
+                  Новинка
+                </Badge>
+                <h2 className="text-5xl font-bold mb-4">
+                  Умный Помощник для студентов
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  ИИ-ассистент поможет адаптировать купленную работу под требования твоего ВУЗа
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <Card className="border-2 border-purple-200 hover:shadow-xl transition-all">
+                  <CardHeader>
+                    <Icon name="Bot" size={48} className="text-purple-600 mb-4" />
+                    <CardTitle className="text-2xl">Что делает помощник?</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm">Анализирует структуру купленной работы</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm">Помогает переформулировать текст под твой стиль</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm">Подсказывает, как адаптировать под требования ВУЗа</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm">Учит работать с источниками и оформлением</p>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 border-blue-200 hover:shadow-xl transition-all">
+                  <CardHeader>
+                    <Icon name="Lightbulb" size={48} className="text-blue-600 mb-4" />
+                    <CardTitle className="text-2xl">Принцип работы</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                        1
+                      </div>
+                      <p className="text-sm">Загружаешь купленную работу в чат</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                        2
+                      </div>
+                      <p className="text-sm">Описываешь требования своего ВУЗа</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                        3
+                      </div>
+                      <p className="text-sm">Получаешь пошаговые инструкции и подсказки</p>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                        4
+                      </div>
+                      <p className="text-sm">Самостоятельно дорабатываешь текст с помощью ИИ</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="border-2 border-orange-200 bg-orange-50/50 mb-8">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <Icon name="AlertCircle" size={32} className="text-orange-600 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-bold text-lg mb-2">Важно: мы учим, а не делаем за тебя!</h3>
+                      <p className="text-muted-foreground text-sm">
+                        Помощник не пишет работу за тебя — он помогает понять, как адаптировать текст самостоятельно. 
+                        Это как репетитор: объясняет, направляет, но главная работа — за тобой. Так ты действительно учишься! 📚
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="bg-white rounded-2xl p-8 shadow-xl">
+                <h3 className="text-2xl font-bold mb-6 text-center">Тарифы на Умного Помощника</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="border-2 rounded-xl p-6 hover:border-primary transition-all">
+                    <div className="text-center mb-4">
+                      <Icon name="Zap" size={32} className="text-yellow-500 mx-auto mb-2" />
+                      <h4 className="font-bold text-lg">Разовый доступ</h4>
+                      <p className="text-sm text-muted-foreground">Для одной работы</p>
+                    </div>
+                    <div className="text-center mb-4">
+                      <span className="text-4xl font-bold">500₽</span>
+                    </div>
+                    <ul className="space-y-2 text-sm mb-6">
+                      <li className="flex items-center gap-2">
+                        <Icon name="Check" size={16} className="text-green-600" />
+                        Доступ на 7 дней
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Icon name="Check" size={16} className="text-green-600" />
+                        Неограниченные запросы
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="border-2 border-purple-500 rounded-xl p-6 relative">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">Популярный</Badge>
+                    </div>
+                    <div className="text-center mb-4">
+                      <Icon name="Rocket" size={32} className="text-purple-500 mx-auto mb-2" />
+                      <h4 className="font-bold text-lg">Месячная</h4>
+                      <p className="text-sm text-muted-foreground">Без ограничений</p>
+                    </div>
+                    <div className="text-center mb-4">
+                      <span className="text-4xl font-bold">2 990₽</span>
+                    </div>
+                    <ul className="space-y-2 text-sm mb-6">
+                      <li className="flex items-center gap-2">
+                        <Icon name="Check" size={16} className="text-green-600" />
+                        Любое количество работ
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Icon name="Check" size={16} className="text-green-600" />
+                        Приоритетная поддержка
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="border-2 rounded-xl p-6 hover:border-primary transition-all">
+                    <div className="text-center mb-4">
+                      <Icon name="Crown" size={32} className="text-yellow-500 mx-auto mb-2" />
+                      <h4 className="font-bold text-lg">Годовая</h4>
+                      <p className="text-sm text-muted-foreground">Максимальная выгода</p>
+                    </div>
+                    <div className="text-center mb-4">
+                      <span className="text-4xl font-bold">18 000₽</span>
+                      <p className="text-sm text-green-600 font-semibold">Экономия 50%</p>
+                    </div>
+                    <ul className="space-y-2 text-sm mb-6">
+                      <li className="flex items-center gap-2">
+                        <Icon name="Check" size={16} className="text-green-600" />
+                        Всё из месячной
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Icon name="Check" size={16} className="text-green-600" />
+                        Эксклюзивные функции
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="text-center mt-8">
+                  <Button 
+                    size="lg" 
+                    className="h-14 px-10 text-lg bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                    asChild
+                  >
+                    <a href="/ai-assistant">
+                      <Icon name="Bot" size={22} className="mr-2" />
+                      Попробовать Умного Помощника
+                    </a>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="py-20">
           <div className="container mx-auto px-4">
             <Tabs defaultValue="upload" className="w-full">

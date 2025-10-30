@@ -20,6 +20,7 @@ import WorkDetailPage from "./pages/WorkDetailPage";
 import CatalogPage from "./pages/CatalogPage";
 import AuthorMarketplacePage from "./pages/AuthorMarketplacePage";
 import RoskomnadzorGuidePage from "./pages/RoskomnadzorGuidePage";
+import AIAssistantPage from "./pages/AIAssistantPage";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/marketplace" element={<AuthorMarketplacePage />} />
           <Route path="/roskomnadzor-guide" element={<RoskomnadzorGuidePage />} />
+          <Route path="/ai-assistant" element={<AIAssistantPage />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

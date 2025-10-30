@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Get work reviews",
+      "method": "GET",
+      "path": "/?work_id=1",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "reviews": "array",
+        "average_rating": "number",
+        "total_reviews": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Add review",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "work_id": 1,
+        "rating": 5,
+        "comment": "Отличная работа!"
+      },
+      "expectedStatus": 201,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "tests": [
+    {
+      "name": "Get user favorites",
+      "method": "GET",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "favorites": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Add to favorites",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-User-Id": "1"
+      },
+      "body": {
+        "work_id": 1
+      },
+      "expectedStatus": 201,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

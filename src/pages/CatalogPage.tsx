@@ -21,13 +21,21 @@ interface Work {
   yandexDiskLink: string;
 }
 
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export default function CatalogPage() {
   const [works, setWorks] = useState<Work[]>([]);
   const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
+  const [filterCategory, setFilterCategory] = useState<string>('all');
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [loadingPreviews, setLoadingPreviews] = useState(false);
 
@@ -144,6 +152,21 @@ export default function CatalogPage() {
     
     return 'Пояснительная записка';
   };
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetch('https://functions.poehali.dev/fe9c2ac7-b4dc-4649-a10d-c4c20015ae82');
+        const data = await response.json();
+        if (data.categories) {
+          setCategories(data.categories);
+        }
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+      }
+    };
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     const CACHE_KEY = 'catalog_works_cache_v3';
@@ -336,8 +359,15 @@ export default function CatalogPage() {
       filtered = filtered.filter(work => work.subject === filterSubject);
     }
 
+    if (filterCategory !== 'all') {
+      const category = categories.find(c => c.slug === filterCategory);
+      if (category) {
+        filtered = filtered.filter(work => work.workType.toLowerCase().includes(category.name.toLowerCase()));
+      }
+    }
+
     setFilteredWorks(filtered);
-  }, [searchQuery, filterType, filterSubject, works]);
+  }, [searchQuery, filterType, filterSubject, filterCategory, works, categories]);
 
   const workTypes = Array.from(new Set(works.map(w => w.workType)));
   const subjects = Array.from(new Set(works.map(w => w.subject)));
@@ -374,7 +404,21 @@ export default function CatalogPage() {
               </div>
             </div>
             
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap">
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="w-[200px] h-11 border-gray-300 rounded-md">
+                  <SelectValue placeholder="Категория" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все категории</SelectItem>
+                  {categories.map(cat => (
+                    <SelectItem key={cat.id} value={cat.slug}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
               <Select value={filterType} onValueChange={setFilterType}>
                 <SelectTrigger className="w-[200px] h-11 border-gray-300 rounded-md">
                   <SelectValue placeholder="Тип работы" />

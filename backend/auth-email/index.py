@@ -59,9 +59,13 @@ def get_db_connection():
 
 def send_email(to_email: str, subject: str, html_content: str) -> bool:
     smtp_host = os.environ.get('SMTP_HOST')
-    smtp_port = int(os.environ.get('SMTP_PORT', '587'))
+    smtp_port = int(os.environ.get('SMTP_PORT', '465'))
     smtp_user = os.environ.get('SMTP_USER')
     smtp_password = os.environ.get('SMTP_PASSWORD')
+    
+    if not all([smtp_host, smtp_user, smtp_password]):
+        print('SMTP credentials not configured')
+        return False
     
     msg = MIMEMultipart('alternative')
     msg['From'] = f"Tech Forma <{smtp_user}>"
@@ -72,8 +76,7 @@ def send_email(to_email: str, subject: str, html_content: str) -> bool:
     msg.attach(html_part)
     
     try:
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
-            server.starttls()
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as server:
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
         return True

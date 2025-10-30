@@ -264,131 +264,48 @@ export default function WorkDetailPage() {
 
       try {
         const response = await fetch(
-          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&limit=500`
+          `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?id=${workId}`
         );
         const data = await response.json();
 
-        if (data._embedded && data._embedded.items) {
-          const item = data._embedded.items.find((item: any) => item.resource_id === workId);
+        if (data && data.id) {
+          const title = data.title;
+          const workType = data.work_type || 'другое';
+          const subject = data.subject || determineSubject(title);
+          const price = data.price_points || determinePrice(workType, title);
+          const rating = parseFloat(data.rating) || determineRating(workType);
+          const universities = data.universities || extractUniversity(title);
+          const composition = data.composition ? data.composition.split(',').map((c: string) => c.trim()) : determineComposition(workType, title);
+          const universitiesList = determineUniversities(subject);
           
-          if (item) {
-            const { title, workType } = extractWorkInfo(item.name);
-            const subject = determineSubject(title);
-            const price = determinePrice(workType, title);
-            const rating = determineRating(workType);
-            const universities = extractUniversity(title);
-            const composition = determineComposition(workType, title);
-            const universitiesList = determineUniversities(subject);
-            
-            // Формируем прямую ссылку на папку работы
-            const folderPublicUrl = `${YANDEX_DISK_URL}:${item.path}`;
+          const folderPublicUrl = data.yandex_disk_link || data.file_url || YANDEX_DISK_URL;
 
-            let previewUrl: string | null = null;
-            let fileFormats: string[] = [];
-            let parsedDescription: string | null = null;
-            let parsedComposition: string[] = composition;
-            
-            // Get real file composition
-            try {
-              const filesResponse = await fetch(
-                `${GET_WORK_FILES_URL}?folder_name=${encodeURIComponent(item.name)}&public_key=${encodeURIComponent(YANDEX_DISK_URL)}`
-              );
-              
-              if (filesResponse.ok) {
-                const filesData = await filesResponse.json();
-                
-                if (filesData.composition && filesData.composition.length > 0) {
-                  parsedComposition = filesData.composition;
-                }
-              }
-            } catch (error) {
-              console.log('Error fetching work files:', error);
-            }
-            
-            // Load preview images gallery
-            try {
-              const folderResponse = await fetch(
-                `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + item.name)}&limit=100`
-              );
-              const folderData = await folderResponse.json();
-              
-              if (folderData._embedded && folderData._embedded.items) {
-                const previewImages: string[] = [];
-                
-                const previewFiles = folderData._embedded.items
-                  .filter((file: any) => 
-                    file.type === 'file' && 
-                    file.name.toLowerCase().startsWith('preview') &&
-                    (file.name.toLowerCase().endsWith('.png') || 
-                     file.name.toLowerCase().endsWith('.jpg') ||
-                     file.name.toLowerCase().endsWith('.jpeg'))
-                  )
-                  .sort((a: any, b: any) => {
-                    const aNum = parseInt(a.name.match(/\d+/)?.[0] || '0');
-                    const bNum = parseInt(b.name.match(/\d+/)?.[0] || '0');
-                    return aNum - bNum;
-                  });
-                
-                for (const file of previewFiles) {
-                  if (file.file) {
-                    previewImages.push(file.file);
-                    
-                    if (!previewUrl) {
-                      previewUrl = file.file;
-                    }
-                  }
-                }
-                
-                setGallery(previewImages);
-              }
-            } catch (error) {
-              console.log('Error loading preview images:', error);
-            }
-
-            // Parse work details from backend
-            try {
-              const parserResponse = await fetch(
-                `${WORK_PARSER_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`
-              );
-              
-              if (parserResponse.ok) {
-                const parserData = await parserResponse.json();
-                
-                if (parserData.fileFormats && parserData.fileFormats.length > 0) {
-                  fileFormats = parserData.fileFormats;
-                }
-                
-                if (parserData.description) {
-                  parsedDescription = parserData.description;
-                }
-                
-                if (parserData.composition && parserData.composition.length > 0) {
-                  parsedComposition = parserData.composition;
-                }
-              }
-            } catch (error) {
-              console.log('Error parsing work details:', error);
-            }
-
-            const detailedDescription = parsedDescription || generateDetailedDescription(workType, title, subject);
-            
-            setWork({
-              id: item.resource_id,
-              title,
-              workType,
-              subject,
-              description: detailedDescription,
-              composition: parsedComposition,
-              universities: universitiesList.join(', '),
-              price,
-              rating,
-              previewUrl,
-              yandexDiskLink: folderPublicUrl,
-              fileFormats: fileFormats.length > 0 ? fileFormats : undefined
-            });
-          } else {
-            navigate('/catalog');
+          const previewUrl: string | null = data.preview_image_url || null;
+          const fileFormats: string[] = [];
+          const parsedDescription = data.description || generateDetailedDescription(workType, title, subject);
+          const parsedComposition = composition;
+          
+          if (previewUrl) {
+            setGallery([previewUrl]);
           }
+          
+          setWork({
+            id: String(data.id),
+            title,
+            workType,
+            subject,
+            description: parsedDescription,
+            composition: parsedComposition,
+            universities: universitiesList.join(', '),
+            price,
+            rating,
+            previewUrl,
+            yandexDiskLink: folderPublicUrl,
+            fileFormats: undefined
+          });
+          setLoading(false);
+        } else {
+          navigate('/catalog');
         }
       } catch (error) {
         console.error('Error fetching work:', error);

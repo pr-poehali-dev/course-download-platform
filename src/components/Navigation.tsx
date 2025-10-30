@@ -22,14 +22,14 @@ export default function Navigation({
 }: NavigationProps) {
   return (
     <header className="border-b bg-white/95 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
         <div className="flex items-center justify-between">
-          <a href="/" className="flex items-center gap-3">
-            <Icon name="Cpu" size={32} className="text-primary" />
-            <h1 className="text-2xl font-bold">Tech Forma</h1>
+          <a href="/" className="flex items-center gap-2 md:gap-3">
+            <Icon name="Cpu" size={24} className="text-primary md:w-8 md:h-8" />
+            <h1 className="text-lg md:text-2xl font-bold">Tech Forma</h1>
           </a>
           
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm">
             <a href="/" className="hover:text-primary transition-colors">Главная</a>
             <a href="/catalog" className="hover:text-primary transition-colors">Каталог</a>
             <a href="/ai-assistant" className="hover:text-primary transition-colors flex items-center gap-1">
@@ -41,7 +41,7 @@ export default function Navigation({
             <a href="/#support" className="hover:text-primary transition-colors">Поддержка</a>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 md:gap-2">
             {onFavoritesClick && (
               <Button 
                 variant="ghost" 
@@ -76,9 +76,9 @@ export default function Navigation({
             
             {onPromoClick && (
               <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full cursor-pointer" onClick={onPromoClick}>
-                  <Icon name="Coins" size={20} className="text-primary" />
-                  <span className="font-semibold">{userBalance}</span>
+                <div className="flex items-center gap-1.5 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 bg-primary/10 rounded-full cursor-pointer" onClick={onPromoClick}>
+                  <Icon name="Coins" size={16} className="text-primary md:w-5 md:h-5" />
+                  <span className="font-semibold text-sm md:text-base">{userBalance}</span>
                 </div>
               </div>
             )}
@@ -88,16 +88,18 @@ export default function Navigation({
                 variant="outline" 
                 size="sm"
                 onClick={onPaymentClick}
+                className="hidden sm:flex text-xs md:text-sm h-8 md:h-9"
               >
-                <Icon name="Plus" size={16} className="mr-2" />
-                Пополнить
+                <Icon name="Plus" size={14} className="mr-1 md:mr-2" />
+                <span className="hidden md:inline">Пополнить</span>
+                <span className="md:hidden">+</span>
               </Button>
             )}
 
-            <Button size="sm" asChild>
+            <Button size="sm" asChild className="text-xs md:text-sm h-8 md:h-9">
               <a href="/profile">
-                <Icon name="User" size={16} className="mr-2" />
-                Профиль
+                <Icon name="User" size={14} className="mr-0 md:mr-2" />
+                <span className="hidden md:inline">Профиль</span>
               </a>
             </Button>
           </div>

@@ -303,25 +303,25 @@ export default function CatalogPage() {
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold mb-6">Каталог готовых работ</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold mb-4 md:mb-6">Каталог готовых работ</h1>
           
-          <div className="flex flex-col lg:flex-row gap-4 mb-6">
-            <div className="flex-1">
+          <div className="flex flex-col gap-4 mb-6">
+            <div className="w-full">
               <div className="relative">
                 <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <Input
                   type="text"
-                  placeholder="Поиск по названию, предмету, университету, типу работы..."
+                  placeholder="Поиск работ..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-11 border-gray-300 rounded-md"
+                  className="pl-10 h-11 border-gray-300 rounded-md text-sm md:text-base"
                 />
               </div>
             </div>
             
-            <div className="flex gap-3 flex-wrap">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="w-[200px] h-11 border-gray-300 rounded-md">
+                <SelectTrigger className="w-full h-11 border-gray-300 rounded-md text-sm md:text-base">
                   <SelectValue placeholder="Категория" />
                 </SelectTrigger>
                 <SelectContent>
@@ -335,7 +335,7 @@ export default function CatalogPage() {
               </Select>
 
               <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="w-[200px] h-11 border-gray-300 rounded-md">
+                <SelectTrigger className="w-full h-11 border-gray-300 rounded-md text-sm md:text-base">
                   <SelectValue placeholder="Тип работы" />
                 </SelectTrigger>
                 <SelectContent>
@@ -353,7 +353,7 @@ export default function CatalogPage() {
               </Select>
 
               <Select value={filterSubject} onValueChange={setFilterSubject}>
-                <SelectTrigger className="w-[200px] h-11 border-gray-300 rounded-md">
+                <SelectTrigger className="w-full h-11 border-gray-300 rounded-md text-sm md:text-base">
                   <SelectValue placeholder="Предмет" />
                 </SelectTrigger>
                 <SelectContent>
@@ -390,11 +390,11 @@ export default function CatalogPage() {
             <p className="text-gray-500 mt-2">Попробуйте изменить параметры поиска</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {filteredWorks.map((work) => (
               <div 
                 key={work.id} 
-                className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+                className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
                 onClick={() => window.location.href = `/work-detail/${work.id}`}
               >
                 <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
@@ -425,9 +425,9 @@ export default function CatalogPage() {
                   </div>
                 </div>
 
-                <div className="p-5">
-                  <div className="flex items-center justify-between mb-3">
-                    <Badge className="bg-primary/10 text-primary text-[11px] font-semibold px-3 py-1 rounded-full border-0">
+                <div className="p-4 md:p-5">
+                  <div className="flex items-center justify-between mb-2 md:mb-3">
+                    <Badge className="bg-primary/10 text-primary text-[10px] md:text-[11px] font-semibold px-2 md:px-3 py-1 rounded-full border-0">
                       {work.workType}
                     </Badge>
                     <div className="flex items-center gap-1">
@@ -436,12 +436,12 @@ export default function CatalogPage() {
                     </div>
                   </div>
 
-                  <h3 className="font-bold text-[15px] mb-3 line-clamp-3 leading-snug min-h-[63px] group-hover:text-primary transition-colors">
+                  <h3 className="font-bold text-sm md:text-[15px] mb-2 md:mb-3 line-clamp-3 leading-snug min-h-[60px] md:min-h-[63px] group-hover:text-primary transition-colors">
                     {work.title.charAt(0).toUpperCase() + work.title.slice(1).toLowerCase()}
                   </h3>
                   
-                  <div className="space-y-2.5 mb-4">
-                    <div className="flex items-start gap-2.5 text-[13px] text-gray-600">
+                  <div className="space-y-2 md:space-y-2.5 mb-3 md:mb-4">
+                    <div className="flex items-start gap-2 md:gap-2.5 text-xs md:text-[13px] text-gray-600">
                       <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Icon name="Package" size={14} className="text-blue-600" />
                       </div>

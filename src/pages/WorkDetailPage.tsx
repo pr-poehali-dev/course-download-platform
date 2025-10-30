@@ -454,34 +454,34 @@ export default function WorkDetailPage() {
     <div className="min-h-screen bg-white">
       <Navigation />
       
-      <main className="container mx-auto px-4 py-6 mt-16 max-w-[1200px]">
+      <main className="container mx-auto px-4 py-4 md:py-6 mt-16 max-w-[1200px]">
         <Button 
           variant="ghost" 
-          className="mb-6 text-gray-600 hover:text-gray-900"
+          className="mb-4 md:mb-6 text-gray-600 hover:text-gray-900 text-sm md:text-base"
           onClick={() => navigate('/catalog')}
         >
-          <Icon name="ArrowLeft" size={20} className="mr-2" />
+          <Icon name="ArrowLeft" size={18} className="mr-2" />
           Назад к каталогу
         </Button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <Badge className="bg-gray-100 text-gray-700 text-xs font-medium px-3 py-1 rounded-sm border-0">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Badge className="bg-gray-100 text-gray-700 text-[10px] md:text-xs font-medium px-2 md:px-3 py-1 rounded-sm border-0">
                 {work.workType}
               </Badge>
               <div className="flex items-center gap-1.5">
-                <Icon name="Star" size={18} className="text-yellow-500 fill-yellow-500" />
-                <span className="text-lg font-bold text-gray-800">{work.rating}</span>
-                <span className="text-sm text-gray-500">/5.0</span>
+                <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
+                <span className="text-base md:text-lg font-bold text-gray-800">{work.rating}</span>
+                <span className="text-xs md:text-sm text-gray-500">/5.0</span>
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
               {work.title}
             </h1>
 
-            <div className="space-y-4 mb-8">
+            <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
               {gallery.length > 0 ? (
                 <>
                   <div className="bg-white rounded-lg overflow-hidden border-2 border-gray-200 shadow-sm">
@@ -557,10 +557,10 @@ export default function WorkDetailPage() {
               )}
 
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Предметная область</h2>
-                <div className="flex items-center gap-3">
-                  <Icon name="Tag" size={20} className="flex-shrink-0 text-gray-400" />
-                  <Badge className="bg-blue-50 text-blue-700 text-sm font-normal px-3 py-1 border-0">
+                <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 md:mb-3">Предметная область</h2>
+                <div className="flex items-center gap-2 md:gap-3">
+                  <Icon name="Tag" size={18} className="flex-shrink-0 text-gray-400" />
+                  <Badge className="bg-blue-50 text-blue-700 text-xs md:text-sm font-normal px-2 md:px-3 py-1 border-0">
                     {work.subject}
                   </Badge>
                 </div>
@@ -568,13 +568,13 @@ export default function WorkDetailPage() {
 
               {work.universities && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Подходит для университетов</h2>
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <ul className="space-y-2.5">
+                  <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 md:mb-3">Подходит для университетов</h2>
+                  <div className="bg-gray-50 rounded-lg p-3 md:p-4">
+                    <ul className="space-y-2">
                       {work.universities.split(', ').map((uni, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <Icon name="GraduationCap" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
-                          <span className="text-gray-700">{uni}</span>
+                        <li key={index} className="flex items-start gap-2 md:gap-3">
+                          <Icon name="GraduationCap" size={16} className="mt-0.5 flex-shrink-0 text-blue-600" />
+                          <span className="text-xs md:text-sm text-gray-700">{uni}</span>
                         </li>
                       ))}
                     </ul>
@@ -585,20 +585,20 @@ export default function WorkDetailPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-card rounded-xl p-6 sticky top-20 border-2 border-border shadow-sm hover:shadow-md transition-shadow">
-              <div className="text-center mb-5 pb-5 border-b border-border">
-                <div className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Стоимость</div>
+            <div className="bg-card rounded-lg md:rounded-xl p-4 md:p-6 lg:sticky lg:top-20 border-2 border-border shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
+                <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
                 <div className="flex items-baseline justify-center gap-1.5">
-                  <span className="text-4xl font-extrabold text-primary">
+                  <span className="text-3xl md:text-4xl font-extrabold text-primary">
                     {work.price.toLocaleString()}
                   </span>
-                  <span className="text-lg font-medium text-muted-foreground">баллов</span>
+                  <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
                 </div>
               </div>
 
               <Button 
                 size="default"
-                className="w-full font-semibold rounded-lg mb-3 shadow-md hover:shadow-lg transition-all duration-200 h-11"
+                className="w-full font-semibold rounded-lg mb-3 shadow-md hover:shadow-lg transition-all duration-200 h-10 md:h-11 text-sm md:text-base"
                 onClick={handlePurchaseAndDownload}
                 disabled={downloading}
               >
@@ -618,7 +618,7 @@ export default function WorkDetailPage() {
               <Button 
                 variant="outline"
                 size="default"
-                className="w-full font-semibold rounded-lg mb-5 h-11"
+                className="w-full font-semibold rounded-lg mb-4 md:mb-5 h-10 md:h-11 text-sm md:text-base"
                 onClick={handleShowPdfPreview}
                 disabled={loadingPdfPreview}
               >
@@ -635,16 +635,16 @@ export default function WorkDetailPage() {
                 )}
               </Button>
 
-              <div className="space-y-3">
-                <div className="flex items-center gap-2.5 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name="CheckCircle2" size={16} className="text-primary" />
+              <div className="space-y-2.5 md:space-y-3">
+                <div className="flex items-center gap-2 md:gap-2.5 text-xs md:text-sm">
+                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="CheckCircle2" size={14} className="text-primary" />
                   </div>
                   <span className="font-medium">Проверенное качество</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Zap" size={16} className="text-primary" />
+                <div className="flex items-center gap-2 md:gap-2.5 text-xs md:text-sm">
+                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Zap" size={14} className="text-primary" />
                   </div>
                   <span className="font-medium">Мгновенный доступ</span>
                 </div>

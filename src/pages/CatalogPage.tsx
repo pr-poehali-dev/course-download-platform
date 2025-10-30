@@ -182,72 +182,47 @@ export default function CatalogPage() {
 
     const fetchWorks = async () => {
       setLoading(true);
+      setLoadingProgress(20);
       
-      const cachedWorks = loadFromCache();
-      if (cachedWorks) {
-        setWorks(cachedWorks);
-        setFilteredWorks(cachedWorks);
-        setLoadingProgress(100);
-        setLoading(false);
-        return;
-      }
-
-      const allWorks: Work[] = [];
-
-      const totalBatches = 5;
-      for (let i = 0; i < totalBatches; i++) {
-        const offset = i * 100;
-        setLoadingProgress(Math.round((i / totalBatches) * 100));
+      try {
+        const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413');
+        setLoadingProgress(60);
         
-        await sleep(200);
+        const data = await response.json();
+        setLoadingProgress(80);
         
-        try {
-          const response = await fetch(
-            `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&limit=100&offset=${offset}`
-          );
-          const data = await response.json();
-
-          if (data._embedded && data._embedded.items) {
-            const folders = data._embedded.items.filter((item: any) => item.type === 'dir');
-            
-            const works = folders.map((item: any) => {
-              const { title, workType } = extractWorkInfo(item.name);
-              const subject = determineSubject(title);
-              const price = determinePrice(workType, title);
-              const universities = extractUniversity(title);
-              const composition = determineComposition(workType, title);
-              const rating = determineRating(workType);
-
-              return {
-                id: item.resource_id,
-                folderName: item.name,
-                title,
-                workType,
-                subject,
-                description: `${workType} • ${subject}`,
-                composition,
-                universities,
-                price,
-                rating,
-                previewUrl: null,
-                yandexDiskLink: item.public_url || YANDEX_DISK_URL
-              };
-            });
-
-            allWorks.push(...works);
-          }
-        } catch (error) {
-          console.error(`Error fetching offset ${offset}:`, error);
+        if (data.works && Array.isArray(data.works)) {
+          const transformedWorks: Work[] = data.works.map((work: any) => ({
+            id: String(work.id),
+            folderName: work.title,
+            title: work.title,
+            workType: work.work_type || 'другое',
+            subject: work.subject || 'общая инженерия',
+            description: work.description || `${work.work_type} • ${work.subject}`,
+            composition: work.composition || 'Пояснительная записка',
+            universities: work.universities || null,
+            price: work.price_points || 300,
+            rating: parseFloat(work.rating) || 4.5,
+            previewUrl: work.preview_image_url || null,
+            yandexDiskLink: work.yandex_disk_link || work.file_url || ''
+          }));
+          
+          saveToCache(transformedWorks);
+          setWorks(transformedWorks);
+          setFilteredWorks(transformedWorks);
+          setLoadingProgress(100);
         }
+      } catch (error) {
+        console.error('Error loading works from database:', error);
+        
+        const cachedWorks = loadFromCache();
+        if (cachedWorks) {
+          setWorks(cachedWorks);
+          setFilteredWorks(cachedWorks);
+        }
+      } finally {
+        setLoading(false);
       }
-
-      saveToCache(allWorks);
-      setWorks(allWorks);
-      setFilteredWorks(allWorks);
-      setLoadingProgress(100);
-      setLoading(false);
-      
-      loadPreviews(allWorks);
     };
 
     fetchWorks();

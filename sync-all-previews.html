@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автоматическая синхронизация превью</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .stats {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 16px;
+        }
+        .stat-label {
+            font-weight: 500;
+            color: #666;
+        }
+        .stat-value {
+            font-weight: 600;
+            color: #333;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .info { color: #007bff; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .progress {
+            margin-top: 20px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #007bff, #0056b3);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        .log {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .log-item {
+            margin: 4px 0;
+            padding: 4px 0;
+        }
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Автоматическая синхронизация превью</h1>
+        
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-label">Всего обработано:</span>
+                <span class="stat-value info" id="total">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">✅ Успешно:</span>
+                <span class="stat-value success" id="success">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">❌ Ошибок:</span>
+                <span class="stat-value error" id="failed">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Батчей выполнено:</span>
+                <span class="stat-value" id="batches">0</span>
+            </div>
+        </div>
+
+        <div class="progress">
+            <div>Прогресс: <span id="progress-text">0%</span></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 0%">0%</div>
+            </div>
+        </div>
+
+        <button id="startBtn" onclick="startSync()">
+            Запустить синхронизацию (443 работы)
+        </button>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://functions.poehali.dev/c5c39645-740b-4fc3-8d3f-d4dc911fae68';
+        const BATCH_SIZE = 50; // Обрабатываем по 50 работ за раз
+        const TOTAL_WORKS = 443;
+        
+        let totalProcessed = 0;
+        let totalSuccess = 0;
+        let totalFailed = 0;
+        let batchCount = 0;
+
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const item = document.createElement('div');
+            item.className = `log-item ${type}`;
+            item.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(item);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateStats() {
+            document.getElementById('total').textContent = totalProcessed;
+            document.getElementById('success').textContent = totalSuccess;
+            document.getElementById('failed').textContent = totalFailed;
+            document.getElementById('batches').textContent = batchCount;
+            
+            const progress = Math.min(100, Math.round((totalProcessed / TOTAL_WORKS) * 100));
+            document.getElementById('progress-text').textContent = `${progress}%`;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            document.getElementById('progress-fill').textContent = `${progress}%`;
+        }
+
+        async function syncBatch() {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ limit: BATCH_SIZE })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                totalProcessed += data.total_processed;
+                totalSuccess += data.success;
+                totalFailed += data.failed;
+                batchCount++;
+
+                addLog(`Батч ${batchCount}: обработано ${data.total_processed}, успешно ${data.success}, ошибок ${data.failed}`, 'success');
+                
+                if (data.errors && data.errors.length > 0) {
+                    data.errors.slice(0, 3).forEach(err => {
+                        addLog(`  ⚠️ ${err.title}: ${err.error}`, 'error');
+                    });
+                }
+
+                updateStats();
+                
+                return data.total_processed;
+            } catch (error) {
+                addLog(`Ошибка батча: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        async function startSync() {
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Синхронизация...';
+            
+            totalProcessed = 0;
+            totalSuccess = 0;
+            totalFailed = 0;
+            batchCount = 0;
+            
+            document.getElementById('log').innerHTML = '';
+            addLog('🚀 Начинаем автоматическую синхронизацию...');
+            
+            try {
+                let processedInBatch = BATCH_SIZE;
+                
+                while (processedInBatch === BATCH_SIZE && totalProcessed < TOTAL_WORKS) {
+                    processedInBatch = await syncBatch();
+                    
+                    // Небольшая пауза между батчами
+                    if (processedInBatch === BATCH_SIZE) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+                
+                addLog('✅ Синхронизация завершена!', 'success');
+                addLog(`Итого: ${totalSuccess} успешно, ${totalFailed} ошибок из ${totalProcessed} обработанных`, 'info');
+                
+                btn.innerHTML = '✅ Завершено! Обновить страницу';
+                btn.onclick = () => window.location.reload();
+                btn.disabled = false;
+                
+            } catch (error) {
+                addLog('❌ Синхронизация прервана из-за ошибки', 'error');
+                btn.innerHTML = 'Повторить попытку';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

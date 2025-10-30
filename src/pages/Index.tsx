@@ -972,6 +972,7 @@ export default function Index() {
                   <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Пользовательское соглашение</a></li>
                   <li><a href="/offer" className="hover:text-primary transition-colors">Договор-оферта</a></li>
                   <li><a href="/requisites" className="hover:text-primary transition-colors">Реквизиты</a></li>
+                  <li><a href="/roskomnadzor-guide" className="hover:text-primary transition-colors">Регистрация в Роскомнадзоре</a></li>
                   <li><a href="/admin" className="hover:text-primary transition-colors">Админ-панель</a></li>
                 </ul>
               </div>

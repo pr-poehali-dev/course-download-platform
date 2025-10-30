@@ -13,6 +13,7 @@ import FinanceManagement from '@/components/FinanceManagement';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import PlatformSettings from '@/components/PlatformSettings';
 import YandexDiskImport from '@/components/YandexDiskImport';
+import PreviewGenerator from '@/components/PreviewGenerator';
 
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
 const ADMIN_PASSWORD = 'stas221974';
@@ -159,7 +160,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs defaultValue="analytics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="analytics">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Аналитика
@@ -167,6 +168,10 @@ export default function AdminPanel() {
           <TabsTrigger value="works">
             <Icon name="FileText" size={18} className="mr-2" />
             Работы
+          </TabsTrigger>
+          <TabsTrigger value="previews">
+            <Icon name="Image" size={18} className="mr-2" />
+            Превью
           </TabsTrigger>
           <TabsTrigger value="import">
             <Icon name="CloudDownload" size={18} className="mr-2" />
@@ -196,6 +201,10 @@ export default function AdminPanel() {
 
         <TabsContent value="works" className="space-y-6">
           <WorksManagement />
+        </TabsContent>
+
+        <TabsContent value="previews" className="space-y-6">
+          <PreviewGenerator />
         </TabsContent>
 
         <TabsContent value="import" className="space-y-6">

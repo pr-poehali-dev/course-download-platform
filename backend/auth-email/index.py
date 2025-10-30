@@ -2,6 +2,7 @@
 Business: Отправка email для регистрации и восстановления пароля через SendGrid API
 Args: event - HTTP event, context - function context
 Returns: JSON response with status
+Version: 1.0.1
 '''
 
 import json

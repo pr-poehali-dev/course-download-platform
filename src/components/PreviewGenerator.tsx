@@ -11,6 +11,8 @@ export default function PreviewGenerator() {
   const [progress, setProgress] = useState(0);
   const [batchSize, setBatchSize] = useState(100);
   const [stats, setStats] = useState({ total: 0, success: 0, failed: 0 });
+  const [currentBatch, setCurrentBatch] = useState(0);
+  const [totalBatches, setTotalBatches] = useState(0);
 
   const generatePreviews = async () => {
     setIsGenerating(true);
@@ -54,6 +56,71 @@ export default function PreviewGenerator() {
     }
   };
 
+  const syncAllPreviews = async () => {
+    setIsGenerating(true);
+    setProgress(0);
+    setCurrentBatch(0);
+    setTotalBatches(0);
+    
+    const cumulativeStats = { total: 0, success: 0, failed: 0 };
+    let batchNum = 0;
+    const BATCH_SIZE = 100;
+    
+    try {
+      toast({
+        title: '🚀 Начинаем автосинхронизацию',
+        description: 'Загружаем все превью с Яндекс.Диска...'
+      });
+
+      while (true) {
+        batchNum++;
+        setCurrentBatch(batchNum);
+        
+        const response = await fetch('https://functions.poehali.dev/c5c39645-740b-4fc3-8d3f-d4dc911fae68', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ limit: BATCH_SIZE })
+        });
+        
+        const result = await response.json();
+        
+        if (result.error) {
+          throw new Error(result.error);
+        }
+        
+        cumulativeStats.total += result.total_processed || 0;
+        cumulativeStats.success += result.success || 0;
+        cumulativeStats.failed += result.failed || 0;
+        
+        setStats({ ...cumulativeStats });
+        setProgress(Math.min(95, (cumulativeStats.total / 443) * 100));
+        
+        if ((result.total_processed || 0) < BATCH_SIZE) {
+          break;
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      setProgress(100);
+      setTotalBatches(batchNum);
+      
+      toast({
+        title: '✅ Автосинхронизация завершена!',
+        description: `Обработано ${cumulativeStats.total} работ за ${batchNum} батчей. Успешно: ${cumulativeStats.success}, Ошибок: ${cumulativeStats.failed}`
+      });
+      
+    } catch (error) {
+      toast({
+        title: 'Ошибка автосинхронизации',
+        description: error instanceof Error ? error.message : 'Неизвестная ошибка',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
 
 
   return (
@@ -88,8 +155,8 @@ export default function PreviewGenerator() {
         {isGenerating && (
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Прогресс</span>
-              <span>{progress}%</span>
+              <span>Прогресс {currentBatch > 0 && `(Батч ${currentBatch})`}</span>
+              <span>{Math.round(progress)}%</span>
             </div>
             <Progress value={progress} />
             <div className="flex gap-4 text-sm text-muted-foreground">
@@ -100,23 +167,44 @@ export default function PreviewGenerator() {
           </div>
         )}
 
-        <Button 
-          onClick={generatePreviews} 
-          disabled={isGenerating}
-          className="w-full"
-        >
-          {isGenerating ? (
-            <>
-              <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-              Синхронизация...
-            </>
-          ) : (
-            <>
-              <Icon name="Sparkles" size={18} className="mr-2" />
-              Синхронизировать превью
-            </>
-          )}
-        </Button>
+        <div className="grid grid-cols-2 gap-3">
+          <Button 
+            onClick={generatePreviews} 
+            disabled={isGenerating}
+            variant="outline"
+            className="w-full"
+          >
+            {isGenerating ? (
+              <>
+                <div className="animate-spin mr-2 h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
+                Загрузка...
+              </>
+            ) : (
+              <>
+                <Icon name="Sparkles" size={18} className="mr-2" />
+                Один батч
+              </>
+            )}
+          </Button>
+
+          <Button 
+            onClick={syncAllPreviews} 
+            disabled={isGenerating}
+            className="w-full"
+          >
+            {isGenerating ? (
+              <>
+                <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                Синхронизация...
+              </>
+            ) : (
+              <>
+                <Icon name="Zap" size={18} className="mr-2" />
+                Синхронизировать ВСЁ
+              </>
+            )}
+          </Button>
+        </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
           <div className="flex items-start gap-2">

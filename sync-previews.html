@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Image Sync</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #d4d4d4;
+        }
+        .container {
+            background: #252526;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #4ec9b0;
+            margin-top: 0;
+        }
+        .info {
+            background: #2d2d30;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4ec9b0;
+        }
+        .info p {
+            margin: 5px 0;
+        }
+        button {
+            background: #0e639c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #1177bb;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        #log {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .log-entry {
+            margin: 5px 0;
+        }
+        .log-header {
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+        .log-batch {
+            color: #dcdcaa;
+            font-weight: bold;
+        }
+        .log-success {
+            color: #4ec9b0;
+        }
+        .log-error {
+            color: #f48771;
+        }
+        .log-info {
+            color: #9cdcfe;
+        }
+        .stats {
+            background: #2d2d30;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            border-left: 4px solid #dcdcaa;
+        }
+        .stats h3 {
+            color: #dcdcaa;
+            margin-top: 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-item {
+            background: #1e1e1e;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .stat-label {
+            color: #858585;
+            font-size: 12px;
+        }
+        .stat-value {
+            color: #4ec9b0;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Preview Image Sync - Yandex Disk</h1>
+        
+        <div class="info">
+            <p><strong>API Endpoint:</strong> https://functions.poehali.dev/c5c39645-740b-4fc3-8d3f-d4dc911fae68</p>
+            <p><strong>Target Works:</strong> 443</p>
+            <p><strong>Batch Size:</strong> 100 works per request</p>
+            <p><strong>Delay:</strong> 1 second between batches</p>
+        </div>
+
+        <button id="startBtn" onclick="startSync()">Start Sync Process</button>
+
+        <div id="log"></div>
+
+        <div id="statsContainer" style="display: none;">
+            <div class="stats">
+                <h3>Final Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-label">Total Processed</div>
+                        <div class="stat-value" id="statProcessed">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Successful Syncs</div>
+                        <div class="stat-value" id="statSuccess">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Failed Syncs</div>
+                        <div class="stat-value" id="statFailed">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Batches Executed</div>
+                        <div class="stat-value" id="statBatches">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://functions.poehali.dev/c5c39645-740b-4fc3-8d3f-d4dc911fae68';
+        const BATCH_SIZE = 100;
+        const DELAY_MS = 1000;
+
+        const stats = {
+            totalProcessed: 0,
+            totalSuccess: 0,
+            totalFailed: 0,
+            batchesExecuted: 0,
+            errors: []
+        };
+
+        function log(message, className = '') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${className}`;
+            entry.textContent = message;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStats() {
+            document.getElementById('statProcessed').textContent = stats.totalProcessed;
+            document.getElementById('statSuccess').textContent = stats.totalSuccess;
+            document.getElementById('statFailed').textContent = stats.totalFailed;
+            document.getElementById('statBatches').textContent = stats.batchesExecuted;
+            document.getElementById('statsContainer').style.display = 'block';
+        }
+
+        async function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function syncBatch(batchNumber) {
+            log(`--- Batch ${batchNumber} ---`, 'log-batch');
+            log(`Calling API...`, 'log-info');
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ limit: BATCH_SIZE })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                log(`Response: ${JSON.stringify(data)}`, 'log-info');
+
+                // Update cumulative statistics
+                stats.totalProcessed += data.total_processed || 0;
+                stats.totalSuccess += data.success || 0;
+                stats.totalFailed += data.failed || 0;
+                stats.batchesExecuted++;
+
+                if (data.errors && data.errors.length > 0) {
+                    stats.errors.push(...data.errors);
+                    data.errors.forEach(error => {
+                        log(`Error: ${JSON.stringify(error)}`, 'log-error');
+                    });
+                }
+
+                log(`Batch ${batchNumber} completed: ${data.total_processed} processed, ${data.success} success, ${data.failed} failed`, 'log-success');
+
+                return data;
+            } catch (error) {
+                log(`Error in batch ${batchNumber}: ${error.message}`, 'log-error');
+                throw error;
+            }
+        }
+
+        async function startSync() {
+            const startBtn = document.getElementById('startBtn');
+            startBtn.disabled = true;
+            document.getElementById('log').innerHTML = '';
+            document.getElementById('statsContainer').style.display = 'none';
+
+            // Reset stats
+            stats.totalProcessed = 0;
+            stats.totalSuccess = 0;
+            stats.totalFailed = 0;
+            stats.batchesExecuted = 0;
+            stats.errors = [];
+
+            log('====================================', 'log-header');
+            log('Starting Preview Image Sync Process', 'log-header');
+            log('====================================', 'log-header');
+            log(`Target: 443 works`, 'log-info');
+            log(`Batch size: ${BATCH_SIZE}`, 'log-info');
+            log(`Delay between batches: ${DELAY_MS}ms`, 'log-info');
+            log('');
+
+            let batchNumber = 1;
+            let continueProcessing = true;
+
+            try {
+                while (continueProcessing) {
+                    const result = await syncBatch(batchNumber);
+
+                    // Check if we should continue
+                    if (result.total_processed < BATCH_SIZE) {
+                        log('');
+                        log(`Last batch processed ${result.total_processed} works (less than ${BATCH_SIZE}). Stopping.`, 'log-info');
+                        continueProcessing = false;
+                    } else {
+                        log('');
+                        log(`Batch complete. Waiting ${DELAY_MS}ms before next batch...`, 'log-info');
+                        await sleep(DELAY_MS);
+                        batchNumber++;
+                        log('');
+                    }
+                }
+
+                // Print final statistics
+                log('');
+                log('====================================', 'log-header');
+                log('SYNC COMPLETE - FINAL STATISTICS', 'log-header');
+                log('====================================', 'log-header');
+                log(`Total works processed: ${stats.totalProcessed}`, 'log-success');
+                log(`Total successful syncs: ${stats.totalSuccess}`, 'log-success');
+                log(`Total failed syncs: ${stats.totalFailed}`, stats.totalFailed > 0 ? 'log-error' : 'log-success');
+                log(`Number of batches executed: ${stats.batchesExecuted}`, 'log-success');
+
+                if (stats.errors.length > 0) {
+                    log('');
+                    log(`Errors encountered (${stats.errors.length}):`, 'log-error');
+                    stats.errors.forEach((error, index) => {
+                        log(`  ${index + 1}. ${JSON.stringify(error)}`, 'log-error');
+                    });
+                } else {
+                    log('');
+                    log('No errors encountered!', 'log-success');
+                }
+
+                log('====================================', 'log-header');
+                log('');
+                log('Process completed successfully!', 'log-success');
+
+                updateStats();
+
+            } catch (error) {
+                log('');
+                log('====================================', 'log-error');
+                log('SYNC FAILED', 'log-error');
+                log('====================================', 'log-error');
+                log(`Error: ${error.message}`, 'log-error');
+                log('');
+                log('Partial statistics:', 'log-info');
+                log(`Total works processed: ${stats.totalProcessed}`, 'log-info');
+                log(`Total successful syncs: ${stats.totalSuccess}`, 'log-info');
+                log(`Total failed syncs: ${stats.totalFailed}`, 'log-info');
+                log(`Number of batches executed: ${stats.batchesExecuted}`, 'log-info');
+                log('====================================', 'log-error');
+
+                updateStats();
+            } finally {
+                startBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

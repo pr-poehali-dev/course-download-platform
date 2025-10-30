@@ -449,8 +449,8 @@ export default function CatalogPage() {
                     </Badge>
                   </div>
 
-                  <h3 className="font-bold text-[15px] mb-3 line-clamp-3 leading-snug min-h-[63px] group-hover:text-primary transition-colors capitalize">
-                    {work.title.toLowerCase()}
+                  <h3 className="font-bold text-[15px] mb-3 line-clamp-3 leading-snug min-h-[63px] group-hover:text-primary transition-colors">
+                    {work.title.charAt(0).toUpperCase() + work.title.slice(1).toLowerCase()}
                   </h3>
                   
                   <div className="space-y-2.5 mb-4">

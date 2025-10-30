@@ -37,11 +37,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         body_str = event.get('body') or '{}'
         body = json.loads(body_str) if body_str else {}
-        work_yandex_id = body.get('workId')
+        work_id = body.get('workId')
         user_id = body.get('userId')
         price = body.get('price')
         
-        if not all([work_yandex_id, user_id, price]):
+        if not all([work_id, user_id, price]):
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -58,6 +58,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
+            # Проверяем существование работы
+            cur.execute(
+                "SELECT id, author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                (work_id,)
+            )
+            work_result = cur.fetchone()
+            
+            if not work_result:
+                conn.rollback()
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Work not found'}),
+                    'isBase64Encoded': False
+                }
+            
+            db_work_id = work_result[0]
+            
             # Проверяем баланс пользователя
             cur.execute(
                 "SELECT balance FROM t_p63326274_course_download_plat.users WHERE id = %s",
@@ -88,25 +106,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     }),
                     'isBase64Encoded': False
                 }
-            
-            # Находим или создаём work_id в БД
-            cur.execute(
-                "SELECT id FROM t_p63326274_course_download_plat.works WHERE yandex_disk_link LIKE %s LIMIT 1",
-                (f'%{work_yandex_id}%',)
-            )
-            work_result = cur.fetchone()
-            
-            if work_result:
-                db_work_id = work_result[0]
-            else:
-                # Создаём временную запись о работе
-                cur.execute(
-                    """INSERT INTO t_p63326274_course_download_plat.works 
-                    (title, work_type, subject, description, composition, price_points, yandex_disk_link, status)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id""",
-                    ('Imported Work', 'unknown', 'unknown', '', '', price, work_yandex_id, 'active')
-                )
-                db_work_id = cur.fetchone()[0]
             
             # Проверяем, не куплена ли уже эта работа
             cur.execute(
@@ -142,15 +141,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             )
             purchase_id = cur.fetchone()[0]
             
-            # Получаем author_id работы
-            cur.execute(
-                "SELECT author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
-                (db_work_id,)
-            )
-            author_result = cur.fetchone()
+            # author_id уже получен в work_result выше
+            author_id = work_result[1]
             
             # Если есть автор, начисляем ему 90%
-            if author_result and author_result[0]:
+            if author_id:
                 author_id = author_result[0]
                 author_share = int(price * 0.9)
                 platform_fee = int(price * 0.1)

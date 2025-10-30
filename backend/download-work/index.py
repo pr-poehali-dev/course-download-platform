@@ -13,6 +13,11 @@ from io import BytesIO
 import base64
 from typing import Dict, Any, Optional
 
+try:
+    import psycopg2
+except ImportError:
+    psycopg2 = None
+
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
@@ -51,33 +56,71 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     try:
-        # Получаем список всех папок
-        api_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(public_key)}&limit=500"
+        # Загружаем данные работы из БД
+        dsn = os.environ.get('DATABASE_URL')
+        if not dsn:
+            raise Exception('DATABASE_URL not configured')
+        
+        if not psycopg2:
+            raise Exception('psycopg2 module not available')
+        
+        conn = psycopg2.connect(dsn)
+        cur = conn.cursor()
+        
+        try:
+            cur.execute(
+                "SELECT title, yandex_disk_link, file_url FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                (work_id,)
+            )
+            work_result = cur.fetchone()
+            
+            if not work_result:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Work not found in database'}),
+                    'isBase64Encoded': False
+                }
+            
+            folder_name = work_result[0]
+            yandex_link = work_result[1] or work_result[2] or public_key
+            
+        finally:
+            cur.close()
+            conn.close()
+        
+        # Получаем список всех папок на Яндекс.Диске
+        api_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(yandex_link)}&limit=500"
         
         req = urllib.request.Request(api_url)
         with urllib.request.urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
         
+        # Ищем папку с работой по названию
         work_item = None
         if '_embedded' in data and 'items' in data['_embedded']:
             for item in data['_embedded']['items']:
-                if item.get('resource_id') == work_id:
+                if item.get('name') == folder_name or item.get('name') in folder_name:
                     work_item = item
                     break
         
         if not work_item:
-            return {
-                'statusCode': 404,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Work not found'}),
-                'isBase64Encoded': False
-            }
+            # Пробуем использовать первую папку
+            if '_embedded' in data and 'items' in data['_embedded'] and len(data['_embedded']['items']) > 0:
+                work_item = data['_embedded']['items'][0]
+            else:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Work folder not found on disk'}),
+                    'isBase64Encoded': False
+                }
         
         folder_name = work_item['name']
         folder_path = '/' + folder_name
         
         # Получаем содержимое папки работы
-        folder_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(public_key)}&path={urllib.parse.quote(folder_path)}&limit=100"
+        folder_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(yandex_link)}&path={urllib.parse.quote(folder_path)}&limit=100"
         
         req = urllib.request.Request(folder_url)
         with urllib.request.urlopen(req, timeout=10) as resp:
@@ -96,7 +139,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         continue
                     
                     # Получаем ссылку на скачивание файла
-                    download_url = get_download_url(public_key, folder_path + '/' + file_name)
+                    download_url = get_download_url(yandex_link, folder_path + '/' + file_name)
                     
                     if download_url:
                         try:

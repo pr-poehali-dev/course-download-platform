@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import { authService } from '@/lib/auth';
 
 interface UserProfile {
   name: string;
@@ -48,7 +49,7 @@ interface Transaction {
 }
 
 export default function ProfilePage() {
-  const [user] = useState<UserProfile>({
+  const [user, setUser] = useState<UserProfile>({
     name: 'Александр Иванов',
     email: 'alex.ivanov@example.com',
     balance: 350,
@@ -59,6 +60,26 @@ export default function ProfilePage() {
     rating: 4.8,
     registrationDate: '2024-01-15'
   });
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('payment') === 'success') {
+      toast({
+        title: 'Платёж успешно обработан!',
+        description: 'Баллы зачислены на ваш счёт',
+      });
+      
+      authService.verify().then((userData) => {
+        if (userData) {
+          setUser(prev => ({ ...prev, balance: userData.balance }));
+        }
+      });
+      
+      const url = new URL(window.location.href);
+      url.searchParams.delete('payment');
+      window.history.replaceState({}, '', url.toString());
+    }
+  }, []);
 
   const [purchases] = useState<Purchase[]>([
     {

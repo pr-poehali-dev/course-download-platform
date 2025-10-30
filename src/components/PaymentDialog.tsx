@@ -26,21 +26,15 @@ interface PaymentPackage {
 }
 
 const PACKAGES: PaymentPackage[] = [
-  { points: 100, price: 500, bonus: 0 },
-  { points: 500, price: 2500, bonus: 100, popular: true },
-  { points: 5000, price: 5000, bonus: 2000 },
+  { points: 100, price: 100, bonus: 0 },
+  { points: 500, price: 450, bonus: 100, popular: true },
+  { points: 1000, price: 850, bonus: 250 },
 ];
 
-declare global {
-  interface Window {
-    cp?: any;
-  }
-}
-
 export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail }: PaymentDialogProps) {
-  const [publicId, setPublicId] = useState('');
+  const [paymentReady, setPaymentReady] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [scriptLoaded, setScriptLoaded] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState('');
 
   useEffect(() => {
     const loadConfig = async () => {
@@ -48,9 +42,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
         const funcUrls = await import('../../backend/func2url.json');
         const response = await fetch(funcUrls.payment);
         const data = await response.json();
-        if (data.public_id) {
-          setPublicId(data.public_id);
-        }
+        setPaymentReady(data.ready);
       } catch (error) {
         console.error('Failed to load payment config:', error);
       } finally {
@@ -61,66 +53,44 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
     loadConfig();
   }, []);
 
-  useEffect(() => {
-    if (!scriptLoaded) {
-      const script = document.createElement('script');
-      script.src = 'https://widget.cloudpayments.ru/bundles/cloudpayments.js';
-      script.async = true;
-      script.onload = () => setScriptLoaded(true);
-      document.body.appendChild(script);
-
-      return () => {
-        document.body.removeChild(script);
-      };
-    }
-  }, [scriptLoaded]);
-
-  const handlePayment = (pkg: PaymentPackage) => {
-    if (!publicId || !scriptLoaded || !window.cp) {
-      toast({
-        title: 'Ошибка',
-        description: 'Платёжная система ещё загружается, попробуйте через пару секунд',
-        variant: 'destructive',
+  const handlePayment = async (pkg: PaymentPackage) => {
+    try {
+      const funcUrls = await import('../../backend/func2url.json');
+      const totalPoints = pkg.points + pkg.bonus;
+      
+      const response = await fetch(funcUrls.payment, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'create_payment',
+          user_email: userEmail,
+          points: totalPoints,
+          price: pkg.price,
+          return_url: window.location.origin + '/profile?payment=success'
+        }),
       });
-      return;
-    }
 
-    const widget = new window.cp.CloudPayments();
-    const totalPoints = pkg.points + pkg.bonus;
-
-    widget.pay('charge', {
-      publicId: publicId,
-      description: `Покупка ${pkg.points} баллов${pkg.bonus ? ` + ${pkg.bonus} бонусных` : ''}`,
-      amount: pkg.price,
-      currency: 'RUB',
-      accountId: userEmail,
-      invoiceId: `${Date.now()}`,
-      skin: 'mini',
-      data: {
-        points: pkg.points,
-        bonus: pkg.bonus,
-        total: totalPoints,
-      },
-    }, {
-      onSuccess: function() {
-        onSuccess(totalPoints);
-        onOpenChange(false);
+      const data = await response.json();
+      
+      if (data.confirmation_url) {
+        window.location.href = data.confirmation_url;
+      } else {
         toast({
-          title: 'Оплата успешна! 🎉',
-          description: `+${totalPoints} баллов зачислено на ваш счёт`,
-        });
-      },
-      onFail: function(reason: string) {
-        toast({
-          title: 'Ошибка оплаты',
-          description: reason || 'Платёж не прошёл, попробуйте ещё раз',
+          title: 'Ошибка',
+          description: 'Не удалось создать платёж',
           variant: 'destructive',
         });
-      },
-      onComplete: function() {
-        console.log('Payment completed');
       }
-    });
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Произошла ошибка при создании платежа',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (loading) {
@@ -136,7 +106,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
     );
   }
 
-  if (!publicId) {
+  if (!paymentReady) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-2xl">
@@ -146,7 +116,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
               Настройка платежей
             </DialogTitle>
             <DialogDescription>
-              Платёжная система ещё не настроена. Пожалуйста, добавьте ключи CloudPayments в настройках проекта.
+              Платёжная система ещё не настроена. Пожалуйста, добавьте ключи ЮКассы в настройках проекта.
             </DialogDescription>
           </DialogHeader>
         </DialogContent>
@@ -167,7 +137,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4">
           {PACKAGES.map((pkg) => (
             <Card 
               key={pkg.points}
@@ -182,24 +152,23 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
               )}
               
               <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <Icon name="Coins" size={24} className="text-yellow-500" />
-                      <span className="text-3xl font-bold">{pkg.points}</span>
-                    </div>
-                    {pkg.bonus > 0 && (
-                      <div className="flex items-center gap-1 text-green-600">
-                        <Icon name="Gift" size={16} />
-                        <span className="text-sm font-semibold">+{pkg.bonus} бонус</span>
-                      </div>
-                    )}
+                <div className="text-center mb-4">
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <Icon name="Coins" size={24} className="text-yellow-500" />
+                    <span className="text-3xl font-bold">{pkg.points}</span>
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold">{pkg.price} ₽</div>
-                    <div className="text-xs text-muted-foreground">
-                      {(pkg.price / pkg.points).toFixed(1)} ₽/балл
+                  {pkg.bonus > 0 && (
+                    <div className="flex items-center justify-center gap-1 text-green-600">
+                      <Icon name="Gift" size={16} />
+                      <span className="text-sm font-semibold">+{pkg.bonus} бонус</span>
                     </div>
+                  )}
+                </div>
+
+                <div className="text-center mb-4">
+                  <div className="text-3xl font-bold">{pkg.price} ₽</div>
+                  <div className="text-xs text-muted-foreground">
+                    {(pkg.price / pkg.points).toFixed(1)} ₽/балл
                   </div>
                 </div>
 
@@ -208,7 +177,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-green-800">Всего получите:</span>
                       <span className="text-lg font-bold text-green-700">
-                        {pkg.points + pkg.bonus} баллов
+                        {pkg.points + pkg.bonus}
                       </span>
                     </div>
                   </div>
@@ -223,7 +192,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
                   }`}
                 >
                   <Icon name="CreditCard" size={20} className="mr-2" />
-                  Купить за {pkg.price} ₽
+                  Купить
                 </Button>
               </div>
             </Card>
@@ -235,7 +204,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
             <Icon name="Shield" size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-foreground mb-1">Безопасная оплата</p>
-              <p>Платежи обрабатываются через CloudPayments. Мы не храним данные ваших карт. Поддерживаем карты Visa, MasterCard, МИР, а также СБП.</p>
+              <p>Платежи обрабатываются через ЮКассу. Мы не храним данные ваших карт. Поддерживаем все российские карты и СБП.</p>
             </div>
           </div>
         </div>

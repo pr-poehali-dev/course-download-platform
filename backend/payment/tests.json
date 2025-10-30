@@ -6,26 +6,16 @@
       "path": "/",
       "expectedStatus": 200,
       "expectedBody": {
-        "public_id": "string",
+        "provider": "yookassa",
         "ready": "boolean"
       },
       "bodyMatcher": "partial"
     },
     {
-      "name": "Payment check callback",
-      "method": "POST",
+      "name": "OPTIONS request",
+      "method": "OPTIONS",
       "path": "/",
-      "body": {
-        "type": "check",
-        "TransactionId": 12345,
-        "Amount": 500,
-        "Currency": "RUB"
-      },
-      "expectedStatus": 200,
-      "expectedBody": {
-        "code": 0
-      },
-      "bodyMatcher": "partial"
+      "expectedStatus": 200
     }
   ]
 }

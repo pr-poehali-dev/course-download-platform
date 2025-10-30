@@ -22,6 +22,9 @@ import AuthorMarketplacePage from "./pages/AuthorMarketplacePage";
 import RoskomnadzorGuidePage from "./pages/RoskomnadzorGuidePage";
 import AIAssistantPage from "./pages/AIAssistantPage";
 import SyncPreviewsPage from "./pages/SyncPreviewsPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +52,9 @@ const App = () => (
           <Route path="/roskomnadzor-guide" element={<RoskomnadzorGuidePage />} />
           <Route path="/ai-assistant" element={<AIAssistantPage />} />
           <Route path="/sync-previews" element={<SyncPreviewsPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -99,12 +99,30 @@ export default function Navigation({
               </Button>
             )}
 
-            <Button size="sm" asChild className="text-xs md:text-sm h-8 md:h-9">
-              <a href="/profile">
-                <Icon name="User" size={14} className="mr-0 md:mr-2" />
-                <span className="hidden md:inline">Профиль</span>
-              </a>
-            </Button>
+            {userBalance > 0 ? (
+              <Button size="sm" asChild className="text-xs md:text-sm h-8 md:h-9">
+                <a href="/profile">
+                  <Icon name="User" size={14} className="mr-0 md:mr-2" />
+                  <span className="hidden md:inline">Профиль</span>
+                </a>
+              </Button>
+            ) : (
+              <>
+                <Button size="sm" variant="ghost" asChild className="text-xs md:text-sm h-8 md:h-9 hidden md:flex">
+                  <a href="/login">
+                    <Icon name="LogIn" size={14} className="mr-2" />
+                    Вход
+                  </a>
+                </Button>
+                <Button size="sm" asChild className="text-xs md:text-sm h-8 md:h-9">
+                  <a href="/register">
+                    <Icon name="UserPlus" size={14} className="mr-0 md:mr-2" />
+                    <span className="hidden md:inline">Регистрация</span>
+                    <span className="md:hidden">Вход</span>
+                  </a>
+                </Button>
+              </>
+            )}
 
             <Button 
               variant="ghost" 

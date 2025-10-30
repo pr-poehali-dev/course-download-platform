@@ -102,8 +102,8 @@ export default function Navigation({
             {userBalance > 0 ? (
               <Button size="sm" asChild className="text-xs md:text-sm h-8 md:h-9">
                 <a href="/profile">
-                  <Icon name="User" size={14} className="mr-0 md:mr-2" />
-                  <span className="hidden md:inline">Профиль</span>
+                  <Icon name="LogIn" size={14} className="mr-0 md:mr-2" />
+                  <span className="hidden md:inline">Личный кабинет</span>
                 </a>
               </Button>
             ) : (

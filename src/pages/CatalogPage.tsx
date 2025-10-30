@@ -32,12 +32,28 @@ export default function CatalogPage() {
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
 
+  const normalizeWorkType = (workType: string): string => {
+    const wt = workType.toLowerCase().trim();
+    
+    if (/курсовая|курсовой/.test(wt)) return 'Курсовая работа';
+    if (/дипломная|диплом/.test(wt)) return 'Дипломная работа';
+    if (/диссертация/.test(wt)) return 'Диссертация';
+    if (/реферат/.test(wt)) return 'Реферат';
+    if (/практическая/.test(wt) && !/отчет/.test(wt)) return 'Практическая';
+    if (/практика|отчет.*практ/.test(wt)) return 'Практика';
+    if (/вкр|выпускная/.test(wt)) return 'Выпускная квалификационная работа';
+    if (/литературный.*обзор|обзор.*литератур/.test(wt)) return 'Литературный обзор';
+    if (/чертеж|чертежи/.test(wt)) return 'Чертежи';
+    
+    return workType;
+  };
+
   const extractWorkInfo = (folderName: string) => {
     const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
     if (match) {
       return {
         title: match[1].trim(),
-        workType: match[2].trim()
+        workType: normalizeWorkType(match[2].trim())
       };
     }
     return {

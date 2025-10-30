@@ -74,15 +74,36 @@ export default function AIAssistantPage() {
     setInputValue('');
     setIsLoading(true);
 
-    setTimeout(() => {
+    try {
+      const chatHistory = [...messages, userMessage].map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      const response = await fetch('https://functions.poehali.dev/080d86fb-5678-411e-bef2-e4c81606015a', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          messages: chatHistory
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка при обращении к ИИ');
+      }
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Отличный вопрос! Давай разберём это по шагам:\n\n1. Сначала открой документ и найди раздел...\n2. Теперь тебе нужно самостоятельно переформулировать...\n3. Попробуй изменить структуру так, чтобы...\n\nПопробуй выполнить первый шаг и покажи, что получилось. Я подскажу, если что-то будет непонятно! 💡',
+        content: data.message,
         timestamp: new Date()
       };
+      
       setMessages(prev => [...prev, assistantMessage]);
-      setIsLoading(false);
 
       if (subscription.type === 'single' && subscription.requestsLeft) {
         setSubscription(prev => ({
@@ -90,7 +111,17 @@ export default function AIAssistantPage() {
           requestsLeft: (prev.requestsLeft || 0) - 1
         }));
       }
-    }, 1500);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось получить ответ от ИИ',
+        variant: 'destructive'
+      });
+      
+      setMessages(prev => prev.slice(0, -1));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

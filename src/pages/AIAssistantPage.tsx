@@ -26,7 +26,7 @@ export default function AIAssistantPage() {
     {
       id: '1',
       role: 'assistant',
-      content: 'Привет! Я твой помощник по адаптации студенческих работ. Загрузи купленную работу, расскажи требования своего ВУЗа, и я помогу тебе шаг за шагом переделать её под твои нужды. Помни: я помогаю учиться, а не делаю всё за тебя! 📚',
+      content: 'Привет! Я — Адаптер Работ, твой личный наставник по студенческим проектам. Расскажи про купленную работу и требования ВУЗа — я помогу тебе шаг за шагом адаптировать её. Помни: я учу, а не делаю за тебя! 📚','
       timestamp: new Date()
     }
   ]);
@@ -159,10 +159,10 @@ export default function AIAssistantPage() {
           <div>
             <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
               <Icon name="Bot" size={36} className="text-primary" />
-              Умный Помощник
+              Адаптер Работ
             </h1>
             <p className="text-muted-foreground">
-              Адаптирую купленные работы под требования твоего ВУЗа
+              Помогу переделать купленную работу под требования твоего ВУЗа
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -260,7 +260,7 @@ export default function AIAssistantPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Icon name="Lightbulb" size={20} className="text-yellow-500" />
-                  Как я работаю
+                  Мои возможности
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
@@ -324,7 +324,7 @@ export default function AIAssistantPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-2xl">Выберите тариф</CardTitle>
-                  <CardDescription>Доступ к умному помощнику для адаптации работ</CardDescription>
+                  <CardDescription>Доступ к Адаптеру Работ для персональной помощи</CardDescription>
                 </div>
                 <Button
                   variant="ghost"

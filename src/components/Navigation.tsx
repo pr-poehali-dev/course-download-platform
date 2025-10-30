@@ -34,7 +34,7 @@ export default function Navigation({
             <a href="/catalog" className="hover:text-primary transition-colors">Каталог</a>
             <a href="/ai-assistant" className="hover:text-primary transition-colors flex items-center gap-1">
               <Icon name="Bot" size={16} />
-              Умный помощник
+              Адаптер Работ
             </a>
             <a href="/marketplace" className="hover:text-primary transition-colors">Авторам</a>
             <a href="/#blog" className="hover:text-primary transition-colors">Блог</a>

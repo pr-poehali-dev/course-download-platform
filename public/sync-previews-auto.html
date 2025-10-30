@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автосинхронизация превью</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+        }
+        
+        .info-box h3 {
+            color: #667eea;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .info-box p {
+            color: #555;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        
+        .sync-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .sync-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .sync-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .sync-btn:disabled .spinner {
+            display: block;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .stats {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+        }
+        
+        .stat-label {
+            font-weight: 500;
+        }
+        
+        .stat-value {
+            font-weight: 700;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Автосинхронизация превью</h1>
+        <p class="subtitle">
+            Автоматически найдет и загрузит превью изображения для всех работ из Яндекс.Диска
+        </p>
+        
+        <div class="info-box">
+            <h3>Как это работает:</h3>
+            <p>
+                Функция автоматически пройдется по всем работам без превью, найдет соответствующие папки 
+                на Яндекс.Диске, извлечет первое найденное изображение и привяжет его к работе в базе данных.
+            </p>
+        </div>
+        
+        <button class="sync-btn" id="syncBtn">
+            <span class="spinner"></span>
+            <span id="btnText">🚀 Запустить синхронизацию</span>
+        </button>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const syncBtn = document.getElementById('syncBtn');
+        const btnText = document.getElementById('btnText');
+        const result = document.getElementById('result');
+        
+        syncBtn.addEventListener('click', async () => {
+            syncBtn.disabled = true;
+            btnText.textContent = 'Синхронизация...';
+            result.style.display = 'none';
+            result.className = 'result';
+            
+            try {
+                const response = await fetch('https://functions.poehali.dev/722d5c93-b101-4896-9429-8aa76d806055', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    result.className = 'result success';
+                    result.innerHTML = `
+                        <div>✅ Синхронизация завершена успешно!</div>
+                        <div class="stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Всего работ без превью:</span>
+                                <span class="stat-value">${data.total_works}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Обновлено превью:</span>
+                                <span class="stat-value">${data.updated_count}</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Пропущено:</span>
+                                <span class="stat-value">${data.skipped_count}</span>
+                            </div>
+                        </div>
+                        ${data.errors.length > 0 ? `<div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
+                            <strong>Ошибки:</strong><br>${data.errors.slice(0, 5).join('<br>')}</div>` : ''}
+                    `;
+                } else {
+                    throw new Error(data.error || 'Sync failed');
+                }
+                
+                result.style.display = 'block';
+            } catch (error) {
+                result.className = 'result error';
+                result.innerHTML = `
+                    <div>❌ Ошибка синхронизации</div>
+                    <div style="margin-top: 10px; font-size: 13px;">${error.message}</div>
+                `;
+                result.style.display = 'block';
+            } finally {
+                syncBtn.disabled = false;
+                btnText.textContent = '🔄 Запустить повторно';
+            }
+        });
+    </script>
+</body>
+</html>

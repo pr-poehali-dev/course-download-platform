@@ -491,9 +491,12 @@ export default function CatalogPage() {
                     </div>
                   )}
                   
-                  <div className="absolute top-3 right-3">
+                  <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
                     <div className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                       {work.price.toLocaleString()} б.
+                    </div>
+                    <div className="bg-white/95 backdrop-blur-sm text-gray-700 text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                      {(work.price * 5).toLocaleString()} ₽
                     </div>
                   </div>
                 </div>

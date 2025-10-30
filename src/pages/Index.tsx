@@ -574,6 +574,108 @@ export default function Index() {
           </div>
         </section>
 
+        <section className="py-24 bg-slate-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <Badge className="mb-4 bg-slate-900 text-white">
+                <Icon name="Code" size={14} className="mr-1" />
+                Технологический стек
+              </Badge>
+              <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                Современные технологии
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Используем передовые решения для максимальной производительности и безопасности
+              </p>
+            </div>
+
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                <Card className="p-6 text-center hover:shadow-lg transition-all border-2 hover:border-blue-500">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center">
+                    <Icon name="Code" size={32} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">React + Vite</h3>
+                  <p className="text-sm text-muted-foreground">Молниеносный UI</p>
+                </Card>
+
+                <Card className="p-6 text-center hover:shadow-lg transition-all border-2 hover:border-purple-500">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-400 to-purple-600 rounded-2xl flex items-center justify-center">
+                    <Icon name="Brain" size={32} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">OpenAI GPT-4</h3>
+                  <p className="text-sm text-muted-foreground">ИИ-помощник</p>
+                </Card>
+
+                <Card className="p-6 text-center hover:shadow-lg transition-all border-2 hover:border-green-500">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center">
+                    <Icon name="Database" size={32} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">PostgreSQL</h3>
+                  <p className="text-sm text-muted-foreground">Надёжная БД</p>
+                </Card>
+
+                <Card className="p-6 text-center hover:shadow-lg transition-all border-2 hover:border-orange-500">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-orange-400 to-orange-600 rounded-2xl flex items-center justify-center">
+                    <Icon name="Zap" size={32} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Cloud Functions</h3>
+                  <p className="text-sm text-muted-foreground">Serverless API</p>
+                </Card>
+
+                <Card className="p-6 text-center hover:shadow-lg transition-all border-2 hover:border-red-500">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-red-400 to-red-600 rounded-2xl flex items-center justify-center">
+                    <Icon name="FileText" size={32} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">PDF.js</h3>
+                  <p className="text-sm text-muted-foreground">Превью файлов</p>
+                </Card>
+
+                <Card className="p-6 text-center hover:shadow-lg transition-all border-2 hover:border-yellow-500">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-2xl flex items-center justify-center">
+                    <Icon name="CreditCard" size={32} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">ЮКасса</h3>
+                  <p className="text-sm text-muted-foreground">Оплата</p>
+                </Card>
+
+                <Card className="p-6 text-center hover:shadow-lg transition-all border-2 hover:border-cyan-500">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-2xl flex items-center justify-center">
+                    <Icon name="Cloud" size={32} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Yandex Cloud</h3>
+                  <p className="text-sm text-muted-foreground">Инфраструктура</p>
+                </Card>
+
+                <Card className="p-6 text-center hover:shadow-lg transition-all border-2 hover:border-pink-500">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-pink-400 to-pink-600 rounded-2xl flex items-center justify-center">
+                    <Icon name="Shield" size={32} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">SSL/TLS</h3>
+                  <p className="text-sm text-muted-foreground">Безопасность</p>
+                </Card>
+              </div>
+
+              <Card className="bg-gradient-to-br from-slate-900 to-slate-700 text-white p-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                  <div>
+                    <div className="text-4xl font-bold mb-2 text-blue-400">99.9%</div>
+                    <p className="text-slate-300">Uptime гарантия</p>
+                  </div>
+                  <div>
+                    <div className="text-4xl font-bold mb-2 text-green-400">&lt;100ms</div>
+                    <p className="text-slate-300">Средний ответ API</p>
+                  </div>
+                  <div>
+                    <div className="text-4xl font-bold mb-2 text-purple-400">256-bit</div>
+                    <p className="text-slate-300">Шифрование данных</p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </section>
+
         <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">

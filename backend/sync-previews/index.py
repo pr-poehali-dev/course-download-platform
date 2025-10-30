@@ -117,20 +117,56 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
     try:
-        url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&limit=100'
+        folder_path = '/' + work_title
+        subfolder_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(folder_path)}&limit=50'
         
-        req = urllib.request.Request(url)
+        try:
+            req = urllib.request.Request(subfolder_url)
+            with urllib.request.urlopen(req, timeout=10) as response:
+                data = json.loads(response.read().decode())
+            
+            if data.get('_embedded') and data['_embedded'].get('items'):
+                for item in data['_embedded']['items']:
+                    if item.get('type') == 'file':
+                        name = item.get('name', '').lower()
+                        file_url = item.get('file')
+                        
+                        if not file_url:
+                            continue
+                        
+                        if name == 'preview.png':
+                            return file_url
+                        
+                        if name.startswith('preview') and (name.endswith('.png') or name.endswith('.jpg') or name.endswith('.jpeg')):
+                            return file_url
+        except:
+            pass
+        
+        root_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&limit=100'
+        req = urllib.request.Request(root_url)
         with urllib.request.urlopen(req, timeout=10) as response:
             data = json.loads(response.read().decode())
+        
+        preview_candidates = []
+        image_candidates = []
         
         if data.get('_embedded') and data['_embedded'].get('items'):
             for item in data['_embedded']['items']:
                 if item.get('type') == 'file':
                     name = item.get('name', '').lower()
+                    file_url = item.get('file')
+                    
+                    if not file_url:
+                        continue
+                    
                     if name.startswith('preview') and (name.endswith('.png') or name.endswith('.jpg') or name.endswith('.jpeg')):
-                        file_url = item.get('file')
-                        if file_url:
-                            return file_url
+                        return file_url
+                    
+                    if name.endswith(('.png', '.jpg', '.jpeg')):
+                        preview_candidates.append(file_url)
+        
+        if preview_candidates:
+            return preview_candidates[0]
         
         return None
         

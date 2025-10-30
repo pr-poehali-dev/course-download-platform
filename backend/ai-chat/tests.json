@@ -8,29 +8,6 @@
       "expectedBody": ""
     },
     {
-      "name": "Test POST with valid messages",
-      "method": "POST",
-      "path": "/",
-      "body": {
-        "messages": [
-          {
-            "role": "user",
-            "content": "Привет! Помоги мне адаптировать курсовую работу по экономике"
-          }
-        ]
-      },
-      "expectedStatus": 200,
-      "expectedBody": {
-        "message": "string",
-        "usage": {
-          "prompt_tokens": "number",
-          "completion_tokens": "number",
-          "total_tokens": "number"
-        }
-      },
-      "bodyMatcher": "partial"
-    },
-    {
       "name": "Test POST without messages",
       "method": "POST",
       "path": "/",

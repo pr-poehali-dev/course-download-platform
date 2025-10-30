@@ -1,6 +1,11 @@
 import json
 import os
+import sys
 from typing import Dict, Any
+
+if sys.stdout.encoding != 'utf-8':
+    import io
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -33,8 +38,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     try:
-        body_data = json.loads(event.get('body', '{}'))
+        body = event.get('body') or '{}'
+        body_data = json.loads(body) if body else {}
         messages = body_data.get('messages', [])
+        file_content = body_data.get('file_content', '')
         
         if not messages:
             return {
@@ -100,6 +107,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             content = msg.get('content', '')
             if role in ['user', 'assistant']:
                 api_messages.append({'role': role, 'content': content})
+        
+        if file_content:
+            last_user_msg = api_messages[-1] if api_messages[-1]['role'] == 'user' else None
+            if last_user_msg:
+                last_user_msg['content'] += f"\n\n=== СОДЕРЖИМОЕ ФАЙЛА ===\n{file_content[:15000]}\n=== КОНЕЦ ФАЙЛА ==="
         
         response = client.chat.completions.create(
             model='gpt-4o-mini',

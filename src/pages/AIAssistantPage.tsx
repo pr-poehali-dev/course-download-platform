@@ -34,8 +34,10 @@ export default function AIAssistantPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [subscription, setSubscription] = useState<Subscription>({ type: 'none' });
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -45,8 +47,32 @@ export default function AIAssistantPage() {
     scrollToBottom();
   }, [messages]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: 'Неподдерживаемый формат',
+          description: 'Поддерживаются файлы: PDF, DOC, DOCX, TXT',
+          variant: 'destructive'
+        });
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast({
+          title: 'Файл слишком большой',
+          description: 'Максимальный размер файла — 10 МБ',
+          variant: 'destructive'
+        });
+        return;
+      }
+      setAttachedFile(file);
+    }
+  };
+
   const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() && !attachedFile) return;
 
     if (subscription.type === 'none') {
       setShowPricingModal(true);
@@ -63,15 +89,22 @@ export default function AIAssistantPage() {
       return;
     }
 
+    let messageContent = inputValue;
+    if (attachedFile) {
+      messageContent += `\n\n📎 Прикреплён файл: ${attachedFile.name}`;
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputValue,
+      content: messageContent,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
+    const currentFile = attachedFile;
+    setAttachedFile(null);
     setIsLoading(true);
 
     try {
@@ -80,13 +113,24 @@ export default function AIAssistantPage() {
         content: msg.content
       }));
 
+      let fileContent = '';
+      if (currentFile) {
+        const reader = new FileReader();
+        fileContent = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsText(currentFile);
+        });
+      }
+
       const response = await fetch('https://functions.poehali.dev/080d86fb-5678-411e-bef2-e4c81606015a', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          messages: chatHistory
+          messages: chatHistory,
+          file_content: fileContent || undefined
         })
       });
 
@@ -226,30 +270,62 @@ export default function AIAssistantPage() {
                 <div ref={messagesEndRef} />
               </CardContent>
 
-              <div className="border-t p-4">
+              <div className="border-t p-4 space-y-3">
+                {attachedFile && (
+                  <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg p-2">
+                    <Icon name="Paperclip" size={16} className="text-blue-600" />
+                    <span className="text-sm flex-1">{attachedFile.name}</span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setAttachedFile(null)}
+                    >
+                      <Icon name="X" size={16} />
+                    </Button>
+                  </div>
+                )}
                 <div className="flex gap-2">
-                  <Textarea
-                    ref={textareaRef}
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder={
-                      subscription.type === 'none'
-                        ? 'Оформите подписку для начала работы...'
-                        : 'Напиши свой вопрос... (Enter - отправить, Shift+Enter - новая строка)'
-                    }
-                    className="resize-none"
-                    rows={3}
-                    disabled={subscription.type === 'none'}
-                  />
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={!inputValue.trim() || isLoading || subscription.type === 'none'}
-                    size="icon"
-                    className="h-auto px-4"
-                  >
-                    <Icon name="Send" size={20} />
-                  </Button>
+                  <div className="flex flex-col gap-2 flex-1">
+                    <Textarea
+                      ref={textareaRef}
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder={
+                        subscription.type === 'none'
+                          ? 'Оформите подписку для начала работы...'
+                          : 'Напиши свой вопрос... (Enter - отправить, Shift+Enter - новая строка)'
+                      }
+                      className="resize-none"
+                      rows={3}
+                      disabled={subscription.type === 'none'}
+                    />
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.txt"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={subscription.type === 'none' || isLoading}
+                      variant="outline"
+                      size="icon"
+                    >
+                      <Icon name="Paperclip" size={20} />
+                    </Button>
+                    <Button
+                      onClick={handleSendMessage}
+                      disabled={(!inputValue.trim() && !attachedFile) || isLoading || subscription.type === 'none'}
+                      size="icon"
+                      className="h-auto flex-1"
+                    >
+                      <Icon name="Send" size={20} />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </Card>

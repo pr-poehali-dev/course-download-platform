@@ -367,13 +367,6 @@ export default function CatalogPage() {
               </Select>
             </div>
           </div>
-          
-          {loadingPreviews && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
-              <span>Загружаются превью работ...</span>
-            </div>
-          )}
         </div>
 
         {loading ? (

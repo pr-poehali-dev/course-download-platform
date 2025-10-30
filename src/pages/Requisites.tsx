@@ -49,6 +49,14 @@ export default function Requisites() {
                 </div>
                 
                 <div className="flex items-start gap-2">
+                  <Icon name="FileText" size={16} className="mt-1 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">ИНН:</p>
+                    <p className="text-sm text-muted-foreground">290540407146</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-2">
                   <Icon name="Mail" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Email:</p>

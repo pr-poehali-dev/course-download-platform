@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import Navigation from '../components/Navigation';
+import { authService } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -22,6 +23,16 @@ interface Subscription {
 
 export default function AIAssistantPage() {
   const { toast } = useToast();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await authService.verify();
+      setIsLoggedIn(!!user);
+    };
+    checkAuth();
+  }, []);
+
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -196,7 +207,7 @@ export default function AIAssistantPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <Navigation />
+      <Navigation isLoggedIn={isLoggedIn} />
       
       <div className="container mx-auto px-4 pt-24 pb-8 max-w-6xl">
         <div className="mb-6 flex items-center justify-between">

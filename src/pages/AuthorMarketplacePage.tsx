@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
+import { authService } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
@@ -9,6 +10,15 @@ export default function AuthorMarketplacePage() {
   const navigate = useNavigate();
   const [userStr] = useState(localStorage.getItem('user'));
   const user = userStr ? JSON.parse(userStr) : null;
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await authService.verify();
+      setIsLoggedIn(!!user);
+    };
+    checkAuth();
+  }, []);
 
   const features = [
     {
@@ -74,7 +84,7 @@ export default function AuthorMarketplacePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
+      <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-12 mt-16 max-w-7xl">
         <div className="text-center mb-16">

@@ -4,6 +4,7 @@ import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { authService } from '@/lib/auth';
 
 interface Work {
   id: string;
@@ -31,6 +32,15 @@ export default function WorkDetailPage() {
   const [showingPdfPreview, setShowingPdfPreview] = useState(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [loadingPdfPreview, setLoadingPdfPreview] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await authService.verify();
+      setIsLoggedIn(!!user);
+    };
+    checkAuth();
+  }, []);
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
@@ -435,7 +445,7 @@ export default function WorkDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
-        <Navigation />
+        <Navigation isLoggedIn={isLoggedIn} />
         <main className="container mx-auto px-4 py-20 mt-16">
           <div className="text-center">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600"></div>
@@ -452,7 +462,7 @@ export default function WorkDetailPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
+      <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-4 md:py-6 mt-16 max-w-[1200px]">
         <Button 

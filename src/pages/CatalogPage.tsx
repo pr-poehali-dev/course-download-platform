@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+import { authService } from '@/lib/auth';
 
 interface Work {
   id: string;
@@ -37,6 +38,15 @@ export default function CatalogPage() {
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await authService.verify();
+      setIsLoggedIn(!!user);
+    };
+    checkAuth();
+  }, []);
 
   const normalizeWorkType = (workType: string): string => {
     const wt = workType.toLowerCase().trim();
@@ -299,7 +309,7 @@ export default function CatalogPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation />
+      <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
         <div className="mb-8">

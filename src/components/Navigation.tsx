@@ -10,6 +10,7 @@ interface NavigationProps {
   userBalance?: number;
   cartCount?: number;
   favoritesCount?: number;
+  isLoggedIn?: boolean;
 }
 
 export default function Navigation({
@@ -20,6 +21,7 @@ export default function Navigation({
   userBalance = 0,
   cartCount = 0,
   favoritesCount = 0,
+  isLoggedIn = false,
 }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -99,10 +101,10 @@ export default function Navigation({
               </Button>
             )}
 
-            {userBalance > 0 ? (
+            {isLoggedIn ? (
               <Button size="sm" asChild className="text-xs md:text-sm h-8 md:h-9">
                 <a href="/profile">
-                  <Icon name="LogIn" size={14} className="mr-0 md:mr-2" />
+                  <Icon name="UserCircle" size={14} className="mr-0 md:mr-2" />
                   <span className="hidden md:inline">Личный кабинет</span>
                 </a>
               </Button>

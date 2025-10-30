@@ -87,7 +87,7 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
     conn = get_db_connection()
     cur = conn.cursor()
     
-    cur.execute("SELECT id FROM users WHERE username = %s OR email = %s", (username, email))
+    cur.execute("SELECT id FROM t_p63326274_course_download_plat.users WHERE username = %s OR email = %s", (username, email))
     if cur.fetchone():
         cur.close()
         conn.close()
@@ -101,14 +101,14 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
     referral_code = generate_referral_code(username)
     
     cur.execute(
-        "INSERT INTO users (username, email, password_hash, referral_code, balance) VALUES (%s, %s, %s, %s, %s) RETURNING id",
+        "INSERT INTO t_p63326274_course_download_plat.users (username, email, password_hash, referral_code, balance) VALUES (%s, %s, %s, %s, %s) RETURNING id",
         (username, email, password_hash, referral_code, 100)
     )
     user_id = cur.fetchone()[0]
     conn.commit()
     
     cur.execute(
-        "INSERT INTO transactions (user_id, type, amount, description) VALUES (%s, %s, %s, %s)",
+        "INSERT INTO t_p63326274_course_download_plat.transactions (user_id, type, amount, description) VALUES (%s, %s, %s, %s)",
         (user_id, 'refill', 100, 'Бонус при регистрации')
     )
     conn.commit()
@@ -151,7 +151,7 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     cur = conn.cursor()
     
     cur.execute(
-        "SELECT id, username, email, balance, referral_code FROM users WHERE username = %s AND password_hash = %s",
+        "SELECT id, username, email, balance, referral_code FROM t_p63326274_course_download_plat.users WHERE username = %s AND password_hash = %s",
         (username, password_hash)
     )
     user = cur.fetchone()
@@ -204,7 +204,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
         cur = conn.cursor()
         
         cur.execute(
-            "SELECT id, username, email, balance, referral_code FROM users WHERE id = %s",
+            "SELECT id, username, email, balance, referral_code FROM t_p63326274_course_download_plat.users WHERE id = %s",
             (user_id,)
         )
         user = cur.fetchone()

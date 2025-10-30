@@ -566,7 +566,7 @@ export default function Index() {
                   Новинка
                 </Badge>
                 <h2 className="text-5xl font-bold mb-4">
-                  Адаптер Работ — твой наставник
+                  TechMentor Pro — твой наставник
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                   ИИ-помощник поможет адаптировать купленную работу под требования твоего ВУЗа
@@ -577,7 +577,7 @@ export default function Index() {
                 <Card className="border-2 border-purple-200 hover:shadow-xl transition-all">
                   <CardHeader>
                     <Icon name="Bot" size={48} className="text-purple-600 mb-4" />
-                    <CardTitle className="text-2xl">Что умеет Адаптер?</CardTitle>
+                    <CardTitle className="text-2xl">Что умеет TechMentor Pro?</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-start gap-3">
@@ -649,7 +649,7 @@ export default function Index() {
               </Card>
 
               <div className="bg-white rounded-2xl p-8 shadow-xl">
-                <h3 className="text-2xl font-bold mb-6 text-center">Тарифы на Адаптер Работ</h3>
+                <h3 className="text-2xl font-bold mb-6 text-center">Тарифы на TechMentor Pro</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="border-2 rounded-xl p-6 hover:border-primary transition-all">
                     <div className="text-center mb-4">
@@ -727,7 +727,7 @@ export default function Index() {
                   >
                     <a href="/ai-assistant">
                       <Icon name="Bot" size={22} className="mr-2" />
-                      Попробовать Адаптер Работ
+                      Попробовать TechMentor Pro
                     </a>
                   </Button>
                 </div>

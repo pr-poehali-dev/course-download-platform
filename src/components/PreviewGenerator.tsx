@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 export default function PreviewGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [batchSize, setBatchSize] = useState(50);
+  const [batchSize, setBatchSize] = useState(100);
   const [stats, setStats] = useState({ total: 0, success: 0, failed: 0 });
 
   const generatePreviews = async () => {

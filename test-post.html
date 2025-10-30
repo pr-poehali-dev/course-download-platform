@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Endpoint Test</title>
+</head>
+<body>
+    <h1>Testing POST Endpoint</h1>
+    <pre id="result">Testing...</pre>
+    
+    <script>
+        async function testPostEndpoint() {
+            try {
+                const response = await fetch('https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'verify' })
+                });
+                
+                const status = response.status;
+                const data = await response.json();
+                
+                document.getElementById('result').textContent = 
+                    `Status: ${status}\n\nResponse:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                document.getElementById('result').textContent = 
+                    `Error: ${error.message}`;
+            }
+        }
+        
+        testPostEndpoint();
+    </script>
+</body>
+</html>

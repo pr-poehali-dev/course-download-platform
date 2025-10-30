@@ -387,172 +387,189 @@ export default function Index() {
           </div>
         </header>
 
-        <section className="relative py-24 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-primary/10"></div>
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDMiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
+        <section className="relative py-32 overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDIiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-60"></div>
+          
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-300/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
           
           <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-4xl mx-auto text-center mb-12">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-6 animate-fade-in">
-                <Icon name="Zap" size={16} className="text-primary" />
-                <span className="text-sm font-medium">Более 450 готовых работ</span>
+            <div className="max-w-5xl mx-auto text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full mb-8 animate-fade-in backdrop-blur-sm border border-primary/20">
+                <Icon name="Sparkles" size={18} className="text-primary" />
+                <span className="text-sm font-semibold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                  Платформа нового поколения для студентов
+                </span>
               </div>
               
-              <h2 className="text-6xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-transparent animate-fade-in">
-                Обмен студенческими работами
+              <h2 className="text-6xl md:text-8xl font-bold mb-8 bg-gradient-to-r from-slate-900 via-primary to-purple-600 bg-clip-text text-transparent animate-fade-in leading-tight">
+                Tech Forma
               </h2>
               
-              <p className="text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto animate-fade-in">
-                Делись работами и получай доступ к материалам других студентов
+              <p className="text-2xl md:text-3xl font-semibold text-slate-700 mb-6 animate-fade-in">
+                Умная экосистема для студентов
               </p>
               
-              <div className="max-w-2xl mx-auto relative animate-fade-in">
-                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full"></div>
-                <div className="relative bg-white/80 backdrop-blur-md rounded-2xl p-2 shadow-2xl border-2 border-primary/20">
-                  <div className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Icon name="Search" size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                      <Input
-                        placeholder="Курсовая по экономике, диплом по программированию..."
-                        className="pl-12 h-14 text-lg border-0 bg-transparent focus-visible:ring-0"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                    </div>
-                    <Button size="lg" className="h-14 px-8 gradient-purple-blue animate-gradient hover:shadow-xl transition-all duration-300">
-                      <Icon name="Search" size={20} className="mr-2" />
-                      Найти
-                    </Button>
-                  </div>
-                </div>
+              <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed">
+                Облачный каталог работ + ИИ-помощник + Маркетплейс авторов. Всё в одном месте.
+              </p>
+              
+              <div className="flex gap-4 justify-center mb-12 flex-wrap animate-fade-in">
+                <Button size="lg" className="h-14 px-8 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-lg shadow-xl" asChild>
+                  <a href="/catalog">
+                    <Icon name="Database" size={20} className="mr-2" />
+                    Каталог работ
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 backdrop-blur-sm bg-white/50" asChild>
+                  <a href="/ai-assistant">
+                    <Icon name="Bot" size={20} className="mr-2" />
+                    TechMentor Pro
+                  </a>
+                </Button>
               </div>
 
-              <div className="flex gap-3 justify-center mt-8 flex-wrap animate-fade-in">
-                <Badge 
-                  variant={selectedCategory === 'all' ? 'default' : 'outline'} 
-                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
-                  onClick={() => setSelectedCategory('all')}>
-                  <Icon name="BookOpen" size={14} className="mr-2" />
-                  Все работы
-                </Badge>
-                <Badge 
-                  variant={selectedCategory === 'Курсовая работа' ? 'default' : 'outline'} 
-                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
-                  onClick={() => setSelectedCategory('Курсовая работа')}>
-                  <Icon name="FileText" size={14} className="mr-2" />
-                  Курсовые
-                </Badge>
-                <Badge 
-                  variant={selectedCategory === 'Дипломная работа' ? 'default' : 'outline'} 
-                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
-                  onClick={() => setSelectedCategory('Дипломная работа')}>
-                  <Icon name="Award" size={14} className="mr-2" />
-                  Дипломные
-                </Badge>
-                <Badge 
-                  variant={selectedCategory === 'Практическая работа' ? 'default' : 'outline'} 
-                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
-                  onClick={() => setSelectedCategory('Практическая работа')}>
-                  <Icon name="Lightbulb" size={14} className="mr-2" />
-                  Практические
-                </Badge>
-                <Badge 
-                  variant={selectedCategory === 'Чертеж' ? 'default' : 'outline'} 
-                  className="cursor-pointer px-5 py-2.5 text-sm hover:scale-105 transition-transform" 
-                  onClick={() => setSelectedCategory('Чертеж')}>
-                  <Icon name="Ruler" size={14} className="mr-2" />
-                  Чертежи
-                </Badge>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mt-16">
-              <div className="text-center animate-fade-in">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Icon name="Clock" size={32} className="text-primary" />
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
+                  <div className="text-3xl font-bold text-primary mb-1">450+</div>
+                  <p className="text-sm text-muted-foreground">Готовых работ</p>
                 </div>
-                <h3 className="text-4xl font-bold mb-2">24/7</h3>
-                <p className="text-sm text-muted-foreground">Доступ к материалам</p>
-              </div>
-              
-              <div className="text-center animate-fade-in">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Icon name="Users" size={32} className="text-primary" />
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-purple-200 hover:border-purple-400 transition-all hover:shadow-lg">
+                  <div className="text-3xl font-bold text-purple-600 mb-1">ИИ</div>
+                  <p className="text-sm text-muted-foreground">Помощник</p>
                 </div>
-                <h3 className="text-4xl font-bold mb-2">5000+</h3>
-                <p className="text-sm text-muted-foreground">Студентов с нами</p>
-              </div>
-              
-              <div className="text-center animate-fade-in">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Icon name="Star" size={32} className="text-primary" />
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-blue-200 hover:border-blue-400 transition-all hover:shadow-lg">
+                  <div className="text-3xl font-bold text-blue-600 mb-1">24/7</div>
+                  <p className="text-sm text-muted-foreground">Доступ</p>
                 </div>
-                <h3 className="text-4xl font-bold mb-2">4.8</h3>
-                <p className="text-sm text-muted-foreground">Средний рейтинг работ</p>
+                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-green-200 hover:border-green-400 transition-all hover:shadow-lg">
+                  <div className="text-3xl font-bold text-green-600 mb-1">5000+</div>
+                  <p className="text-sm text-muted-foreground">Студентов</p>
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-muted/30">
+        <section className="py-24 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-5xl font-bold mb-4">
-                Как это работает?
+              <Badge className="mb-4 bg-gradient-to-r from-primary to-purple-600">
+                Возможности платформы
+              </Badge>
+              <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+                Всё, что нужно студенту
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Три простых шага для обмена студенческими работами
+                Три мощных инструмента в единой экосистеме
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-              <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-border">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                  <Icon name="Upload" size={32} className="text-primary" />
-                </div>
-                <div className="inline-block bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full mb-4">
-                  ШАГ 1
-                </div>
-                <h3 className="text-2xl font-bold mb-3">Загрузи работу</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Поделись своей курсовой, дипломом или рефератом и получи баллы за каждую загрузку
-                </p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+              <Card className="relative overflow-hidden border-2 hover:border-primary transition-all group hover:shadow-2xl">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all"></div>
+                <CardHeader>
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Icon name="Database" size={28} className="text-white" />
+                  </div>
+                  <CardTitle className="text-2xl">Облачный каталог</CardTitle>
+                  <CardDescription className="text-base">450+ готовых работ</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Курсовые, дипломы, чертежи</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>PDF превью перед покупкой</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Мгновенный доступ</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Рейтинги и отзывы</span>
+                  </div>
+                  <Button className="w-full mt-4" variant="outline" asChild>
+                    <a href="/catalog">
+                      <Icon name="ArrowRight" size={16} className="mr-2" />
+                      Смотреть каталог
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
 
-              <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-border">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                  <Icon name="Coins" size={32} className="text-primary" />
-                </div>
-                <div className="inline-block bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full mb-4">
-                  ШАГ 2
-                </div>
-                <h3 className="text-2xl font-bold mb-3">Получай баллы</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Зарабатывай баллы за свои работы или пополняй баланс для доступа к материалам
-                </p>
-              </div>
+              <Card className="relative overflow-hidden border-2 border-purple-200 hover:border-purple-500 transition-all group hover:shadow-2xl">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all"></div>
+                <CardHeader>
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Icon name="Bot" size={28} className="text-white" />
+                  </div>
+                  <CardTitle className="text-2xl">TechMentor Pro</CardTitle>
+                  <CardDescription className="text-base">ИИ-помощник для адаптации</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Адаптация под ВУЗ</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Переформулирование текста</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Помощь с оформлением</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>GPT-4 под капотом</span>
+                  </div>
+                  <Button className="w-full mt-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700" asChild>
+                    <a href="/ai-assistant">
+                      <Icon name="Sparkles" size={16} className="mr-2" />
+                      Попробовать ИИ
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
 
-              <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-border">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
-                  <Icon name="Download" size={32} className="text-primary" />
-                </div>
-                <div className="inline-block bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full mb-4">
-                  ШАГ 3
-                </div>
-                <h3 className="text-2xl font-bold mb-3">Скачивай нужное</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Используй баллы для доступа к тысячам готовых работ от других студентов
-                </p>
-              </div>
-            </div>
-
-            <div className="text-center">
-              <Button size="lg" className="h-14 px-10 text-lg shadow-xl hover:shadow-2xl" asChild>
-                <a href="/catalog">
-                  <Icon name="BookOpen" size={22} className="mr-2" />
-                  Перейти в каталог
-                </a>
-              </Button>
+              <Card className="relative overflow-hidden border-2 hover:border-green-500 transition-all group hover:shadow-2xl">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-3xl group-hover:bg-green-500/10 transition-all"></div>
+                <CardHeader>
+                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <Icon name="TrendingUp" size={28} className="text-white" />
+                  </div>
+                  <CardTitle className="text-2xl">Маркетплейс</CardTitle>
+                  <CardDescription className="text-base">Продавай свои работы</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>До 70% от продаж</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Авто-модерация</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Статистика продаж</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Быстрый вывод</span>
+                  </div>
+                  <Button className="w-full mt-4" variant="outline" asChild>
+                    <a href="/marketplace">
+                      <Icon name="Upload" size={16} className="mr-2" />
+                      Стать автором
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>

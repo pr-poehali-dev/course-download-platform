@@ -494,60 +494,60 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="py-20 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50">
+        <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h2 className="text-5xl font-bold mb-4">
                 Как это работает?
               </h2>
-              <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                 Три простых шага для обмена студенческими работами
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-16">
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Icon name="Upload" size={32} className="text-white" />
+              <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-border">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+                  <Icon name="Upload" size={32} className="text-primary" />
                 </div>
-                <div className="inline-block bg-blue-100 text-blue-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
+                <div className="inline-block bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full mb-4">
                   ШАГ 1
                 </div>
                 <h3 className="text-2xl font-bold mb-3">Загрузи работу</h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   Поделись своей курсовой, дипломом или рефератом и получи баллы за каждую загрузку
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Icon name="Coins" size={32} className="text-white" />
+              <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-border">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+                  <Icon name="Coins" size={32} className="text-primary" />
                 </div>
-                <div className="inline-block bg-purple-100 text-purple-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
+                <div className="inline-block bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full mb-4">
                   ШАГ 2
                 </div>
                 <h3 className="text-2xl font-bold mb-3">Получай баллы</h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   Зарабатывай баллы за свои работы или пополняй баланс для доступа к материалам
                 </p>
               </div>
 
-              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mb-6">
-                  <Icon name="Download" size={32} className="text-white" />
+              <div className="bg-card rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 border-2 border-border">
+                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+                  <Icon name="Download" size={32} className="text-primary" />
                 </div>
-                <div className="inline-block bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full mb-4">
+                <div className="inline-block bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full mb-4">
                   ШАГ 3
                 </div>
                 <h3 className="text-2xl font-bold mb-3">Скачивай нужное</h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   Используй баллы для доступа к тысячам готовых работ от других студентов
                 </p>
               </div>
             </div>
 
             <div className="text-center">
-              <Button size="lg" className="h-14 px-10 text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-xl hover:shadow-2xl" asChild>
+              <Button size="lg" className="h-14 px-10 text-lg shadow-xl hover:shadow-2xl" asChild>
                 <a href="/catalog">
                   <Icon name="BookOpen" size={22} className="mr-2" />
                   Перейти в каталог
@@ -803,55 +803,55 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="py-20 bg-gradient-to-b from-white to-gray-50">
+        <section className="py-20 bg-background">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-16">
-                <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                <h2 className="text-5xl font-bold mb-4">
                   Почему выбирают нас?
                 </h2>
-                <p className="text-xl text-gray-600">
+                <p className="text-xl text-muted-foreground">
                   Тысячи студентов уже используют платформу
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mb-5">
-                    <Icon name="Shield" size={24} className="text-white" />
+                <div className="bg-card p-8 rounded-2xl shadow-lg border-2 border-border hover:shadow-xl transition-shadow hover:border-primary/50">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
+                    <Icon name="Shield" size={24} className="text-primary" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">Проверенные работы</h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     Все материалы проходят модерацию перед публикацией. Гарантия качества и актуальности.
                   </p>
                 </div>
 
-                <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                  <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center mb-5">
-                    <Icon name="Zap" size={24} className="text-white" />
+                <div className="bg-card p-8 rounded-2xl shadow-lg border-2 border-border hover:shadow-xl transition-shadow hover:border-primary/50">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
+                    <Icon name="Zap" size={24} className="text-primary" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">Быстрый доступ</h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     Мгновенное скачивание после покупки. Все файлы доступны 24/7 в личном кабинете.
                   </p>
                 </div>
 
-                <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-5">
-                    <Icon name="TrendingUp" size={24} className="text-white" />
+                <div className="bg-card p-8 rounded-2xl shadow-lg border-2 border-border hover:shadow-xl transition-shadow hover:border-primary/50">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
+                    <Icon name="TrendingUp" size={24} className="text-primary" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">Зарабатывай на работах</h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     Получай баллы за каждую загруженную работу. Помогай другим и получай доступ к материалам.
                   </p>
                 </div>
 
-                <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl flex items-center justify-center mb-5">
-                    <Icon name="Users" size={24} className="text-white" />
+                <div className="bg-card p-8 rounded-2xl shadow-lg border-2 border-border hover:shadow-xl transition-shadow hover:border-primary/50">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
+                    <Icon name="Users" size={24} className="text-primary" />
                   </div>
                   <h3 className="text-xl font-bold mb-3">Сообщество студентов</h3>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed">
                     Более 5000 активных пользователей. Обменивайся знаниями с коллегами по всей стране.
                   </p>
                 </div>

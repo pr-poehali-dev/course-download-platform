@@ -539,22 +539,20 @@ export default function WorkDetailPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl p-6 sticky top-20 border-2 border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-              {/* Цена */}
-              <div className="text-center mb-5 pb-5 border-b border-gray-100">
-                <div className="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Стоимость</div>
+            <div className="bg-card rounded-xl p-6 sticky top-20 border-2 border-border shadow-sm hover:shadow-md transition-shadow">
+              <div className="text-center mb-5 pb-5 border-b border-border">
+                <div className="text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wider">Стоимость</div>
                 <div className="flex items-baseline justify-center gap-1.5">
-                  <span className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  <span className="text-4xl font-extrabold text-primary">
                     {work.price.toLocaleString()}
                   </span>
-                  <span className="text-lg font-medium text-gray-500">баллов</span>
+                  <span className="text-lg font-medium text-muted-foreground">баллов</span>
                 </div>
               </div>
 
-              {/* Кнопка покупки */}
               <Button 
                 size="default"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold rounded-lg mb-5 shadow-md hover:shadow-lg transition-all duration-200 h-11"
+                className="w-full font-semibold rounded-lg mb-5 shadow-md hover:shadow-lg transition-all duration-200 h-11"
                 onClick={handlePurchaseAndDownload}
                 disabled={downloading}
               >
@@ -571,37 +569,35 @@ export default function WorkDetailPage() {
                 )}
               </Button>
 
-              {/* Преимущества */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2.5 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                    <Icon name="CheckCircle2" size={16} className="text-emerald-600" />
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="CheckCircle2" size={16} className="text-primary" />
                   </div>
-                  <span className="text-gray-700 font-medium">Проверенное качество</span>
+                  <span className="font-medium">Проверенное качество</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Zap" size={16} className="text-blue-600" />
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Zap" size={16} className="text-primary" />
                   </div>
-                  <span className="text-gray-700 font-medium">Мгновенный доступ</span>
+                  <span className="font-medium">Мгновенный доступ</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Shield" size={16} className="text-purple-600" />
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Shield" size={16} className="text-primary" />
                   </div>
-                  <span className="text-gray-700 font-medium">Гарантия возврата</span>
+                  <span className="font-medium">Гарантия возврата</span>
                 </div>
                 <div className="flex items-center gap-2.5 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Star" size={16} className="text-amber-500" />
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Star" size={16} className="text-primary" />
                   </div>
-                  <span className="text-gray-700 font-medium">Премиум поддержка</span>
+                  <span className="font-medium">Премиум поддержка</span>
                 </div>
               </div>
 
-              {/* Доп информация */}
-              <div className="mt-5 pt-5 border-t border-gray-100">
-                <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+              <div className="mt-5 pt-5 border-t border-border">
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                   <Icon name="Lock" size={14} />
                   <span>Безопасная покупка</span>
                 </div>

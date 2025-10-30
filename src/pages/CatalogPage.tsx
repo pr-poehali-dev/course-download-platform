@@ -435,7 +435,7 @@ export default function CatalogPage() {
                   )}
                   
                   <div className="absolute top-3 right-3">
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg backdrop-blur-sm">
+                    <div className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                       {work.price.toLocaleString()} б.
                     </div>
                   </div>
@@ -443,12 +443,12 @@ export default function CatalogPage() {
 
                 <div className="p-5">
                   <div className="mb-3">
-                    <Badge className="bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 text-[11px] font-semibold px-3 py-1 rounded-full border-0">
+                    <Badge className="bg-primary/10 text-primary text-[11px] font-semibold px-3 py-1 rounded-full border-0">
                       {work.workType}
                     </Badge>
                   </div>
 
-                  <h3 className="font-bold text-[15px] text-gray-900 mb-3 line-clamp-3 leading-snug min-h-[63px] group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-bold text-[15px] mb-3 line-clamp-3 leading-snug min-h-[63px] group-hover:text-primary transition-colors">
                     {work.title}
                   </h3>
                   

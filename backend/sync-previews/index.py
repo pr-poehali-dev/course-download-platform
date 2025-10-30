@@ -70,7 +70,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             results['total_processed'] += 1
             
             try:
-                preview_url = find_preview_in_folder(yandex_link)
+                preview_url = find_preview_in_folder(yandex_link, title)
                 
                 if preview_url:
                     escaped_url = preview_url.replace("'", "''")
@@ -115,9 +115,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
 
 
-def find_preview_in_folder(public_link: str) -> Optional[str]:
+def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
     try:
-        url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&limit=500'
+        url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&limit=100'
         
         req = urllib.request.Request(url)
         with urllib.request.urlopen(req, timeout=10) as response:
@@ -125,28 +125,12 @@ def find_preview_in_folder(public_link: str) -> Optional[str]:
         
         if data.get('_embedded') and data['_embedded'].get('items'):
             for item in data['_embedded']['items']:
-                if item.get('type') == 'dir':
-                    subfolder_path = item.get('path', '')
-                    try:
-                        subfolder_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(subfolder_path)}&limit=20'
-                        
-                        subreq = urllib.request.Request(subfolder_url)
-                        with urllib.request.urlopen(subreq, timeout=10) as subresponse:
-                            subdata = json.loads(subresponse.read().decode())
-                        
-                        if subdata.get('_embedded') and subdata['_embedded'].get('items'):
-                            for file in subdata['_embedded']['items']:
-                                if file.get('type') == 'file':
-                                    name = file.get('name', '').lower()
-                                    if name == 'preview.png':
-                                        return file.get('file')
-                    except:
-                        continue
-                
-                elif item.get('type') == 'file':
+                if item.get('type') == 'file':
                     name = item.get('name', '').lower()
-                    if name == 'preview.png':
-                        return item.get('file')
+                    if name.startswith('preview') and (name.endswith('.png') or name.endswith('.jpg') or name.endswith('.jpeg')):
+                        file_url = item.get('file')
+                        if file_url:
+                            return file_url
         
         return None
         

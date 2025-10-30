@@ -245,10 +245,14 @@ export default function ProfilePage() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">
               <Icon name="User" size={18} className="mr-2" />
               Профиль
+            </TabsTrigger>
+            <TabsTrigger value="earnings">
+              <Icon name="TrendingUp" size={18} className="mr-2" />
+              Заработок
             </TabsTrigger>
             <TabsTrigger value="purchases">
               <Icon name="ShoppingBag" size={18} className="mr-2" />
@@ -263,6 +267,118 @@ export default function ProfilePage() {
               Транзакции
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="earnings" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Всего заработано</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-green-600">{user.totalEarned}</div>
+                  <p className="text-sm text-muted-foreground mt-1">баллов за все время</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Продано работ</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-blue-600">
+                    {uploads.reduce((sum, work) => sum + work.sales, 0)}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">всего продаж</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Средний чек</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-purple-600">
+                    {uploads.reduce((sum, work) => sum + work.sales, 0) > 0
+                      ? Math.round(user.totalEarned / uploads.reduce((sum, work) => sum + work.sales, 0))
+                      : 0}
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-1">баллов за работу</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Популярные работы</CardTitle>
+                <CardDescription>Топ работ по количеству продаж</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {uploads
+                    .filter(work => work.sales > 0)
+                    .sort((a, b) => b.sales - a.sales)
+                    .map((work, index) => (
+                      <div key={work.id} className="flex items-center gap-4 p-4 border rounded-lg hover:bg-accent transition-colors">
+                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary text-primary-foreground font-bold">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold">{work.title}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {work.sales} продаж × {work.price} баллов
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-green-600">{work.sales * work.price}</div>
+                          <p className="text-xs text-muted-foreground">заработано</p>
+                        </div>
+                      </div>
+                    ))}
+                  {uploads.filter(work => work.sales > 0).length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Icon name="TrendingUp" size={48} className="mx-auto mb-2 opacity-50" />
+                      <p>Пока нет продаж</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>История заработка</CardTitle>
+                <CardDescription>Последние продажи ваших работ</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {transactions
+                    .filter(t => t.type === 'sale')
+                    .map(transaction => (
+                      <div key={transaction.id} className="flex items-center justify-between p-3 border rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center">
+                            <Icon name="TrendingUp" size={20} className="text-green-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium">{transaction.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(transaction.date).toLocaleDateString('ru-RU')}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-lg font-bold text-green-600">+{transaction.amount}</div>
+                      </div>
+                    ))}
+                  {transactions.filter(t => t.type === 'sale').length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Icon name="Receipt" size={48} className="mx-auto mb-2 opacity-50" />
+                      <p>История продаж пуста</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="overview" className="space-y-6">
             <Card>

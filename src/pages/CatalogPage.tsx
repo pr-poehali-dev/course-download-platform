@@ -37,10 +37,6 @@ export default function CatalogPage() {
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [loadingPreviews, setLoadingPreviews] = useState(false);
-
-  const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
-  const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
 
   const normalizeWorkType = (workType: string): string => {
     const wt = workType.toLowerCase().trim();
@@ -251,88 +247,7 @@ export default function CatalogPage() {
     fetchWorks();
   }, []);
   
-  const loadPreviews = async (worksList: Work[]) => {
-    setLoadingPreviews(true);
-    const PREVIEW_CACHE_KEY = 'catalog_previews_v3';
-    
-    const loadCache = (): Record<string, string> => {
-      try {
-        const cached = localStorage.getItem(PREVIEW_CACHE_KEY);
-        return cached ? JSON.parse(cached) : {};
-      } catch {
-        return {};
-      }
-    };
 
-    const saveCache = (cache: Record<string, string>) => {
-      try {
-        localStorage.setItem(PREVIEW_CACHE_KEY, JSON.stringify(cache));
-      } catch (error) {
-        console.error('Cache save error:', error);
-      }
-    };
-
-    const cache = loadCache();
-    const updatedWorks = [...worksList];
-    let cacheUpdated = false;
-
-    for (let i = 0; i < Math.min(updatedWorks.length, 100); i++) {
-      const work = updatedWorks[i];
-      
-      if (cache[work.id]) {
-        updatedWorks[i] = { ...work, previewUrl: cache[work.id] };
-        continue;
-      }
-
-      await new Promise(resolve => setTimeout(resolve, 150));
-
-      try {
-        const response = await fetch(
-          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + work.folderName)}&limit=20`
-        );
-        
-        if (!response.ok) continue;
-        
-        const data = await response.json();
-        
-        if (data._embedded && data._embedded.items) {
-          const previewFile = data._embedded.items.find((file: any) => 
-            file.type === 'file' && 
-            file.name.toLowerCase().startsWith('preview') &&
-            (file.name.toLowerCase().endsWith('.png') || 
-             file.name.toLowerCase().endsWith('.jpg') ||
-             file.name.toLowerCase().endsWith('.jpeg'))
-          );
-          
-          if (previewFile && previewFile.file) {
-            updatedWorks[i] = { ...work, previewUrl: previewFile.file };
-            cache[work.id] = previewFile.file;
-            cacheUpdated = true;
-            
-            if (i % 10 === 0) {
-              setWorks([...updatedWorks]);
-              setFilteredWorks(prev => 
-                prev.map(w => updatedWorks.find(uw => uw.id === w.id) || w)
-              );
-              saveCache(cache);
-            }
-          }
-        }
-      } catch (error) {
-        continue;
-      }
-    }
-
-    if (cacheUpdated) {
-      setWorks([...updatedWorks]);
-      setFilteredWorks(prev => 
-        prev.map(w => updatedWorks.find(uw => uw.id === w.id) || w)
-      );
-      saveCache(cache);
-    }
-    
-    setLoadingPreviews(false);
-  };
 
 
 
@@ -502,17 +417,8 @@ export default function CatalogPage() {
                     </>
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                      {loadingPreviews ? (
-                        <>
-                          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600"></div>
-                          <span className="text-xs text-gray-400">Загрузка...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Icon name="FileText" className="text-gray-300 group-hover:text-gray-400 transition-colors" size={56} />
-                          <span className="text-sm font-medium text-gray-500">{work.workType}</span>
-                        </>
-                      )}
+                      <Icon name="FileText" className="text-gray-300 group-hover:text-gray-400 transition-colors" size={56} />
+                      <span className="text-sm font-medium text-gray-500">{work.workType}</span>
                     </div>
                   )}
                   

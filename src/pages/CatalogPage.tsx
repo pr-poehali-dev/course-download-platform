@@ -27,7 +27,6 @@ export default function CatalogPage() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const [loadingPreviews, setLoadingPreviews] = useState(false);
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
@@ -227,97 +226,12 @@ export default function CatalogPage() {
       setFilteredWorks(allWorks);
       setLoadingProgress(100);
       setLoading(false);
-      
-      loadPreviews(allWorks);
     };
 
     fetchWorks();
   }, []);
 
-  const loadPreviews = async (worksList: Work[]) => {
-    setLoadingPreviews(true);
-    const PREVIEW_CACHE_KEY = 'catalog_previews_cache_v2';
-    
-    const loadPreviewCache = (): Record<string, string> => {
-      try {
-        const cached = localStorage.getItem(PREVIEW_CACHE_KEY);
-        return cached ? JSON.parse(cached) : {};
-      } catch {
-        return {};
-      }
-    };
 
-    const savePreviewCache = (cache: Record<string, string>) => {
-      try {
-        localStorage.setItem(PREVIEW_CACHE_KEY, JSON.stringify(cache));
-      } catch (error) {
-        console.error('Preview cache save error:', error);
-      }
-    };
-
-    const previewCache = loadPreviewCache();
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-    
-    const updatedWorks = [...worksList];
-    let hasUpdates = false;
-
-    for (let i = 0; i < Math.min(updatedWorks.length, 60); i++) {
-      const work = updatedWorks[i];
-      
-      if (previewCache[work.id]) {
-        updatedWorks[i] = { ...work, previewUrl: previewCache[work.id] };
-        hasUpdates = true;
-        continue;
-      }
-
-      await sleep(200);
-
-      try {
-        const folderName = work.title + ' (' + work.workType + ')';
-        const response = await fetch(
-          `${API_BASE}?public_key=${encodeURIComponent(YANDEX_DISK_URL)}&path=${encodeURIComponent('/' + folderName)}&limit=20`
-        );
-        
-        if (!response.ok) continue;
-        
-        const data = await response.json();
-        
-        if (data._embedded && data._embedded.items) {
-          const imageFile = data._embedded.items.find((file: any) => 
-            file.type === 'file' && 
-            (file.name.toLowerCase().includes('preview') || 
-             file.name.toLowerCase().includes('титул') ||
-             file.name.toLowerCase().includes('обложка')) &&
-            (file.name.toLowerCase().endsWith('.png') || 
-             file.name.toLowerCase().endsWith('.jpg') ||
-             file.name.toLowerCase().endsWith('.jpeg'))
-          );
-          
-          if (imageFile && imageFile.file) {
-            updatedWorks[i] = { ...work, previewUrl: imageFile.file };
-            previewCache[work.id] = imageFile.file;
-            hasUpdates = true;
-            
-            if (i % 10 === 0) {
-              setWorks([...updatedWorks]);
-              setFilteredWorks([...updatedWorks]);
-              savePreviewCache(previewCache);
-            }
-          }
-        }
-      } catch (error) {
-        continue;
-      }
-    }
-
-    if (hasUpdates) {
-      setWorks([...updatedWorks]);
-      setFilteredWorks([...updatedWorks]);
-      savePreviewCache(previewCache);
-    }
-    
-    setLoadingPreviews(false);
-  };
 
   useEffect(() => {
     let filtered = works;
@@ -410,12 +324,7 @@ export default function CatalogPage() {
             </div>
           </div>
 
-          {loadingPreviews && (
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
-              <span>Загружаются изображения...</span>
-            </div>
-          )}
+
         </div>
 
         {loading ? (
@@ -446,29 +355,11 @@ export default function CatalogPage() {
                 className="group bg-white rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
                 onClick={() => window.location.href = `/work-detail/${work.id}`}
               >
-                <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
-                  {work.previewUrl ? (
-                    <>
-                      <img 
-                        src={work.previewUrl} 
-                        alt={work.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </>
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                      {loadingPreviews ? (
-                        <>
-                          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gray-200 border-t-blue-600"></div>
-                          <span className="text-xs text-gray-400">Загрузка...</span>
-                        </>
-                      ) : (
-                        <Icon name="FileText" className="text-gray-300 group-hover:text-gray-400 transition-colors" size={56} />
-                      )}
-                    </div>
-                  )}
+                <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 aspect-[4/3] overflow-hidden flex items-center justify-center">
+                  <div className="flex flex-col items-center gap-3">
+                    <Icon name="FileText" className="text-indigo-400 group-hover:text-indigo-500 transition-colors" size={64} />
+                    <span className="text-sm font-medium text-gray-600">{work.workType}</span>
+                  </div>
                   
                   <div className="absolute top-3 right-3">
                     <div className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">

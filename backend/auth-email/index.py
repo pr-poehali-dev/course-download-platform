@@ -129,7 +129,7 @@ def send_password_reset(email: str) -> Dict[str, Any]:
     cur.close()
     conn.close()
     
-    reset_url = f'https://course-download-platform--preview.poehali.dev/reset-password?token={reset_token}'
+    reset_url = f'https://techforma.pro/reset-password?token={reset_token}'
     
     html_content = f'''
 <!DOCTYPE html>

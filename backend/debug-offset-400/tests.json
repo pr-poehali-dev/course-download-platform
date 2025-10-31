@@ -1,0 +1,11 @@
+[
+  {
+    "name": "Debug offset 400",
+    "event": {
+      "httpMethod": "GET"
+    },
+    "expect": {
+      "statusCode": 200
+    }
+  }
+]

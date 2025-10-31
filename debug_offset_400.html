@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Offset 400 - Yandex Disk API</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .violation {
+            background-color: #ffebee;
+            border: 2px solid #f44336;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .item {
+            background-color: #f5f5f5;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        .field {
+            margin: 5px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            overflow-x: auto;
+        }
+        .summary {
+            background-color: #e3f2fd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug Yandex Disk API - Offset 400</h1>
+    <button onclick="fetchAndAnalyze()">Fetch Data from Offset 400</button>
+    <div id="output"></div>
+
+    <script>
+        function extractWorkInfo(folderName) {
+            const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);
+            if (match) {
+                return {
+                    title: match[1].trim(),
+                    work_type: match[2].trim()
+                };
+            }
+            return {
+                title: folderName,
+                work_type: 'неизвестный тип'
+            };
+        }
+
+        function determineSubject(title) {
+            const t = title.toLowerCase();
+            
+            if (/электро|электри|энергет|эу|ру/.test(t)) return 'электроэнергетика';
+            if (/автоматиз|управлен|асу|контрол|регулир/.test(t)) return 'автоматизация';
+            if (/строител|бетон|конструк|здание|сооружен/.test(t)) return 'строительство';
+            if (/механ|привод|станок|оборудован/.test(t)) return 'механика';
+            if (/газ|газопровод|нефт/.test(t)) return 'газоснабжение';
+            if (/програм|по|software|алгоритм|дискрет/.test(t)) return 'программирование';
+            if (/безопасн|охран|труд|защит/.test(t)) return 'безопасность';
+            if (/тепло|водоснабжен|вентиляц|отоплен/.test(t)) return 'теплоснабжение';
+            if (/транспорт|дорог|судов|автомобил|локомотив/.test(t)) return 'транспорт';
+            if (/гидравлик|гидро/.test(t)) return 'гидравлика';
+            
+            return 'общая инженерия';
+        }
+
+        async function fetchAndAnalyze() {
+            const output = document.getElementById('output');
+            output.innerHTML = '<p>Fetching data...</p>';
+
+            try {
+                const publicKey = encodeURIComponent('https://disk.yandex.ru/d/usjmeUqnkY9IfQ');
+                const url = `https://cloud-api.yandex.net/v1/disk/public/resources?public_key=${publicKey}&limit=100&offset=400`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (!data._embedded || !data._embedded.items) {
+                    output.innerHTML = '<p>No items found in response</p>';
+                    return;
+                }
+
+                const items = data._embedded.items;
+                const TITLE_LIMIT = 1000;
+                const WORK_TYPE_LIMIT = 100;
+                const SUBJECT_LIMIT = 200;
+                
+                const violations = [];
+                const allItems = [];
+                
+                items.forEach((item, i) => {
+                    if (item.type === 'dir') {
+                        const folderName = item.name || '';
+                        const workInfo = extractWorkInfo(folderName);
+                        
+                        const title = workInfo.title;
+                        const workType = workInfo.work_type;
+                        const subject = determineSubject(title);
+                        
+                        const titleLen = title.length;
+                        const workTypeLen = workType.length;
+                        const subjectLen = subject.length;
+                        
+                        const offsetIndex = 400 + i;
+                        
+                        const itemData = {
+                            offsetIndex,
+                            folderName,
+                            title,
+                            titleLen,
+                            workType,
+                            workTypeLen,
+                            subject,
+                            subjectLen,
+                            violations: []
+                        };
+                        
+                        if (titleLen > TITLE_LIMIT) {
+                            itemData.violations.push({
+                                field: 'title',
+                                length: titleLen,
+                                limit: TITLE_LIMIT,
+                                exceeds: titleLen - TITLE_LIMIT
+                            });
+                        }
+                        
+                        if (workTypeLen > WORK_TYPE_LIMIT) {
+                            itemData.violations.push({
+                                field: 'work_type',
+                                length: workTypeLen,
+                                limit: WORK_TYPE_LIMIT,
+                                exceeds: workTypeLen - WORK_TYPE_LIMIT
+                            });
+                        }
+                        
+                        if (subjectLen > SUBJECT_LIMIT) {
+                            itemData.violations.push({
+                                field: 'subject',
+                                length: subjectLen,
+                                limit: SUBJECT_LIMIT,
+                                exceeds: subjectLen - SUBJECT_LIMIT
+                            });
+                        }
+                        
+                        allItems.push(itemData);
+                        
+                        if (itemData.violations.length > 0) {
+                            violations.push(itemData);
+                        }
+                    }
+                });
+                
+                let html = `<div class="summary">
+                    <h2>Summary</h2>
+                    <p>Total items analyzed: ${allItems.length}</p>
+                    <p>Items with violations: ${violations.length}</p>
+                </div>`;
+                
+                if (violations.length > 0) {
+                    html += '<h2>VIOLATIONS FOUND:</h2>';
+                    violations.forEach(item => {
+                        html += `<div class="violation">
+                            <h3>Offset ${item.offsetIndex}</h3>
+                            <div class="field"><strong>Folder Name:</strong><br>${escapeHtml(item.folderName)}</div>
+                            <div class="field"><strong>Title:</strong> (${item.titleLen} chars)<br>${escapeHtml(item.title)}</div>
+                            <div class="field"><strong>Work Type:</strong> (${item.workTypeLen} chars)<br>${escapeHtml(item.workType)}</div>
+                            <div class="field"><strong>Subject:</strong> (${item.subjectLen} chars)<br>${escapeHtml(item.subject)}</div>
+                            <h4 style="color: red;">Violations:</h4>
+                            <ul>`;
+                        
+                        item.violations.forEach(v => {
+                            html += `<li><strong>${v.field}</strong>: ${v.length} characters (limit: ${v.limit}, <span style="color: red;">exceeds by ${v.exceeds}</span>)</li>`;
+                        });
+                        
+                        html += `</ul></div>`;
+                    });
+                } else {
+                    html += '<p>No violations found!</p>';
+                    html += '<h2>All Items (showing top 20):</h2>';
+                    allItems.slice(0, 20).forEach(item => {
+                        html += `<div class="item">
+                            <strong>Offset ${item.offsetIndex}</strong><br>
+                            Title: ${item.titleLen} chars | Work Type: ${item.workTypeLen} chars | Subject: ${item.subjectLen} chars<br>
+                            <small>${escapeHtml(item.folderName.substring(0, 150))}${item.folderName.length > 150 ? '...' : ''}</small>
+                        </div>`;
+                    });
+                }
+                
+                output.innerHTML = html;
+                
+            } catch (error) {
+                output.innerHTML = `<p style="color: red;">Error: ${error.message}</p><pre>${error.stack}</pre>`;
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>

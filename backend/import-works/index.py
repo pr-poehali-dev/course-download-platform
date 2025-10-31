@@ -168,28 +168,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         description = f'Работа по теме: {title}'
                         yandex_link = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ'
                         
+                        # Escape single quotes for SQL
+                        safe_title = title.replace("'", "''")
+                        safe_folder = folder_name.replace("'", "''")
+                        safe_work_type = work_type.replace("'", "''")
+                        safe_desc = description.replace("'", "''")
+                        safe_comp = composition.replace("'", "''")
+                        safe_univ = university.replace("'", "''") if university else None
+                        
                         # Check if work exists by title
-                        cur.execute('''
-                            SELECT id FROM t_p63326274_course_download_plat.works 
-                            WHERE title = %s LIMIT 1
-                        ''', (title,))
+                        cur.execute(f"SELECT id FROM t_p63326274_course_download_plat.works WHERE title = '{safe_title}' LIMIT 1")
                         
                         existing = cur.fetchone()
                         
                         if existing:
                             # Update existing work with folder_path
-                            cur.execute('''
-                                UPDATE t_p63326274_course_download_plat.works
-                                SET folder_path = %s, yandex_disk_link = %s
-                                WHERE id = %s
-                            ''', (folder_name, yandex_link, existing[0]))
+                            cur.execute(f"UPDATE t_p63326274_course_download_plat.works SET folder_path = '{safe_folder}', yandex_disk_link = '{yandex_link}' WHERE id = {existing[0]}")
                         else:
                             # Insert new work
-                            cur.execute('''
-                                INSERT INTO t_p63326274_course_download_plat.works 
-                                (title, work_type, subject, description, composition, universities, price_points, yandex_disk_link, folder_path)
-                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                            ''', (title, work_type, subject, description, composition, university, price, yandex_link, folder_name))
+                            univ_value = f"'{safe_univ}'" if safe_univ else 'NULL'
+                            cur.execute(f"INSERT INTO t_p63326274_course_download_plat.works (title, work_type, subject, description, composition, universities, price_points, yandex_disk_link, folder_path) VALUES ('{safe_title}', '{safe_work_type}', '{subject}', '{safe_desc}', '{safe_comp}', {univ_value}, {price}, '{yandex_link}', '{safe_folder}')")
                         
                         total_imported += 1
         except Exception as e:

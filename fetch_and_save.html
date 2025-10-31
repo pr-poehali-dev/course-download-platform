@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fetch Yandex Disk Data</title>
+    <script>
+async function fetchData() {
+    const url = 'https://cloud-api.yandex.net/v1/disk/public/resources?public_key=' + 
+                encodeURIComponent('https://disk.yandex.ru/d/usjmeUqnkY9IfQ') + 
+                '&limit=100&offset=400';
+    
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+        
+        // Also analyze
+        if (data._embedded && data._embedded.items) {
+            let analysis = '\n\n=== ANALYSIS ===\n\n';
+            const items = data._embedded.items;
+            
+            items.forEach((item, i) => {
+                if (item.type === 'dir') {
+                    const name = item.name;
+                    analysis += `Item ${i} (Offset ${400+i}): ${name.length} chars\n`;
+                    
+                    // Extract title using regex
+                    const match = name.match(/^(.+?)\s*\(([^)]+)\)\s*$/);
+                    if (match) {
+                        const title = match[1].trim();
+                        const workType = match[2].trim();
+                        
+                        if (title.length > 1000) {
+                            analysis += `  *** TITLE TOO LONG: ${title.length} chars ***\n`;
+                            analysis += `  Title: ${title}\n`;
+                        }
+                        if (workType.length > 100) {
+                            analysis += `  *** WORK TYPE TOO LONG: ${workType.length} chars ***\n`;
+                            analysis += `  Work Type: ${workType}\n`;
+                        }
+                    }
+                    
+                    if (name.length > 200) {
+                        analysis += `  Long name: ${name.substring(0, 100)}...\n`;
+                    }
+                    analysis += '\n';
+                }
+            });
+            
+            document.getElementById('analysis').textContent = analysis;
+        }
+    } catch (error) {
+        document.getElementById('output').textContent = 'Error: ' + error.message;
+    }
+}
+
+window.onload = fetchData;
+    </script>
+</head>
+<body>
+    <h1>Yandex Disk Data - Offset 400</h1>
+    <h2>Analysis:</h2>
+    <pre id="analysis"></pre>
+    <h2>Raw JSON:</h2>
+    <pre id="output"></pre>
+</body>
+</html>

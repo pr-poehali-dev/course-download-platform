@@ -1,0 +1,102 @@
+Folder name from API response (Item 1 at offset 401):
+"Управление техническим состоянием железнодорожного пути по направлению Строительство железных дорог, мостов и транспортных тоннелей (для специалистов с высшим образованием) (курсовая работа)"
+
+Let's break this down character by character:
+
+Part 1: "Управление техническим состоянием железнодорожного пути по направлению Строительство железных дорог, мостов и транспортных тоннелей (для специалистов с высшим образованием) "
+Part 2: "(курсовая работа)"
+
+Using the regex pattern: r'^(.+?)\s*\((.+?)\)\s*$'
+
+This regex:
+- Starts from beginning ^
+- Captures (.+?) - non-greedy, captures minimal text
+- Matches \s*\( - optional whitespace then opening parenthesis  
+- Captures (.+?) - non-greedy, captures minimal text
+- Matches \)\s*$ - closing parenthesis, optional whitespace, end
+
+But wait! The regex is NON-GREEDY (.+?) which means it will match as LITTLE as possible.
+
+So for: "...тоннелей (для специалистов с высшим образованием) (курсовая работа)"
+
+It will match:
+- Group 1 (title): "...тоннелей "
+- First ( 
+- Group 2 (work_type): "для специалистов с высшим образованием"
+- First )
+- Remaining text: " (курсовая работа)" - NOT MATCHED!
+
+This is WRONG! The regex will fail because the pattern expects the string to END after the first closing parenthesis.
+
+Actually, let me re-read the regex more carefully:
+r'^(.+?)\s*\((.+?)\)\s*$'
+
+The $ at the end means it MUST end with ) followed by optional whitespace.
+
+So it will try to match the FIRST ( and the LAST ) to satisfy the $ constraint.
+
+Wait, that's not how non-greedy works with the $ anchor...
+
+Let me trace through this properly:
+
+Text: "Управление...тоннелей (для специалистов с высшим образованием) (курсовая работа)"
+
+The regex engine will:
+1. Start matching (.+?) from the beginning
+2. Try to find the earliest point where \s*\((.+?)\)\s*$ matches the rest
+3. The $ anchor forces it to END at the string end
+4. So (.+?) in group 2 will match up to the LAST )
+
+So it should actually match:
+- Group 1: "Управление техническим состоянием железнодорожного пути по направлению Строительство железных дорог, мостов и транспортных тоннелей (для специалистов с высшим образованием)"
+- Group 2: "курсовая работа"
+
+Let me count the length of Group 1:
+
+"Управление техническим состоянием железнодорожного пути по направлению Строительство железных дорог, мостов и транспортных тоннелей (для специалистов с высшим образованием)"
+
+Counting manually:
+Управление = 10
+(space) = 1
+техническим = 11
+(space) = 1
+состоянием = 10
+(space) = 1
+железнодорожного = 17
+(space) = 1
+пути = 4
+(space) = 1
+по = 2
+(space) = 1
+направлению = 11
+(space) = 1
+Строительство = 13
+(space) = 1
+железных = 8
+(space) = 1
+дорог, = 6
+(space) = 1
+мостов = 6
+(space) = 1
+и = 1
+(space) = 1
+транспортных = 12
+(space) = 1
+тоннелей = 8
+(space) = 1
+(для = 4
+(space) = 1
+специалистов = 13
+(space) = 1
+с = 1
+(space) = 1
+высшим = 6
+(space) = 1
+образованием) = 12
+
+Total = 10+1+11+1+10+1+17+1+4+1+2+1+11+1+13+1+8+1+6+1+6+1+1+1+12+1+8+1+4+1+13+1+1+1+6+1+12
+    = 170 characters
+
+This is well within 1000 limit!
+
+So this is NOT the problem folder. Let me look for others in the response.

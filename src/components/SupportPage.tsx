@@ -7,8 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../backend/func2url.json';
 
-const SUPPORT_API = 'https://functions.poehali.dev/c13b3d8d-6ee7-416d-9f1f-0350aae86e61';
+const SUPPORT_API = func2url.support;
 
 interface Ticket {
   id: number;

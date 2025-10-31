@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import func2url from '../../backend/func2url.json';
 
 interface Message {
   id: string;
@@ -134,7 +135,7 @@ export default function AIAssistantPage() {
         });
       }
 
-      const response = await fetch('https://functions.poehali.dev/080d86fb-5678-411e-bef2-e4c81606015a', {
+      const response = await fetch(func2url['ai-chat'], {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

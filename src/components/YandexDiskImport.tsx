@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import { Progress } from '@/components/ui/progress';
+import func2url from '../../backend/func2url.json';
 
 interface ImportResult {
   success: boolean;
@@ -38,7 +39,7 @@ export default function YandexDiskImport() {
     try {
       setProgress(30);
       
-      const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413', {
+      const response = await fetch(func2url.works, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

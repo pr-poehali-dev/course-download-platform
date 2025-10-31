@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../backend/func2url.json';
 import {
   Dialog,
   DialogContent,
@@ -49,7 +50,7 @@ export default function WorksManagement() {
   const loadWorks = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413');
+      const response = await fetch(func2url.works);
       const data = await response.json();
       if (data.works) {
         const worksWithStatus = data.works.map((w: any) => ({

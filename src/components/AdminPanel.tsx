@@ -14,6 +14,7 @@ import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import PlatformSettings from '@/components/PlatformSettings';
 import YandexDiskImport from '@/components/YandexDiskImport';
 import PreviewGenerator from '@/components/PreviewGenerator';
+import func2url from '../../backend/func2url.json';
 
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
 const ADMIN_PASSWORD = 'stas221974';
@@ -53,7 +54,7 @@ export default function AdminPanel() {
   const loadStats = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413');
+      const response = await fetch(func2url.works);
       const data = await response.json();
       
       if (data.works) {

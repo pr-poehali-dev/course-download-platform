@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
+import func2url from '../../backend/func2url.json';
 
 interface Work {
   id: string;
@@ -162,7 +163,7 @@ export default function CatalogPage() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        const response = await fetch('https://functions.poehali.dev/fe9c2ac7-b4dc-4649-a10d-c4c20015ae82');
+        const response = await fetch(func2url.categories);
         const data = await response.json();
         if (data.categories) {
           setCategories(data.categories);
@@ -214,7 +215,7 @@ export default function CatalogPage() {
       setLoadingProgress(20);
       
       try {
-        const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413');
+        const response = await fetch(func2url.works);
         setLoadingProgress(60);
         
         const data = await response.json();

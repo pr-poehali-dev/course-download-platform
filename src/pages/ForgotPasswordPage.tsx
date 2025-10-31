@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../backend/func2url.json';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -17,7 +18,7 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/195e0d18-1732-45c7-a76b-ab9880c8793a', {
+      const response = await fetch(func2url['auth-email'], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

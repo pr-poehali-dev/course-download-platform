@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import func2url from '../../backend/func2url.json';
 
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -131,7 +132,7 @@ export default function Index() {
   useEffect(() => {
     const loadWorks = async () => {
       try {
-        const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413');
+        const response = await fetch(func2url.works);
         const data = await response.json();
         if (data.works) {
           setRealWorks(data.works);

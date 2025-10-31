@@ -1,4 +1,6 @@
-const AUTH_API = 'https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46';
+import func2url from '../../backend/func2url.json';
+
+const AUTH_API = func2url.auth;
 const TOKEN_KEY = 'auth_token';
 
 export interface User {

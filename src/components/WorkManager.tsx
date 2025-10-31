@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../backend/func2url.json';
 
 const WORK_TYPES = [
   'Курсовая работа',
@@ -78,7 +79,7 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
     setLoading(true);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413', {
+      const response = await fetch(func2url.works, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import func2url from '../../backend/func2url.json';
 
 export default function SyncPreviewsPage() {
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,7 @@ export default function SyncPreviewsPage() {
     setResult(null);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/722d5c93-b101-4896-9429-8aa76d806055', {
+      const response = await fetch(func2url['sync-previews-auto'], {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

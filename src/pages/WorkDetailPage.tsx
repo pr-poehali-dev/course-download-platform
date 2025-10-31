@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
+import func2url from '../../backend/func2url.json';
 
 interface Work {
   id: string;
@@ -44,11 +45,11 @@ export default function WorkDetailPage() {
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
-  const WORK_PARSER_URL = 'https://functions.poehali.dev/9899633c-f583-430f-aac2-e02cdad0cda5';
-  const DOWNLOAD_WORK_URL = 'https://functions.poehali.dev/5898b2f2-c4d9-4ff7-bd15-9600829fed08';
-  const PURCHASE_WORK_URL = 'https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9';
-  const GET_WORK_FILES_URL = 'https://functions.poehali.dev/ec3bbe78-f975-4ae0-9b3f-3a3fc67dd7d1';
-  const PDF_PREVIEW_URL = 'https://functions.poehali.dev/c40802ab-38ad-48ab-9750-03b63b2bdaca';
+  const WORK_PARSER_URL = func2url['work-parser'];
+  const DOWNLOAD_WORK_URL = func2url['download-work'];
+  const PURCHASE_WORK_URL = func2url['purchase-work'];
+  const GET_WORK_FILES_URL = func2url['get-work-files'];
+  const PDF_PREVIEW_URL = func2url['pdf-preview'];
 
   const extractWorkInfo = (folderName: string) => {
     const match = folderName.trim().match(/^(.+?)\s*\((.+?)\)\s*$/);

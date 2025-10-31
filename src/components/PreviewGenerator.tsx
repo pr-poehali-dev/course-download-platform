@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../backend/func2url.json';
 
 export default function PreviewGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -20,7 +21,7 @@ export default function PreviewGenerator() {
     setStats({ total: 0, success: 0, failed: 0 });
 
     try {
-      const response = await fetch('https://functions.poehali.dev/c5c39645-740b-4fc3-8d3f-d4dc911fae68', {
+      const response = await fetch(func2url['sync-previews'], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ limit: batchSize })
@@ -76,7 +77,7 @@ export default function PreviewGenerator() {
         batchNum++;
         setCurrentBatch(batchNum);
         
-        const response = await fetch('https://functions.poehali.dev/c5c39645-740b-4fc3-8d3f-d4dc911fae68', {
+        const response = await fetch(func2url['sync-previews'], {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ limit: BATCH_SIZE })

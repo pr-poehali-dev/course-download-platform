@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../backend/func2url.json';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46?action=login', {
+      const response = await fetch(`${func2url.auth}?action=login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: email, password })

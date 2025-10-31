@@ -10,6 +10,7 @@ import func2url from '../../backend/func2url.json';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import AuthDialog from '@/components/AuthDialog';
@@ -380,12 +381,51 @@ export default function Index() {
                   Пополнить
                 </Button>
 
-                <Button size="sm" asChild>
-                  <a href="/profile">
-                    <Icon name="User" size={16} className="mr-2" />
-                    Профиль
-                  </a>
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white font-semibold flex items-center justify-center text-lg">
+                        {username ? username[0].toUpperCase() : 'U'}
+                      </div>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{username || 'Пользователь'}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{email || 'user@example.com'}</p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <a href="/profile" className="cursor-pointer">
+                        <Icon name="User" size={16} className="mr-2" />
+                        Профиль
+                      </a>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setPaymentDialogOpen(true)}>
+                      <Icon name="Wallet" size={16} className="mr-2" />
+                      Пополнить баланс
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setFavoritesDialogOpen(true)}>
+                      <Icon name="Heart" size={16} className="mr-2" />
+                      Избранное
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setPromoDialogOpen(true)}>
+                      <Icon name="Gift" size={16} className="mr-2" />
+                      Промокоды
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setReferralDialogOpen(true)}>
+                      <Icon name="Users" size={16} className="mr-2" />
+                      Реферальная программа
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                      <Icon name="LogOut" size={16} className="mr-2" />
+                      Выйти
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </div>

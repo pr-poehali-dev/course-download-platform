@@ -34,30 +34,37 @@ export default function PremiumDialog({
 
     setLoading(true);
     try {
-      const response = await fetch(func2url.premium, {
+      // Получить user email
+      const userEmail = localStorage.getItem('user_email') || '';
+      
+      // Создать платёж через ЮKassa
+      const response = await fetch(func2url.payment, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId })
+        body: JSON.stringify({
+          action: 'create_payment',
+          user_email: userEmail,
+          user_id: userId,
+          price: 299,
+          payment_type: 'premium',
+          return_url: window.location.origin + '/?payment=success'
+        })
       });
       
       const data = await response.json();
       
-      if (response.ok && data.success) {
-        toast({
-          title: 'Premium активирован!',
-          description: data.message,
-        });
-        onSuccess();
-        onOpenChange(false);
+      if (data.confirmation_url) {
+        // Перенаправить на страницу оплаты ЮKassa
+        window.location.href = data.confirmation_url;
       } else {
         toast({
           title: 'Ошибка',
-          description: data.error || 'Не удалось оформить подписку',
+          description: 'Не удалось создать платёж',
           variant: 'destructive',
         });
       }
     } catch (error) {
-      console.error('Failed to subscribe:', error);
+      console.error('Failed to create payment:', error);
       toast({
         title: 'Ошибка',
         description: 'Не удалось оформить подписку',

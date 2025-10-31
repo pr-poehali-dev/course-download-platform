@@ -57,10 +57,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         if action == 'create_payment':
             user_email = body_data.get('user_email')
+            user_id = body_data.get('user_id')
             points = body_data.get('points', 0)
             price = body_data.get('price', 0)
+            payment_type = body_data.get('payment_type', 'points')  # 'points' or 'premium'
             
-            if not user_email or not points or not price:
+            if not user_email or not price:
                 return {
                     'statusCode': 400,
                     'headers': {
@@ -72,6 +74,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             idempotence_key = str(uuid.uuid4())
             
+            if payment_type == 'premium':
+                description = "Подписка Premium на 30 дней"
+            else:
+                description = f"Покупка {points} баллов"
+            
             payment = Payment.create({
                 "amount": {
                     "value": str(price),
@@ -82,10 +89,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     "return_url": body_data.get('return_url', 'https://example.com/success')
                 },
                 "capture": True,
-                "description": f"Покупка {points} баллов",
+                "description": description,
                 "metadata": {
                     "user_email": user_email,
-                    "points": points
+                    "user_id": str(user_id) if user_id else "",
+                    "points": str(points),
+                    "payment_type": payment_type
                 }
             }, idempotence_key)
             
@@ -110,31 +119,61 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 payment_id = payment_obj.get('id')
                 metadata = payment_obj.get('metadata', {})
                 user_email = metadata.get('user_email')
-                points = int(metadata.get('points', 0))
+                user_id = metadata.get('user_id')
+                points = int(metadata.get('points', 0)) if metadata.get('points') else 0
+                payment_type = metadata.get('payment_type', 'points')
                 
-                if user_email and points > 0:
-                    conn = get_db_connection()
-                    cur = conn.cursor()
+                conn = get_db_connection()
+                cur = conn.cursor()
+                
+                try:
+                    if payment_type == 'premium' and user_id:
+                        # Активировать Premium подписку
+                        from datetime import datetime, timedelta
+                        expires_at = datetime.now() + timedelta(days=30)
+                        
+                        cur.execute("""
+                            UPDATE t_p63326274_course_download_plat.users 
+                            SET is_premium = TRUE, premium_expires_at = %s
+                            WHERE id = %s
+                        """, (expires_at, int(user_id)))
+                        
+                        cur.execute("""
+                            INSERT INTO t_p63326274_course_download_plat.subscriptions
+                            (user_id, subscription_type, amount, status, starts_at, expires_at, payment_id)
+                            VALUES (%s, 'premium_monthly', 299, 'active', NOW(), %s, %s)
+                        """, (int(user_id), expires_at, payment_id))
+                        
+                        conn.commit()
                     
-                    try:
+                    elif user_email and points > 0:
+                        # Начислить баллы
                         cur.execute("""
                             UPDATE t_p63326274_course_download_plat.users 
                             SET balance = balance + %s 
                             WHERE email = %s
                         """, (points, user_email))
                         
-                        conn.commit()
-                        
                         cur.execute("""
-                            INSERT INTO t_p63326274_course_download_plat.payments 
-                            (user_email, points, amount, payment_id, status, created_at)
-                            VALUES (%s, %s, %s, %s, 'succeeded', NOW())
-                        """, (user_email, points, float(payment_obj.get('amount', {}).get('value', 0)), payment_id))
+                            INSERT INTO t_p63326274_course_download_plat.transactions
+                            (user_id, amount, transaction_type, description)
+                            SELECT id, %s, 'balance_topup', 'Пополнение баланса'
+                            FROM t_p63326274_course_download_plat.users WHERE email = %s
+                        """, (points, user_email))
                         
                         conn.commit()
-                    finally:
-                        cur.close()
-                        conn.close()
+                    
+                    # Записать платёж
+                    cur.execute("""
+                        INSERT INTO t_p63326274_course_download_plat.payments 
+                        (user_email, points, amount, payment_id, status, created_at)
+                        VALUES (%s, %s, %s, %s, 'succeeded', NOW())
+                    """, (user_email, points, float(payment_obj.get('amount', {}).get('value', 0)), payment_id))
+                    
+                    conn.commit()
+                finally:
+                    cur.close()
+                    conn.close()
                 
                 return {
                     'statusCode': 200,

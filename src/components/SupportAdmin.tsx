@@ -48,16 +48,23 @@ export default function SupportAdmin() {
   const loadTickets = async () => {
     setLoading(true);
     try {
+      console.log('Запрос тикетов с заголовком:', ADMIN_EMAIL);
       const response = await fetch(SUPPORT_API, {
         headers: {
           'X-Admin-Email': ADMIN_EMAIL
         }
       });
+      console.log('Статус ответа:', response.status);
       const data = await response.json();
+      console.log('Данные от сервера:', data);
       if (data.tickets) {
         setTickets(data.tickets);
+        console.log('Загружено тикетов:', data.tickets.length);
+      } else {
+        console.log('В ответе нет поля tickets');
       }
     } catch (error) {
+      console.error('Ошибка загрузки:', error);
       toast({
         title: 'Ошибка',
         description: 'Не удалось загрузить тикеты',

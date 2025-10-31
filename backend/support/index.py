@@ -20,10 +20,10 @@ def get_db_connection():
 
 def send_email(to_email: str, subject: str, message: str) -> bool:
     try:
-        smtp_host = os.environ.get('SMTP_HOST')
-        smtp_port = int(os.environ.get('SMTP_PORT', '465'))
-        smtp_user = os.environ.get('SMTP_USER')
-        smtp_password = os.environ.get('SMTP_PASSWORD')
+        smtp_host = 'smtp.yandex.ru'
+        smtp_port = 465
+        smtp_user = 'tech.forma@yandex.ru'
+        smtp_password = 'dzhbdpkghkrsxpox'
         
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
@@ -41,8 +41,8 @@ def send_email(to_email: str, subject: str, message: str) -> bool:
                     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
                     <p style="color: #6b7280; font-size: 14px;">
                         С уважением,<br>
-                        Служба поддержки<br>
-                        rekrutiw@yandex.ru
+                        Служба поддержки Tech Forma<br>
+                        tech.forma@yandex.ru
                     </p>
                 </div>
             </body>
@@ -120,7 +120,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        if admin_email == 'rekrutiw@yandex.ru':
+        if admin_email == 'tech.forma@yandex.ru':
             cur.execute("""
                 SELECT id, user_email, subject, message, attachment_url, status, admin_response, 
                        created_at, updated_at 
@@ -170,7 +170,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if method == 'PUT':
         admin_email = event.get('headers', {}).get('x-admin-email', '')
         
-        if admin_email != 'rekrutiw@yandex.ru':
+        if admin_email != 'tech.forma@yandex.ru':
             return {
                 'statusCode': 403,
                 'headers': headers,

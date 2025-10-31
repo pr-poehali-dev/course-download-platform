@@ -6,9 +6,7 @@ Returns: HTTP ответ с данными тикетов или статусо�
 
 import json
 import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import requests
 from typing import Dict, Any, List
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -19,15 +17,10 @@ def get_db_connection():
     return psycopg2.connect(database_url)
 
 def send_email(to_email: str, subject: str, message: str) -> bool:
-    smtp_host = os.environ.get('SMTP_HOST', 'smtp.yandex.ru')
-    smtp_port = int(os.environ.get('SMTP_PORT', '465'))
-    smtp_user = os.environ.get('SMTP_USER', 'tech.forma@yandex.ru')
-    smtp_password = os.environ.get('SMTP_PASSWORD')
+    resend_api_key = os.environ.get('RESEND_API_KEY')
     
-    print(f'DEBUG: SMTP config - host={smtp_host}, port={smtp_port}, user={smtp_user}, password_exists={bool(smtp_password)}')
-    
-    if not smtp_password:
-        print('SMTP password not configured')
+    if not resend_api_key:
+        print('Resend API key not configured')
         return False
     
     html_content = f"""
@@ -41,8 +34,7 @@ def send_email(to_email: str, subject: str, message: str) -> bool:
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
                 <p style="color: #6b7280; font-size: 14px;">
                     С уважением,<br>
-                    Служба поддержки Tech Forma<br>
-                    {smtp_user}
+                    Служба поддержки Tech Forma
                 </p>
             </div>
         </body>
@@ -50,22 +42,30 @@ def send_email(to_email: str, subject: str, message: str) -> bool:
     """
     
     try:
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = f'Tech Forma Support <{smtp_user}>'
-        msg['To'] = to_email
+        response = requests.post(
+            'https://api.resend.com/emails',
+            headers={
+                'Authorization': f'Bearer {resend_api_key}',
+                'Content-Type': 'application/json'
+            },
+            json={
+                'from': 'Tech Forma Support <onboarding@resend.dev>',
+                'to': [to_email],
+                'subject': subject,
+                'html': html_content
+            },
+            timeout=10
+        )
         
-        html_part = MIMEText(html_content, 'html', 'utf-8')
-        msg.attach(html_part)
-        
-        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as server:
-            server.login(smtp_user, smtp_password)
-            server.send_message(msg)
-            print(f'Email sent successfully via SMTP to {to_email}')
+        if response.status_code == 200:
+            print(f'Email sent successfully via Resend to {to_email}')
             return True
+        else:
+            print(f'Resend API error: {response.status_code} - {response.text}')
+            return False
             
     except Exception as e:
-        print(f'SMTP error: {e}')
+        print(f'Email sending error: {e}')
         return False
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:

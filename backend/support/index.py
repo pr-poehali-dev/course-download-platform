@@ -6,8 +6,9 @@ Returns: HTTP ответ с данными тикетов или статусо�
 
 import json
 import os
-import urllib.request
-import urllib.error
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from typing import Dict, Any, List
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -18,12 +19,13 @@ def get_db_connection():
     return psycopg2.connect(database_url)
 
 def send_email(to_email: str, subject: str, message: str) -> bool:
-    api_key = os.environ.get('SENDGRID_API_KEY')
-    from_email = os.environ.get('SENDGRID_FROM_EMAIL', 'tech.forma@yandex.ru')
-    from_name = 'Tech Forma Support'
+    smtp_host = os.environ.get('SMTP_HOST', 'smtp.yandex.ru')
+    smtp_port = int(os.environ.get('SMTP_PORT', '465'))
+    smtp_user = os.environ.get('SMTP_USER', 'rekrutiw@yandex.ru')
+    smtp_password = os.environ.get('SMTP_PASSWORD')
     
-    if not api_key:
-        print('SendGrid API key not configured')
+    if not smtp_password:
+        print('SMTP password not configured')
         return False
     
     html_content = f"""
@@ -38,52 +40,30 @@ def send_email(to_email: str, subject: str, message: str) -> bool:
                 <p style="color: #6b7280; font-size: 14px;">
                     С уважением,<br>
                     Служба поддержки Tech Forma<br>
-                    {from_email}
+                    {smtp_user}
                 </p>
             </div>
         </body>
     </html>
     """
     
-    payload = {
-        'personalizations': [{
-            'to': [{'email': to_email}]
-        }],
-        'from': {
-            'email': from_email,
-            'name': from_name
-        },
-        'subject': subject,
-        'content': [{
-            'type': 'text/html',
-            'value': html_content
-        }]
-    }
-    
     try:
-        req = urllib.request.Request(
-            'https://api.sendgrid.com/v3/mail/send',
-            data=json.dumps(payload).encode('utf-8'),
-            headers={
-                'Authorization': f'Bearer {api_key}',
-                'Content-Type': 'application/json'
-            },
-            method='POST'
-        )
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = f'Tech Forma Support <{smtp_user}>'
+        msg['To'] = to_email
         
-        with urllib.request.urlopen(req, timeout=10) as response:
-            if response.status in [200, 202]:
-                print(f'Email sent successfully via SendGrid to {to_email}')
-                return True
-            else:
-                print(f'SendGrid API error: {response.status}')
-                return False
-                
-    except urllib.error.HTTPError as e:
-        print(f'SendGrid HTTP error: {e.code} - {e.read().decode()}')
-        return False
+        html_part = MIMEText(html_content, 'html', 'utf-8')
+        msg.attach(html_part)
+        
+        with smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=10) as server:
+            server.login(smtp_user, smtp_password)
+            server.send_message(msg)
+            print(f'Email sent successfully via SMTP to {to_email}')
+            return True
+            
     except Exception as e:
-        print(f'SendGrid error: {e}')
+        print(f'SMTP error: {e}')
         return False
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:

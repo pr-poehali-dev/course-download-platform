@@ -5,23 +5,51 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import func2url from '../../backend/func2url.json';
 
 interface ReferralDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   username: string;
+  userId?: number;
 }
 
 export default function ReferralDialog({
   open,
   onOpenChange,
-  username
+  username,
+  userId
 }: ReferralDialogProps) {
-  const referralCode = username.toUpperCase().replace(/\s/g, '') + Math.floor(Math.random() * 1000);
-  const referralLink = `https://techforma.ru/ref/${referralCode}`;
+  const [referralCode, setReferralCode] = useState('');
   const [referrals, setReferrals] = useState(0);
   const [earned, setEarned] = useState(0);
+  const [loading, setLoading] = useState(true);
+  
+  const referralLink = referralCode ? `https://techforma.ru/ref/${referralCode}` : '';
+
+  useEffect(() => {
+    const loadReferralData = async () => {
+      if (!userId || !open) return;
+      
+      setLoading(true);
+      try {
+        const response = await fetch(`${func2url['user-data']}?user_id=${userId}&action=referrals`);
+        const data = await response.json();
+        
+        if (data.referral) {
+          setReferralCode(data.referral.code);
+          setReferrals(data.referral.referred_count);
+          setEarned(data.referral.total_earned);
+        }
+      } catch (error) {
+        console.error('Failed to load referral data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadReferralData();
+  }, [userId, open]);
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);

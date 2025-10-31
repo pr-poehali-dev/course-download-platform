@@ -147,6 +147,23 @@ export default function Index() {
     loadWorks();
   }, []);
 
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!currentUser?.id) return;
+      
+      try {
+        const response = await fetch(`${func2url['user-data']}?user_id=${currentUser.id}&action=all`);
+        const data = await response.json();
+        
+        if (data.favorites) setFavoriteItems(data.favorites);
+        if (data.purchases) setPurchases(data.purchases);
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+      }
+    };
+    loadUserData();
+  }, [currentUser]);
+
   const handleShowTerms = (user: string, userEmail: string, password: string) => {
     setPendingUser({ username: user, email: userEmail, password });
     setTermsDialogOpen(true);
@@ -246,7 +263,16 @@ export default function Index() {
     }
   };
 
-  const handleAddToFavorites = (work: any) => {
+  const handleAddToFavorites = async (work: any) => {
+    if (!currentUser?.id) {
+      toast({
+        title: 'Требуется авторизация',
+        description: 'Войдите, чтобы добавлять в избранное',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (favoriteItems.find(item => item.id === work.id)) {
       toast({
         title: 'Уже в избранном',
@@ -255,27 +281,61 @@ export default function Index() {
       });
       return;
     }
-    setFavoriteItems([...favoriteItems, work]);
-    toast({
-      title: 'Добавлено в избранное',
-      description: work.title,
-    });
-  };
 
-  const handleRemoveFromFavorites = (id: number) => {
-    setFavoriteItems(favoriteItems.filter(item => item.id !== id));
-  };
-
-  const handleApplyPromo = (bonus: number, code: string) => {
-    if (activatedPromos.includes(code)) {
+    try {
+      const response = await fetch(func2url['toggle-favorite'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUser.id, work_id: work.id })
+      });
+      const data = await response.json();
+      
+      if (data.success && data.action === 'added') {
+        setFavoriteItems([...favoriteItems, work]);
+        toast({
+          title: 'Добавлено в избранное',
+          description: work.title,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to add to favorites:', error);
       toast({
-        title: 'Промокод уже использован',
-        description: 'Вы уже активировали этот промокод',
+        title: 'Ошибка',
+        description: 'Не удалось добавить в избранное',
         variant: 'destructive',
       });
-      return;
     }
-    setUserBalance(userBalance + bonus);
+  };
+
+  const handleRemoveFromFavorites = async (id: number) => {
+    if (!currentUser?.id) return;
+
+    try {
+      const response = await fetch(func2url['toggle-favorite'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: currentUser.id, work_id: id })
+      });
+      const data = await response.json();
+      
+      if (data.success && data.action === 'removed') {
+        setFavoriteItems(favoriteItems.filter(item => item.id !== id));
+        toast({
+          title: 'Удалено из избранного',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to remove from favorites:', error);
+    }
+  };
+
+  const handleApplyPromo = (bonus: number, code: string, newBalance: number) => {
+    if (currentUser) {
+      setCurrentUser({
+        ...currentUser,
+        balance: newBalance
+      });
+    }
     setActivatedPromos([...activatedPromos, code]);
     
     if (email) {
@@ -1052,10 +1112,18 @@ export default function Index() {
                           <Button 
                             variant="outline"
                             size="icon"
-                            onClick={() => handleAddToFavorites(work)}
-                            className={favoriteItems.find(item => item.id === work.id) ? 'text-red-500' : ''}
+                            onClick={() => {
+                              const inFavorites = favoriteItems.find(item => item.id === work.id);
+                              if (inFavorites) {
+                                handleRemoveFromFavorites(work.id);
+                              } else {
+                                handleAddToFavorites(work);
+                              }
+                            }}
+                            className={favoriteItems.find(item => item.id === work.id) ? 'text-red-500 bg-red-50 hover:bg-red-100 border-red-200' : ''}
+                            title={favoriteItems.find(item => item.id === work.id) ? 'Удалить из избранного' : 'Добавить в избранное'}
                           >
-                            <Icon name="Heart" size={16} />
+                            <Icon name="Heart" size={16} className={favoriteItems.find(item => item.id === work.id) ? 'fill-red-500' : ''} />
                           </Button>
                           <Button 
                             onClick={() => handleAddToCart(work)}
@@ -1385,12 +1453,14 @@ export default function Index() {
         open={promoDialogOpen}
         onOpenChange={setPromoDialogOpen}
         onApplyPromo={handleApplyPromo}
+        userId={currentUser?.id}
       />
 
       <ReferralDialog
         open={referralDialogOpen}
         onOpenChange={setReferralDialogOpen}
         username={username}
+        userId={currentUser?.id}
       />
 
       <AgeBadge />

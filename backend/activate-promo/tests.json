@@ -1,0 +1,33 @@
+{
+  "tests": [
+    {
+      "name": "Activate valid promo",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "user_id": 1,
+        "promo_code": "WELCOME2024"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "bonus_points": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Invalid promo code",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "user_id": 1,
+        "promo_code": "INVALID123"
+      },
+      "expectedStatus": 404,
+      "expectedBody": {
+        "error": "Промокод не найден"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

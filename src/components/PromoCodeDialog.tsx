@@ -5,50 +5,78 @@ import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import { useState } from 'react';
+import func2url from '../../backend/func2url.json';
 
 interface PromoCodeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onApplyPromo: (bonus: number, code: string) => void;
+  onApplyPromo: (bonus: number, code: string, newBalance: number) => void;
+  userId?: number;
 }
 
 const PROMO_CODES = {
-  'FIRST50': { bonus: 50, description: 'Бонус для новых пользователей' },
+  'WELCOME2024': { bonus: 50, description: 'Бонус для новых пользователей' },
   'STUDENT100': { bonus: 100, description: 'Специальное предложение для студентов' },
-  'WINTER2024': { bonus: 75, description: 'Зимняя акция' }
+  'VIPUSER': { bonus: 200, description: 'Для VIP пользователей' }
 };
 
 export default function PromoCodeDialog({
   open,
   onOpenChange,
-  onApplyPromo
+  onApplyPromo,
+  userId
 }: PromoCodeDialogProps) {
   const [promoCode, setPromoCode] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleApply = () => {
+  const handleApply = async () => {
+    if (!userId) {
+      toast({
+        title: 'Требуется авторизация',
+        description: 'Войдите, чтобы активировать промокод',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      const upperCode = promoCode.toUpperCase();
-      const promo = PROMO_CODES[upperCode as keyof typeof PROMO_CODES];
+    try {
+      const response = await fetch(func2url['activate-promo'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          user_id: userId, 
+          promo_code: promoCode.toUpperCase() 
+        })
+      });
       
-      if (promo) {
-        onApplyPromo(promo.bonus, upperCode);
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        onApplyPromo(data.bonus_points, promoCode.toUpperCase(), data.new_balance);
         toast({
           title: 'Промокод активирован!',
-          description: `Вам начислено ${promo.bonus} баллов`,
+          description: data.message || `Вам начислено ${data.bonus_points} баллов`,
         });
         setPromoCode('');
         onOpenChange(false);
       } else {
         toast({
-          title: 'Промокод недействителен',
-          description: 'Проверьте правильность кода',
+          title: 'Ошибка',
+          description: data.error || 'Не удалось активировать промокод',
           variant: 'destructive',
         });
       }
+    } catch (error) {
+      console.error('Failed to activate promo:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось активировать промокод',
+        variant: 'destructive',
+      });
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   return (

@@ -33,10 +33,13 @@ export default function SupportAdmin() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleLogin = () => {
+    console.log('Попытка входа с паролем:', password);
     if (password === 'admin123') {
+      console.log('Пароль верный, загружаем тикеты...');
       setIsAuthenticated(true);
       loadTickets();
     } else {
+      console.log('Неверный пароль');
       toast({
         title: 'Ошибка',
         description: 'Неверный пароль',

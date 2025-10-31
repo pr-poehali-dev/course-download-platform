@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Check download limit",
+      "method": "GET",
+      "path": "/?user_id=1",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "can_download": "boolean",
+        "is_premium": "boolean"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Subscribe to Premium",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "user_id": 1
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -144,16 +144,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # author_id уже получен в work_result выше
             author_id = work_result[1]
             
-            # Если есть автор, начисляем ему 90%
+            # Если есть автор, начисляем ему 90% + бонус за скачивание
             if author_id:
-                author_id = author_result[0]
                 author_share = int(price * 0.9)
                 platform_fee = int(price * 0.1)
+                download_bonus = 10  # Бонус за каждое скачивание
                 
-                # Начисляем автору 90% на баланс
+                # Начисляем автору 90% + 10 баллов бонуса
                 cur.execute(
                     "UPDATE t_p63326274_course_download_plat.users SET balance = balance + %s WHERE id = %s",
-                    (author_share, author_id)
+                    (author_share + download_bonus, author_id)
                 )
                 
                 # Записываем транзакцию выплаты
@@ -162,6 +162,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     (author_id, work_id, purchase_id, sale_amount, author_share, platform_fee, status)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)""",
                     (author_id, db_work_id, purchase_id, price, author_share, platform_fee, 'paid')
+                )
+                
+                # Записываем бонус за скачивание
+                cur.execute(
+                    """INSERT INTO t_p63326274_course_download_plat.transactions
+                    (user_id, amount, transaction_type, description)
+                    VALUES (%s, %s, %s, %s)""",
+                    (author_id, download_bonus, 'download_bonus', f'Бонус за скачивание работы #{db_work_id}')
                 )
             
             # Обновляем счётчик скачиваний

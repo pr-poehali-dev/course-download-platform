@@ -26,9 +26,9 @@ interface PaymentPackage {
 }
 
 const PACKAGES: PaymentPackage[] = [
-  { points: 100, price: 100, bonus: 0 },
-  { points: 500, price: 450, bonus: 100, popular: true },
-  { points: 1000, price: 850, bonus: 250 },
+  { points: 50, price: 50, bonus: 0 },
+  { points: 200, price: 200, bonus: 50, popular: true },
+  { points: 500, price: 500, bonus: 200 },
 ];
 
 export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail }: PaymentDialogProps) {

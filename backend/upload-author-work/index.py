@@ -74,6 +74,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         work_id = cursor.fetchone()[0]
         
+        # Начислить +100 баллов за загрузку работы
+        cursor.execute('''
+            UPDATE t_p63326274_course_download_plat.users
+            SET balance = balance + 100
+            WHERE id = %s
+            RETURNING balance
+        ''', (author_id,))
+        new_balance = cursor.fetchone()[0]
+        
+        # Записать транзакцию
+        cursor.execute('''
+            INSERT INTO t_p63326274_course_download_plat.transactions
+            (user_id, amount, transaction_type, description)
+            VALUES (%s, %s, %s, %s)
+        ''', (author_id, 100, 'work_upload', f'Загрузка работы: {title}'))
+        
         conn.commit()
         cursor.close()
         conn.close()
@@ -88,7 +104,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({
                 'workId': work_id,
                 'status': 'pending',
-                'message': 'Work uploaded successfully and sent for moderation'
+                'message': 'Work uploaded successfully and sent for moderation',
+                'bonus_earned': 100,
+                'new_balance': new_balance
             })
         }
         

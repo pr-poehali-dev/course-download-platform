@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -178,6 +179,12 @@ export default function SupportAdmin() {
       <div className="container max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <div>
+            <Button variant="ghost" className="mb-4" asChild>
+              <Link to="/">
+                <Icon name="Home" size={18} className="mr-2" />
+                На главную
+              </Link>
+            </Button>
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
               Админ-панель поддержки
             </h1>

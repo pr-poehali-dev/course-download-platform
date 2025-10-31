@@ -69,7 +69,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         try:
             cur.execute(
-                "SELECT title, yandex_disk_link, file_url FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                "SELECT title, yandex_disk_link, file_url, folder_path FROM t_p63326274_course_download_plat.works WHERE id = %s",
                 (work_id,)
             )
             work_result = cur.fetchone()
@@ -82,45 +82,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            folder_name = work_result[0]
+            title = work_result[0]
             yandex_link = work_result[1] or work_result[2] or public_key
+            folder_path = work_result[3]
+            
+            if not folder_path:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Folder path not found. Please re-import works.'}),
+                    'isBase64Encoded': False
+                }
             
         finally:
             cur.close()
             conn.close()
         
-        # Получаем список всех папок на Яндекс.Диске
-        api_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(yandex_link)}&limit=500"
-        
-        req = urllib.request.Request(api_url)
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            data = json.loads(resp.read().decode())
-        
-        # Ищем папку с работой по названию
-        work_item = None
-        if '_embedded' in data and 'items' in data['_embedded']:
-            for item in data['_embedded']['items']:
-                if item.get('name') == folder_name or item.get('name') in folder_name:
-                    work_item = item
-                    break
-        
-        if not work_item:
-            # Пробуем использовать первую папку
-            if '_embedded' in data and 'items' in data['_embedded'] and len(data['_embedded']['items']) > 0:
-                work_item = data['_embedded']['items'][0]
-            else:
-                return {
-                    'statusCode': 404,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Work folder not found on disk'}),
-                    'isBase64Encoded': False
-                }
-        
-        folder_name = work_item['name']
-        folder_path = '/' + folder_name
+        # Формируем путь к папке (folder_path уже содержит полное имя папки)
+        folder_path_full = '/' + folder_path
         
         # Получаем содержимое папки работы
-        folder_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(yandex_link)}&path={urllib.parse.quote(folder_path)}&limit=100"
+        folder_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(yandex_link)}&path={urllib.parse.quote(folder_path_full)}&limit=100"
         
         req = urllib.request.Request(folder_url)
         with urllib.request.urlopen(req, timeout=10) as resp:
@@ -139,7 +121,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         continue
                     
                     # Получаем ссылку на скачивание файла
-                    download_url = get_download_url(yandex_link, folder_path + '/' + file_name)
+                    download_url = get_download_url(yandex_link, folder_path_full + '/' + file_name)
                     
                     if download_url:
                         try:
@@ -161,7 +143,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         zip_base64 = base64.b64encode(zip_data).decode('utf-8')
         
         # Безопасное имя файла для архива
-        safe_name = ''.join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in folder_name[:50])
+        safe_name = ''.join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in folder_path[:50])
         
         return {
             'statusCode': 200,

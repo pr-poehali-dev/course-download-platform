@@ -168,12 +168,28 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         description = f'Работа по теме: {title}'
                         yandex_link = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ'
                         
-                        # Insert into database
+                        # Check if work exists by title
                         cur.execute('''
-                            INSERT INTO t_p63326274_course_download_plat.works 
-                            (title, work_type, subject, description, composition, universities, price_points, yandex_disk_link)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                        ''', (title, work_type, subject, description, composition, university, price, yandex_link))
+                            SELECT id FROM t_p63326274_course_download_plat.works 
+                            WHERE title = %s LIMIT 1
+                        ''', (title,))
+                        
+                        existing = cur.fetchone()
+                        
+                        if existing:
+                            # Update existing work with folder_path
+                            cur.execute('''
+                                UPDATE t_p63326274_course_download_plat.works
+                                SET folder_path = %s, yandex_disk_link = %s
+                                WHERE id = %s
+                            ''', (folder_name, yandex_link, existing[0]))
+                        else:
+                            # Insert new work
+                            cur.execute('''
+                                INSERT INTO t_p63326274_course_download_plat.works 
+                                (title, work_type, subject, description, composition, universities, price_points, yandex_disk_link, folder_path)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            ''', (title, work_type, subject, description, composition, university, price, yandex_link, folder_name))
                         
                         total_imported += 1
         except Exception as e:

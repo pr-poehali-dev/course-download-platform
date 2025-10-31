@@ -141,7 +141,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     if method == 'GET':
         params = event.get('queryStringParameters') or {}
-        admin_email = event.get('headers', {}).get('x-admin-email', '')
+        headers_dict = event.get('headers', {})
+        print(f'DEBUG: Все заголовки: {headers_dict}')
+        admin_email = headers_dict.get('x-admin-email', '') or headers_dict.get('X-Admin-Email', '')
         
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -194,7 +196,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     if method == 'PUT':
-        admin_email = event.get('headers', {}).get('x-admin-email', '')
+        headers_dict = event.get('headers', {})
+        admin_email = headers_dict.get('x-admin-email', '') or headers_dict.get('X-Admin-Email', '')
         
         if admin_email != 'tech.forma@yandex.ru':
             return {

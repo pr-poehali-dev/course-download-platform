@@ -10,8 +10,7 @@ import os
 import psycopg2
 import hashlib
 import secrets
-import urllib.request
-import urllib.error
+import requests
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
@@ -57,65 +56,40 @@ def get_db_connection():
     database_url = os.environ.get('DATABASE_URL')
     return psycopg2.connect(database_url)
 
-def send_email_sendgrid(to_email: str, subject: str, html_content: str) -> bool:
-    """Отправка через SendGrid API"""
-    api_key = os.environ.get('SENDGRID_API_KEY')
-    from_email = os.environ.get('SENDGRID_FROM_EMAIL', 'noreply@techforma.ru')
-    from_name = os.environ.get('SENDGRID_FROM_NAME', 'Tech Forma')
+def send_email(to_email: str, subject: str, html_content: str) -> bool:
+    """Отправка email через Resend API"""
+    resend_api_key = os.environ.get('RESEND_API_KEY')
     
-    if not api_key:
-        print('SendGrid API key not configured')
+    if not resend_api_key:
+        print('Resend API key not configured')
         return False
-    
-    payload = {
-        'personalizations': [{
-            'to': [{'email': to_email}]
-        }],
-        'from': {
-            'email': from_email,
-            'name': from_name
-        },
-        'subject': subject,
-        'content': [{
-            'type': 'text/html',
-            'value': html_content
-        }]
-    }
     
     try:
-        req = urllib.request.Request(
-            'https://api.sendgrid.com/v3/mail/send',
-            data=json.dumps(payload).encode('utf-8'),
+        response = requests.post(
+            'https://api.resend.com/emails',
             headers={
-                'Authorization': f'Bearer {api_key}',
+                'Authorization': f'Bearer {resend_api_key}',
                 'Content-Type': 'application/json'
             },
-            method='POST'
+            json={
+                'from': 'Tech Forma <noreply@techforma.pro>',
+                'to': [to_email],
+                'subject': subject,
+                'html': html_content
+            },
+            timeout=10
         )
         
-        with urllib.request.urlopen(req, timeout=10) as response:
-            if response.status in [200, 202]:
-                print(f'Email sent successfully via SendGrid to {to_email}')
-                return True
-            else:
-                print(f'SendGrid API error: {response.status}')
-                return False
-                
-    except urllib.error.HTTPError as e:
-        print(f'SendGrid HTTP error: {e.code} - {e.read().decode()}')
-        return False
+        if response.status_code == 200:
+            print(f'Email sent successfully via Resend to {to_email}')
+            return True
+        else:
+            print(f'Resend API error: {response.status_code} - {response.text}')
+            return False
+            
     except Exception as e:
-        print(f'SendGrid error: {e}')
+        print(f'Email sending error: {e}')
         return False
-
-def send_email(to_email: str, subject: str, html_content: str) -> bool:
-    """Основная функция отправки с fallback"""
-    # Сначала пробуем SendGrid
-    if send_email_sendgrid(to_email, subject, html_content):
-        return True
-    
-    print('SendGrid failed, email not sent')
-    return False
 
 def send_password_reset(email: str) -> Dict[str, Any]:
     if not email:

@@ -14,6 +14,8 @@ import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import PlatformSettings from '@/components/PlatformSettings';
 import YandexDiskImport from '@/components/YandexDiskImport';
 import PreviewGenerator from '@/components/PreviewGenerator';
+import SupportAdmin from '@/components/SupportAdmin';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import func2url from '../../backend/func2url.json';
 
 const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
@@ -154,14 +156,17 @@ export default function AdminPanel() {
           <h1 className="text-4xl font-bold mb-2">Админ-панель</h1>
           <p className="text-muted-foreground">Статистика и аналитика платформы</p>
         </div>
-        <Button onClick={() => setIsAuthenticated(false)} variant="outline">
-          <Icon name="LogOut" size={18} className="mr-2" />
-          Выйти
-        </Button>
+        <div className="flex gap-2">
+          <ThemeToggle />
+          <Button onClick={() => setIsAuthenticated(false)} variant="outline">
+            <Icon name="LogOut" size={18} className="mr-2" />
+            Выйти
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="analytics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-8">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="analytics">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Аналитика
@@ -185,6 +190,10 @@ export default function AdminPanel() {
           <TabsTrigger value="finance">
             <Icon name="Coins" size={18} className="mr-2" />
             Финансы
+          </TabsTrigger>
+          <TabsTrigger value="support">
+            <Icon name="MessageSquare" size={18} className="mr-2" />
+            Тикеты
           </TabsTrigger>
           <TabsTrigger value="add-work">
             <Icon name="Plus" size={18} className="mr-2" />
@@ -218,6 +227,10 @@ export default function AdminPanel() {
 
         <TabsContent value="finance" className="space-y-6">
           <FinanceManagement />
+        </TabsContent>
+
+        <TabsContent value="support" className="space-y-6">
+          <SupportAdmin />
         </TabsContent>
 
         <TabsContent value="add-work" className="space-y-6">

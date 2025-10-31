@@ -1,16 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import Icon from '@/components/ui/icon';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useState } from 'react';
+import EnhancedAnalytics from '@/components/EnhancedAnalytics';
 
 export default function AnalyticsDashboard() {
+  return <EnhancedAnalytics />;
+}
+
+export function AnalyticsDashboardOld() {
   const [period, setPeriod] = useState('week');
 
   const growthData = {

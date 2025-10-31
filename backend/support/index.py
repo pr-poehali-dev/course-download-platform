@@ -49,7 +49,7 @@ def send_email(to_email: str, subject: str, message: str) -> bool:
                 'Content-Type': 'application/json'
             },
             json={
-                'from': 'Tech Forma Support <onboarding@resend.dev>',
+                'from': 'Tech Forma Support <support@techforma.pro>',
                 'to': [to_email],
                 'subject': subject,
                 'html': html_content

@@ -6,9 +6,8 @@ Returns: HTTP ответ с данными тикетов или статусо�
 
 import json
 import os
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import urllib.request
+import urllib.error
 from typing import Dict, Any, List
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -19,45 +18,72 @@ def get_db_connection():
     return psycopg2.connect(database_url)
 
 def send_email(to_email: str, subject: str, message: str) -> bool:
-    try:
-        smtp_host = 'smtp.yandex.ru'
-        smtp_port = 465
-        smtp_user = 'tech.forma@yandex.ru'
-        smtp_password = 'dzhbdpkghkrsxpox'
-        
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = smtp_user
-        msg['To'] = to_email
-        
-        html_content = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <h2 style="color: #2563eb;">Ответ от службы поддержки</h2>
-                    <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
-                        <p style="white-space: pre-line;">{message}</p>
-                    </div>
-                    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
-                    <p style="color: #6b7280; font-size: 14px;">
-                        С уважением,<br>
-                        Служба поддержки Tech Forma<br>
-                        tech.forma@yandex.ru
-                    </p>
+    api_key = os.environ.get('SENDGRID_API_KEY')
+    from_email = os.environ.get('SENDGRID_FROM_EMAIL', 'tech.forma@yandex.ru')
+    from_name = 'Tech Forma Support'
+    
+    if not api_key:
+        print('SendGrid API key not configured')
+        return False
+    
+    html_content = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #2563eb;">Ответ от службы поддержки</h2>
+                <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <p style="white-space: pre-line;">{message}</p>
                 </div>
-            </body>
-        </html>
-        """
+                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;">
+                <p style="color: #6b7280; font-size: 14px;">
+                    С уважением,<br>
+                    Служба поддержки Tech Forma<br>
+                    {from_email}
+                </p>
+            </div>
+        </body>
+    </html>
+    """
+    
+    payload = {
+        'personalizations': [{
+            'to': [{'email': to_email}]
+        }],
+        'from': {
+            'email': from_email,
+            'name': from_name
+        },
+        'subject': subject,
+        'content': [{
+            'type': 'text/html',
+            'value': html_content
+        }]
+    }
+    
+    try:
+        req = urllib.request.Request(
+            'https://api.sendgrid.com/v3/mail/send',
+            data=json.dumps(payload).encode('utf-8'),
+            headers={
+                'Authorization': f'Bearer {api_key}',
+                'Content-Type': 'application/json'
+            },
+            method='POST'
+        )
         
-        msg.attach(MIMEText(html_content, 'html'))
-        
-        with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
-            server.login(smtp_user, smtp_password)
-            server.send_message(msg)
-        
-        return True
+        with urllib.request.urlopen(req, timeout=10) as response:
+            if response.status in [200, 202]:
+                print(f'Email sent successfully via SendGrid to {to_email}')
+                return True
+            else:
+                print(f'SendGrid API error: {response.status}')
+                return False
+                
+    except urllib.error.HTTPError as e:
+        print(f'SendGrid HTTP error: {e.code} - {e.read().decode()}')
+        return False
     except Exception as e:
-        print(f"Email error: {str(e)}")
+        print(f'SendGrid error: {e}')
         return False
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:

@@ -21,8 +21,10 @@ def get_db_connection():
 def send_email(to_email: str, subject: str, message: str) -> bool:
     smtp_host = os.environ.get('SMTP_HOST', 'smtp.yandex.ru')
     smtp_port = int(os.environ.get('SMTP_PORT', '465'))
-    smtp_user = os.environ.get('SMTP_USER', 'rekrutiw@yandex.ru')
+    smtp_user = os.environ.get('SMTP_USER', 'tech.forma@yandex.ru')
     smtp_password = os.environ.get('SMTP_PASSWORD')
+    
+    print(f'DEBUG: SMTP config - host={smtp_host}, port={smtp_port}, user={smtp_user}, password_exists={bool(smtp_password)}')
     
     if not smtp_password:
         print('SMTP password not configured')

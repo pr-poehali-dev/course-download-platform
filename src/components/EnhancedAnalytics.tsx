@@ -65,13 +65,20 @@ export default function EnhancedAnalytics() {
         .sort((a, b) => b.value - a.value)
         .slice(0, 6);
 
-      const revenueByMonth = [
+      const revenueByMonth = totalWorks > 0 ? [
         { month: 'Янв', revenue: Math.floor(totalRevenue * 0.1), purchases: Math.floor(totalWorks * 0.1) },
         { month: 'Фев', revenue: Math.floor(totalRevenue * 0.12), purchases: Math.floor(totalWorks * 0.12) },
         { month: 'Мар', revenue: Math.floor(totalRevenue * 0.15), purchases: Math.floor(totalWorks * 0.14) },
         { month: 'Апр', revenue: Math.floor(totalRevenue * 0.18), purchases: Math.floor(totalWorks * 0.17) },
         { month: 'Май', revenue: Math.floor(totalRevenue * 0.22), purchases: Math.floor(totalWorks * 0.21) },
         { month: 'Июн', revenue: Math.floor(totalRevenue * 0.23), purchases: Math.floor(totalWorks * 0.26) }
+      ] : [
+        { month: 'Янв', revenue: 0, purchases: 0 },
+        { month: 'Фев', revenue: 0, purchases: 0 },
+        { month: 'Мар', revenue: 0, purchases: 0 },
+        { month: 'Апр', revenue: 0, purchases: 0 },
+        { month: 'Май', revenue: 0, purchases: 0 },
+        { month: 'Июн', revenue: 0, purchases: 0 }
       ];
 
       const topWorks = works
@@ -86,13 +93,17 @@ export default function EnhancedAnalytics() {
       setData({
         totalRevenue,
         totalWorks,
-        totalUsers: 125,
-        totalPurchases: Math.floor(totalWorks * 0.7),
-        revenueGrowth: 15.3,
-        usersGrowth: 8.7,
-        popularCategories,
+        totalUsers: 0,
+        totalPurchases: 0,
+        revenueGrowth: 0,
+        usersGrowth: 0,
+        popularCategories: popularCategories.length > 0 ? popularCategories : [
+          { name: 'Пока нет данных', value: 1, color: COLORS[0] }
+        ],
         revenueByMonth,
-        topWorks
+        topWorks: topWorks.length > 0 ? topWorks : [
+          { title: 'Пока нет работ', revenue: 0, downloads: 0 }
+        ]
       });
     } catch (error) {
       console.error('Analytics load error:', error);
@@ -121,9 +132,8 @@ export default function EnhancedAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{data.totalRevenue.toLocaleString()}</div>
-            <p className="text-xs opacity-80 mt-1 flex items-center gap-1">
-              <Icon name="TrendingUp" size={14} />
-              +{data.revenueGrowth}% за месяц
+            <p className="text-xs opacity-80 mt-1">
+              {data.totalRevenue === 0 ? 'Ожидание продаж' : `+${data.revenueGrowth}% за месяц`}
             </p>
           </CardContent>
         </Card>
@@ -137,7 +147,7 @@ export default function EnhancedAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{data.totalWorks}</div>
-            <p className="text-xs opacity-80 mt-1">В каталоге</p>
+            <p className="text-xs opacity-80 mt-1">{data.totalWorks === 0 ? 'Ожидание загрузок' : 'В каталоге'}</p>
           </CardContent>
         </Card>
 
@@ -150,9 +160,8 @@ export default function EnhancedAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{data.totalUsers}</div>
-            <p className="text-xs opacity-80 mt-1 flex items-center gap-1">
-              <Icon name="TrendingUp" size={14} />
-              +{data.usersGrowth}% за месяц
+            <p className="text-xs opacity-80 mt-1">
+              {data.totalUsers === 0 ? 'Ожидание регистраций' : `+${data.usersGrowth}% за месяц`}
             </p>
           </CardContent>
         </Card>
@@ -166,7 +175,7 @@ export default function EnhancedAnalytics() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{data.totalPurchases}</div>
-            <p className="text-xs opacity-80 mt-1">Всего транзакций</p>
+            <p className="text-xs opacity-80 mt-1">{data.totalPurchases === 0 ? 'Ожидание покупок' : 'Всего транзакций'}</p>
           </CardContent>
         </Card>
       </div>

@@ -42,7 +42,7 @@ const App = () => (
           <Route path="/usage-rules" element={<UsageRulesPage />} />
           <Route path="/offer" element={<OfferPage />} />
           <Route path="/requisites" element={<Requisites />} />
-          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin" element={<SupportAdmin />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/buy-points" element={<BuyPointsPage />} />
           <Route path="/upload" element={<UploadWorkPage />} />
@@ -56,7 +56,6 @@ const App = () => (
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/support-admin" element={<SupportAdmin />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

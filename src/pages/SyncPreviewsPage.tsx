@@ -12,11 +12,12 @@ export default function SyncPreviewsPage() {
     setResult(null);
 
     try {
-      const response = await fetch(func2url['sync-previews-auto'], {
+      const response = await fetch(func2url['sync-previews'], {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ limit: 50 })
       });
 
       const data = await response.json();

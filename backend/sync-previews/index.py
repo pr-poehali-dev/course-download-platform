@@ -118,34 +118,58 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
     try:
-        
-        root_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&limit=100'
+        root_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&limit=500'
         req = urllib.request.Request(root_url)
-        with urllib.request.urlopen(req, timeout=10) as response:
+        with urllib.request.urlopen(req, timeout=15) as response:
             data = json.loads(response.read().decode())
         
-        preview_candidates = []
-        image_candidates = []
+        if not data.get('_embedded') or not data['_embedded'].get('items'):
+            return None
         
-        if data.get('_embedded') and data['_embedded'].get('items'):
-            for item in data['_embedded']['items']:
-                if item.get('type') == 'file':
-                    name = item.get('name', '').lower()
-                    file_url = item.get('file')
-                    
-                    if not file_url:
-                        continue
-                    
-                    if name.startswith('preview') and (name.endswith('.png') or name.endswith('.jpg') or name.endswith('.jpeg')):
-                        return file_url
-                    
-                    if name.endswith(('.png', '.jpg', '.jpeg')):
-                        preview_candidates.append(file_url)
+        folder_name = None
+        clean_title = work_title.strip().replace('«', '').replace('»', '').replace('"', '').replace('"', '')
         
-        if preview_candidates:
-            return preview_candidates[0]
+        for item in data['_embedded']['items']:
+            if item.get('type') == 'dir':
+                dir_name = item.get('name', '')
+                clean_dir = dir_name.strip().replace('«', '').replace('»', '').replace('"', '').replace('"', '')
+                
+                if clean_title.lower() in clean_dir.lower() or clean_dir.lower() in clean_title.lower():
+                    folder_name = dir_name
+                    break
+        
+        if not folder_name:
+            return None
+        
+        folder_path = f'/{folder_name}'
+        folder_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(folder_path)}&limit=50'
+        
+        req = urllib.request.Request(folder_url)
+        with urllib.request.urlopen(req, timeout=15) as response:
+            folder_data = json.loads(response.read().decode())
+        
+        if not folder_data.get('_embedded') or not folder_data['_embedded'].get('items'):
+            return None
+        
+        for item in folder_data['_embedded']['items']:
+            if item.get('type') == 'file':
+                name = item.get('name', '').lower()
+                
+                if name == 'preview.png' or name == 'preview .png':
+                    file_path = f'/{folder_name}/{item["name"]}'
+                    file_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(file_path)}'
+                    
+                    req = urllib.request.Request(file_url)
+                    with urllib.request.urlopen(req, timeout=10) as response:
+                        file_data = json.loads(response.read().decode())
+                    
+                    if file_data.get('sizes') and len(file_data['sizes']) > 0:
+                        return file_data['sizes'][0]['url']
+                    
+                    if file_data.get('file'):
+                        return file_data['file']
         
         return None
         
     except Exception as e:
-        raise Exception(f'Failed to load folder: {str(e)}')
+        raise Exception(f'Failed to load preview: {str(e)}')

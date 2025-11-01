@@ -11,7 +11,7 @@ export default function PreviewGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [batchSize, setBatchSize] = useState(3);
-  const [publicKey, setPublicKey] = useState('https://disk.yandex.ru/d/dQBBqvLRShUD6A');
+  const [publicKey, setPublicKey] = useState('https://disk.yandex.ru/d/8J9vk2t_fe3cpA');
   const [stats, setStats] = useState({ total: 0, success: 0, failed: 0 });
   const [currentBatch, setCurrentBatch] = useState(0);
   const [totalBatches, setTotalBatches] = useState(0);

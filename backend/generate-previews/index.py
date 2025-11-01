@@ -238,7 +238,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
     offset = body_data.get('offset', 0)
     limit = body_data.get('limit', 3)  # Уменьшено до 3 работ за раз для избежания таймаута
-    public_key = body_data.get('public_key', 'https://disk.yandex.ru/d/dQBBqvLRShUD6A')
+    public_key = body_data.get('public_key', 'https://disk.yandex.ru/d/8J9vk2t_fe3cpA')
     
     conn = get_db_connection()
     cur = conn.cursor()

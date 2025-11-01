@@ -89,6 +89,18 @@ export default function AdminPanel() {
     if (adminEmail === ADMIN_EMAIL && adminPassword === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
       localStorage.setItem('admin_authenticated', 'true');
+      
+      // Сохраняем админа как пользователя для общей системы авторизации
+      const adminUser = {
+        id: 1,
+        username: 'admin',
+        email: ADMIN_EMAIL,
+        balance: 999999,
+        referral_code: 'ADMIN',
+        role: 'admin'
+      };
+      localStorage.setItem('user', JSON.stringify(adminUser));
+      
       toast({
         title: 'Вход выполнен',
         description: 'Добро пожаловать в админ-панель'
@@ -105,6 +117,7 @@ export default function AdminPanel() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('admin_authenticated');
+    localStorage.removeItem('user');
     toast({
       title: 'Выход выполнен',
       description: 'Вы вышли из админ-панели'

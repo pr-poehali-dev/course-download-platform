@@ -9,6 +9,7 @@ export interface User {
   email: string;
   balance: number;
   referral_code: string;
+  role?: string;
 }
 
 export interface AuthResponse {
@@ -86,6 +87,7 @@ export const authService = {
 
   logout() {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem('admin_authenticated');
   },
 
   getToken(): string | null {

@@ -259,6 +259,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         if action == 'import':
             public_key = body_data.get('public_key')
+            offset = body_data.get('offset', 0)
+            limit = body_data.get('limit', 50)
             
             if not public_key:
                 return {
@@ -268,6 +270,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             folders = get_yandex_disk_folders(public_key)
+            total_folders = len(folders)
+            
+            # Применяем offset и limit
+            folders_batch = folders[offset:offset+limit]
             
             imported = []
             errors = []
@@ -275,10 +281,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             conn = get_db_connection()
             cur = conn.cursor()
             
-            print(f"🚀 Начинаю импорт {len(folders)} работ...")
+            print(f"🚀 Начинаю импорт батча {offset}-{offset+len(folders_batch)} из {total_folders} работ...")
             
             try:
-                for folder in folders:
+                for folder in folders_batch:
                     folder_name = folder['name']
                     yandex_disk_link = folder.get('public_url', '')
                     
@@ -331,6 +337,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'success': True,
                         'imported': len(imported),
                         'errors': len(errors),
+                        'total': total_folders,
+                        'offset': offset,
+                        'limit': limit,
+                        'has_more': offset + limit < total_folders,
+                        'next_offset': offset + limit if offset + limit < total_folders else None,
                         'details': {
                             'imported': imported,
                             'errors': errors

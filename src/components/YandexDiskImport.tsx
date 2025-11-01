@@ -34,39 +34,73 @@ export default function YandexDiskImport() {
 
   const handleImport = async () => {
     setImporting(true);
-    setProgress(10);
+    setProgress(0);
     setResult(null);
 
+    let totalImported = 0;
+    let totalErrors = 0;
+    let allImported: any[] = [];
+    let allErrors: any[] = [];
+    let offset = 0;
+    const limit = 50;
+
     try {
-      setProgress(30);
-      
-      const response = await fetch(func2url.works, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Admin-Email': 'rekrutiw@yandex.ru'
-        },
-        body: JSON.stringify({
-          action: 'import',
-          public_key: publicKey
-        })
-      });
+      let hasMore = true;
 
-      setProgress(80);
+      while (hasMore) {
+        const response = await fetch(func2url.works, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Email': 'rekrutiw@yandex.ru'
+          },
+          body: JSON.stringify({
+            action: 'import',
+            public_key: publicKey,
+            offset,
+            limit
+          })
+        });
 
-      const data = await response.json();
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Ошибка импорта');
+        }
+
+        totalImported += data.imported;
+        totalErrors += data.errors;
+        allImported = [...allImported, ...data.details.imported];
+        allErrors = [...allErrors, ...data.details.errors];
+
+        // Обновляем прогресс
+        const progressPercent = Math.round(((offset + data.imported) / data.total) * 100);
+        setProgress(progressPercent);
+
+        console.log(`Импортировано ${offset + data.imported} из ${data.total}`);
+
+        hasMore = data.has_more;
+        offset = data.next_offset || 0;
+      }
 
       setProgress(100);
 
-      if (data.success) {
-        setResult(data);
-        toast({
-          title: 'Импорт завершен!',
-          description: `Загружено работ: ${data.imported}. Ошибок: ${data.errors}`
-        });
-      } else {
-        throw new Error(data.error || 'Ошибка импорта');
-      }
+      const finalResult = {
+        success: true,
+        imported: totalImported,
+        errors: totalErrors,
+        details: {
+          imported: allImported,
+          errors: allErrors
+        }
+      };
+
+      setResult(finalResult);
+      
+      toast({
+        title: 'Импорт завершен!',
+        description: `Загружено работ: ${totalImported}. Ошибок: ${totalErrors}`
+      });
     } catch (error: any) {
       toast({
         title: 'Ошибка импорта',

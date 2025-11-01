@@ -14,7 +14,7 @@ from typing import Dict, Any, List, Optional
 
 def fetch_yandex_disk_batch(offset: int) -> Dict[str, Any]:
     """Fetch batch of folders from Yandex Disk API"""
-    public_key = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ'
+    public_key = 'https://disk.yandex.ru/d/9sBuGSvwb5KwNw'
     api_url = f'https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(public_key)}&limit=100&offset={offset}'
     
     req = urllib.request.Request(api_url)
@@ -23,7 +23,7 @@ def fetch_yandex_disk_batch(offset: int) -> Dict[str, Any]:
 
 def fetch_folder_contents(folder_path: str) -> Dict[str, Any]:
     """Fetch contents of a specific folder from Yandex Disk"""
-    public_key = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ'
+    public_key = 'https://disk.yandex.ru/d/9sBuGSvwb5KwNw'
     api_url = f'https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(public_key)}&path={urllib.parse.quote(folder_path)}'
     
     req = urllib.request.Request(api_url)
@@ -31,15 +31,10 @@ def fetch_folder_contents(folder_path: str) -> Dict[str, Any]:
         return json.loads(response.read().decode('utf-8'))
 
 def find_preview_image(items: List[Dict[str, Any]]) -> Optional[str]:
-    """Find first image file in folder items"""
-    image_extensions = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
-    
+    """Find first preview URL from folder items"""
     for item in items:
-        if item.get('type') == 'file':
-            name = item.get('name', '').lower()
-            if any(name.endswith(ext) for ext in image_extensions):
-                return item.get('file')
-    
+        if item.get('type') == 'file' and item.get('preview'):
+            return item['preview']
     return None
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -80,7 +75,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     errors = []
     
     # Fetch all works from database
-    cur.execute('SELECT id, title FROM t_p63326274_course_download_plat.works WHERE preview_image_url IS NULL OR preview_image_url = \'\'')
+    cur.execute("SELECT id, title FROM t_p63326274_course_download_plat.works WHERE preview_image_url IS NULL OR preview_image_url LIKE 'data:image%%'")
     works_without_preview = cur.fetchall()
     
     total_works = len(works_without_preview)
@@ -121,11 +116,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         
                         if preview_url:
                             # Update database
-                            cur.execute('''
-                                UPDATE t_p63326274_course_download_plat.works
-                                SET preview_image_url = %s
-                                WHERE id = %s
-                            ''', (preview_url, work_id))
+                            escaped_url = preview_url.replace("'", "''")
+                            cur.execute(f"UPDATE t_p63326274_course_download_plat.works SET preview_image_url = '{escaped_url}' WHERE id = {work_id}")
                             
                             updated_count += 1
                             matched = True

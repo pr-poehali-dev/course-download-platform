@@ -25,23 +25,51 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
     """Получить список файлов из папки на Яндекс.Диске"""
     api_url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
     
-    # Получаем список файлов в конкретной папке через path
-    folder_path = f'/{folder_name}'
-    params = {
+    # Сначала получаем корневую папку
+    root_params = {
         'public_key': public_key,
-        'path': folder_path,
+        'limit': 200
+    }
+    
+    print(f"🔍 Запрос корневой папки Яндекс.Диска")
+    
+    root_response = requests.get(api_url, params=root_params, timeout=15)
+    root_data = root_response.json()
+    
+    print(f"📦 Корневая папка: status={root_response.status_code}")
+    
+    if 'error' in root_data:
+        print(f"❌ Ошибка API корня: {root_data.get('error')} - {root_data.get('message', '')}")
+        return []
+    
+    # Ищем нужную папку по названию
+    target_folder_path = None
+    if '_embedded' in root_data and 'items' in root_data['_embedded']:
+        print(f"📁 Папок в корне: {len(root_data['_embedded']['items'])}")
+        for item in root_data['_embedded']['items']:
+            if item['type'] == 'dir' and item['name'] == folder_name:
+                target_folder_path = item['path']
+                print(f"✅ Найдена папка: {target_folder_path}")
+                break
+    
+    if not target_folder_path:
+        print(f"❌ Папка '{folder_name}' не найдена в корне")
+        return []
+    
+    # Получаем файлы из найденной папки
+    folder_params = {
+        'public_key': public_key,
+        'path': target_folder_path,
         'limit': 100
     }
     
-    print(f"🔍 Запрос к Яндекс.Диску: {api_url} with path={folder_path}")
-    
-    response = requests.get(api_url, params=params, timeout=15)
+    response = requests.get(api_url, params=folder_params, timeout=15)
     data = response.json()
     
-    print(f"📦 Ответ от Яндекс.Диска: status={response.status_code}")
+    print(f"📦 Ответ от Яндекс.Диска для папки: status={response.status_code}")
     
     if 'error' in data:
-        print(f"❌ Ошибка API: {data.get('error')} - {data.get('message', '')}")
+        print(f"❌ Ошибка API папки: {data.get('error')} - {data.get('message', '')}")
         return []
     
     files = []
@@ -73,7 +101,7 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
                 except Exception as e:
                     print(f"  ⚠️ Ошибка получения ссылки для {file_item['name']}: {e}")
     else:
-        print(f"⚠️ Нет _embedded или items в ответе")
+        print(f"⚠️ Нет _embedded или items в ответе папки")
     
     return files
 

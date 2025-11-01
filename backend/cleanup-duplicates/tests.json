@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "Cleanup duplicates with admin auth",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-Admin-Email": "rekrutiw@yandex.ru"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

@@ -30,6 +30,7 @@ export default function YandexDiskImport() {
   const [importing, setImporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<ImportResult | null>(null);
+  const [cleaning, setCleaning] = useState(false);
 
   const handleImport = async () => {
     setImporting(true);
@@ -75,6 +76,42 @@ export default function YandexDiskImport() {
     } finally {
       setImporting(false);
       setTimeout(() => setProgress(0), 1000);
+    }
+  };
+
+  const handleCleanupDuplicates = async () => {
+    if (!confirm('Удалить все дубликаты работ? Будут сохранены только последние версии.')) {
+      return;
+    }
+
+    setCleaning(true);
+    try {
+      const response = await fetch(func2url['cleanup-duplicates'], {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        }
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: 'Очистка завершена!',
+          description: `Удалено дубликатов: ${data.removed}`
+        });
+      } else {
+        throw new Error(data.error || 'Ошибка очистки');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка очистки',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setCleaning(false);
     }
   };
 
@@ -168,7 +205,7 @@ export default function YandexDiskImport() {
         <div className="flex gap-3">
           <Button 
             onClick={handleImport} 
-            disabled={importing || !publicKey}
+            disabled={importing || !publicKey || cleaning}
             className="flex-1"
           >
             {importing ? (
@@ -180,6 +217,24 @@ export default function YandexDiskImport() {
               <>
                 <Icon name="Download" size={18} className="mr-2" />
                 Запустить импорт
+              </>
+            )}
+          </Button>
+          
+          <Button 
+            onClick={handleCleanupDuplicates}
+            disabled={importing || cleaning}
+            variant="outline"
+          >
+            {cleaning ? (
+              <>
+                <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                Очистка...
+              </>
+            ) : (
+              <>
+                <Icon name="Trash2" size={18} className="mr-2" />
+                Удалить дубликаты
               </>
             )}
           </Button>

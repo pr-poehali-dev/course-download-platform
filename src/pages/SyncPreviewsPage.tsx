@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import func2url from '../../backend/func2url.json';
@@ -6,6 +6,7 @@ import func2url from '../../backend/func2url.json';
 export default function SyncPreviewsPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [autoStarted, setAutoStarted] = useState(false);
 
   const handleSync = async () => {
     setLoading(true);
@@ -31,6 +32,13 @@ export default function SyncPreviewsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!autoStarted) {
+      setAutoStarted(true);
+      handleSync();
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">

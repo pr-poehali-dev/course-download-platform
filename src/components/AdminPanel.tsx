@@ -37,7 +37,9 @@ interface StatData {
 export default function AdminPanel() {
   const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('admin_authenticated') === 'true';
+  });
   const [stats, setStats] = useState<StatData>({
     totalWorks: 0,
     totalUsers: 0,
@@ -86,6 +88,7 @@ export default function AdminPanel() {
   const handleLogin = () => {
     if (adminEmail === ADMIN_EMAIL && adminPassword === ADMIN_PASSWORD) {
       setIsAuthenticated(true);
+      localStorage.setItem('admin_authenticated', 'true');
       toast({
         title: 'Вход выполнен',
         description: 'Добро пожаловать в админ-панель'
@@ -97,6 +100,15 @@ export default function AdminPanel() {
         variant: 'destructive'
       });
     }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem('admin_authenticated');
+    toast({
+      title: 'Выход выполнен',
+      description: 'Вы вышли из админ-панели'
+    });
   };
 
 
@@ -158,7 +170,7 @@ export default function AdminPanel() {
         </div>
         <div className="flex gap-2">
           <ThemeToggle />
-          <Button onClick={() => setIsAuthenticated(false)} variant="outline">
+          <Button onClick={handleLogout} variant="outline">
             <Icon name="LogOut" size={18} className="mr-2" />
             Выйти
           </Button>

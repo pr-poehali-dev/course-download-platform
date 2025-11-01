@@ -24,7 +24,7 @@ export default function SyncPreviewsPage() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ limit: 5 })
+        body: JSON.stringify({ limit: 2 })
       });
 
       const data = await response.json();
@@ -37,8 +37,8 @@ export default function SyncPreviewsPage() {
         failed: prev.failed + (data.failed || 0)
       }));
       
-      // Если обработали меньше 5 работ, значит все готово
-      if (data.total_processed < 5) {
+      // Если обработали меньше 2 работ, значит все готово
+      if (data.total_processed < 2) {
         setIsComplete(true);
       } else {
         // Иначе автоматически запускаем следующую партию через 1 секунду
@@ -80,7 +80,7 @@ export default function SyncPreviewsPage() {
         <div className="bg-blue-50 border-l-4 border-primary p-4 mb-6 rounded">
           <h3 className="font-semibold text-primary mb-2">Как это работает:</h3>
           <p className="text-sm text-gray-700">
-            Функция автоматически обработает работы партиями по 5 штук. Процесс продолжится автоматически 
+            Функция автоматически обработает работы партиями по 2 штуки. Процесс продолжится автоматически 
             до тех пор, пока все работы не будут обработаны.
           </p>
         </div>

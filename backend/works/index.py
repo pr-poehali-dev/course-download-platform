@@ -262,7 +262,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur = conn.cursor()
             
             try:
-                # Удалить все работы
+                # Удалить связанные данные сначала
+                cur.execute("DELETE FROM t_p63326274_course_download_plat.work_files")
+                cur.execute("DELETE FROM t_p63326274_course_download_plat.favorites")
+                cur.execute("DELETE FROM t_p63326274_course_download_plat.reviews")
+                cur.execute("DELETE FROM t_p63326274_course_download_plat.purchases")
+                
+                # Теперь удаляем работы
                 cur.execute("DELETE FROM t_p63326274_course_download_plat.works")
                 deleted_count = cur.rowcount
                 conn.commit()

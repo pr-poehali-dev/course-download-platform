@@ -10,12 +10,51 @@ import os
 import uuid
 from typing import Dict, Any
 import psycopg2
+import boto3
+from botocore.config import Config
 
 
 def upload_file_to_storage(file_base64: str, filename: str) -> str:
     """Загрузка любого файла (изображения, PDF, документы и т.д.)"""
     ext = filename.rsplit('.', 1)[-1] if '.' in filename else 'bin'
     file_name = f"work_{uuid.uuid4().hex[:12]}.{ext}"
+    
+    # Декодируем base64
+    file_data = base64.b64decode(file_base64)
+    
+    # Настройка S3 клиента для Yandex Cloud
+    s3_client = boto3.client(
+        's3',
+        endpoint_url='https://storage.yandexcloud.net',
+        aws_access_key_id=os.environ.get('YANDEX_S3_KEY_ID', ''),
+        aws_secret_access_key=os.environ.get('YANDEX_S3_SECRET_KEY', ''),
+        region_name='ru-central1',
+        config=Config(signature_version='s3v4')
+    )
+    
+    # Определяем Content-Type
+    content_type = 'application/octet-stream'
+    ext_lower = ext.lower()
+    if ext_lower in ['jpg', 'jpeg']:
+        content_type = 'image/jpeg'
+    elif ext_lower == 'png':
+        content_type = 'image/png'
+    elif ext_lower == 'gif':
+        content_type = 'image/gif'
+    elif ext_lower == 'webp':
+        content_type = 'image/webp'
+    elif ext_lower == 'pdf':
+        content_type = 'application/pdf'
+    
+    # Загружаем файл в S3
+    s3_client.put_object(
+        Bucket='techforma-files',
+        Key=file_name,
+        Body=file_data,
+        ContentType=content_type,
+        ACL='public-read'
+    )
+    
     file_url = f"https://storage.yandexcloud.net/techforma-files/{file_name}"
     return file_url
 

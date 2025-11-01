@@ -56,11 +56,19 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
         
         print(f"🔎 Ищем папку: '{folder_name}'")
         
+        # Ищем по началу названия (папки на диске имеют суффиксы типа " (курсовая работа)")
         for item in items:
-            if item['type'] == 'dir' and item['name'] == folder_name:
-                target_folder_path = item['path']
-                print(f"✅ Найдена папка: {target_folder_path}")
-                break
+            if item['type'] == 'dir':
+                folder_name_normalized = folder_name.strip()
+                item_name_normalized = item['name'].strip()
+                
+                # Проверяем точное совпадение или совпадение с началом + пробел + скобка
+                if (item_name_normalized == folder_name_normalized or 
+                    item_name_normalized.startswith(folder_name_normalized + ' (') or
+                    item_name_normalized.startswith(folder_name_normalized + '(')):
+                    target_folder_path = item['path']
+                    print(f"✅ Найдена папка: '{item['name']}' → {target_folder_path}")
+                    break
     
     if not target_folder_path:
         print(f"❌ Папка '{folder_name}' не найдена в корне")

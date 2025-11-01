@@ -21,9 +21,12 @@ export default function PreviewGenerator() {
     setStats({ total: 0, success: 0, failed: 0 });
 
     try {
-      const response = await fetch(func2url['sync-previews'], {
+      const response = await fetch(func2url['generate-previews'], {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        },
         body: JSON.stringify({ limit: batchSize })
       });
       
@@ -77,9 +80,12 @@ export default function PreviewGenerator() {
         batchNum++;
         setCurrentBatch(batchNum);
         
-        const response = await fetch(func2url['sync-previews'], {
+        const response = await fetch(func2url['generate-previews'], {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 
+            'Content-Type': 'application/json',
+            'X-Admin-Email': 'rekrutiw@yandex.ru'
+          },
           body: JSON.stringify({ limit: BATCH_SIZE })
         });
         

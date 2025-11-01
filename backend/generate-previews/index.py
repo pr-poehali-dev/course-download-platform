@@ -1,5 +1,5 @@
 '''
-Business: Generate preview images from PDF/DOCX files on Yandex Disk
+Business: Generate preview images from PNG or PDF files on Yandex Disk
 Args: event with httpMethod POST, body with offset/limit for batch processing
 Returns: HTTP response with generation statistics
 '''
@@ -123,29 +123,41 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
     
     return files
 
-def find_main_document(files: list) -> Optional[str]:
-    """Найти основной документ (PDF или DOCX) в списке файлов"""
-    # Приоритет: ПЗ, записка, диплом, курсовая
+def find_preview_or_pdf(files: list) -> tuple[Optional[str], str]:
+    """Найти готовое превью (PNG) или PDF для генерации. Возвращает (url, type)"""
+    # Сначала ищем готовые PNG превью
+    png_files = [f for f in files if f['name'].lower().endswith('.png')]
+    
+    # Приоритет PNG файлов: preview.png, превью.png
+    for png in png_files:
+        name_lower = png['name'].lower()
+        if 'preview' in name_lower or 'превью' in name_lower:
+            print(f"  ✅ Найдено готовое PNG превью: {png['name']}")
+            return (png['download_url'], 'png')
+    
+    # Если есть любой PNG, берём его
+    if png_files:
+        print(f"  ✅ Используем PNG: {png_files[0]['name']}")
+        return (png_files[0]['download_url'], 'png')
+    
+    # Если PNG нет, ищем PDF для генерации превью
+    pdf_files = [f for f in files if f['name'].lower().endswith('.pdf')]
+    
+    # Приоритет PDF: ПЗ, записка, диплом, курсовая
     priority_keywords = ['пз', 'записка', 'диплом', 'курсовая', 'реферат']
     
-    pdf_files = [f for f in files if f['name'].lower().endswith('.pdf')]
-    docx_files = [f for f in files if f['name'].lower().endswith(('.docx', '.doc'))]
-    
-    # Ищем по приоритетным ключевым словам
     for keyword in priority_keywords:
         for pdf in pdf_files:
             if keyword in pdf['name'].lower():
-                return pdf['download_url']
+                print(f"  📄 Найден приоритетный PDF: {pdf['name']}")
+                return (pdf['download_url'], 'pdf')
     
-    # Если не нашли, берем первый PDF
+    # Берём первый доступный PDF
     if pdf_files:
-        return pdf_files[0]['download_url']
+        print(f"  📄 Используем первый PDF: {pdf_files[0]['name']}")
+        return (pdf_files[0]['download_url'], 'pdf')
     
-    # Или первый DOCX
-    if docx_files:
-        return docx_files[0]['download_url']
-    
-    return None
+    return (None, '')
 
 def generate_preview_from_pdf(download_url: str) -> Optional[bytes]:
     """Сгенерировать PNG превью из первой страницы PDF"""
@@ -263,20 +275,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not files:
                     raise Exception('Файлы не найдены в папке')
                 
-                # Находим основной документ
-                doc_url = find_main_document(files)
+                # Находим готовое превью или PDF для генерации
+                file_url, file_type = find_preview_or_pdf(files)
                 
-                if not doc_url:
-                    raise Exception('Не найден PDF/DOCX файл')
+                if not file_url:
+                    raise Exception('Не найден PNG или PDF файл')
                 
-                # Генерируем превью
-                preview_bytes = generate_preview_from_pdf(doc_url)
-                
-                if not preview_bytes:
-                    raise Exception('Не удалось сгенерировать превью')
-                
-                # Загружаем в хранилище
-                preview_url = upload_to_cloudflare(preview_bytes, f'preview_{work_id}.png')
+                # Если нашли готовый PNG, используем его напрямую
+                if file_type == 'png':
+                    print(f"  ✅ Используем готовое PNG превью")
+                    response = requests.get(file_url, timeout=30)
+                    preview_bytes = response.content
+                    preview_url = upload_to_cloudflare(preview_bytes, f'preview_{work_id}.png')
+                # Если нашли PDF, генерируем превью из него
+                elif file_type == 'pdf':
+                    print(f"  🔄 Генерируем превью из PDF")
+                    preview_bytes = generate_preview_from_pdf(file_url)
+                    if not preview_bytes:
+                        raise Exception('Не удалось сгенерировать превью из PDF')
+                    preview_url = upload_to_cloudflare(preview_bytes, f'preview_{work_id}.png')
+                else:
+                    raise Exception('Неизвестный тип файла')
                 
                 # Сохраняем URL в базу
                 safe_url = preview_url.replace("'", "''")

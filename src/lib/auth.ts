@@ -57,6 +57,23 @@ export const authService = {
   },
 
   async verify(): Promise<User | null> {
+    // Сначала проверяем, есть ли админ в localStorage
+    const isAdminAuthenticated = localStorage.getItem('admin_authenticated') === 'true';
+    if (isAdminAuthenticated) {
+      const adminUser = localStorage.getItem('user');
+      if (adminUser) {
+        try {
+          const user = JSON.parse(adminUser);
+          if (user.role === 'admin') {
+            return user;
+          }
+        } catch (e) {
+          // Игнорируем ошибку парсинга
+        }
+      }
+    }
+
+    // Если не админ, проверяем обычный токен
     const token = localStorage.getItem(TOKEN_KEY);
 
     if (!token) {

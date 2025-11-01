@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "Generate previews unauthorized",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "offset": 0,
+        "limit": 1
+      },
+      "expectedStatus": 403,
+      "expectedBody": {
+        "error": "Unauthorized"
+      }
+    }
+  ]
+}

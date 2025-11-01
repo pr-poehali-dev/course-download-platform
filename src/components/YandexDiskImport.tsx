@@ -31,6 +31,8 @@ export default function YandexDiskImport() {
   const [progress, setProgress] = useState(0);
   const [result, setResult] = useState<ImportResult | null>(null);
   const [cleaning, setCleaning] = useState(false);
+  const [generatingPreviews, setGeneratingPreviews] = useState(false);
+  const [previewProgress, setPreviewProgress] = useState(0);
 
   const handleImport = async () => {
     setImporting(true);
@@ -153,6 +155,74 @@ export default function YandexDiskImport() {
     }
   };
 
+  const handleGeneratePreviews = async () => {
+    if (!confirm('Запустить генерацию превью для всех работ без изображений? Это может занять несколько минут.')) {
+      return;
+    }
+
+    setGeneratingPreviews(true);
+    setPreviewProgress(0);
+
+    let totalProcessed = 0;
+    let totalSuccess = 0;
+    let offset = 0;
+    const limit = 10;
+
+    try {
+      let hasMore = true;
+
+      while (hasMore) {
+        const response = await fetch(func2url['generate-previews'], {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Admin-Email': 'rekrutiw@yandex.ru'
+          },
+          body: JSON.stringify({
+            offset,
+            limit,
+            public_key: publicKey
+          })
+        });
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Ошибка генерации превью');
+        }
+
+        totalProcessed += data.processed;
+        totalSuccess += data.success;
+
+        // Обновляем прогресс (примерно, т.к. не знаем общее количество)
+        const progressPercent = Math.min(95, Math.round((totalProcessed / 486) * 100));
+        setPreviewProgress(progressPercent);
+
+        console.log(`Сгенерировано превью: ${totalProcessed}, успешно: ${totalSuccess}`);
+
+        // Если обработано меньше чем лимит, значит закончились работы
+        hasMore = data.processed >= limit;
+        offset += limit;
+      }
+
+      setPreviewProgress(100);
+
+      toast({
+        title: 'Генерация завершена!',
+        description: `Обработано работ: ${totalProcessed}. Успешно: ${totalSuccess}`
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка генерации',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setGeneratingPreviews(false);
+      setTimeout(() => setPreviewProgress(0), 1000);
+    }
+  };
+
   const handleCleanupDuplicates = async () => {
     if (!confirm('Удалить дубликаты работ? Будут сохранены только первые версии.')) {
       return;
@@ -232,6 +302,16 @@ export default function YandexDiskImport() {
           </div>
         )}
 
+        {generatingPreviews && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Генерация превью...</span>
+              <span>{previewProgress}%</span>
+            </div>
+            <Progress value={previewProgress} />
+          </div>
+        )}
+
         {result && (
           <div className="space-y-4 p-4 bg-muted rounded-lg">
             <div className="grid grid-cols-2 gap-4">
@@ -282,7 +362,7 @@ export default function YandexDiskImport() {
         <div className="flex gap-3">
           <Button 
             onClick={handleImport} 
-            disabled={importing || !publicKey || cleaning}
+            disabled={importing || !publicKey || cleaning || generatingPreviews}
             className="flex-1"
           >
             {importing ? (
@@ -300,7 +380,7 @@ export default function YandexDiskImport() {
           
           <Button 
             onClick={handleCleanupDuplicates}
-            disabled={importing || cleaning}
+            disabled={importing || cleaning || generatingPreviews}
             variant="outline"
           >
             {cleaning ? (
@@ -318,7 +398,7 @@ export default function YandexDiskImport() {
 
           <Button 
             onClick={handleClearAll}
-            disabled={importing || cleaning}
+            disabled={importing || cleaning || generatingPreviews}
             variant="destructive"
           >
             {cleaning ? (
@@ -330,6 +410,27 @@ export default function YandexDiskImport() {
               <>
                 <Icon name="Trash" size={18} className="mr-2" />
                 Очистить базу
+              </>
+            )}
+          </Button>
+        </div>
+
+        <div className="border-t pt-6">
+          <Button 
+            onClick={handleGeneratePreviews}
+            disabled={importing || cleaning || generatingPreviews || !publicKey}
+            className="w-full"
+            variant="secondary"
+          >
+            {generatingPreviews ? (
+              <>
+                <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                Генерация превью... {previewProgress}%
+              </>
+            ) : (
+              <>
+                <Icon name="Image" size={18} className="mr-2" />
+                Сгенерировать превью из PDF
               </>
             )}
           </Button>

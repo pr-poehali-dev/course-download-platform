@@ -10,7 +10,7 @@ import func2url from '../../backend/func2url.json';
 export default function PreviewGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [batchSize, setBatchSize] = useState(100);
+  const [batchSize, setBatchSize] = useState(3);
   const [stats, setStats] = useState({ total: 0, success: 0, failed: 0 });
   const [currentBatch, setCurrentBatch] = useState(0);
   const [totalBatches, setTotalBatches] = useState(0);
@@ -65,7 +65,7 @@ export default function PreviewGenerator() {
     
     const cumulativeStats = { total: 0, success: 0, failed: 0 };
     let batchNum = 0;
-    const BATCH_SIZE = 100;
+    const BATCH_SIZE = 3;
     
     try {
       toast({
@@ -143,13 +143,13 @@ export default function PreviewGenerator() {
           <Input
             type="number"
             min={1}
-            max={200}
+            max={10}
             value={batchSize}
-            onChange={(e) => setBatchSize(parseInt(e.target.value) || 50)}
+            onChange={(e) => setBatchSize(parseInt(e.target.value) || 3)}
             disabled={isGenerating}
           />
           <p className="text-xs text-muted-foreground">
-            Рекомендуется: 50-100 работ за раз (быстрая синхронизация с Яндекс.Диском)
+            Рекомендуется: 3 работы за раз (чтобы избежать таймаута 30 сек)
           </p>
         </div>
 

@@ -124,21 +124,21 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
     return files
 
 def find_preview_or_pdf(files: list) -> tuple[Optional[str], str]:
-    """Найти готовое превью (PNG/JPG) или PDF для генерации. Возвращает (url, type)"""
-    # Сначала ищем готовые превью (PNG, JPG, JPEG)
-    image_files = [f for f in files if f['name'].lower().endswith(('.png', '.jpg', '.jpeg'))]
+    """Найти готовое превью (PNG) или PDF для генерации. Возвращает (url, type)"""
+    # Сначала ищем готовые PNG превью
+    png_files = [f for f in files if f['name'].lower().endswith('.png')]
     
     # Приоритет файлов с "preview" или "превью" в названии
-    for img in image_files:
-        name_lower = img['name'].lower()
+    for png in png_files:
+        name_lower = png['name'].lower()
         if 'preview' in name_lower or 'превью' in name_lower:
-            print(f"  ✅ Найдено готовое превью: {img['name']}")
-            return (img['download_url'], 'image')
+            print(f"  ✅ Найдено готовое PNG превью: {png['name']}")
+            return (png['download_url'], 'png')
     
-    # Если есть любое изображение, берём первое
-    if image_files:
-        print(f"  ✅ Используем изображение: {image_files[0]['name']}")
-        return (image_files[0]['download_url'], 'image')
+    # Если есть любой PNG, берём первый
+    if png_files:
+        print(f"  ✅ Используем PNG: {png_files[0]['name']}")
+        return (png_files[0]['download_url'], 'png')
     
     # Если PNG нет, ищем PDF для генерации превью
     pdf_files = [f for f in files if f['name'].lower().endswith('.pdf')]
@@ -279,21 +279,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 file_url, file_type = find_preview_or_pdf(files)
                 
                 if not file_url:
-                    raise Exception('Не найдено превью (PNG/JPG) или PDF файла')
+                    raise Exception('Не найден PNG или PDF файл')
                 
-                # Если нашли готовое изображение (PNG/JPG), используем его напрямую
-                if file_type == 'image':
-                    print(f"  ✅ Используем готовое превью")
+                # Если нашли готовое PNG превью, используем его напрямую
+                if file_type == 'png':
+                    print(f"  ✅ Используем готовое PNG превью")
                     response = requests.get(file_url, timeout=30)
                     preview_bytes = response.content
-                    
-                    # Конвертируем JPG в PNG если нужно
-                    img = Image.open(BytesIO(preview_bytes))
-                    if img.format == 'JPEG':
-                        output = BytesIO()
-                        img.convert('RGB').save(output, format='PNG')
-                        preview_bytes = output.getvalue()
-                    
                     preview_url = upload_to_cloudflare(preview_bytes, f'preview_{work_id}.png')
                 # Если нашли PDF, генерируем превью из него
                 elif file_type == 'pdf':

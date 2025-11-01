@@ -371,7 +371,12 @@ export default function WorkDetailPage() {
       
       // Шаг 2: Скачивание архива
       const downloadResponse = await fetch(
-        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`
+        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`,
+        {
+          headers: {
+            'X-User-Id': String(userId)
+          }
+        }
       );
       
       if (!downloadResponse.ok) {

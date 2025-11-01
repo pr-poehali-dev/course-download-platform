@@ -156,6 +156,8 @@ def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
         if not folder_data.get('_embedded') or not folder_data['_embedded'].get('items'):
             return None
         
+        fallback_image = None
+        
         for item in folder_data['_embedded']['items']:
             if item.get('type') == 'file':
                 name = item.get('name', '').lower()
@@ -181,6 +183,23 @@ def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
                     
                     if file_data.get('file'):
                         return file_data['file']
+                
+                if not fallback_image and (name.endswith('.png') or name.endswith('.jpg') or name.endswith('.jpeg')):
+                    fallback_image = item
+        
+        if fallback_image:
+            file_path = f'/{folder_name}/{fallback_image["name"]}'
+            file_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(file_path)}'
+            
+            req = urllib.request.Request(file_url)
+            with urllib.request.urlopen(req, timeout=10) as response:
+                file_data = json.loads(response.read().decode())
+            
+            if file_data.get('sizes') and len(file_data['sizes']) > 0:
+                return file_data['sizes'][0]['url']
+            
+            if file_data.get('file'):
+                return file_data['file']
         
         return None
         

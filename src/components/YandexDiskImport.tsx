@@ -113,27 +113,70 @@ export default function YandexDiskImport() {
     }
   };
 
-  const handleCleanupDuplicates = async () => {
-    if (!confirm('Удалить все дубликаты работ? Будут сохранены только последние версии.')) {
+  const handleClearAll = async () => {
+    if (!confirm('⚠️ ВНИМАНИЕ! Это удалит ВСЕ работы из базы данных. Продолжить?')) {
       return;
     }
 
     setCleaning(true);
     try {
-      const response = await fetch(func2url['cleanup-duplicates'], {
+      const response = await fetch(func2url.works, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Admin-Email': 'rekrutiw@yandex.ru'
-        }
+        },
+        body: JSON.stringify({
+          action: 'clear_all'
+        })
       });
 
       const data = await response.json();
 
       if (data.success) {
         toast({
-          title: 'Очистка завершена!',
-          description: `Удалено дубликатов: ${data.removed}`
+          title: 'База очищена!',
+          description: `Удалено работ: ${data.deleted}`
+        });
+        setResult(null);
+      } else {
+        throw new Error(data.error || 'Ошибка очистки');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка очистки',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setCleaning(false);
+    }
+  };
+
+  const handleCleanupDuplicates = async () => {
+    if (!confirm('Удалить дубликаты работ? Будут сохранены только первые версии.')) {
+      return;
+    }
+
+    setCleaning(true);
+    try {
+      const response = await fetch(func2url.works, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        },
+        body: JSON.stringify({
+          action: 'remove_duplicates'
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: 'Дубликаты удалены!',
+          description: data.message
         });
       } else {
         throw new Error(data.error || 'Ошибка очистки');
@@ -263,12 +306,30 @@ export default function YandexDiskImport() {
             {cleaning ? (
               <>
                 <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                Очистка...
+                Удаление...
               </>
             ) : (
               <>
                 <Icon name="Trash2" size={18} className="mr-2" />
                 Удалить дубликаты
+              </>
+            )}
+          </Button>
+
+          <Button 
+            onClick={handleClearAll}
+            disabled={importing || cleaning}
+            variant="destructive"
+          >
+            {cleaning ? (
+              <>
+                <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                Очистка...
+              </>
+            ) : (
+              <>
+                <Icon name="Trash" size={18} className="mr-2" />
+                Очистить базу
               </>
             )}
           </Button>

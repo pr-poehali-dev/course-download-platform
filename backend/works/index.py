@@ -257,6 +257,31 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         body_data = json.loads(event.get('body', '{}'))
         action = body_data.get('action')
         
+        if action == 'clear_all':
+            conn = get_db_connection()
+            cur = conn.cursor()
+            
+            try:
+                # Удалить все работы
+                cur.execute("DELETE FROM t_p63326274_course_download_plat.works")
+                deleted_count = cur.rowcount
+                conn.commit()
+                
+                print(f"🗑️ Удалено всех работ: {deleted_count}")
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'success': True,
+                        'deleted': deleted_count,
+                        'message': f'База очищена. Удалено работ: {deleted_count}'
+                    })
+                }
+            finally:
+                cur.close()
+                conn.close()
+        
         if action == 'remove_duplicates':
             conn = get_db_connection()
             cur = conn.cursor()

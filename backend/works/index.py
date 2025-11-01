@@ -292,11 +292,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     price_points = 150
                     
                     try:
-                        cur.execute("""
-                            INSERT INTO works (title, work_type, subject, description, composition, price_points, yandex_disk_link)
-                            VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        # Escape single quotes for SQL
+                        safe_title = title.replace("'", "''")
+                        safe_work_type = work_type.replace("'", "''")
+                        safe_subject = subject.replace("'", "''")
+                        safe_desc = description.replace("'", "''")
+                        safe_comp = composition.replace("'", "''")
+                        safe_link = yandex_disk_link.replace("'", "''")
+                        
+                        cur.execute(f"""
+                            INSERT INTO t_p63326274_course_download_plat.works (title, work_type, subject, description, composition, price_points, yandex_disk_link)
+                            VALUES ('{safe_title}', '{safe_work_type}', '{safe_subject}', '{safe_desc}', '{safe_comp}', {price_points}, '{safe_link}')
                             RETURNING id
-                        """, (title, work_type, subject, description, composition, price_points, yandex_disk_link))
+                        """)
                         
                         work_id = cur.fetchone()[0]
                         conn.commit()

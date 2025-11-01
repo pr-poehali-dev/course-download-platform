@@ -1,4 +1,5 @@
 {
+  "batch-upload-works": "https://functions.poehali.dev/e7e5a34a-b227-4c60-aae3-842f84aa97ee",
   "update-work-preview": "https://functions.poehali.dev/29bd33fc-96f3-4da2-af7c-ce84a7103573",
   "generate-previews": "https://functions.poehali.dev/3254456f-12d2-4b1e-9817-cf6a7254e57f",
   "premium": "https://functions.poehali.dev/5909592c-afca-4205-9f4e-2e0f97dd49ca",
@@ -7,8 +8,6 @@
   "toggle-favorite": "https://functions.poehali.dev/da6d749a-ed9f-4f6b-96e3-846ab6dad9cb",
   "admin-auth": "https://functions.poehali.dev/a5c7fe14-620c-4bd6-b7b7-0ce24b66f7c5",
   "auth-email": "https://functions.poehali.dev/195e0d18-1732-45c7-a76b-ab9880c8793a",
-  "upload-previews": "https://functions.poehali.dev/005ff6c5-003b-4740-867e-fa0d36afadf6",
-  "sync-previews": "https://functions.poehali.dev/c5c39645-740b-4fc3-8d3f-d4dc911fae68",
   "categories": "https://functions.poehali.dev/fe9c2ac7-b4dc-4649-a10d-c4c20015ae82",
   "favorites": "https://functions.poehali.dev/d5cc0ee3-cd85-4ed0-a57c-53253eb1300c",
   "reviews": "https://functions.poehali.dev/554b6ac8-14fe-4dc4-880b-0fa36adc2c65",

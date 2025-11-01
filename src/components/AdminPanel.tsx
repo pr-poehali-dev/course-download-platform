@@ -191,7 +191,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs defaultValue="analytics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-9">
+        <TabsList className="grid w-full grid-cols-10">
           <TabsTrigger value="analytics">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Аналитика
@@ -199,6 +199,10 @@ export default function AdminPanel() {
           <TabsTrigger value="works">
             <Icon name="FileText" size={18} className="mr-2" />
             Работы
+          </TabsTrigger>
+          <TabsTrigger value="batch-upload">
+            <Icon name="Upload" size={18} className="mr-2" />
+            Загрузка
           </TabsTrigger>
           <TabsTrigger value="previews">
             <Icon name="Image" size={18} className="mr-2" />
@@ -236,6 +240,28 @@ export default function AdminPanel() {
 
         <TabsContent value="works" className="space-y-6">
           <WorksManagement />
+        </TabsContent>
+
+        <TabsContent value="batch-upload" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="Upload" size={24} />
+                Массовая загрузка работ
+              </CardTitle>
+              <CardDescription>
+                Загрузите ZIP-архивы работ из Яндекс.Диска с автоматическим созданием превью
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button asChild className="w-full">
+                <a href="/batch-upload">
+                  <Icon name="Upload" size={18} className="mr-2" />
+                  Открыть страницу загрузки
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="previews" className="space-y-6">

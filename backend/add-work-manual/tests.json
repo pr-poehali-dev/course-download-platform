@@ -1,0 +1,37 @@
+{
+  "tests": [
+    {
+      "name": "Добавление работы с полными данными",
+      "method": "POST",
+      "body": {
+        "title": "Тестовая курсовая",
+        "description": "Описание работы",
+        "work_type": "Курсовая",
+        "subject": "Химия",
+        "price_points": 150,
+        "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+        "image_filename": "test.png"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "work_id": "number",
+        "image_url": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Ошибка без названия",
+      "method": "POST",
+      "body": {
+        "description": "Описание",
+        "image_base64": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "success": false
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

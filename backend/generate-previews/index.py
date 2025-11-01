@@ -244,11 +244,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur = conn.cursor()
     
     try:
-        # Получаем работы без превью
+        # Получаем работы без превью (исключая помеченные как NO_FILES)
         cur.execute(f"""
             SELECT id, title, yandex_disk_link
             FROM t_p63326274_course_download_plat.works
-            WHERE preview_image_url IS NULL
+            WHERE (preview_image_url IS NULL OR preview_image_url = '')
+            AND preview_image_url != 'NO_FILES'
             ORDER BY id
             LIMIT {limit} OFFSET {offset}
         """)
@@ -314,14 +315,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 print(f"✅ Превью создано для работы ID={work_id}")
                 
             except Exception as e:
+                error_msg = str(e)
                 results['failed'] += 1
                 results['errors'].append({
                     'work_id': work_id,
                     'title': title,
-                    'error': str(e)
+                    'error': error_msg
                 })
-                print(f"❌ Ошибка для работы ID={work_id}: {str(e)}")
-                conn.rollback()
+                print(f"❌ Ошибка для работы ID={work_id}: {error_msg}")
+                
+                # Если нет PNG/PDF файлов, помечаем работу чтобы больше не пытаться
+                if 'Не найден PNG или PDF файл' in error_msg or 'Файлы не найдены' in error_msg:
+                    cur.execute(f"""
+                        UPDATE t_p63326274_course_download_plat.works
+                        SET preview_image_url = 'NO_FILES'
+                        WHERE id = {work_id}
+                    """)
+                    conn.commit()
+                    print(f"  ⚠️ Пометили работу как 'нет файлов'")
+                else:
+                    conn.rollback()
         
         return {
             'statusCode': 200,

@@ -25,32 +25,42 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
     """Получить список файлов из папки на Яндекс.Диске"""
     api_url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
     
-    # Пробуем получить файлы напрямую из корня публичной ссылки
-    params = {'public_key': public_key, 'limit': 100}
+    # Получаем список файлов в конкретной папке через path
+    folder_path = f'/{folder_name}'
+    params = {
+        'public_key': public_key,
+        'path': folder_path,
+        'limit': 100
+    }
     
     response = requests.get(api_url, params=params, timeout=15)
     data = response.json()
     
     files = []
     if '_embedded' in data and 'items' in data['_embedded']:
-        # Ищем папку с названием работы
-        for item in data['_embedded']['items']:
-            if item['type'] == 'dir' and item['name'] == folder_name:
-                # Получаем содержимое папки
-                folder_public_url = item.get('public_url', '')
-                if folder_public_url:
-                    folder_response = requests.get(api_url, params={'public_key': folder_public_url, 'limit': 100}, timeout=15)
-                    folder_data = folder_response.json()
+        for file_item in data['_embedded']['items']:
+            if file_item['type'] == 'file':
+                # Получаем прямую ссылку на скачивание
+                file_path = file_item['path']
+                download_params = {
+                    'public_key': public_key,
+                    'path': file_path
+                }
+                
+                try:
+                    dl_url = f'{api_url}/download'
+                    dl_response = requests.get(dl_url, params=download_params, timeout=10)
+                    dl_data = dl_response.json()
+                    download_url = dl_data.get('href', '')
                     
-                    if '_embedded' in folder_data and 'items' in folder_data['_embedded']:
-                        for file_item in folder_data['_embedded']['items']:
-                            if file_item['type'] == 'file':
-                                files.append({
-                                    'name': file_item['name'],
-                                    'path': file_item['path'],
-                                    'download_url': file_item.get('file', '')
-                                })
-                break
+                    if download_url:
+                        files.append({
+                            'name': file_item['name'],
+                            'path': file_item['path'],
+                            'download_url': download_url
+                        })
+                except:
+                    pass
     
     return files
 

@@ -11,6 +11,7 @@ export default function PreviewGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [batchSize, setBatchSize] = useState(3);
+  const [publicKey, setPublicKey] = useState('https://disk.yandex.ru/d/dQBBqvLRShUD6A');
   const [stats, setStats] = useState({ total: 0, success: 0, failed: 0 });
   const [currentBatch, setCurrentBatch] = useState(0);
   const [totalBatches, setTotalBatches] = useState(0);
@@ -27,7 +28,7 @@ export default function PreviewGenerator() {
           'Content-Type': 'application/json',
           'X-Admin-Email': 'rekrutiw@yandex.ru'
         },
-        body: JSON.stringify({ limit: batchSize })
+        body: JSON.stringify({ limit: batchSize, public_key: publicKey })
       });
       
       const result = await response.json();
@@ -86,7 +87,7 @@ export default function PreviewGenerator() {
             'Content-Type': 'application/json',
             'X-Admin-Email': 'rekrutiw@yandex.ru'
           },
-          body: JSON.stringify({ limit: BATCH_SIZE })
+          body: JSON.stringify({ limit: BATCH_SIZE, public_key: publicKey })
         });
         
         const result = await response.json();
@@ -144,6 +145,20 @@ export default function PreviewGenerator() {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium">Публичная ссылка Яндекс.Диск</label>
+          <Input
+            type="text"
+            value={publicKey}
+            onChange={(e) => setPublicKey(e.target.value)}
+            disabled={isGenerating}
+            placeholder="https://disk.yandex.ru/d/..."
+          />
+          <p className="text-xs text-muted-foreground">
+            Ссылка на папку с работами на Яндекс.Диске
+          </p>
+        </div>
+
         <div className="space-y-2">
           <label className="text-sm font-medium">Количество работ за раз</label>
           <Input

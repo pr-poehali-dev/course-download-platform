@@ -155,7 +155,15 @@ def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
             if item.get('type') == 'file':
                 name = item.get('name', '').lower()
                 
-                if name == 'preview.png' or name == 'preview .png':
+                is_preview = (
+                    name == 'preview.png' or 
+                    name == 'preview .png' or
+                    name.startswith('preview') and name.endswith('.png') or
+                    name.startswith('превью') and name.endswith('.png') or
+                    'preview' in name and '.png' in name
+                )
+                
+                if is_preview:
                     file_path = f'/{folder_name}/{item["name"]}'
                     file_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(file_path)}'
                     

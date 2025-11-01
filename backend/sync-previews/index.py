@@ -39,7 +39,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         body_data = json.loads(event.get('body', '{}'))
-        limit = body_data.get('limit', 20)
+        limit = body_data.get('limit', 5)
         
         database_url = os.environ.get('DATABASE_URL')
         if not database_url:
@@ -73,9 +73,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             results['total_processed'] += 1
             
             try:
+                print(f"[DEBUG] Processing work_id={work_id}, title='{title}', link={yandex_link}")
                 preview_url = find_preview_in_folder(yandex_link, title)
                 
                 if preview_url:
+                    print(f"[SUCCESS] Found preview for work_id={work_id}: {preview_url}")
                     escaped_url = preview_url.replace("'", "''")
                     cursor.execute(
                         f"UPDATE t_p63326274_course_download_plat.works SET preview_image_url = '{escaped_url}' WHERE id = {work_id}"
@@ -126,7 +128,7 @@ def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
     try:
         root_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&limit=500'
         req = urllib.request.Request(root_url)
-        with urllib.request.urlopen(req, timeout=15) as response:
+        with urllib.request.urlopen(req, timeout=5) as response:
             data = json.loads(response.read().decode())
         
         if not data.get('_embedded') or not data['_embedded'].get('items'):
@@ -135,6 +137,8 @@ def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
         folder_name = None
         clean_title = work_title.strip().replace('«', '').replace('»', '').replace('"', '').replace('"', '')
         
+        print(f"[DEBUG] Searching for folder matching '{clean_title}' in {len(data['_embedded']['items'])} items")
+        
         for item in data['_embedded']['items']:
             if item.get('type') == 'dir':
                 dir_name = item.get('name', '')
@@ -142,66 +146,56 @@ def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
                 
                 if clean_title.lower() in clean_dir.lower() or clean_dir.lower() in clean_title.lower():
                     folder_name = dir_name
+                    print(f"[DEBUG] Found matching folder: '{folder_name}'")
                     break
         
         if not folder_name:
+            print(f"[ERROR] No folder found for title: '{clean_title}'")
             return None
         
         folder_path = f'/{folder_name}'
         folder_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(folder_path)}&limit=50'
         
         req = urllib.request.Request(folder_url)
-        with urllib.request.urlopen(req, timeout=15) as response:
+        with urllib.request.urlopen(req, timeout=5) as response:
             folder_data = json.loads(response.read().decode())
         
         if not folder_data.get('_embedded') or not folder_data['_embedded'].get('items'):
+            print(f"[ERROR] No items in folder '{folder_name}'")
             return None
         
-        fallback_image = None
+        items = folder_data['_embedded']['items']
+        print(f"[DEBUG] Found {len(items)} items in folder '{folder_name}'")
         
-        for item in folder_data['_embedded']['items']:
+        # Берём первый файл с превью
+        for item in items:
+            if item.get('type') == 'file' and item.get('preview'):
+                preview_url = item['preview']
+                print(f"[SUCCESS] Using preview from file: {item.get('name')}")
+                return preview_url
+        
+        # Если превью нет, ищем изображения
+        for item in items:
             if item.get('type') == 'file':
                 name = item.get('name', '').lower()
-                
-                is_preview = (
-                    name == 'preview.png' or 
-                    name == 'preview .png' or
-                    name.startswith('preview') and name.endswith('.png') or
-                    name.startswith('превью') and name.endswith('.png') or
-                    'preview' in name and '.png' in name
-                )
-                
-                if is_preview:
+                if name.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp')):
+                    # Запрашиваем полную информацию о файле
                     file_path = f'/{folder_name}/{item["name"]}'
                     file_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(file_path)}'
                     
-                    req = urllib.request.Request(file_url)
-                    with urllib.request.urlopen(req, timeout=10) as response:
-                        file_data = json.loads(response.read().decode())
-                    
-                    if file_data.get('sizes') and len(file_data['sizes']) > 0:
-                        return file_data['sizes'][0]['url']
-                    
-                    if file_data.get('file'):
-                        return file_data['file']
-                
-                if not fallback_image and (name.endswith('.png') or name.endswith('.jpg') or name.endswith('.jpeg')):
-                    fallback_image = item
+                    try:
+                        req = urllib.request.Request(file_url)
+                        with urllib.request.urlopen(req, timeout=3) as response:
+                            file_data = json.loads(response.read().decode())
+                        
+                        if file_data.get('preview'):
+                            print(f"[SUCCESS] Using image file: {item['name']}")
+                            return file_data['preview']
+                    except Exception as e:
+                        print(f"[WARN] Failed to get file info for {item['name']}: {e}")
+                        continue
         
-        if fallback_image:
-            file_path = f'/{folder_name}/{fallback_image["name"]}'
-            file_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(file_path)}'
-            
-            req = urllib.request.Request(file_url)
-            with urllib.request.urlopen(req, timeout=10) as response:
-                file_data = json.loads(response.read().decode())
-            
-            if file_data.get('sizes') and len(file_data['sizes']) > 0:
-                return file_data['sizes'][0]['url']
-            
-            if file_data.get('file'):
-                return file_data['file']
-        
+        print(f"[ERROR] No preview or image files found in folder '{folder_name}'")
         return None
         
     except Exception as e:

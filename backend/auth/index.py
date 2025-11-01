@@ -34,6 +34,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return register_user(event)
         elif path == 'login':
             return login_user(event)
+        elif path == 'reset-password':
+            return reset_password(event)
     
     if method == 'GET' and path == 'verify':
         return verify_token(event)
@@ -182,6 +184,71 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
             }
         })
     }
+
+def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
+    body_data = json.loads(event.get('body', '{}'))
+    token = body_data.get('token', '').strip()
+    new_password = body_data.get('password', '')
+    
+    if not token or not new_password:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Укажите токен и новый пароль'})
+        }
+    
+    if len(new_password) < 6:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Пароль должен быть минимум 6 символов'})
+        }
+    
+    secret = os.environ.get('JWT_SECRET')
+    
+    try:
+        payload = jwt.decode(token, secret, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+        reset_purpose = payload.get('purpose')
+        
+        if reset_purpose != 'password_reset':
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Неверный токен сброса'})
+            }
+        
+        password_hash = hash_password(new_password)
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute(
+            "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s WHERE id = %s",
+            (password_hash, user_id)
+        )
+        conn.commit()
+        
+        cur.close()
+        conn.close()
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'message': 'Пароль успешно изменён'})
+        }
+    except jwt.ExpiredSignatureError:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Ссылка для сброса пароля истекла'})
+        }
+    except jwt.InvalidTokenError:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Неверная ссылка для сброса пароля'})
+        }
 
 def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
     headers = event.get('headers', {})

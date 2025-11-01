@@ -13,6 +13,34 @@ export default function SyncPreviewsPage() {
     failed: 0
   });
   const [isComplete, setIsComplete] = useState(false);
+  const [fullSyncMode, setFullSyncMode] = useState(false);
+
+  const handleFullSync = async () => {
+    setLoading(true);
+    setResult(null);
+    setFullSyncMode(true);
+
+    try {
+      const response = await fetch(func2url['sync-previews-auto'], {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      setResult(data);
+      setIsComplete(true);
+    } catch (error: any) {
+      setResult({
+        success: false,
+        error: error.message
+      });
+      setIsComplete(true);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSync = async () => {
     setLoading(true);
@@ -60,7 +88,6 @@ export default function SyncPreviewsPage() {
   useEffect(() => {
     if (!autoStarted) {
       setAutoStarted(true);
-      handleSync();
     }
   }, []);
 
@@ -77,12 +104,38 @@ export default function SyncPreviewsPage() {
           </p>
         </div>
 
-        <div className="bg-blue-50 border-l-4 border-primary p-4 mb-6 rounded">
-          <h3 className="font-semibold text-primary mb-2">Как это работает:</h3>
-          <p className="text-sm text-gray-700">
-            Функция автоматически обработает работы партиями по 2 штуки. Процесс продолжится автоматически 
-            до тех пор, пока все работы не будут обработаны.
-          </p>
+        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6 rounded">
+          <h3 className="font-semibold text-yellow-800 mb-2">🚀 Выберите режим синхронизации:</h3>
+          <div className="space-y-3 mt-3">
+            <Button 
+              onClick={handleFullSync}
+              disabled={loading}
+              className="w-full bg-purple-600 hover:bg-purple-700"
+              size="lg"
+            >
+              {loading && fullSyncMode ? (
+                <>
+                  <Icon name="Loader2" className="mr-2 h-5 w-5 animate-spin" />
+                  Полная синхронизация... (5-10 минут)
+                </>
+              ) : (
+                <>
+                  <Icon name="Zap" className="mr-2 h-5 w-5" />
+                  Полная синхронизация (все 432 работы за раз)
+                </>
+              )}
+            </Button>
+            <Button 
+              onClick={handleSync}
+              disabled={loading}
+              className="w-full"
+              size="lg"
+              variant="outline"
+            >
+              <Icon name="RefreshCw" className="mr-2 h-5 w-5" />
+              Партиями по 2 (медленнее, но надёжнее)
+            </Button>
+          </div>
         </div>
 
         {!isComplete && (
@@ -99,7 +152,21 @@ export default function SyncPreviewsPage() {
           </div>
         )}
 
-        {isComplete && (
+{isComplete && fullSyncMode && result && result.success && (
+          <div className="mb-6 p-4 bg-green-100 border-l-4 border-green-600 rounded">
+            <div className="flex items-center gap-2">
+              <Icon name="CheckCircle2" className="text-green-600" size={24} />
+              <div>
+                <h3 className="font-semibold text-green-900">✅ Полная синхронизация завершена!</h3>
+                <p className="text-sm text-green-700 mt-1">
+                  Всего работ: {result.total_works || 0} | Обновлено: {result.updated_count || 0} | Пропущено: {result.skipped_count || 0}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isComplete && !fullSyncMode && (
           <div className="mb-6 p-4 bg-green-100 border-l-4 border-green-600 rounded">
             <div className="flex items-center gap-2">
               <Icon name="CheckCircle2" className="text-green-600" size={24} />
@@ -113,39 +180,7 @@ export default function SyncPreviewsPage() {
           </div>
         )}
 
-        {isComplete ? (
-          <Button 
-            onClick={() => {
-              setTotalStats({ total: 0, success: 0, failed: 0 });
-              setIsComplete(false);
-              handleSync();
-            }}
-            className="w-full h-14 text-lg"
-            size="lg"
-          >
-            <Icon name="RefreshCw" className="mr-2 h-5 w-5" />
-            Запустить заново
-          </Button>
-        ) : (
-          <Button 
-            onClick={handleSync} 
-            disabled={loading}
-            className="w-full h-14 text-lg"
-            size="lg"
-          >
-            {loading ? (
-              <>
-                <Icon name="Loader2" className="mr-2 h-5 w-5 animate-spin" />
-                Синхронизация...
-              </>
-            ) : (
-              <>
-                <Icon name="Rocket" className="mr-2 h-5 w-5" />
-                Запустить синхронизацию
-              </>
-            )}
-          </Button>
-        )}
+
 
         {result && (
           <div className="mt-6 p-6 rounded-lg border bg-blue-50 border-blue-200">

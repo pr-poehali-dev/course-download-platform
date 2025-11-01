@@ -257,6 +257,38 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         body_data = json.loads(event.get('body', '{}'))
         action = body_data.get('action')
         
+        if action == 'remove_duplicates':
+            conn = get_db_connection()
+            cur = conn.cursor()
+            
+            try:
+                # Найти и удалить дубликаты, оставив только самые ранние записи
+                cur.execute("""
+                    DELETE FROM t_p63326274_course_download_plat.works
+                    WHERE id NOT IN (
+                        SELECT MIN(id)
+                        FROM t_p63326274_course_download_plat.works
+                        GROUP BY title
+                    )
+                """)
+                deleted_count = cur.rowcount
+                conn.commit()
+                
+                print(f"🗑️ Удалено дубликатов: {deleted_count}")
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'success': True,
+                        'deleted': deleted_count,
+                        'message': f'Удалено дубликатов: {deleted_count}'
+                    })
+                }
+            finally:
+                cur.close()
+                conn.close()
+        
         if action == 'import':
             public_key = body_data.get('public_key')
             offset = body_data.get('offset', 0)

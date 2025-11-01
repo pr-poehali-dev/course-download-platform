@@ -33,11 +33,21 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
         'limit': 100
     }
     
+    print(f"🔍 Запрос к Яндекс.Диску: {api_url} with path={folder_path}")
+    
     response = requests.get(api_url, params=params, timeout=15)
     data = response.json()
     
+    print(f"📦 Ответ от Яндекс.Диска: status={response.status_code}")
+    
+    if 'error' in data:
+        print(f"❌ Ошибка API: {data.get('error')} - {data.get('message', '')}")
+        return []
+    
     files = []
     if '_embedded' in data and 'items' in data['_embedded']:
+        print(f"📁 Найдено файлов в папке: {len(data['_embedded']['items'])}")
+        
         for file_item in data['_embedded']['items']:
             if file_item['type'] == 'file':
                 # Получаем прямую ссылку на скачивание
@@ -59,8 +69,11 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
                             'path': file_item['path'],
                             'download_url': download_url
                         })
-                except:
-                    pass
+                        print(f"  ✅ Файл: {file_item['name']}")
+                except Exception as e:
+                    print(f"  ⚠️ Ошибка получения ссылки для {file_item['name']}: {e}")
+    else:
+        print(f"⚠️ Нет _embedded или items в ответе")
     
     return files
 

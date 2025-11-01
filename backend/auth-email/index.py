@@ -8,8 +8,7 @@ Version: 1.0.1
 import json
 import os
 import psycopg2
-import hashlib
-import secrets
+import jwt
 import requests
 from datetime import datetime, timedelta
 from typing import Dict, Any
@@ -116,18 +115,19 @@ def send_password_reset(email: str) -> Dict[str, Any]:
     
     user_id, username = user
     
-    reset_token = secrets.token_urlsafe(32)
-    reset_hash = hashlib.sha256(reset_token.encode()).hexdigest()
-    expires_at = datetime.utcnow() + timedelta(hours=24)
-    
-    cur.execute('''
-        INSERT INTO t_p63326274_course_download_plat.password_resets (user_id, token_hash, expires_at)
-        VALUES (%s, %s, %s)
-    ''', (user_id, reset_hash, expires_at))
-    conn.commit()
-    
     cur.close()
     conn.close()
+    
+    secret = os.environ.get('JWT_SECRET')
+    reset_token = jwt.encode(
+        {
+            'user_id': user_id,
+            'purpose': 'password_reset',
+            'exp': datetime.utcnow() + timedelta(hours=24)
+        },
+        secret,
+        algorithm='HS256'
+    )
     
     reset_url = f'https://techforma.pro/reset-password?token={reset_token}'
     

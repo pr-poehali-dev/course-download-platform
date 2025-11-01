@@ -110,6 +110,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             yandex_link = work_result[1] or work_result[2] or public_key
             folder_path = work_result[3]
             
+            print(f"[DEBUG] Work found: title={title}, folder_path={folder_path}, yandex_link={yandex_link}")
+            
             if not folder_path:
                 return {
                     'statusCode': 404,
@@ -128,16 +130,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Получаем содержимое папки работы
         folder_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(yandex_link)}&path={urllib.parse.quote(folder_path_full)}&limit=100"
         
+        print(f"[DEBUG] Requesting Yandex Disk: {folder_url}")
+        
         req = urllib.request.Request(folder_url)
         with urllib.request.urlopen(req, timeout=10) as resp:
             folder_data = json.loads(resp.read().decode())
+            print(f"[DEBUG] Yandex response status: {resp.status}")
         
         # Создаем ZIP архив в памяти
         zip_buffer = BytesIO()
         
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
             if '_embedded' in folder_data and 'items' in folder_data['_embedded']:
-                for file_item in folder_data['_embedded']['items']:
+                items = folder_data['_embedded']['items']
+                print(f"[DEBUG] Found {len(items)} items in folder")
+                
+                for file_item in items:
                     file_name = file_item.get('name', '')
                     
                     # Пропускаем превью
@@ -163,8 +171,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         zip_buffer.seek(0)
         zip_data = zip_buffer.read()
         
+        print(f"[DEBUG] Created ZIP archive: {len(zip_data)} bytes")
+        
         # Кодируем в base64 для передачи
         zip_base64 = base64.b64encode(zip_data).decode('utf-8')
+        print(f"[DEBUG] Base64 encoded: {len(zip_base64)} chars")
         
         # Безопасное имя файла для архива
         safe_name = ''.join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in folder_path[:50])

@@ -400,14 +400,19 @@ export default function WorkDetailPage() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       
-      // Обновляем баланс пользователя в localStorage
-      user.balance = purchaseData.newBalance;
-      localStorage.setItem('user', JSON.stringify(user));
+      // Обновляем баланс пользователя в localStorage (если не админ)
+      if (user.role !== 'admin') {
+        user.balance = purchaseData.newBalance;
+        localStorage.setItem('user', JSON.stringify(user));
+      }
       
-      alert(purchaseData.alreadyPurchased 
-        ? 'Работа уже была куплена ранее. Начинается скачивание...' 
-        : `Покупка успешна! Списано ${work.price} баллов. Новый баланс: ${purchaseData.newBalance}`
-      );
+      const message = purchaseData.isAdmin 
+        ? 'Скачивание началось (бесплатно для админа)' 
+        : purchaseData.alreadyPurchased 
+          ? 'Работа уже была куплена ранее. Начинается скачивание...' 
+          : `Покупка успешна! Списано ${work.price} баллов. Новый баланс: ${purchaseData.newBalance}`;
+      
+      alert(message);
       
     } catch (error) {
       console.error('Purchase/Download error:', error);

@@ -92,10 +92,10 @@ export default function AdminPanel() {
       
       // Сохраняем админа как пользователя для общей системы авторизации
       const adminUser = {
-        id: 1,
+        id: 999999,
         username: 'admin',
         email: ADMIN_EMAIL,
-        balance: 999999,
+        balance: 999999999,
         referral_code: 'ADMIN',
         role: 'admin'
       };

@@ -34,11 +34,18 @@ export default function WorkDetailPage() {
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [loadingPdfPreview, setLoadingPdfPreview] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [showUploadButton, setShowUploadButton] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       const user = await authService.verify();
       setIsLoggedIn(!!user);
+      
+      // Проверяем, является ли пользователь админом
+      if (user && user.role === 'admin') {
+        setShowUploadButton(true);
+      }
     };
     checkAuth();
   }, []);
@@ -448,6 +455,53 @@ export default function WorkDetailPage() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !workId) return;
+
+    setUploadingImage(true);
+
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64Image = (reader.result as string).split(',')[1];
+
+        const UPDATE_PREVIEW_URL = func2url['update-work-preview'];
+        const response = await fetch(UPDATE_PREVIEW_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            work_id: workId,
+            image_base64: base64Image,
+            image_filename: file.name
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setGallery([data.image_url]);
+          setSelectedImage(0);
+          
+          if (work) {
+            setWork({ ...work, previewUrl: data.image_url });
+          }
+          
+          alert('✅ Фото успешно загружено!');
+        } else {
+          alert('❌ Ошибка: ' + data.error);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert('❌ Ошибка загрузки');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -536,6 +590,41 @@ export default function WorkDetailPage() {
                   <Icon name="FileText" className="text-indigo-400 mb-4" size={80} />
                   <span className="text-lg font-medium text-gray-700">{work.workType}</span>
                   <span className="text-sm text-gray-500 mt-2">{work.subject}</span>
+                </div>
+              )}
+
+              {showUploadButton && (
+                <div className="mt-4">
+                  <label className="cursor-pointer">
+                    <Button 
+                      type="button"
+                      variant="outline"
+                      disabled={uploadingImage}
+                      className="w-full"
+                      asChild
+                    >
+                      <span>
+                        {uploadingImage ? (
+                          <>
+                            <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />
+                            Загрузка...
+                          </>
+                        ) : (
+                          <>
+                            <Icon name="Upload" className="mr-2 h-4 w-4" />
+                            📸 Загрузить фото для этой работы
+                          </>
+                        )}
+                      </span>
+                    </Button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                  </label>
                 </div>
               )}
             </div>

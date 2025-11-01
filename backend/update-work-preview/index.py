@@ -1,7 +1,7 @@
 '''
-Business: Добавление работы в каталог через ручную загрузку фото
-Args: event с POST body (title, description, work_type, subject, price_points, image_base64, image_filename)
-Returns: {success, work_id, image_url} или {success: false, error}
+Business: Обновление превью работы через загрузку фото
+Args: event с POST body (work_id, image_base64, image_filename)
+Returns: {success, image_url} или {success: false, error}
 '''
 
 import json
@@ -10,7 +10,6 @@ import os
 import uuid
 from typing import Dict, Any
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 
 def upload_image_to_storage(image_base64: str, filename: str) -> str:
@@ -44,19 +43,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     body_data = json.loads(event.get('body', '{}'))
     
-    title = body_data.get('title', '').strip()
-    description = body_data.get('description', '').strip()
-    work_type = body_data.get('work_type', '').strip()
-    subject = body_data.get('subject', '').strip()
-    price_points = body_data.get('price_points', 0)
+    work_id = body_data.get('work_id')
     image_base64 = body_data.get('image_base64', '')
     image_filename = body_data.get('image_filename', 'image.jpg')
     
-    if not title or not image_base64:
+    if not work_id or not image_base64:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'success': False, 'error': 'Название и фото обязательны'})
+            'body': json.dumps({'success': False, 'error': 'work_id и image_base64 обязательны'})
         }
     
     image_url = upload_image_to_storage(image_base64, image_filename)
@@ -64,25 +59,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     database_url = os.environ.get('DATABASE_URL', '')
     
     conn = psycopg2.connect(database_url)
-    cursor = conn.cursor(cursor_factory=RealDictCursor)
+    cursor = conn.cursor()
     
-    insert_query = """
-        INSERT INTO works (
-            title, description, work_type, subject, price_points, 
-            preview_image_url, status, author_id, category_id,
-            created_at, updated_at, rating, downloads, views_count
-        ) VALUES (
-            %s, %s, %s, %s, %s,
-            %s, 'active', 1, 1,
-            NOW(), NOW(), 0, 0, 0
-        ) RETURNING id
+    update_query = """
+        UPDATE works 
+        SET preview_image_url = %s, updated_at = NOW()
+        WHERE id = %s
     """
     
-    cursor.execute(insert_query, (
-        title, description, work_type, subject, price_points, image_url
-    ))
-    
-    work_id = cursor.fetchone()['id']
+    cursor.execute(update_query, (image_url, work_id))
     
     conn.commit()
     cursor.close()
@@ -96,7 +81,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         },
         'body': json.dumps({
             'success': True,
-            'work_id': work_id,
             'image_url': image_url
         })
     }

@@ -12,11 +12,12 @@ from typing import Dict, Any
 import psycopg2
 
 
-def upload_image_to_storage(image_base64: str, filename: str) -> str:
-    ext = filename.rsplit('.', 1)[-1] if '.' in filename else 'jpg'
-    image_name = f"work_{uuid.uuid4().hex[:12]}.{ext}"
-    image_url = f"https://storage.yandexcloud.net/techforma-images/{image_name}"
-    return image_url
+def upload_file_to_storage(file_base64: str, filename: str) -> str:
+    """Загрузка любого файла (изображения, PDF, документы и т.д.)"""
+    ext = filename.rsplit('.', 1)[-1] if '.' in filename else 'bin'
+    file_name = f"work_{uuid.uuid4().hex[:12]}.{ext}"
+    file_url = f"https://storage.yandexcloud.net/techforma-files/{file_name}"
+    return file_url
 
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -54,7 +55,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'success': False, 'error': 'work_id и image_base64 обязательны'})
         }
     
-    image_url = upload_image_to_storage(image_base64, image_filename)
+    file_url = upload_file_to_storage(image_base64, image_filename)
     
     database_url = os.environ.get('DATABASE_URL', '')
     
@@ -67,7 +68,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         WHERE id = %s
     """
     
-    cursor.execute(update_query, (image_url, work_id))
+    cursor.execute(update_query, (file_url, work_id))
     
     conn.commit()
     cursor.close()
@@ -81,6 +82,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         },
         'body': json.dumps({
             'success': True,
-            'image_url': image_url
+            'image_url': file_url
         })
     }

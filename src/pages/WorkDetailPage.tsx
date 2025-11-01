@@ -612,14 +612,14 @@ export default function WorkDetailPage() {
                         ) : (
                           <>
                             <Icon name="Upload" className="mr-2 h-4 w-4" />
-                            📸 Загрузить фото для этой работы
+                            📎 Загрузить файл для работы
                           </>
                         )}
                       </span>
                     </Button>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt"
                       onChange={handleImageUpload}
                       className="hidden"
                       disabled={uploadingImage}

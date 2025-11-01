@@ -94,7 +94,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             balance = result[0]
             
-            if balance < price:
+            # Проверяем роль пользователя (админ пропускает проверку баланса)
+            cur.execute(
+                "SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s",
+                (user_id,)
+            )
+            role_result = cur.fetchone()
+            user_role = role_result[0] if role_result else None
+            
+            is_admin = (user_role == 'admin')
+            
+            if not is_admin and balance < price:
                 conn.rollback()
                 return {
                     'statusCode': 400,
@@ -126,11 +136,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            # Списываем баллы
-            cur.execute(
-                "UPDATE t_p63326274_course_download_plat.users SET balance = balance - %s WHERE id = %s",
-                (price, user_id)
-            )
+            # Списываем баллы (только если не админ)
+            if not is_admin:
+                cur.execute(
+                    "UPDATE t_p63326274_course_download_plat.users SET balance = balance - %s WHERE id = %s",
+                    (price, user_id)
+                )
             
             # Создаём запись о покупке
             commission = int(price * 0.1)
@@ -185,8 +196,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
                     'success': True,
-                    'newBalance': balance - price,
-                    'message': 'Purchase successful'
+                    'newBalance': balance if is_admin else balance - price,
+                    'message': 'Purchase successful',
+                    'isAdmin': is_admin
                 }),
                 'isBase64Encoded': False
             }

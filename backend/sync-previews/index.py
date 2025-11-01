@@ -52,7 +52,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cursor.execute(f'''
             SELECT id, title, yandex_disk_link 
             FROM t_p63326274_course_download_plat.works 
-            WHERE preview_image_url IS NULL AND yandex_disk_link IS NOT NULL
+            WHERE yandex_disk_link IS NOT NULL 
+            AND (preview_image_url IS NULL OR preview_image_url LIKE 'data:image%%')
             LIMIT {limit}
         ''')
         
@@ -117,30 +118,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 def find_preview_in_folder(public_link: str, work_title: str) -> Optional[str]:
     try:
-        folder_path = '/' + work_title
-        subfolder_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&path={urllib.parse.quote(folder_path)}&limit=50'
-        
-        try:
-            req = urllib.request.Request(subfolder_url)
-            with urllib.request.urlopen(req, timeout=10) as response:
-                data = json.loads(response.read().decode())
-            
-            if data.get('_embedded') and data['_embedded'].get('items'):
-                for item in data['_embedded']['items']:
-                    if item.get('type') == 'file':
-                        name = item.get('name', '').lower()
-                        file_url = item.get('file')
-                        
-                        if not file_url:
-                            continue
-                        
-                        if name == 'preview.png':
-                            return file_url
-                        
-                        if name.startswith('preview') and (name.endswith('.png') or name.endswith('.jpg') or name.endswith('.jpeg')):
-                            return file_url
-        except:
-            pass
         
         root_url = f'{API_BASE}?public_key={urllib.parse.quote(public_link)}&limit=100'
         req = urllib.request.Request(root_url)

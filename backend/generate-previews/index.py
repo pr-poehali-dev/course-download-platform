@@ -249,7 +249,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             SELECT id, title, yandex_disk_link
             FROM t_p63326274_course_download_plat.works
             WHERE (preview_image_url IS NULL OR preview_image_url = '')
-            AND preview_image_url != 'NO_FILES'
+            AND COALESCE(preview_image_url, '') != 'NO_FILES'
             ORDER BY id
             LIMIT {limit} OFFSET {offset}
         """)

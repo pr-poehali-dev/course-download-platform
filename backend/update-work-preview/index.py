@@ -48,14 +48,14 @@ def upload_file_to_storage(file_base64: str, filename: str) -> str:
     
     # Загружаем файл в S3
     s3_client.put_object(
-        Bucket='techforma-files',
+        Bucket='kyra',
         Key=file_name,
         Body=file_data,
         ContentType=content_type,
         ACL='public-read'
     )
     
-    file_url = f"https://storage.yandexcloud.net/techforma-files/{file_name}"
+    file_url = f"https://storage.yandexcloud.net/kyra/{file_name}"
     return file_url
 
 

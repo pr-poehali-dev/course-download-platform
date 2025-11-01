@@ -7,6 +7,12 @@ export default function SyncPreviewsPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [autoStarted, setAutoStarted] = useState(false);
+  const [totalStats, setTotalStats] = useState({
+    total: 0,
+    success: 0,
+    failed: 0
+  });
+  const [isComplete, setIsComplete] = useState(false);
 
   const handleSync = async () => {
     setLoading(true);
@@ -18,16 +24,34 @@ export default function SyncPreviewsPage() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ limit: 1000 })
+        body: JSON.stringify({ limit: 20 })
       });
 
       const data = await response.json();
       setResult(data);
+      
+      // Обновляем общую статистику
+      setTotalStats(prev => ({
+        total: prev.total + (data.total_processed || 0),
+        success: prev.success + (data.success || 0),
+        failed: prev.failed + (data.failed || 0)
+      }));
+      
+      // Если обработали меньше 20 работ, значит все готово
+      if (data.total_processed < 20) {
+        setIsComplete(true);
+      } else {
+        // Иначе автоматически запускаем следующую партию через 2 секунды
+        setTimeout(() => {
+          handleSync();
+        }, 2000);
+      }
     } catch (error: any) {
       setResult({
         success: false,
         error: error.message
       });
+      setIsComplete(true);
     } finally {
       setLoading(false);
     }
@@ -56,29 +80,72 @@ export default function SyncPreviewsPage() {
         <div className="bg-blue-50 border-l-4 border-primary p-4 mb-6 rounded">
           <h3 className="font-semibold text-primary mb-2">Как это работает:</h3>
           <p className="text-sm text-gray-700">
-            Функция автоматически пройдется по всем работам без превью, найдет соответствующие папки 
-            на Яндекс.Диске, извлечет первое найденное изображение и привяжет его к работе в базе данных.
+            Функция автоматически обработает работы партиями по 20 штук. Процесс продолжится автоматически 
+            до тех пор, пока все работы не будут обработаны.
           </p>
         </div>
 
-        <Button 
-          onClick={handleSync} 
-          disabled={loading}
-          className="w-full h-14 text-lg"
-          size="lg"
-        >
-          {loading ? (
-            <>
-              <Icon name="Loader2" className="mr-2 h-5 w-5 animate-spin" />
-              Синхронизация...
-            </>
-          ) : (
-            <>
-              <Icon name="Rocket" className="mr-2 h-5 w-5" />
-              Запустить синхронизацию
-            </>
-          )}
-        </Button>
+        {!isComplete && (
+          <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded">
+            <div className="flex items-center gap-2">
+              <Icon name="Loader2" className="animate-spin text-green-600" size={20} />
+              <div>
+                <h3 className="font-semibold text-green-900">Обработка в процессе...</h3>
+                <p className="text-sm text-green-700 mt-1">
+                  Обработано: {totalStats.total} | Успешно: {totalStats.success} | Ошибок: {totalStats.failed}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isComplete && (
+          <div className="mb-6 p-4 bg-green-100 border-l-4 border-green-600 rounded">
+            <div className="flex items-center gap-2">
+              <Icon name="CheckCircle2" className="text-green-600" size={24} />
+              <div>
+                <h3 className="font-semibold text-green-900">✅ Синхронизация завершена!</h3>
+                <p className="text-sm text-green-700 mt-1">
+                  Всего обработано: {totalStats.total} | Успешно: {totalStats.success} | Ошибок: {totalStats.failed}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isComplete ? (
+          <Button 
+            onClick={() => {
+              setTotalStats({ total: 0, success: 0, failed: 0 });
+              setIsComplete(false);
+              handleSync();
+            }}
+            className="w-full h-14 text-lg"
+            size="lg"
+          >
+            <Icon name="RefreshCw" className="mr-2 h-5 w-5" />
+            Запустить заново
+          </Button>
+        ) : (
+          <Button 
+            onClick={handleSync} 
+            disabled={loading}
+            className="w-full h-14 text-lg"
+            size="lg"
+          >
+            {loading ? (
+              <>
+                <Icon name="Loader2" className="mr-2 h-5 w-5 animate-spin" />
+                Синхронизация...
+              </>
+            ) : (
+              <>
+                <Icon name="Rocket" className="mr-2 h-5 w-5" />
+                Запустить синхронизацию
+              </>
+            )}
+          </Button>
+        )}
 
         {result && (
           <div className="mt-6 p-6 rounded-lg border bg-blue-50 border-blue-200">

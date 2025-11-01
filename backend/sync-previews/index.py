@@ -39,7 +39,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         body_data = json.loads(event.get('body', '{}'))
-        limit = body_data.get('limit', 1000)
+        limit = body_data.get('limit', 20)
         
         database_url = os.environ.get('DATABASE_URL')
         if not database_url:
@@ -54,6 +54,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             FROM t_p63326274_course_download_plat.works 
             WHERE yandex_disk_link IS NOT NULL 
             AND (preview_image_url IS NULL OR preview_image_url LIKE 'data:image%%')
+            ORDER BY id
             LIMIT {limit}
         ''')
         

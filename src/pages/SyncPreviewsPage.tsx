@@ -17,7 +17,7 @@ export default function SyncPreviewsPage() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ limit: 50 })
+        body: JSON.stringify({ limit: 1000 })
       });
 
       const data = await response.json();
@@ -73,55 +73,61 @@ export default function SyncPreviewsPage() {
         </Button>
 
         {result && (
-          <div className={`mt-6 p-6 rounded-lg border ${
-            result.success 
-              ? 'bg-green-50 border-green-200' 
-              : 'bg-red-50 border-red-200'
-          }`}>
+          <div className="mt-6 p-6 rounded-lg border bg-blue-50 border-blue-200">
             <div className="flex items-start gap-3">
               <Icon 
-                name={result.success ? "CheckCircle2" : "XCircle"} 
-                className={result.success ? "text-green-600" : "text-red-600"}
+                name="Database" 
+                className="text-blue-600"
                 size={24}
               />
               <div className="flex-1">
-                <h3 className={`font-semibold mb-2 ${
-                  result.success ? 'text-green-900' : 'text-red-900'
-                }`}>
-                  {result.success ? 'Синхронизация завершена!' : 'Ошибка синхронизации'}
+                <h3 className="font-semibold mb-3 text-blue-900">
+                  Результаты синхронизации
                 </h3>
                 
-                {result.success && (
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between py-2 border-b border-green-200">
-                      <span className="text-gray-700">Всего работ без превью:</span>
-                      <span className="font-bold text-green-900">{result.total_works}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-green-200">
-                      <span className="text-gray-700">Обновлено превью:</span>
-                      <span className="font-bold text-green-900">{result.updated_count}</span>
-                    </div>
-                    <div className="flex justify-between py-2">
-                      <span className="text-gray-700">Пропущено:</span>
-                      <span className="font-bold text-green-900">{result.skipped_count}</span>
-                    </div>
-                    
-                    {result.errors && result.errors.length > 0 && (
-                      <div className="mt-4 pt-4 border-t border-green-200">
-                        <p className="font-semibold text-gray-700 mb-2">Ошибки:</p>
-                        <div className="text-xs text-gray-600 space-y-1 max-h-40 overflow-y-auto">
-                          {result.errors.slice(0, 10).map((error: string, i: number) => (
-                            <div key={i}>{error}</div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2 border-b border-blue-200">
+                    <span className="text-gray-700">Всего обработано:</span>
+                    <span className="font-bold text-blue-900">{result.total_processed || 0}</span>
                   </div>
-                )}
-
-                {!result.success && result.error && (
-                  <p className="text-sm text-red-700">{result.error}</p>
-                )}
+                  <div className="flex justify-between py-2 border-b border-green-200 bg-green-50 px-2 -mx-2 rounded">
+                    <span className="text-gray-700">✅ Успешно синхронизировано:</span>
+                    <span className="font-bold text-green-900">{result.success || 0}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-red-200 bg-red-50 px-2 -mx-2 rounded">
+                    <span className="text-gray-700">❌ Ошибки:</span>
+                    <span className="font-bold text-red-900">{result.failed || 0}</span>
+                  </div>
+                  
+                  {result.success_items && result.success_items.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-blue-200">
+                      <p className="font-semibold text-green-700 mb-2">✅ Успешно ({result.success_items.length}):</p>
+                      <div className="text-xs text-gray-600 space-y-1 max-h-40 overflow-y-auto">
+                        {result.success_items.map((item: any, i: number) => (
+                          <div key={i} className="py-1">
+                            <span className="font-mono text-blue-600">#{item.work_id}</span> — {item.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {result.errors && result.errors.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-red-200">
+                      <p className="font-semibold text-red-700 mb-2">❌ Ошибки ({result.errors.length}):</p>
+                      <div className="text-xs text-gray-600 space-y-2 max-h-60 overflow-y-auto">
+                        {result.errors.map((error: any, i: number) => (
+                          <div key={i} className="bg-red-50 p-2 rounded border border-red-100">
+                            <div className="font-semibold">
+                              <span className="font-mono text-red-600">#{error.work_id}</span> — {error.title}
+                            </div>
+                            <div className="text-red-600 mt-1">{error.error}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>

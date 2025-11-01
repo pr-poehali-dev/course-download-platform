@@ -39,7 +39,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         body_data = json.loads(event.get('body', '{}'))
-        limit = body_data.get('limit', 100)
+        limit = body_data.get('limit', 1000)
         
         database_url = os.environ.get('DATABASE_URL')
         if not database_url:
@@ -63,7 +63,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'total_processed': 0,
             'success': 0,
             'failed': 0,
-            'errors': []
+            'errors': [],
+            'success_items': []
         }
         
         for work in works:
@@ -80,6 +81,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     )
                     conn.commit()
                     results['success'] += 1
+                    results['success_items'].append({
+                        'work_id': work_id,
+                        'title': title
+                    })
                 else:
                     results['failed'] += 1
                     results['errors'].append({

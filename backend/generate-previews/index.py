@@ -45,8 +45,18 @@ def get_files_from_yandex_folder(public_key: str, folder_name: str) -> list:
     # Ищем нужную папку по названию
     target_folder_path = None
     if '_embedded' in root_data and 'items' in root_data['_embedded']:
-        print(f"📁 Папок в корне: {len(root_data['_embedded']['items'])}")
-        for item in root_data['_embedded']['items']:
+        items = root_data['_embedded']['items']
+        print(f"📁 Папок в корне: {len(items)}")
+        
+        # Выводим первые 5 папок для отладки
+        print(f"🔎 Первые папки:")
+        for i, item in enumerate(items[:5]):
+            if item['type'] == 'dir':
+                print(f"  {i+1}. '{item['name']}'")
+        
+        print(f"🔎 Ищем папку: '{folder_name}'")
+        
+        for item in items:
             if item['type'] == 'dir' and item['name'] == folder_name:
                 target_folder_path = item['path']
                 print(f"✅ Найдена папка: {target_folder_path}")

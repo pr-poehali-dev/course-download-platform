@@ -269,8 +269,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             try:
                 print(f"📄 Обрабатываю работу ID={work_id}: {title}")
                 
+                # Используем ссылку из БД или дефолтную
+                disk_key = yandex_link if yandex_link else public_key
+                print(f"  🔗 Используем ссылку: {disk_key}")
+                
                 # Получаем файлы из папки
-                files = get_files_from_yandex_folder(public_key, title)
+                files = get_files_from_yandex_folder(disk_key, title)
                 
                 if not files:
                     raise Exception('Файлы не найдены в папке')

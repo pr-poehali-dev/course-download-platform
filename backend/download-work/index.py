@@ -7,11 +7,8 @@ Returns: ZIP-архив с файлами работы
 import json
 import os
 import urllib.request
-import urllib.parse
-import zipfile
-from io import BytesIO
 import base64
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 try:
     import psycopg2
@@ -93,7 +90,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             cur.execute(
-                "SELECT title, yandex_disk_link, file_url, folder_path FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                "SELECT title, download_url, file_url FROM t_p63326274_course_download_plat.works WHERE id = %s",
                 (work_id,)
             )
             work_result = cur.fetchone()
@@ -107,16 +104,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             title = work_result[0]
-            yandex_link = work_result[1] or work_result[2] or public_key
-            folder_path = work_result[3]
+            download_url = work_result[1] or work_result[2]
             
-            print(f"[DEBUG] Work found: title={title}, folder_path={folder_path}, yandex_link={yandex_link}")
+            print(f"[DEBUG] Work found: title={title}, download_url={download_url}")
             
-            if not folder_path:
+            if not download_url:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Folder path not found. Please re-import works.'}),
+                    'body': json.dumps({'error': 'Download URL not found for this work.'}),
                     'isBase64Encoded': False
                 }
             
@@ -124,70 +120,41 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.close()
             conn.close()
         
-        # Формируем путь к папке (folder_path уже содержит полное имя папки)
-        folder_path_full = '/' + folder_path
+        # Скачиваем файл напрямую с Yandex Cloud Storage
+        print(f"[DEBUG] Downloading file from: {download_url}")
         
-        # Получаем содержимое папки работы
-        folder_url = f"https://cloud-api.yandex.net/v1/disk/public/resources?public_key={urllib.parse.quote(yandex_link)}&path={urllib.parse.quote(folder_path_full)}&limit=100"
-        
-        print(f"[DEBUG] Requesting Yandex Disk: {folder_url}")
-        
-        req = urllib.request.Request(folder_url)
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            folder_data = json.loads(resp.read().decode())
-            print(f"[DEBUG] Yandex response status: {resp.status}")
-        
-        # Создаем ZIP архив в памяти
-        zip_buffer = BytesIO()
-        
-        with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
-            if '_embedded' in folder_data and 'items' in folder_data['_embedded']:
-                items = folder_data['_embedded']['items']
-                print(f"[DEBUG] Found {len(items)} items in folder")
-                
-                for file_item in items:
-                    file_name = file_item.get('name', '')
-                    
-                    # Пропускаем превью
-                    if 'preview' in file_name.lower():
-                        continue
-                    
-                    # Получаем ссылку на скачивание файла
-                    download_url = get_download_url(yandex_link, folder_path_full + '/' + file_name)
-                    
-                    if download_url:
-                        try:
-                            # Скачиваем файл
-                            file_data = download_file(download_url)
-                            
-                            # Добавляем в архив
-                            zip_file.writestr(file_name, file_data)
-                            print(f"[DEBUG] Added file to archive: {file_name} ({len(file_data)} bytes)")
-                        except Exception as e:
-                            print(f"[ERROR] Failed to download file {file_name}: {e}")
-                            continue
-        
-        # Получаем содержимое архива
-        zip_buffer.seek(0)
-        zip_data = zip_buffer.read()
-        
-        print(f"[DEBUG] Created ZIP archive: {len(zip_data)} bytes")
+        req = urllib.request.Request(download_url)
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            file_data = resp.read()
+            print(f"[DEBUG] Downloaded file: {len(file_data)} bytes")
         
         # Кодируем в base64 для передачи
-        zip_base64 = base64.b64encode(zip_data).decode('utf-8')
-        print(f"[DEBUG] Base64 encoded: {len(zip_base64)} chars")
+        file_base64 = base64.b64encode(file_data).decode('utf-8')
+        print(f"[DEBUG] Base64 encoded: {len(file_base64)} chars")
         
-        # Безопасное имя файла для архива
-        safe_name = ''.join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in folder_path[:50])
+        # Безопасное имя файла
+        safe_name = ''.join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in title[:50])
+        
+        # Определяем тип файла по расширению URL
+        file_extension = 'rar'
+        if download_url:
+            if download_url.lower().endswith('.zip'):
+                file_extension = 'zip'
+            elif download_url.lower().endswith('.rar'):
+                file_extension = 'rar'
+            elif download_url.lower().endswith('.7z'):
+                file_extension = '7z'
+        
+        content_type = 'application/x-rar-compressed' if file_extension == 'rar' else 'application/zip'
         
         return {
             'statusCode': 200,
             'headers': {
-                'Content-Type': 'application/zip',
-                'Content-Disposition': f'attachment; filename="{safe_name}.zip"',
+                'Content-Type': content_type,
+                'Content-Disposition': f'attachment; filename="{safe_name}.{file_extension}"',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': zip_base64,
+            'body': file_base64,
             'isBase64Encoded': True
         }
         
@@ -199,21 +166,3 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': f'Download failed: {str(e)}'}),
             'isBase64Encoded': False
         }
-
-
-def get_download_url(public_key: str, file_path: str) -> Optional[str]:
-    try:
-        download_url = f"https://cloud-api.yandex.net/v1/disk/public/resources/download?public_key={urllib.parse.quote(public_key)}&path={urllib.parse.quote(file_path)}"
-        req = urllib.request.Request(download_url)
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            data = json.loads(resp.read().decode())
-            return data.get('href')
-    except Exception as e:
-        print(f"[ERROR] Error getting download URL: {type(e).__name__}: {str(e)}")
-        return None
-
-
-def download_file(url: str) -> bytes:
-    req = urllib.request.Request(url)
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        return resp.read()

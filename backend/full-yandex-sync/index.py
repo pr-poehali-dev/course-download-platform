@@ -217,21 +217,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             insert_query = """
                 INSERT INTO works (
-                    title, work_type, category, description,
-                    preview_image_url, download_url,
-                    price, year, pages,
+                    title, work_type, subject, category, description,
+                    preview_image_url, download_url, file_url,
+                    price, price_points, year, pages,
                     universities, specializations, keywords
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             
             cursor.execute(insert_query, (
                 work['title'],
                 work['work_type'],
+                metadata['category'],  # subject - обязательное поле
                 metadata['category'],
                 metadata['description'],
                 preview_url,
                 download_url,
+                download_url,  # file_url - ссылка на файл
                 metadata['price'],
+                metadata['price'],  # price_points - цена в баллах (обязательное)
                 metadata['year'],
                 metadata['pages'],
                 json.dumps(metadata['universities'], ensure_ascii=False),

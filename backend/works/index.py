@@ -216,7 +216,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             else:
                 # Пагинация и фильтрация
-                limit = int(query_params.get('limit', 20))
+                # Увеличен лимит до 1000 для отображения всех работ в каталоге
+                limit = int(query_params.get('limit', 1000))
                 offset = int(query_params.get('offset', 0))
                 category = query_params.get('category')
                 search = query_params.get('search')

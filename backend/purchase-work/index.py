@@ -76,28 +76,31 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             db_work_id = work_result[0]
             
-            # Проверяем баланс пользователя
-            cur.execute(
-                "SELECT balance FROM t_p63326274_course_download_plat.users WHERE id = %s",
-                (user_id,)
-            )
-            result = cur.fetchone()
-            
-            if not result:
-                conn.rollback()
-                return {
-                    'statusCode': 404,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'User not found'}),
-                    'isBase64Encoded': False
-                }
-            
-            balance = result[0]
-            
-            # Проверяем является ли пользователь администратором
-            # ID 999999 - это хардкод админ из фронтенда
+            # СНАЧАЛА проверяем является ли пользователь администратором
+            # ID 999999 - это хардкод админ из фронтенда (AdminPanel.tsx:95)
             is_admin = (int(user_id) == 999999)
             
+            # Для не-админов проверяем баланс
+            balance = 0
+            if not is_admin:
+                cur.execute(
+                    "SELECT balance FROM t_p63326274_course_download_plat.users WHERE id = %s",
+                    (user_id,)
+                )
+                result = cur.fetchone()
+                
+                if not result:
+                    conn.rollback()
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'User not found'}),
+                        'isBase64Encoded': False
+                    }
+                
+                balance = result[0]
+            
+            # Проверяем баланс только для не-админов
             if not is_admin and balance < price:
                 conn.rollback()
                 return {

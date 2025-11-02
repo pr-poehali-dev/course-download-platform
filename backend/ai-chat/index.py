@@ -195,7 +195,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             {'role': 'system', 'content': system_prompt}
         ]
         
-        for msg in messages:
+        # Берем только последние 10 сообщений для контекста (экономим токены и время)
+        recent_messages = messages[-10:] if len(messages) > 10 else messages
+        
+        for msg in recent_messages:
             role = msg.get('role', 'user')
             content = msg.get('content', '')
             if role in ['user', 'assistant']:

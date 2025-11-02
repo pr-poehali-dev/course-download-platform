@@ -10,12 +10,13 @@ import os
 import uuid
 import tempfile
 import zipfile
-import rarfile
 import urllib.request
+import urllib.parse
 from typing import Dict, Any, List
 import psycopg2
 import boto3
 from botocore.config import Config
+from unrar import rarfile
 
 
 def upload_file_to_storage(file_base64: str, filename: str) -> str:
@@ -67,8 +68,14 @@ def extract_images_from_archive(archive_url: str, work_id: int, work_title: str)
     """Извлечь PNG изображения из архива и загрузить в S3"""
     print(f"[DEBUG] Downloading archive from: {archive_url}")
     
+    # URL-кодируем путь, чтобы поддержать кириллицу и пробелы
+    parsed = urllib.parse.urlparse(archive_url)
+    encoded_path = urllib.parse.quote(parsed.path.encode('utf-8'))
+    safe_url = f"{parsed.scheme}://{parsed.netloc}{encoded_path}"
+    print(f"[DEBUG] Encoded URL: {safe_url}")
+    
     with tempfile.NamedTemporaryFile(delete=False, suffix='.archive') as tmp_archive:
-        req = urllib.request.Request(archive_url, headers={'User-Agent': 'Mozilla/5.0'})
+        req = urllib.request.Request(safe_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=60) as response:
             tmp_archive.write(response.read())
         tmp_archive_path = tmp_archive.name
@@ -76,28 +83,25 @@ def extract_images_from_archive(archive_url: str, work_id: int, work_title: str)
     png_files = []
     
     try:
+        # Пробуем ZIP
         with zipfile.ZipFile(tmp_archive_path, 'r') as archive:
             for file_info in archive.namelist():
                 if file_info.lower().endswith('.png'):
                     png_data = archive.read(file_info)
-                    png_files.append({
-                        'name': os.path.basename(file_info),
-                        'data': png_data
-                    })
+                    png_files.append({'name': os.path.basename(file_info), 'data': png_data})
                     print(f"[DEBUG] Found PNG in ZIP: {file_info}")
     except zipfile.BadZipFile:
+        # Если не ZIP, пробуем RAR
         try:
-            with rarfile.RarFile(tmp_archive_path, 'r') as archive:
+            print(f"[DEBUG] Trying RAR extraction")
+            with rarfile.RarFile(tmp_archive_path) as archive:
                 for file_info in archive.namelist():
                     if file_info.lower().endswith('.png'):
                         png_data = archive.read(file_info)
-                        png_files.append({
-                            'name': os.path.basename(file_info),
-                            'data': png_data
-                        })
+                        png_files.append({'name': os.path.basename(file_info), 'data': png_data})
                         print(f"[DEBUG] Found PNG in RAR: {file_info}")
         except Exception as e:
-            print(f"[ERROR] Failed to open as RAR: {e}")
+            print(f"[ERROR] Failed to extract RAR: {e}")
     
     os.unlink(tmp_archive_path)
     

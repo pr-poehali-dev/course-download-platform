@@ -148,7 +148,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             plan = pricing[sub_type]
             
-            cur.execute("SELECT points FROM users WHERE id = %s", (user_id,))
+            cur.execute("SELECT balance FROM t_p63326274_course_download_plat.users WHERE id = %s", (user_id,))
             user_row = cur.fetchone()
             
             if not user_row or user_row[0] < plan['points']:
@@ -181,8 +181,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             new_sub_id = cur.fetchone()[0]
             
             cur.execute("""
-                UPDATE users 
-                SET points = points - %s 
+                UPDATE t_p63326274_course_download_plat.users 
+                SET balance = balance - %s 
                 WHERE id = %s
             """, (plan['points'], user_id))
             

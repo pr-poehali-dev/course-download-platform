@@ -272,11 +272,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'work_type': row[2],
                         'subject': row[3],
                         'preview': row[4][:150] + '...' if row[4] and len(row[4]) > 150 else (row[4] or ''),
-                        'price': row[5],
+                        'price_points': row[5],
                         'rating': float(row[6]) if row[6] else 0,
                         'downloads': row[7] or 0,
                         'category': row[8],
-                        'preview_image': row[9]
+                        'preview_image_url': row[9]
                     }
                     works.append(work)
                 

@@ -176,12 +176,13 @@ export default function CatalogPage() {
   }, []);
 
   useEffect(() => {
-    const CACHE_KEY = 'catalog_works_cache_v4';
+    const CACHE_KEY = 'catalog_works_cache_v5';
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
     
     localStorage.removeItem('catalog_works_cache');
     localStorage.removeItem('catalog_works_cache_v2');
     localStorage.removeItem('catalog_works_cache_v3');
+    localStorage.removeItem('catalog_works_cache_v4');
 
     const loadFromCache = (): Work[] | null => {
       try {

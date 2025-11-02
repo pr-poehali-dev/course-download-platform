@@ -1,6 +1,8 @@
 import json
 import os
 import sys
+import psycopg2
+from datetime import datetime
 from typing import Dict, Any
 
 if sys.stdout.encoding != 'utf-8':
@@ -9,8 +11,8 @@ if sys.stdout.encoding != 'utf-8':
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: AI chat assistant for student work adaptation
-    Args: event with httpMethod, body containing messages array
+    Business: AI chat assistant for student work adaptation with subscription check
+    Args: event with httpMethod, headers with X-User-Id, body containing messages array
     Returns: HTTP response with AI assistant reply
     '''
     method: str = event.get('httpMethod', 'POST')
@@ -37,11 +39,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Method not allowed'})
         }
     
+    headers = event.get('headers', {})
+    user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+    
+    if not user_id:
+        return {
+            'statusCode': 401,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json.dumps({'error': 'User not authenticated'})
+        }
+    
     try:
         body = event.get('body') or '{}'
         body_data = json.loads(body) if body else {}
         messages = body_data.get('messages', [])
         file_content = body_data.get('file_content', '')
+        file_name = body_data.get('file_name', '')
         
         if not messages:
             return {
@@ -51,6 +67,70 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Access-Control-Allow-Origin': '*'
                 },
                 'body': json.dumps({'error': 'Messages array is required'})
+            }
+        
+        database_url = os.environ.get('DATABASE_URL')
+        if not database_url:
+            return {
+                'statusCode': 500,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'error': 'Database not configured'})
+            }
+        
+        conn = psycopg2.connect(database_url)
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT id, subscription_type, requests_total, requests_used, expires_at
+            FROM ai_subscriptions
+            WHERE user_id = %s AND is_active = true
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (user_id,))
+        
+        sub_row = cur.fetchone()
+        
+        if not sub_row:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 403,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'error': 'No active subscription'})
+            }
+        
+        sub_id, sub_type, total_requests, used_requests, expires_at = sub_row
+        
+        if expires_at and datetime.now() > expires_at:
+            cur.execute("UPDATE ai_subscriptions SET is_active = false WHERE id = %s", (sub_id,))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 403,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'error': 'Subscription expired'})
+            }
+        
+        if total_requests > 0 and used_requests >= total_requests:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 403,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'error': 'Request limit reached'})
             }
         
         openai_api_key = os.environ.get('OPENAI_API_KEY', '')
@@ -121,6 +201,29 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         )
         
         assistant_message = response.choices[0].message.content
+        total_tokens = response.usage.total_tokens
+        
+        user_content = messages[-1].get('content', '') if messages else ''
+        
+        cur.execute("""
+            INSERT INTO ai_chat_history (user_id, subscription_id, role, content, file_name, tokens_used)
+            VALUES (%s, %s, 'user', %s, %s, 0)
+        """, (user_id, sub_id, user_content, file_name if file_name else None))
+        
+        cur.execute("""
+            INSERT INTO ai_chat_history (user_id, subscription_id, role, content, tokens_used)
+            VALUES (%s, %s, 'assistant', %s, %s)
+        """, (user_id, sub_id, assistant_message, total_tokens))
+        
+        cur.execute("""
+            UPDATE ai_subscriptions
+            SET requests_used = requests_used + 1
+            WHERE id = %s
+        """, (sub_id,))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
         
         return {
             'statusCode': 200,
@@ -134,7 +237,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'usage': {
                     'prompt_tokens': response.usage.prompt_tokens,
                     'completion_tokens': response.usage.completion_tokens,
-                    'total_tokens': response.usage.total_tokens
+                    'total_tokens': total_tokens
                 }
             })
         }

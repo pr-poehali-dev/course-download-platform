@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
+import AISubscriptionModal from '@/components/AISubscriptionModal';
 import func2url from '../../backend/func2url.json';
 
 interface Message {
@@ -17,19 +18,29 @@ interface Message {
 }
 
 interface Subscription {
+  id?: number;
   type: 'none' | 'single' | 'monthly' | 'yearly';
-  expiresAt?: Date;
+  requestsTotal?: number;
+  requestsUsed?: number;
   requestsLeft?: number;
+  expiresAt?: string;
+  createdAt?: string;
+  price?: number;
 }
 
 export default function AIAssistantPage() {
   const { toast } = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userPoints, setUserPoints] = useState(0);
 
   useEffect(() => {
     const checkAuth = async () => {
       const user = await authService.verify();
       setIsLoggedIn(!!user);
+      if (user) {
+        loadSubscription();
+        loadUserData();
+      }
     };
     checkAuth();
   }, []);
@@ -58,6 +69,46 @@ export default function AIAssistantPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  const loadSubscription = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(func2url['ai-subscription'], {
+        headers: {
+          'X-User-Id': token || ''
+        }
+      });
+      const data = await response.json();
+      
+      if (data.hasSubscription && data.subscription) {
+        setSubscription({
+          ...data.subscription,
+          type: data.subscription.type
+        });
+      } else {
+        setSubscription({ type: 'none' });
+      }
+    } catch (error) {
+      console.error('Failed to load subscription:', error);
+    }
+  };
+
+  const loadUserData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(func2url['user-data'], {
+        headers: {
+          'X-User-Id': token || ''
+        }
+      });
+      const data = await response.json();
+      if (data.points !== undefined) {
+        setUserPoints(data.points);
+      }
+    } catch (error) {
+      console.error('Failed to load user data:', error);
+    }
+  };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -91,7 +142,7 @@ export default function AIAssistantPage() {
       return;
     }
 
-    if (subscription.type === 'single' && subscription.requestsLeft === 0) {
+    if (subscription.type === 'single' && subscription.requestsLeft !== undefined && subscription.requestsLeft <= 0) {
       toast({
         title: 'Запросы закончились',
         description: 'Разовый доступ исчерпан. Оформите подписку для продолжения.',
@@ -135,14 +186,17 @@ export default function AIAssistantPage() {
         });
       }
 
+      const token = localStorage.getItem('token');
       const response = await fetch(func2url['ai-chat'], {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'X-User-Id': token || ''
         },
         body: JSON.stringify({
           messages: chatHistory,
-          file_content: fileContent || undefined
+          file_content: fileContent || undefined,
+          file_name: currentFile?.name || undefined
         })
       });
 
@@ -160,13 +214,8 @@ export default function AIAssistantPage() {
       };
       
       setMessages(prev => [...prev, assistantMessage]);
-
-      if (subscription.type === 'single' && subscription.requestsLeft) {
-        setSubscription(prev => ({
-          ...prev,
-          requestsLeft: (prev.requestsLeft || 0) - 1
-        }));
-      }
+      
+      loadSubscription();
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -583,6 +632,16 @@ export default function AIAssistantPage() {
           </Card>
         </div>
       )}
+
+      <AISubscriptionModal
+        open={showPricingModal}
+        onClose={() => setShowPricingModal(false)}
+        onSubscribe={() => {
+          loadSubscription();
+          loadUserData();
+        }}
+        userPoints={userPoints}
+      />
     </div>
   );
 }

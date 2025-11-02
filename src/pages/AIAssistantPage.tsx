@@ -61,6 +61,7 @@ export default function AIAssistantPage() {
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [showQuickQuestions, setShowQuickQuestions] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -169,8 +170,24 @@ export default function AIAssistantPage() {
     }
   };
 
+  const quickQuestions = [
+    { icon: 'FileEdit', text: 'Как переформулировать введение?', color: 'bg-blue-50 hover:bg-blue-100 border-blue-200' },
+    { icon: 'CheckCircle', text: 'Проверь текст на ошибки', color: 'bg-green-50 hover:bg-green-100 border-green-200' },
+    { icon: 'BookOpen', text: 'Адаптируй под ГОСТ', color: 'bg-purple-50 hover:bg-purple-100 border-purple-200' },
+    { icon: 'RefreshCw', text: 'Как повысить уникальность?', color: 'bg-orange-50 hover:bg-orange-100 border-orange-200' },
+    { icon: 'FileText', text: 'Помоги с оформлением списка литературы', color: 'bg-pink-50 hover:bg-pink-100 border-pink-200' },
+    { icon: 'Lightbulb', text: 'Подскажи идеи для заключения', color: 'bg-yellow-50 hover:bg-yellow-100 border-yellow-200' }
+  ];
+
+  const handleQuickQuestion = (question: string) => {
+    setInputValue(question);
+    setShowQuickQuestions(false);
+    textareaRef.current?.focus();
+  };
+
   const handleSendMessage = async () => {
     if (!inputValue.trim() && !attachedFile) return;
+    setShowQuickQuestions(false);
 
     if (subscription.type === 'none') {
       setShowPricingModal(true);
@@ -317,6 +334,25 @@ export default function AIAssistantPage() {
           <div className="lg:col-span-3">
             <Card className="h-[calc(100vh-280px)] flex flex-col">
               <CardContent className="flex-1 overflow-y-auto p-6 space-y-4">
+                {showQuickQuestions && messages.length === 1 && (
+                  <div className="space-y-3 mb-6">
+                    <p className="text-sm text-muted-foreground font-medium">Быстрые вопросы:</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {quickQuestions.map((q, idx) => (
+                        <Button
+                          key={idx}
+                          variant="outline"
+                          className={`justify-start text-left h-auto py-3 px-4 ${q.color}`}
+                          onClick={() => handleQuickQuestion(q.text)}
+                          disabled={subscription.type === 'none'}
+                        >
+                          <Icon name={q.icon as any} size={18} className="mr-2 flex-shrink-0" />
+                          <span className="text-sm">{q.text}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {messages.map((message) => (
                   <div
                     key={message.id}

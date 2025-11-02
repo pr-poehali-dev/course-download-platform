@@ -142,21 +142,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Request limit reached'})
                 }
         
-        openai_api_key = os.environ.get('OPENAI_API_KEY', '')
+        gigachat_credentials = os.environ.get('GIGACHAT_CREDENTIALS', '')
         
-        if not openai_api_key:
+        if not gigachat_credentials:
             return {
                 'statusCode': 500,
                 'headers': {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps({'error': 'OpenAI API key not configured'})
+                'body': json.dumps({'error': 'GigaChat credentials not configured'})
             }
         
-        from openai import OpenAI
+        from gigachat import GigaChat
         
-        client = OpenAI(api_key=openai_api_key)
+        gigachat_credentials = gigachat_credentials.strip()
+        
+        client = GigaChat(
+            credentials=gigachat_credentials,
+            verify_ssl_certs=False
+        )
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.
 
@@ -208,15 +213,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{safe_content}\n=== END OF FILE ==="
                     break
         
-        response = client.chat.completions.create(
-            model='gpt-4o-mini',
-            messages=api_messages,
-            temperature=0.7,
-            max_tokens=800
-        )
+        payload = {
+            'messages': api_messages,
+            'temperature': 0.7,
+            'max_tokens': 800
+        }
+        response = client.chat(payload)
         
         assistant_message = response.choices[0].message.content
-        total_tokens = response.usage.total_tokens if hasattr(response.usage, 'total_tokens') else 0
+        total_tokens = response.usage.total_tokens if hasattr(response, 'usage') else 0
         
         user_content = messages[-1].get('content', '') if messages else ''
         

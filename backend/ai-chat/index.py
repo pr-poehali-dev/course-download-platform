@@ -11,7 +11,7 @@ if sys.stdout.encoding != 'utf-8':
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: AI chat assistant for student work adaptation with subscription check
+    Business: AI chat assistant for student work adaptation with subscription check and file upload support
     Args: event with httpMethod, headers with X-User-Id, body containing messages array
     Returns: HTTP response with AI assistant reply
     '''

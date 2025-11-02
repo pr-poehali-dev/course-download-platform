@@ -156,12 +156,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         import openai
         
-        client = openai.OpenAI(
-            api_key=openai_api_key,
-            default_headers={
-                'User-Agent': 'CourseDownloadPlatform/1.0'
-            }
-        )
+        client = openai.OpenAI(api_key=openai_api_key)
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.
 
@@ -211,14 +206,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     break
         
         print(f"DEBUG: Sending {len(api_messages)} messages to OpenAI", file=sys.stderr)
-        print(f"DEBUG: Model: gpt-4o-mini", file=sys.stderr)
+        print(f"DEBUG: First message role: {api_messages[0]['role']}", file=sys.stderr)
+        print(f"DEBUG: First message length: {len(api_messages[0]['content'])}", file=sys.stderr)
         
-        response = client.chat.completions.create(
-            model='gpt-4o-mini',
-            messages=api_messages,
-            temperature=0.7,
-            max_tokens=800
-        )
+        try:
+            response = client.chat.completions.create(
+                model='gpt-4o-mini',
+                messages=api_messages,
+                temperature=0.7,
+                max_tokens=800
+            )
+        except UnicodeEncodeError as ue:
+            print(f"UnicodeError details: {ue}", file=sys.stderr)
+            print(f"Problem string: {ue.object[max(0, ue.start-20):ue.end+20]}", file=sys.stderr)
+            raise
         
         assistant_message = response.choices[0].message.content
         total_tokens = response.usage.total_tokens

@@ -114,7 +114,7 @@ export default function UploadWorkPage() {
           </Button>
 
           <h1 className="text-4xl font-bold mb-2">Загрузить работу</h1>
-          <p className="text-muted-foreground">Поделитесь своей работой и начните зарабатывать баллы</p>
+          <p className="text-muted-foreground">Поделитесь своей работой и получайте баллы для покупок</p>
         </div>
 
         <form onSubmit={handleCheckBeforeSubmit} className="space-y-6">

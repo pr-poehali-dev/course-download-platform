@@ -33,8 +33,8 @@ export default function AuthorMarketplacePage() {
     },
     {
       icon: 'Zap',
-      title: 'Быстрые выплаты',
-      description: 'Выводите заработок сразу после продажи работы'
+      title: 'Баллы для покупок',
+      description: 'Тратьте заработанные баллы на работы других авторов'
     },
     {
       icon: 'Users',
@@ -77,8 +77,8 @@ export default function AuthorMarketplacePage() {
     },
     {
       step: 4,
-      title: 'Получайте деньги',
-      description: 'Работа появится в каталоге, вы получаете 90% с каждой продажи'
+      title: 'Получайте баллы',
+      description: 'Работа появится в каталоге, вы получаете 90% баллов с каждой продажи'
     }
   ];
 
@@ -92,8 +92,8 @@ export default function AuthorMarketplacePage() {
             Продавайте свои студенческие работы
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Зарабатывайте на готовых курсовых, дипломах и контрольных. 
-            Получайте 90% с каждой продажи — честные условия для авторов.
+            Загружайте готовые курсовые, дипломы и контрольные — получайте баллы для покупки работ других авторов. 
+            90% баллов с каждой продажи остаются у вас!
           </p>
           <div className="flex gap-4 justify-center">
             <Button 
@@ -174,10 +174,10 @@ export default function AuthorMarketplacePage() {
 
         <Card className="p-12 text-center bg-gradient-to-r from-blue-50 to-indigo-50 border-2">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Готовы начать зарабатывать?
+            Готовы начать обмен работами?
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Загрузите свою первую работу прямо сейчас и начните получать пассивный доход
+            Загрузите свою работу прямо сейчас — получайте баллы и покупайте работы других студентов!
           </p>
           <Button 
             size="lg"

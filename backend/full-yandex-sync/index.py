@@ -186,25 +186,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     conn = psycopg2.connect(database_url)
     cursor = conn.cursor()
     
-    # Удаляем зависимости перед удалением работ (только существующие таблицы)
-    try:
-        cursor.execute("DELETE FROM purchases")
-    except:
-        pass
-    try:
-        cursor.execute("DELETE FROM work_comments")
-    except:
-        pass
-    try:
-        cursor.execute("DELETE FROM work_ratings")
-    except:
-        pass
-    cursor.execute("DELETE FROM works")
+    # Получаем существующие работы чтобы не дублировать
+    cursor.execute("SELECT title FROM works")
+    existing_titles = {row[0] for row in cursor.fetchall()}
     
     synced = 0
+    skipped = 0
     
     for folder in folders:
         try:
+            # Пропускаем если работа уже есть в базе
+            if folder['title'] in existing_titles:
+                skipped += 1
+                continue
+            
             files = get_folder_files(s3_client, bucket_name, folder['folder_path'])
             
             pdf_file = next((f for f in files if f['name'].lower().endswith('.pdf')), None)
@@ -265,7 +260,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'body': json.dumps({
             'success': True,
             'total_works': len(folders),
-            'synced': synced
+            'synced': synced,
+            'skipped': skipped
         }, ensure_ascii=False),
         'isBase64Encoded': False
     }

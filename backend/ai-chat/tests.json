@@ -8,13 +8,15 @@
       "expectedBody": ""
     },
     {
-      "name": "Test POST without messages",
+      "name": "Test POST without auth",
       "method": "POST",
       "path": "/",
-      "body": {},
-      "expectedStatus": 400,
+      "body": {
+        "messages": [{"role": "user", "content": "test"}]
+      },
+      "expectedStatus": 401,
       "expectedBody": {
-        "error": "Messages array is required"
+        "error": "User not authenticated"
       }
     }
   ]

@@ -206,8 +206,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             for i in range(len(api_messages) - 1, -1, -1):
                 if api_messages[i]['role'] == 'user':
                     file_label = "UPLOADED FILE"
-                    api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{file_content[:15000]}\n=== END OF FILE ==="
+                    safe_content = file_content[:15000].encode('utf-8', errors='ignore').decode('utf-8')
+                    api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{safe_content}\n=== END OF FILE ==="
                     break
+        
+        print(f"DEBUG: Sending {len(api_messages)} messages to OpenAI", file=sys.stderr)
+        print(f"DEBUG: Model: gpt-4o-mini", file=sys.stderr)
         
         response = client.chat.completions.create(
             model='gpt-4o-mini',

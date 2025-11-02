@@ -9,6 +9,7 @@ import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
+import func2url from '../../backend/func2url.json';
 
 interface UserProfile {
   name: string;
@@ -61,6 +62,64 @@ export default function ProfilePage() {
     registrationDate: ''
   });
   const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
+
+  const DOWNLOAD_WORK_URL = func2url['download-work'];
+  const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
+
+  const handleDownloadPurchase = async (workId: number, workTitle: string) => {
+    setDownloadingId(workId);
+    
+    try {
+      const userData = await authService.verify();
+      if (!userData) {
+        alert('Необходимо войти в систему');
+        return;
+      }
+
+      const downloadResponse = await fetch(
+        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`,
+        {
+          headers: {
+            'X-User-Id': String(userData.id)
+          }
+        }
+      );
+      
+      if (!downloadResponse.ok) {
+        throw new Error('Ошибка скачивания');
+      }
+      
+      const downloadData = await downloadResponse.json();
+      
+      try {
+        const fileResponse = await fetch(downloadData.download_url);
+        const blob = await fileResponse.blob();
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = downloadData.filename || `${workTitle.substring(0, 50)}.rar`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        toast({
+          title: '✅ Скачивание началось',
+          description: 'Файл сохранится в папку "Загрузки"'
+        });
+      } catch (fetchError) {
+        window.location.href = downloadData.download_url;
+      }
+      
+    } catch (error) {
+      console.error('Download error:', error);
+      alert(error instanceof Error ? error.message : 'Ошибка при скачивании');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -475,19 +534,14 @@ export default function ProfilePage() {
                           </span>
                         </div>
                       </div>
-                      {purchase.yandexDiskLink ? (
-                        <Button size="sm" asChild>
-                          <a href={purchase.yandexDiskLink} target="_blank" rel="noopener noreferrer">
-                            <Icon name="Download" size={16} className="mr-2" />
-                            Скачать с Яндекс.Диска
-                          </a>
-                        </Button>
-                      ) : (
-                        <Button size="sm" disabled>
-                          <Icon name="Download" size={16} className="mr-2" />
-                          Ссылка недоступна
-                        </Button>
-                      )}
+                      <Button 
+                        size="sm" 
+                        onClick={() => handleDownloadPurchase(purchase.id, purchase.workTitle)}
+                        disabled={downloadingId === purchase.id}
+                      >
+                        <Icon name="Download" size={16} className="mr-2" />
+                        {downloadingId === purchase.id ? 'Скачивание...' : 'Скачать работу'}
+                      </Button>
                     </div>
                   ))}
                 </div>

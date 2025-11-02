@@ -13,13 +13,7 @@ from botocore.config import Config
 import io
 import zipfile
 from PIL import Image
-import tempfile
 from pdf2image import convert_from_bytes
-from docx import Document
-from docx.oxml.table import CT_Tbl
-from docx.oxml.text.paragraph import CT_P
-from docx.table import _Cell, Table
-from docx.text.paragraph import Paragraph
 
 
 def get_s3_client():
@@ -66,62 +60,6 @@ def pdf_to_preview(pdf_data: bytes) -> Optional[bytes]:
     return None
 
 
-def docx_to_preview(docx_data: bytes) -> Optional[bytes]:
-    """Конвертирует первую страницу DOCX в PNG через скриншот содержимого"""
-    try:
-        doc = Document(io.BytesIO(docx_data))
-        
-        from PIL import ImageDraw, ImageFont
-        
-        img = Image.new('RGB', (800, 1131), color='white')
-        draw = ImageDraw.Draw(img)
-        
-        y_position = 40
-        max_width = 720
-        left_margin = 40
-        
-        try:
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
-            title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
-        except:
-            font = ImageFont.load_default()
-            title_font = font
-        
-        for element in doc.element.body:
-            if y_position > 1000:
-                break
-                
-            if isinstance(element, CT_P):
-                para = Paragraph(element, doc)
-                text = para.text.strip()
-                if text:
-                    current_font = title_font if para.style.name.startswith('Heading') else font
-                    
-                    words = text.split()
-                    line = ''
-                    for word in words:
-                        test_line = line + word + ' '
-                        bbox = draw.textbbox((0, 0), test_line, font=current_font)
-                        if bbox[2] - bbox[0] <= max_width:
-                            line = test_line
-                        else:
-                            if line:
-                                draw.text((left_margin, y_position), line, fill='black', font=current_font)
-                                y_position += 20
-                            line = word + ' '
-                    
-                    if line:
-                        draw.text((left_margin, y_position), line, fill='black', font=current_font)
-                        y_position += 25
-        
-        print(f"✓ Rendered DOCX to image")
-        return optimize_image(img)
-        
-    except Exception as e:
-        print(f"Error converting DOCX: {e}")
-    return None
-
-
 def extract_preview_from_zip(zip_data: bytes) -> Tuple[Optional[bytes], str]:
     """Извлекает превью из ZIP: PNG, PDF или DOCX"""
     try:
@@ -146,15 +84,6 @@ def extract_preview_from_zip(zip_data: bytes) -> Tuple[Optional[bytes], str]:
             preview = pdf_to_preview(pdf_data)
             if preview:
                 return preview, 'pdf'
-        
-        docx_files = [f for f in files if f.lower().endswith('.docx')]
-        if docx_files:
-            first_docx = sorted(docx_files)[0]
-            print(f"Found DOCX in ZIP: {first_docx}")
-            docx_data = zip_file.read(first_docx)
-            preview = docx_to_preview(docx_data)
-            if preview:
-                return preview, 'docx'
         
         return None, 'none'
         

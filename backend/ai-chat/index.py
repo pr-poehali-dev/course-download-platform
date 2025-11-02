@@ -155,8 +155,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         import openai
+        import httpx
         
-        client = openai.OpenAI(api_key=openai_api_key)
+        proxy_url = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY')
+        
+        if proxy_url:
+            http_client = httpx.Client(proxy=proxy_url)
+            client = openai.OpenAI(api_key=openai_api_key, http_client=http_client)
+        else:
+            client = openai.OpenAI(api_key=openai_api_key)
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.
 

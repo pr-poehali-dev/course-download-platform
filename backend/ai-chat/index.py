@@ -200,7 +200,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if file_content and len(api_messages) > 1:
             for i in range(len(api_messages) - 1, -1, -1):
                 if api_messages[i]['role'] == 'user':
-                    api_messages[i]['content'] += f"\n\n=== СОДЕРЖИМОЕ ФАЙЛА ({file_name}) ===\n{file_content[:15000]}\n=== КОНЕЦ ФАЙЛА ==="
+                    file_label = "UPLOADED FILE"
+                    api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{file_content[:15000]}\n=== END OF FILE ==="
                     break
         
         response = client.chat.completions.create(

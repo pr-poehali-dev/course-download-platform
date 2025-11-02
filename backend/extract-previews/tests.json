@@ -1,14 +1,18 @@
 {
   "tests": [
     {
-      "name": "Extract previews from RAR archives",
+      "name": "Extract previews batch",
       "method": "POST",
       "path": "/",
+      "body": {
+        "batch_size": 2,
+        "offset": 0
+      },
       "expectedStatus": 200,
       "expectedBody": {
         "success": "boolean",
-        "total_works": "number",
-        "processed": "number"
+        "processed": "number",
+        "has_more": "boolean"
       },
       "bodyMatcher": "partial"
     }

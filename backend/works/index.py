@@ -226,6 +226,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 where_clauses = []
                 params = []
                 
+                # Исключаем удалённые записи
+                where_clauses.append("title NOT LIKE %s")
+                params.append('[УДАЛЕНО]%')
+                
                 if category and category != 'all':
                     where_clauses.append("category = %s")
                     params.append(category)
@@ -235,7 +239,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     search_pattern = f'%{search}%'
                     params.extend([search_pattern, search_pattern])
                 
-                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
+                where_sql = " AND ".join(where_clauses)
                 
                 # Получить общее количество
                 count_query = f"""

@@ -1,8 +1,8 @@
 {
+  "batch-extract-previews": "https://functions.poehali.dev/5f369eae-0ddb-4dd8-abb7-7723bcb887ad",
   "full-yandex-sync": "https://functions.poehali.dev/e87de681-bad3-4d65-b601-1746bdee6e4e",
   "batch-upload-works": "https://functions.poehali.dev/e7e5a34a-b227-4c60-aae3-842f84aa97ee",
   "update-work-preview": "https://functions.poehali.dev/29bd33fc-96f3-4da2-af7c-ce84a7103573",
-  "generate-previews": "https://functions.poehali.dev/3254456f-12d2-4b1e-9817-cf6a7254e57f",
   "premium": "https://functions.poehali.dev/5909592c-afca-4205-9f4e-2e0f97dd49ca",
   "user-data": "https://functions.poehali.dev/c605690e-3ba9-40eb-86cd-4c470a0b3387",
   "activate-promo": "https://functions.poehali.dev/1b298243-0b0f-4838-b260-bb90308d904a",

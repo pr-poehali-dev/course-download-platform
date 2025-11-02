@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,14 +11,46 @@ export default function PreviewGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [batchSize, setBatchSize] = useState(15);
-  const [stats, setStats] = useState({ total: 159, processed: 0, errors: 0, remaining: 159 });
+  const [stats, setStats] = useState({ total: 0, processed: 0, errors: 0, remaining: 0 });
   const [currentBatch, setCurrentBatch] = useState(0);
   const [logs, setLogs] = useState<string[]>([]);
+  const [isLoadingStats, setIsLoadingStats] = useState(false);
 
   const addLog = (message: string) => {
     const time = new Date().toLocaleTimeString();
     setLogs(prev => [...prev, `[${time}] ${message}`]);
   };
+
+  const loadStats = async () => {
+    setIsLoadingStats(true);
+    try {
+      const response = await fetch(func2url['extract-previews'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ batch_size: 0, offset: 0 })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        const total = result.total_remaining + (result.processed || 0);
+        setStats({
+          total,
+          processed: total - result.total_remaining,
+          errors: result.errors?.length || 0,
+          remaining: result.total_remaining
+        });
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки статистики:', error);
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStats();
+  }, []);
 
   const processBatch = async (offset: number): Promise<boolean> => {
     try {
@@ -38,9 +70,11 @@ export default function PreviewGenerator() {
         throw new Error('Ошибка обработки батча');
       }
       
+      const currentTotal = stats.total || result.total_remaining + (result.processed || 0);
+      
       setStats({
-        total: 159,
-        processed: 159 - result.total_remaining,
+        total: currentTotal,
+        processed: currentTotal - result.total_remaining,
         errors: result.errors?.length || 0,
         remaining: result.total_remaining
       });
@@ -51,7 +85,7 @@ export default function PreviewGenerator() {
         result.errors.forEach((err: string) => addLog(`⚠️  ${err}`));
       }
       
-      const progressPercent = ((159 - result.total_remaining) / 159) * 100;
+      const progressPercent = currentTotal > 0 ? ((currentTotal - result.total_remaining) / currentTotal) * 100 : 0;
       setProgress(progressPercent);
       
       return result.has_more;
@@ -94,6 +128,8 @@ export default function PreviewGenerator() {
       
       setProgress(100);
       addLog(`🎉 Обработка завершена! Всего батчей: ${batchNum}`);
+      
+      await loadStats();
       
       toast({
         title: '✅ Обработка завершена!',
@@ -179,24 +215,45 @@ export default function PreviewGenerator() {
           </div>
         )}
 
-        <Button 
-          onClick={syncAllPreviews} 
-          disabled={isGenerating}
-          className="w-full"
-          size="lg"
-        >
-          {isGenerating ? (
-            <>
-              <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-              Обработка батча {currentBatch}...
-            </>
-          ) : (
-            <>
-              <Icon name="Zap" size={18} className="mr-2" />
-              Извлечь ВСЕ превью ({stats.remaining} работ)
-            </>
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={syncAllPreviews} 
+            disabled={isGenerating || isLoadingStats || stats.remaining === 0}
+            className="flex-1"
+            size="lg"
+          >
+            {isGenerating ? (
+              <>
+                <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                Обработка батча {currentBatch}...
+              </>
+            ) : isLoadingStats ? (
+              <>
+                <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                Загрузка...
+              </>
+            ) : stats.remaining === 0 ? (
+              <>
+                <Icon name="CheckCircle" size={18} className="mr-2" />
+                Все превью извлечены!
+              </>
+            ) : (
+              <>
+                <Icon name="Zap" size={18} className="mr-2" />
+                Извлечь ВСЕ превью ({stats.remaining} работ)
+              </>
+            )}
+          </Button>
+          
+          <Button 
+            onClick={loadStats} 
+            disabled={isGenerating || isLoadingStats}
+            variant="outline"
+            size="lg"
+          >
+            <Icon name="RefreshCw" size={18} />
+          </Button>
+        </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
           <div className="flex items-start gap-2">

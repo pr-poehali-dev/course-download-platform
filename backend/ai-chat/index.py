@@ -197,10 +197,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if role in ['user', 'assistant']:
                 api_messages.append({'role': role, 'content': content})
         
-        if file_content:
-            last_user_msg = api_messages[-1] if api_messages[-1]['role'] == 'user' else None
-            if last_user_msg:
-                last_user_msg['content'] += f"\n\n=== СОДЕРЖИМОЕ ФАЙЛА ===\n{file_content[:15000]}\n=== КОНЕЦ ФАЙЛА ==="
+        if file_content and len(api_messages) > 1:
+            for i in range(len(api_messages) - 1, -1, -1):
+                if api_messages[i]['role'] == 'user':
+                    api_messages[i]['content'] += f"\n\n=== СОДЕРЖИМОЕ ФАЙЛА ({file_name}) ===\n{file_content[:15000]}\n=== КОНЕЦ ФАЙЛА ==="
+                    break
         
         response = client.chat.completions.create(
             model='gpt-4o-mini',
@@ -262,11 +263,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Invalid JSON in request body'})
         }
     except Exception as e:
+        import traceback
+        error_details = {
+            'error': str(e),
+            'type': type(e).__name__,
+            'traceback': traceback.format_exc()
+        }
+        print(f"AI Chat Error: {json.dumps(error_details)}", file=sys.stderr)
         return {
             'statusCode': 500,
             'headers': {
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': f'{type(e).__name__}: {str(e)}'})
         }

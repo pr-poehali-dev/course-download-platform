@@ -1,18 +1,25 @@
 '''
-Business: Извлечение PNG превью из ZIP архивов работ и загрузка в S3
+Business: Извлечение превью из ZIP архивов (PNG/PDF/DOCX) и загрузка в S3
 Args: event с POST body {batch_size: 15, offset: 0} для пакетной обработки
 Returns: {success, processed, errors, has_more}
 '''
 
 import json
 import os
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Tuple
 import psycopg2
 import boto3
 from botocore.config import Config
 import io
 import zipfile
 from PIL import Image
+import tempfile
+from pdf2image import convert_from_bytes
+from docx import Document
+from docx.oxml.table import CT_Tbl
+from docx.oxml.text.paragraph import CT_P
+from docx.table import _Cell, Table
+from docx.text.paragraph import Paragraph
 
 
 def get_s3_client():
@@ -27,40 +34,133 @@ def get_s3_client():
     )
 
 
-def extract_png_from_zip(zip_data: bytes) -> Optional[bytes]:
-    """Извлекает первый PNG файл из ZIP архива"""
+def optimize_image(img: Image.Image, max_width: int = 800) -> bytes:
+    """Оптимизирует изображение и возвращает PNG байты"""
+    if img.mode == 'RGBA':
+        background = Image.new('RGB', img.size, (255, 255, 255))
+        background.paste(img, mask=img.split()[3])
+        img = background
+    elif img.mode != 'RGB':
+        img = img.convert('RGB')
+    
+    if img.width > max_width:
+        ratio = max_width / img.width
+        new_height = int(img.height * ratio)
+        img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
+    
+    output = io.BytesIO()
+    img.save(output, format='PNG', optimize=True)
+    output.seek(0)
+    return output.getvalue()
+
+
+def pdf_to_preview(pdf_data: bytes) -> Optional[bytes]:
+    """Конвертирует первую страницу PDF в PNG"""
     try:
-        zip_file = zipfile.ZipFile(io.BytesIO(zip_data))
+        images = convert_from_bytes(pdf_data, first_page=1, last_page=1, dpi=150)
+        if images:
+            print(f"✓ Converted PDF first page to image")
+            return optimize_image(images[0])
+    except Exception as e:
+        print(f"Error converting PDF: {e}")
+    return None
+
+
+def docx_to_preview(docx_data: bytes) -> Optional[bytes]:
+    """Конвертирует первую страницу DOCX в PNG через скриншот содержимого"""
+    try:
+        doc = Document(io.BytesIO(docx_data))
         
-        png_files = [f for f in zip_file.namelist() 
-                    if f.lower().endswith('.png') 
-                    and not f.startswith('__MACOSX')
-                    and not os.path.basename(f).startswith('._')]
+        from PIL import ImageDraw, ImageFont
         
-        if not png_files:
-            return None
+        img = Image.new('RGB', (800, 1131), color='white')
+        draw = ImageDraw.Draw(img)
         
-        first_png = sorted(png_files)[0]
-        print(f"Found PNG in ZIP: {first_png}")
+        y_position = 40
+        max_width = 720
+        left_margin = 40
         
-        png_data = zip_file.read(first_png)
+        try:
+            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+            title_font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 16)
+        except:
+            font = ImageFont.load_default()
+            title_font = font
         
-        img = Image.open(io.BytesIO(png_data))
+        for element in doc.element.body:
+            if y_position > 1000:
+                break
+                
+            if isinstance(element, CT_P):
+                para = Paragraph(element, doc)
+                text = para.text.strip()
+                if text:
+                    current_font = title_font if para.style.name.startswith('Heading') else font
+                    
+                    words = text.split()
+                    line = ''
+                    for word in words:
+                        test_line = line + word + ' '
+                        bbox = draw.textbbox((0, 0), test_line, font=current_font)
+                        if bbox[2] - bbox[0] <= max_width:
+                            line = test_line
+                        else:
+                            if line:
+                                draw.text((left_margin, y_position), line, fill='black', font=current_font)
+                                y_position += 20
+                            line = word + ' '
+                    
+                    if line:
+                        draw.text((left_margin, y_position), line, fill='black', font=current_font)
+                        y_position += 25
         
-        max_width = 800
-        if img.width > max_width:
-            ratio = max_width / img.width
-            new_height = int(img.height * ratio)
-            img = img.resize((max_width, new_height), Image.Resampling.LANCZOS)
-        
-        output = io.BytesIO()
-        img.save(output, format='PNG', optimize=True)
-        output.seek(0)
-        return output.getvalue()
+        print(f"✓ Rendered DOCX to image")
+        return optimize_image(img)
         
     except Exception as e:
-        print(f"Error extracting PNG from ZIP: {e}")
-        return None
+        print(f"Error converting DOCX: {e}")
+    return None
+
+
+def extract_preview_from_zip(zip_data: bytes) -> Tuple[Optional[bytes], str]:
+    """Извлекает превью из ZIP: PNG, PDF или DOCX"""
+    try:
+        zip_file = zipfile.ZipFile(io.BytesIO(zip_data))
+        files = [f for f in zip_file.namelist() 
+                if not f.startswith('__MACOSX')
+                and not os.path.basename(f).startswith('._')]
+        
+        png_files = [f for f in files if f.lower().endswith('.png')]
+        if png_files:
+            first_png = sorted(png_files)[0]
+            print(f"Found PNG in ZIP: {first_png}")
+            png_data = zip_file.read(first_png)
+            img = Image.open(io.BytesIO(png_data))
+            return optimize_image(img), 'png'
+        
+        pdf_files = [f for f in files if f.lower().endswith('.pdf')]
+        if pdf_files:
+            first_pdf = sorted(pdf_files)[0]
+            print(f"Found PDF in ZIP: {first_pdf}")
+            pdf_data = zip_file.read(first_pdf)
+            preview = pdf_to_preview(pdf_data)
+            if preview:
+                return preview, 'pdf'
+        
+        docx_files = [f for f in files if f.lower().endswith('.docx')]
+        if docx_files:
+            first_docx = sorted(docx_files)[0]
+            print(f"Found DOCX in ZIP: {first_docx}")
+            docx_data = zip_file.read(first_docx)
+            preview = docx_to_preview(docx_data)
+            if preview:
+                return preview, 'docx'
+        
+        return None, 'none'
+        
+    except Exception as e:
+        print(f"Error extracting from ZIP: {e}")
+        return None, 'error'
 
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -164,15 +264,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 response = s3_client.get_object(Bucket=bucket_name, Key=file_key)
                 archive_data = response['Body'].read()
                 
-                png_data = extract_png_from_zip(archive_data)
+                preview_data, source_type = extract_preview_from_zip(archive_data)
                 
-                if png_data:
+                if preview_data:
                     preview_key = f'previews/preview_{work_id}.png'
                     
                     s3_client.put_object(
                         Bucket=bucket_name,
                         Key=preview_key,
-                        Body=png_data,
+                        Body=preview_data,
                         ContentType='image/png',
                         ACL='public-read'
                     )
@@ -186,9 +286,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     conn.commit()
                     
                     processed += 1
-                    print(f"✓ Work {work_id} preview created")
+                    print(f"✓ Work {work_id} preview created from {source_type}")
                 else:
-                    errors.append(f"Work {work_id}: No PNG found in ZIP")
+                    errors.append(f"Work {work_id}: No preview source found (PNG/PDF/DOCX)")
                     
             except Exception as e:
                 error_msg = f"Work {work_id}: {str(e)[:100]}"

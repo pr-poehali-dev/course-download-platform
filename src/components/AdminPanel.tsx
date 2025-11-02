@@ -281,6 +281,31 @@ export default function AdminPanel() {
             </CardContent>
           </Card>
           
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="Image" size={24} />
+                Извлечение превью из RAR
+              </CardTitle>
+              <CardDescription>
+                Автоматическое извлечение первого PNG из каждого RAR архива для создания превью работ
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                onClick={() => {
+                  window.open('/extract-previews', '_blank');
+                }}
+                className="w-full"
+                size="lg"
+                variant="secondary"
+              >
+                <Icon name="ImagePlus" size={20} className="mr-2" />
+                Запустить извлечение превью (487 работ)
+              </Button>
+            </CardContent>
+          </Card>
+          
           <YandexDiskImport />
           <PreviewGenerator />
         </TabsContent>

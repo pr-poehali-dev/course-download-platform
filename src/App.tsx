@@ -25,6 +25,7 @@ import AIAssistantPage from "./pages/AIAssistantPage";
 import SyncPreviewsPage from "./pages/SyncPreviewsPage";
 import FullSyncPage from "./pages/FullSyncPage";
 import BatchUploadPage from "./pages/BatchUploadPage";
+import ExtractPreviews from "./pages/ExtractPreviews";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -61,6 +62,7 @@ const App = () => (
           <Route path="/sync-previews" element={<SyncPreviewsPage />} />
           <Route path="/full-sync" element={<FullSyncPage />} />
           <Route path="/batch-upload" element={<BatchUploadPage />} />
+          <Route path="/extract-previews" element={<ExtractPreviews />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

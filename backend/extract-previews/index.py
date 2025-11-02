@@ -126,9 +126,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     
                     preview_url = f'https://storage.yandexcloud.net/{bucket_name}/{preview_key}'
                     
+                    safe_url = preview_url.replace("'", "''")
                     cursor.execute(
-                        "UPDATE works SET preview_image_url = %s WHERE id = %s",
-                        (preview_url, work_id)
+                        f"UPDATE works SET preview_image_url = '{safe_url}' WHERE id = {work_id}"
                     )
                     conn.commit()
                     

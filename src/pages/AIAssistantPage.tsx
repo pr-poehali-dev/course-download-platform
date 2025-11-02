@@ -60,12 +60,61 @@ export default function AIAssistantPage() {
   const [subscription, setSubscription] = useState<Subscription>({ type: 'none' });
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const recognitionRef = useRef<any>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'ru-RU';
+
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setInputValue(prev => prev + (prev ? ' ' : '') + transcript);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current.onerror = () => {
+        setIsRecording(false);
+        toast({
+          title: 'Ошибка записи',
+          description: 'Не удалось распознать речь',
+          variant: 'destructive'
+        });
+      };
+    }
+  }, []);
+
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      toast({
+        title: 'Не поддерживается',
+        description: 'Ваш браузер не поддерживает голосовой ввод',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current.start();
+      setIsRecording(true);
+    }
   };
 
   useEffect(() => {
@@ -359,6 +408,15 @@ export default function AIAssistantPage() {
                       size="icon"
                     >
                       <Icon name="Paperclip" size={20} />
+                    </Button>
+                    <Button
+                      onClick={toggleVoiceInput}
+                      disabled={subscription.type === 'none' || isLoading}
+                      variant={isRecording ? 'destructive' : 'outline'}
+                      size="icon"
+                      className={isRecording ? 'animate-pulse' : ''}
+                    >
+                      <Icon name={isRecording ? 'MicOff' : 'Mic'} size={20} />
                     </Button>
                     <Button
                       onClick={handleSendMessage}

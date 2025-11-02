@@ -31,6 +31,7 @@ interface Subscription {
 export default function AIAssistantPage() {
   const { toast } = useToast();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userId, setUserId] = useState<string>('');
   const [userPoints, setUserPoints] = useState(0);
 
   useEffect(() => {
@@ -38,8 +39,9 @@ export default function AIAssistantPage() {
       const user = await authService.verify();
       setIsLoggedIn(!!user);
       if (user) {
-        loadSubscription();
-        loadUserData();
+        setUserId(String(user.id));
+        setUserPoints(user.balance || 0);
+        loadSubscription(String(user.id));
       }
     };
     checkAuth();
@@ -70,12 +72,11 @@ export default function AIAssistantPage() {
     scrollToBottom();
   }, [messages]);
 
-  const loadSubscription = async () => {
+  const loadSubscription = async (uid: string) => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch(func2url['ai-subscription'], {
         headers: {
-          'X-User-Id': token || ''
+          'X-User-Id': uid
         }
       });
       const data = await response.json();
@@ -93,17 +94,7 @@ export default function AIAssistantPage() {
     }
   };
 
-  const loadUserData = async () => {
-    try {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        setUserPoints(user.balance || 0);
-      }
-    } catch (error) {
-      console.error('Failed to load user data:', error);
-    }
-  };
+
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -181,12 +172,11 @@ export default function AIAssistantPage() {
         });
       }
 
-      const token = localStorage.getItem('token');
       const response = await fetch(func2url['ai-chat'], {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Id': token || ''
+          'X-User-Id': userId
         },
         body: JSON.stringify({
           messages: chatHistory,
@@ -210,7 +200,7 @@ export default function AIAssistantPage() {
       
       setMessages(prev => [...prev, assistantMessage]);
       
-      loadSubscription();
+      loadSubscription(userId);
     } catch (error) {
       toast({
         title: 'Ошибка',
@@ -631,9 +621,12 @@ export default function AIAssistantPage() {
       <AISubscriptionModal
         open={showPricingModal}
         onClose={() => setShowPricingModal(false)}
-        onSubscribe={() => {
-          loadSubscription();
-          loadUserData();
+        onSubscribe={async () => {
+          const user = await authService.verify();
+          if (user) {
+            setUserPoints(user.balance || 0);
+            loadSubscription(String(user.id));
+          }
         }}
         userPoints={userPoints}
       />

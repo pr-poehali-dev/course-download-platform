@@ -14,6 +14,14 @@ interface AISubscriptionModalProps {
   userPoints: number;
 }
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  balance: number;
+  role?: string;
+}
+
 export default function AISubscriptionModal({ open, onClose, onSubscribe, userPoints }: AISubscriptionModalProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -83,12 +91,17 @@ export default function AISubscriptionModal({ open, onClose, onSubscribe, userPo
 
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
+      if (!userStr) {
+        throw new Error('Пользователь не авторизован');
+      }
+      const user: User = JSON.parse(userStr);
+      
       const response = await fetch(func2url['ai-subscription'], {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Id': token || ''
+          'X-User-Id': String(user.id)
         },
         body: JSON.stringify({
           subscriptionType: type

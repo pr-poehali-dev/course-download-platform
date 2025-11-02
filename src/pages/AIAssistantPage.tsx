@@ -291,6 +291,29 @@ export default function AIAssistantPage() {
     return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
   };
 
+  const exportChat = () => {
+    const chatText = messages.map(msg => {
+      const time = formatTime(msg.timestamp);
+      const role = msg.role === 'user' ? 'Вы' : 'TechMentor';
+      return `[${time}] ${role}:\n${msg.content}\n`;
+    }).join('\n');
+
+    const blob = new Blob([chatText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `TechMentor_${new Date().toISOString().split('T')[0]}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: 'Диалог сохранён',
+      description: 'Файл загружен на ваше устройство'
+    });
+  };
+
   const getSubscriptionBadge = () => {
     if (subscription.type === 'none') {
       return <Badge variant="secondary">Нет подписки</Badge>;
@@ -320,6 +343,16 @@ export default function AIAssistantPage() {
           </div>
           <div className="flex items-center gap-3">
             {getSubscriptionBadge()}
+            {messages.length > 1 && (
+              <Button 
+                variant="outline" 
+                onClick={exportChat}
+                size="sm"
+              >
+                <Icon name="Download" size={16} className="mr-2" />
+                Сохранить
+              </Button>
+            )}
             <Button 
               variant="outline" 
               onClick={() => setShowPricingModal(true)}

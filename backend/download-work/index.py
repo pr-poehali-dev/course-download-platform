@@ -46,6 +46,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     user_id = headers.get('X-User-Id') or headers.get('x-user-id')
     public_key = params.get('publicKey', 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ')
     
+    print(f"[DEBUG] Headers: {headers}")
+    print(f"[DEBUG] work_id={work_id}, user_id={user_id}")
+    
     if not work_id:
         return {
             'statusCode': 400,

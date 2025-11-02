@@ -156,7 +156,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         from gigachat import GigaChat
         
-        client = GigaChat(credentials=gigachat_credentials, verify_ssl_certs=False)
+        client = GigaChat(
+            credentials=gigachat_credentials, 
+            verify_ssl_certs=False,
+            timeout=25.0
+        )
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.
 

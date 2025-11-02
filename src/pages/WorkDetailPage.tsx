@@ -376,7 +376,7 @@ export default function WorkDetailPage() {
         throw new Error(purchaseData.error || 'Ошибка покупки');
       }
       
-      // Шаг 2: Скачивание архива
+      // Шаг 2: Получение ссылки на скачивание
       const downloadResponse = await fetch(
         `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`,
         {
@@ -390,14 +390,15 @@ export default function WorkDetailPage() {
         throw new Error('Ошибка скачивания');
       }
       
-      const blob = await downloadResponse.blob();
-      const url = window.URL.createObjectURL(blob);
+      const downloadData = await downloadResponse.json();
+      
+      // Скачиваем файл по прямой ссылке
       const a = document.createElement('a');
-      a.href = url;
-      a.download = `${work.title.substring(0, 50)}.zip`;
+      a.href = downloadData.download_url;
+      a.download = downloadData.filename || `${work.title.substring(0, 50)}.rar`;
+      a.target = '_blank';
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
       
       // Обновляем баланс пользователя в localStorage (если не админ)

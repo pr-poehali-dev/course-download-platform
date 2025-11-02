@@ -148,7 +148,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.close()
             conn.close()
         
-        # Скачиваем файл напрямую с Yandex Cloud Storage
+        # Возвращаем прямую ссылку на файл (не проксируем через функцию)
         print(f"[DEBUG] Original URL: {download_url}")
         
         # Кодируем URL (кириллицу и пробелы в percent-encoding)
@@ -165,15 +165,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         print(f"[DEBUG] Encoded URL: {encoded_url}")
         
-        req = urllib.request.Request(encoded_url)
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            file_data = resp.read()
-            print(f"[DEBUG] Downloaded file: {len(file_data)} bytes")
-        
-        # Кодируем в base64 для передачи
-        file_base64 = base64.b64encode(file_data).decode('utf-8')
-        print(f"[DEBUG] Base64 encoded: {len(file_base64)} chars")
-        
         # Безопасное имя файла
         safe_name = ''.join(c if c.isalnum() or c in (' ', '-', '_') else '_' for c in title[:50])
         
@@ -187,17 +178,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             elif download_url.lower().endswith('.7z'):
                 file_extension = '7z'
         
-        content_type = 'application/x-rar-compressed' if file_extension == 'rar' else 'application/zip'
-        
+        # Возвращаем JSON с прямой ссылкой на файл
         return {
             'statusCode': 200,
             'headers': {
-                'Content-Type': content_type,
-                'Content-Disposition': f'attachment; filename="{safe_name}.{file_extension}"',
+                'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': file_base64,
-            'isBase64Encoded': True
+            'body': json.dumps({
+                'download_url': encoded_url,
+                'filename': f'{safe_name}.{file_extension}',
+                'title': title
+            }),
+            'isBase64Encoded': False
         }
         
     except Exception as e:

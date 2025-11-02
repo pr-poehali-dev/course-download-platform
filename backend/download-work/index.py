@@ -79,17 +79,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         try:
             # Проверяем роль пользователя из базы данных
+            print(f"[DEBUG] Querying user with id={user_id}, type={type(user_id)}")
             cur.execute(
                 "SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s",
                 (user_id,)
             )
             user_result = cur.fetchone()
+            print(f"[DEBUG] Query result: {user_result}")
             
             if not user_result:
+                print(f"[ERROR] User not found in database for id={user_id}")
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'User not found'}),
+                    'body': json.dumps({'error': f'User not found for id={user_id}'}),
                     'isBase64Encoded': False
                 }
             

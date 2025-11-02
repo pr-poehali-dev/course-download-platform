@@ -392,8 +392,23 @@ export default function WorkDetailPage() {
       
       const downloadData = await downloadResponse.json();
       
-      // Открываем файл в новой вкладке (работает на мобильных)
-      window.open(downloadData.download_url, '_blank');
+      // Скачиваем файл напрямую (работает на всех устройствах)
+      try {
+        const fileResponse = await fetch(downloadData.download_url);
+        const blob = await fileResponse.blob();
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = downloadData.filename || `${work.title.substring(0, 50)}.rar`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (fetchError) {
+        // Если fetch не сработал, открываем в новой вкладке
+        window.location.href = downloadData.download_url;
+      }
       
       // Обновляем баланс пользователя в localStorage (если не админ)
       if (user.role !== 'admin') {
@@ -401,19 +416,11 @@ export default function WorkDetailPage() {
         localStorage.setItem('user', JSON.stringify(user));
       }
       
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      
       const message = purchaseData.isAdmin 
-        ? (isMobile 
-            ? '✅ Файл откроется в новой вкладке\n\n📱 На телефоне:\n1. Нажмите кнопку "Скачать"\n2. Файл сохранится в "Загрузки"\n3. Откройте через приложение для архивов (iZip, RAR)' 
-            : 'Скачивание началось (бесплатно для админа)')
+        ? '✅ Скачивание началось!\n\nФайл сохранится в папку "Загрузки"' 
         : purchaseData.alreadyPurchased 
-          ? (isMobile
-              ? '✅ Работа уже куплена!\n\nФайл откроется в новой вкладке.\nНажмите "Скачать" в браузере.'
-              : 'Работа уже была куплена ранее. Начинается скачивание...')
-          : (isMobile
-              ? `✅ Покупка успешна!\n\n💰 Списано ${work.price} баллов\n💵 Новый баланс: ${purchaseData.newBalance}\n\n📱 Файл откроется в новой вкладке.\nНажмите "Скачать" в браузере.`
-              : `Покупка успешна! Списано ${work.price} баллов. Новый баланс: ${purchaseData.newBalance}`);
+          ? '✅ Работа уже куплена!\n\nСкачивание началось...' 
+          : `✅ Покупка успешна!\n\n💰 Списано ${work.price} баллов\n💵 Баланс: ${purchaseData.newBalance}\n\n📥 Скачивание началось...`;
       
       alert(message);
       

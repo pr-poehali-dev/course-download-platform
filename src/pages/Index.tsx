@@ -572,23 +572,27 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="py-12 sm:py-16 lg:py-24 bg-white">
-          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4">
+        <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-blue-600 via-primary to-blue-700 relative overflow-hidden">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
+          <div className="absolute top-20 left-10 w-72 h-72 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-300/20 rounded-full blur-3xl"></div>
+          
+          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 relative z-10">
             <div className="text-center mb-16">
-              <Badge className="mb-4 bg-gradient-to-r from-primary to-purple-600">
+              <Badge className="mb-4 bg-white/20 backdrop-blur-sm text-white border-white/30">
                 Возможности платформы
               </Badge>
-              <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
+              <h2 className="text-4xl sm:text-5xl font-bold mb-4 text-white drop-shadow-lg">
                 Всё, что нужно студенту
               </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto">
                 Три мощных инструмента в единой экосистеме
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-              <Card className="relative overflow-hidden border-2 hover:border-primary transition-all group hover:shadow-2xl">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
+              <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
                 <CardHeader>
                   <div className="w-14 h-14 bg-gradient-to-br from-primary to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Icon name="Database" size={28} className="text-white" />
@@ -622,8 +626,8 @@ export default function Index() {
                 </CardContent>
               </Card>
 
-              <Card className="relative overflow-hidden border-2 border-purple-200 hover:border-purple-500 transition-all group hover:shadow-2xl">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-full blur-3xl group-hover:bg-purple-500/10 transition-all"></div>
+              <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
                 <CardHeader>
                   <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Icon name="Bot" size={28} className="text-white" />
@@ -657,8 +661,8 @@ export default function Index() {
                 </CardContent>
               </Card>
 
-              <Card className="relative overflow-hidden border-2 hover:border-green-500 transition-all group hover:shadow-2xl">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-3xl group-hover:bg-green-500/10 transition-all"></div>
+              <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-all"></div>
                 <CardHeader>
                   <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Icon name="TrendingUp" size={28} className="text-white" />

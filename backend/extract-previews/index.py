@@ -102,9 +102,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cursor = conn.cursor()
         
         cursor.execute(f"""
-            SELECT id, title, download_url 
+            SELECT id, title, file_url 
             FROM works 
-            WHERE download_url IS NOT NULL 
+            WHERE file_url IS NOT NULL 
+            AND file_url != ''
             AND preview_image_url IS NULL
             ORDER BY id
             LIMIT {batch_size} OFFSET {offset}
@@ -115,7 +116,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cursor.execute("""
             SELECT COUNT(*) 
             FROM works 
-            WHERE download_url IS NOT NULL 
+            WHERE file_url IS NOT NULL 
+            AND file_url != ''
             AND preview_image_url IS NULL
         """)
         total_remaining = cursor.fetchone()[0]

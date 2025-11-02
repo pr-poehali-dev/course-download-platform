@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Обработка превью</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #00ff00;
+        }
+        #log {
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background: #00ff00;
+            border: none;
+            color: #000;
+            font-weight: bold;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .stats {
+            margin: 20px 0;
+            padding: 10px;
+            background: #2a2a2a;
+            border-left: 4px solid #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Обработка превью для работ</h1>
+    
+    <div class="stats" id="stats">
+        <div>Всего работ без превью: <span id="total">159</span></div>
+        <div>Обработано: <span id="processed">0</span></div>
+        <div>Ошибок: <span id="errors">0</span></div>
+        <div>Прогресс: <span id="progress">0%</span></div>
+    </div>
+    
+    <button onclick="startProcessing()" id="startBtn">Запустить обработку</button>
+    <button onclick="stopProcessing()" id="stopBtn" disabled>Остановить</button>
+    
+    <div id="log"></div>
+
+    <script>
+        const API_URL = 'https://functions.poehali.dev/e7988513-c419-48f5-8131-4bfedcb9b79b';
+        const BATCH_SIZE = 15;
+        let isRunning = false;
+        let totalProcessed = 0;
+        let totalErrors = 0;
+        
+        function log(message) {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            logEl.innerHTML += `[${time}] ${message}\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function updateStats(total, processed, errors) {
+            document.getElementById('total').textContent = total;
+            document.getElementById('processed').textContent = processed;
+            document.getElementById('errors').textContent = errors;
+            const progress = total > 0 ? Math.round((processed / total) * 100) : 0;
+            document.getElementById('progress').textContent = progress + '%';
+        }
+        
+        async function processBatch(offset) {
+            try {
+                log(`📦 Обрабатываю пакет с offset=${offset}, size=${BATCH_SIZE}`);
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        batch_size: BATCH_SIZE,
+                        offset: offset
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    totalProcessed += data.processed;
+                    totalErrors += data.errors.length;
+                    
+                    log(`✅ Обработано: ${data.processed}, Пропущено RAR: ${data.skipped_rar}, Осталось: ${data.total_remaining}`);
+                    
+                    if (data.errors.length > 0) {
+                        data.errors.forEach(err => log(`⚠️  ${err}`));
+                    }
+                    
+                    updateStats(159, totalProcessed, totalErrors);
+                    
+                    if (data.has_more && isRunning) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        return await processBatch(data.next_offset);
+                    } else {
+                        log(`🎉 Обработка завершена! Всего обработано: ${totalProcessed}`);
+                        stopProcessing();
+                    }
+                } else {
+                    log(`❌ Ошибка: ${JSON.stringify(data)}`);
+                    stopProcessing();
+                }
+            } catch (error) {
+                log(`❌ Ошибка запроса: ${error.message}`);
+                stopProcessing();
+            }
+        }
+        
+        function startProcessing() {
+            isRunning = true;
+            totalProcessed = 0;
+            totalErrors = 0;
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('stopBtn').disabled = false;
+            document.getElementById('log').innerHTML = '';
+            log('🚀 Начинаю обработку...');
+            processBatch(0);
+        }
+        
+        function stopProcessing() {
+            isRunning = false;
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('stopBtn').disabled = true;
+            log('⏸️  Обработка остановлена');
+        }
+    </script>
+</body>
+</html>

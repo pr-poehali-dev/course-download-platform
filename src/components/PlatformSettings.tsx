@@ -18,7 +18,7 @@ import {
 export default function PlatformSettings() {
   const [settings, setSettings] = useState({
     platformName: 'Tech Forma',
-    platformCommission: 15,
+    platformCommission: 10,
     minPrice: 50,
     maxPrice: 5000,
     defaultPrice: 150,

@@ -107,7 +107,7 @@ export default function TestimonialsSection() {
           </Badge>
           <h2 className="text-5xl font-bold mb-4">Что говорят о нас</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Более 5000 студентов уже используют платформу для обмена работами
+            Присоединяйтесь к растущему сообществу студентов для обмена работами
           </p>
         </div>
 

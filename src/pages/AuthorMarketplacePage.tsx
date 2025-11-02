@@ -47,16 +47,16 @@ export default function AuthorMarketplacePage() {
       description: 'Загружайте работы за пару минут через простую форму'
     },
     {
-      icon: 'DollarSign',
-      title: 'Пассивный доход',
+      icon: 'RefreshCw',
+      title: 'Постоянный обмен',
       description: 'Одна работа может продаваться неограниченное количество раз'
     }
   ];
 
   const stats = [
-    { value: '500+', label: 'Продано работ' },
-    { value: '90%', label: 'Ваша выплата' },
-    { value: '24/7', label: 'Работает магазин' }
+    { value: '5000+', label: 'Работ в каталоге' },
+    { value: '90%', label: 'Баллов автору' },
+    { value: '24/7', label: 'Обмен работает' }
   ];
 
   const howItWorks = [
@@ -102,7 +102,7 @@ export default function AuthorMarketplacePage() {
               onClick={() => user ? navigate('/upload') : navigate('/')}
             >
               <Icon name="Upload" size={20} className="mr-2" />
-              {user ? 'Загрузить работу' : 'Начать зарабатывать'}
+              {user ? 'Загрузить работу' : 'Начать обмен'}
             </Button>
             <Button 
               size="lg"

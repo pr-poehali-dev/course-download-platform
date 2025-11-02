@@ -157,9 +157,11 @@ export default function Offer() {
                 3.2. Стоимость баллов (примерная)
               </p>
               <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm">• 100 баллов = 99 рублей</p>
-                <p className="text-sm">• 500 баллов = 449 рублей (скидка 10%)</p>
-                <p className="text-sm">• 1000 баллов = 799 рублей (скидка 20%)</p>
+                <p className="text-sm">• 100 баллов = 100 рублей</p>
+                <p className="text-sm">• 500 баллов = 450 рублей (бонус +50 баллов)</p>
+                <p className="text-sm">• 1000 баллов = 800 рублей (бонус +200 баллов)</p>
+                <p className="text-sm">• 2000 баллов = 1500 рублей (бонус +500 баллов)</p>
+                <p className="text-sm">• 5000 баллов = 3500 рублей (бонус +1500 баллов)</p>
                 <p className="text-sm mt-2 text-muted-foreground">
                   Стоимость может быть изменена Исполнителем в одностороннем порядке
                 </p>

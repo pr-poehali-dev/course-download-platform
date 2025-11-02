@@ -462,23 +462,24 @@ export default function YandexDiskImport() {
               )}
             </Button>
 
-          <Button 
-            onClick={handleClearAll}
-            disabled={importing || cleaning || generatingPreviews}
-            variant="destructive"
-          >
-            {cleaning ? (
-              <>
-                <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                Очистка...
-              </>
-            ) : (
-              <>
-                <Icon name="Trash" size={18} className="mr-2" />
-                Очистить базу
-              </>
-            )}
-          </Button>
+            <Button 
+              onClick={handleClearAll}
+              disabled={importing || cleaning || generatingPreviews || syncingStorage}
+              variant="destructive"
+            >
+              {cleaning ? (
+                <>
+                  <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                  Очистка...
+                </>
+              ) : (
+                <>
+                  <Icon name="Trash" size={18} className="mr-2" />
+                  Очистить базу
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         <div className="border-t pt-6">

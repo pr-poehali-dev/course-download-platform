@@ -95,15 +95,10 @@ export default function AIAssistantPage() {
 
   const loadUserData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(func2url['user-data'], {
-        headers: {
-          'X-User-Id': token || ''
-        }
-      });
-      const data = await response.json();
-      if (data.points !== undefined) {
-        setUserPoints(data.points);
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        setUserPoints(user.balance || 0);
       }
     } catch (error) {
       console.error('Failed to load user data:', error);

@@ -399,100 +399,108 @@ export default function Index() {
               </nav>
 
               <div className="flex items-center gap-2">
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="relative"
-                  onClick={() => setFavoritesDialogOpen(true)}
-                >
-                  <Icon name="Heart" size={20} className={favoriteItems.length > 0 ? 'text-red-500' : ''} />
-                  {favoriteItems.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {favoriteItems.length}
-                    </span>
-                  )}
-                </Button>
-                
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  className="relative"
-                  onClick={() => setCartDialogOpen(true)}
-                >
-                  <Icon name="ShoppingCart" size={20} />
-                  {cartItems.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                      {cartItems.length}
-                    </span>
-                  )}
-                </Button>
-                
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full cursor-pointer" onClick={() => setPromoDialogOpen(true)}>
-                    <Icon name="Coins" size={20} className="text-primary" />
-                    <span className="font-semibold">{userBalance}</span>
-                  </div>
-                </div>
-                
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => setPaymentDialogOpen(true)}
-                >
-                  <Icon name="Plus" size={16} className="mr-2" />
-                  Пополнить
-                </Button>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
-                      <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white font-semibold flex items-center justify-center text-lg">
-                        {username ? username[0].toUpperCase() : 'U'}
-                      </div>
+                {isLoggedIn ? (
+                  <>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="relative"
+                      onClick={() => setFavoritesDialogOpen(true)}
+                    >
+                      <Icon name="Heart" size={20} className={favoriteItems.length > 0 ? 'text-red-500' : ''} />
+                      {favoriteItems.length > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          {favoriteItems.length}
+                        </span>
+                      )}
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end">
-                    <DropdownMenuLabel>
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{username || 'Пользователь'}</p>
-                        <p className="text-xs leading-none text-muted-foreground">{email || 'user@example.com'}</p>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="relative"
+                      onClick={() => setCartDialogOpen(true)}
+                    >
+                      <Icon name="ShoppingCart" size={20} />
+                      {cartItems.length > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                          {cartItems.length}
+                        </span>
+                      )}
+                    </Button>
+                    
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full cursor-pointer" onClick={() => setPromoDialogOpen(true)}>
+                        <Icon name="Coins" size={20} className="text-primary" />
+                        <span className="font-semibold">{userBalance}</span>
                       </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <a href="/profile" className="cursor-pointer">
-                        <Icon name="User" size={16} className="mr-2" />
-                        Профиль
-                      </a>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setPremiumDialogOpen(true)} className="text-purple-600 font-medium">
-                      <Icon name="Crown" size={16} className="mr-2" />
-                      Premium подписка
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => setPaymentDialogOpen(true)}>
-                      <Icon name="Wallet" size={16} className="mr-2" />
-                      Пополнить баланс
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setFavoritesDialogOpen(true)}>
-                      <Icon name="Heart" size={16} className="mr-2" />
-                      Избранное
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setPromoDialogOpen(true)}>
-                      <Icon name="Gift" size={16} className="mr-2" />
-                      Промокоды
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setReferralDialogOpen(true)}>
-                      <Icon name="Users" size={16} className="mr-2" />
-                      Реферальная программа
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                      <Icon name="LogOut" size={16} className="mr-2" />
-                      Выйти
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    </div>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setPaymentDialogOpen(true)}
+                    >
+                      <Icon name="Plus" size={16} className="mr-2" />
+                      Пополнить
+                    </Button>
+
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white font-semibold flex items-center justify-center text-lg">
+                            {username ? username[0].toUpperCase() : 'U'}
+                          </div>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56" align="end">
+                        <DropdownMenuLabel>
+                          <div className="flex flex-col space-y-1">
+                            <p className="text-sm font-medium leading-none">{username || 'Пользователь'}</p>
+                            <p className="text-xs leading-none text-muted-foreground">{email || 'user@example.com'}</p>
+                          </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <a href="/profile" className="cursor-pointer">
+                            <Icon name="User" size={16} className="mr-2" />
+                            Профиль
+                          </a>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setPremiumDialogOpen(true)} className="text-purple-600 font-medium">
+                          <Icon name="Crown" size={16} className="mr-2" />
+                          Premium подписка
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => setPaymentDialogOpen(true)}>
+                          <Icon name="Wallet" size={16} className="mr-2" />
+                          Пополнить баланс
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setFavoritesDialogOpen(true)}>
+                          <Icon name="Heart" size={16} className="mr-2" />
+                          Избранное
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setPromoDialogOpen(true)}>
+                          <Icon name="Gift" size={16} className="mr-2" />
+                          Промокоды
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setReferralDialogOpen(true)}>
+                          <Icon name="Users" size={16} className="mr-2" />
+                          Реферальная программа
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                          <Icon name="LogOut" size={16} className="mr-2" />
+                          Выйти
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </>
+                ) : (
+                  <Button onClick={() => setAuthDialogOpen(true)}>
+                    Войти
+                  </Button>
+                )}
               </div>
             </div>
           </div>

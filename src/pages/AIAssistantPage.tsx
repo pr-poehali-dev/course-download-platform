@@ -244,16 +244,13 @@ export default function AIAssistantPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       <Navigation isLoggedIn={isLoggedIn} />
       
-      <div className="container mx-auto px-4 pt-24 pb-8 max-w-6xl">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="container mx-auto px-4 pt-20 pb-4 max-w-7xl h-[calc(100vh-80px)]">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-              <Icon name="Bot" size={36} className="text-primary" />
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <Icon name="Bot" size={28} className="text-primary" />
               TechMentor Pro
             </h1>
-            <p className="text-muted-foreground">
-              Помогу переделать купленную работу под требования твоего ВУЗа
-            </p>
           </div>
           <div className="flex items-center gap-3">
             {getSubscriptionBadge()}

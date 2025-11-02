@@ -173,7 +173,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if work_id:
                 cur.execute("""
                     SELECT id, title, work_type, subject, description, composition, 
-                           price_points, rating, downloads, created_at, yandex_disk_link
+                           price_points, rating, downloads, created_at, yandex_disk_link, 
+                           preview_image_url, file_url
                     FROM t_p63326274_course_download_plat.works WHERE id = %s
                 """, (work_id,))
                 row = cur.fetchone()
@@ -196,7 +197,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'rating': float(row[7]) if row[7] else 0,
                     'downloads': row[8],
                     'created_at': row[9].isoformat() if row[9] else None,
-                    'yandex_disk_link': row[10]
+                    'yandex_disk_link': row[10],
+                    'preview_image_url': row[11],
+                    'file_url': row[12]
                 }
                 
                 cur.execute("""

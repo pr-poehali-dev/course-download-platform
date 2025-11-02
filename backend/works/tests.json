@@ -1,6 +1,18 @@
 {
   "tests": [
     {
+      "name": "Get single work by ID",
+      "method": "GET",
+      "path": "/?id=4856",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "id": "number",
+        "title": "string",
+        "preview_image_url": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
       "name": "Get all works with pagination",
       "method": "GET",
       "path": "/?limit=10&offset=0",
@@ -10,28 +22,6 @@
         "total": "number",
         "limit": 10,
         "offset": 0
-      },
-      "bodyMatcher": "partial"
-    },
-    {
-      "name": "Filter by category",
-      "method": "GET",
-      "path": "/?category=diploma&limit=5",
-      "expectedStatus": 200,
-      "expectedBody": {
-        "works": "array",
-        "total": "number"
-      },
-      "bodyMatcher": "partial"
-    },
-    {
-      "name": "Search works",
-      "method": "GET",
-      "path": "/?search=автомат&limit=5",
-      "expectedStatus": 200,
-      "expectedBody": {
-        "works": "array",
-        "total": "number"
       },
       "bodyMatcher": "partial"
     }

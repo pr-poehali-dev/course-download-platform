@@ -207,7 +207,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         print(f"DEBUG: Sending {len(api_messages)} messages to GigaChat", file=sys.stderr)
         
-        response = client.chat(api_messages, temperature=0.7, max_tokens=800)
+        response = client.chat(api_messages)
         
         assistant_message = response.choices[0].message.content
         total_tokens = response.usage.total_tokens if hasattr(response, 'usage') else 0

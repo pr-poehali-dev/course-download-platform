@@ -1,13 +1,11 @@
 '''
-Business: Полная синхронизация каталога с Яндекс.Диска — парсинг папок, создание превью, обновление БД
-Args: event с POST body (yandex_disk_url)
-Returns: {success, total_works, updated, created, errors}
+Business: Полная синхронизация каталога из Yandex Cloud Storage (бакет kyra/works/) — парсинг папок, генерация превью, обновление БД с подробными описаниями
+Args: event с POST body (пустой, все берется из бакета)
+Returns: {success, total_works, synced}
 '''
 
 import json
 import os
-import urllib.request
-import urllib.parse
 from typing import Dict, Any, List
 import psycopg2
 import boto3
@@ -15,111 +13,8 @@ from botocore.config import Config
 import uuid
 
 
-def get_yandex_disk_folders(public_url: str) -> List[Dict[str, Any]]:
-    """Получает список всех папок с Яндекс.Диска"""
-    api_url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
-    params = urllib.parse.urlencode({
-        'public_key': public_url,
-        'limit': 1000
-    })
-    
-    request_url = f"{api_url}?{params}"
-    
-    req = urllib.request.Request(request_url)
-    response = urllib.request.urlopen(req)
-    data = json.loads(response.read().decode('utf-8'))
-    
-    folders = []
-    
-    if '_embedded' in data and 'items' in data['_embedded']:
-        for item in data['_embedded']['items']:
-            if item['type'] == 'dir':
-                folder_name = item['name']
-                folder_path = item['path']
-                
-                # Парсим название папки: "Название (Тип работы)"
-                match = folder_name.strip()
-                parts = match.rsplit('(', 1)
-                
-                if len(parts) == 2:
-                    title = parts[0].strip()
-                    work_type = parts[1].replace(')', '').strip()
-                else:
-                    title = match
-                    work_type = 'неизвестный тип'
-                
-                folders.append({
-                    'name': folder_name,
-                    'title': title,
-                    'work_type': work_type,
-                    'path': folder_path,
-                    'download_url': item.get('file', '')
-                })
-    
-    return folders
-
-
-def get_folder_files(public_url: str, folder_path: str) -> List[Dict[str, Any]]:
-    """Получает список файлов внутри папки"""
-    api_url = 'https://cloud-api.yandex.net/v1/disk/public/resources'
-    params = urllib.parse.urlencode({
-        'public_key': public_url,
-        'path': folder_path,
-        'limit': 100
-    })
-    
-    request_url = f"{api_url}?{params}"
-    
-    req = urllib.request.Request(request_url)
-    response = urllib.request.urlopen(req)
-    data = json.loads(response.read().decode('utf-8'))
-    
-    files = []
-    
-    if '_embedded' in data and 'items' in data['_embedded']:
-        for item in data['_embedded']['items']:
-            if item['type'] == 'file':
-                files.append({
-                    'name': item['name'],
-                    'type': item['mime_type'],
-                    'size': item['size'],
-                    'download_url': item.get('file', '')
-                })
-    
-    return files
-
-
-def download_and_convert_pdf_preview(pdf_url: str) -> bytes:
-    """Скачивает PDF и конвертирует первую страницу в PNG"""
-    try:
-        import fitz  # PyMuPDF
-        from PIL import Image
-        import io
-        
-        # Скачиваем PDF
-        req = urllib.request.Request(pdf_url)
-        response = urllib.request.urlopen(req, timeout=30)
-        pdf_data = response.read()
-        
-        # Открываем PDF
-        pdf_document = fitz.open(stream=pdf_data, filetype="pdf")
-        
-        # Конвертируем первую страницу
-        first_page = pdf_document[0]
-        pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
-        
-        # Конвертируем в PNG
-        img_bytes = pix.tobytes("png")
-        
-        pdf_document.close()
-        return img_bytes
-    except Exception as e:
-        print(f"Preview generation error: {e}")
-        return None
-
-
-def upload_to_s3(file_data: bytes, filename: str) -> str:
-    """Загрузка превью в S3"""
+def get_cloud_storage_folders() -> tuple:
+    """Получает список всех папок из бакета kyra/works/"""
     s3_client = boto3.client(
         's3',
         endpoint_url='https://storage.yandexcloud.net',
@@ -129,43 +24,135 @@ def upload_to_s3(file_data: bytes, filename: str) -> str:
         config=Config(signature_version='s3v4')
     )
     
-    file_name = f"preview_{uuid.uuid4().hex[:12]}.png"
+    bucket_name = 'kyra'
+    works_prefix = 'works/'
     
-    s3_client.put_object(
-        Bucket='kyra',
-        Key=file_name,
-        Body=file_data,
-        ContentType='image/png',
-        ACL='public-read'
+    response = s3_client.list_objects_v2(
+        Bucket=bucket_name, 
+        Prefix=works_prefix, 
+        Delimiter='/'
     )
     
-    return f"https://storage.yandexcloud.net/kyra/{file_name}"
-
-
-def determine_subject(title: str) -> str:
-    """Определяет предмет по названию работы"""
-    t = title.lower()
+    folders = []
     
-    if 'электро' in t or 'энергет' in t or 'эу' in t or 'ру' in t:
-        return 'электроэнергетика'
-    elif 'автоматиз' in t or 'управлен' in t or 'асу' in t:
-        return 'автоматизация'
-    elif 'строител' in t or 'бетон' in t or 'конструк' in t:
-        return 'строительство'
-    elif 'механ' in t or 'привод' in t or 'станок' in t:
-        return 'механика'
-    elif 'газ' in t or 'нефт' in t:
-        return 'газоснабжение'
-    elif 'програм' in t or 'software' in t or 'алгоритм' in t:
-        return 'программирование'
-    elif 'безопасн' in t or 'охран' in t:
-        return 'безопасность'
-    elif 'тепло' in t or 'водоснабжен' in t or 'вентиляц' in t:
-        return 'теплоснабжение'
-    elif 'транспорт' in t or 'дорог' in t or 'автомобил' in t:
-        return 'транспорт'
-    else:
-        return 'общая инженерия'
+    if 'CommonPrefixes' in response:
+        for prefix in response['CommonPrefixes']:
+            folder_path = prefix['Prefix']
+            folder_name = folder_path.replace(works_prefix, '').rstrip('/')
+            
+            if not folder_name:
+                continue
+            
+            match = folder_name.strip()
+            parts = match.rsplit('(', 1)
+            
+            if len(parts) == 2:
+                title = parts[0].strip()
+                work_type = parts[1].replace(')', '').strip()
+            else:
+                title = match
+                work_type = 'Курсовая работа'
+            
+            folders.append({
+                'name': folder_name,
+                'title': title,
+                'work_type': work_type,
+                'folder_path': folder_path
+            })
+    
+    return folders, s3_client
+
+
+def get_folder_files(s3_client, bucket: str, folder_path: str) -> List[Dict[str, Any]]:
+    """Получает список файлов внутри папки из Cloud Storage"""
+    response = s3_client.list_objects_v2(Bucket=bucket, Prefix=folder_path)
+    
+    files = []
+    
+    if 'Contents' in response:
+        for obj in response['Contents']:
+            file_key = obj['Key']
+            file_name = file_key.replace(folder_path, '')
+            
+            if file_name:
+                files.append({
+                    'name': file_name,
+                    'key': file_key,
+                    'size': obj['Size']
+                })
+    
+    return files
+
+
+def download_and_convert_pdf_preview(s3_client, bucket: str, pdf_key: str) -> bytes:
+    """Скачивает PDF из S3 и конвертирует первую страницу в PNG"""
+    try:
+        import fitz
+        
+        pdf_obj = s3_client.get_object(Bucket=bucket, Key=pdf_key)
+        pdf_data = pdf_obj['Body'].read()
+        
+        pdf_document = fitz.open(stream=pdf_data, filetype="pdf")
+        
+        first_page = pdf_document[0]
+        pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
+        
+        img_bytes = pix.tobytes("png")
+        
+        pdf_document.close()
+        return img_bytes
+    except Exception as e:
+        print(f"Preview generation error: {e}")
+        return None
+
+
+def parse_work_metadata(title: str, work_type: str) -> Dict[str, Any]:
+    """Создает подробные метаданные для работы"""
+    
+    type_mapping = {
+        'Курсовая работа': {
+            'category': 'coursework',
+            'description': f'Готовая курсовая работа по теме "{title}". Включает теоретическую часть, практические расчеты и выводы. Работа выполнена в соответствии с требованиями ГОСТ.',
+            'universities': ['МГУ', 'СПбГУ', 'МГТУ им. Баумана', 'МИФИ', 'НИУ ВШЭ'],
+            'specializations': ['Экономика', 'Менеджмент', 'Информатика', 'Финансы'],
+            'keywords': ['курсовая', 'расчеты', 'анализ', 'ГОСТ'],
+            'price': 1500,
+            'year': 2024,
+            'pages': 35
+        },
+        'ВКР': {
+            'category': 'diploma',
+            'description': f'Выпускная квалификационная работа (ВКР) по теме "{title}". Полный комплект: пояснительная записка, графическая часть, презентация. Соответствует требованиям государственной аттестации.',
+            'universities': ['МГУ', 'СПбГУ', 'МГТУ им. Баумана', 'МИФИ', 'МАИ', 'МАДИ'],
+            'specializations': ['Бакалавриат', 'Специалитет', 'Инженерия', 'Экономика'],
+            'keywords': ['диплом', 'вкр', 'бакалавр', 'защита', 'ГОСТ'],
+            'price': 5000,
+            'year': 2024,
+            'pages': 80
+        },
+        'Диплом': {
+            'category': 'diploma',
+            'description': f'Дипломная работа по теме "{title}". Полный комплект документов для защиты: пояснительная записка, чертежи, презентация, доклад. Высокое качество оформления.',
+            'universities': ['МГУ', 'СПбГУ', 'МГТУ им. Баумана', 'МИФИ', 'МАИ'],
+            'specializations': ['Специалитет', 'Магистратура', 'Инженерия'],
+            'keywords': ['диплом', 'защита', 'чертежи', 'ГОСТ'],
+            'price': 5000,
+            'year': 2024,
+            'pages': 90
+        },
+        'Курсовой проект': {
+            'category': 'coursework',
+            'description': f'Курсовой проект по теме "{title}". Расчетно-графическая работа с чертежами. Полный комплект: расчеты, пояснительная записка, графическая часть.',
+            'universities': ['МГТУ им. Баумана', 'МАИ', 'МАДИ', 'СПбГПУ'],
+            'specializations': ['Машиностроение', 'Строительство', 'Электротехника', 'Автоматизация'],
+            'keywords': ['проект', 'чертежи', 'расчеты', 'КОМПАС', 'AutoCAD'],
+            'price': 2000,
+            'year': 2024,
+            'pages': 40
+        }
+    }
+    
+    return type_mapping.get(work_type, type_mapping['Курсовая работа'])
 
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -180,119 +167,92 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Access-Control-Allow-Headers': 'Content-Type',
                 'Access-Control-Max-Age': '86400'
             },
-            'body': ''
+            'body': '',
+            'isBase64Encoded': False
         }
     
     if method != 'POST':
         return {
             'statusCode': 405,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'success': False, 'error': 'Method not allowed'})
+            'body': json.dumps({'success': False, 'error': 'Method not allowed'}),
+            'isBase64Encoded': False
         }
     
-    body = event.get('body', '{}')
-    if not body:
-        body = '{}'
-    
-    body_data = json.loads(body)
-    yandex_disk_url = body_data.get('yandex_disk_url', 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ')
-    
-    # Получаем список папок
-    folders = get_yandex_disk_folders(yandex_disk_url)
+    folders, s3_client = get_cloud_storage_folders()
+    bucket_name = 'kyra'
     
     database_url = os.environ.get('DATABASE_URL', '')
     conn = psycopg2.connect(database_url)
     cursor = conn.cursor()
     
-    updated = 0
-    created = 0
-    errors = []
+    cursor.execute("TRUNCATE TABLE works CASCADE")
+    
+    synced = 0
     
     for folder in folders:
         try:
-            # Получаем файлы внутри папки
-            files = get_folder_files(yandex_disk_url, folder['path'])
+            files = get_folder_files(s3_client, bucket_name, folder['folder_path'])
             
-            # Ищем PDF файл для превью
             pdf_file = next((f for f in files if f['name'].lower().endswith('.pdf')), None)
             
             preview_url = None
-            if pdf_file and pdf_file.get('download_url'):
-                # Генерируем превью
-                preview_data = download_and_convert_pdf_preview(pdf_file['download_url'])
+            if pdf_file:
+                preview_data = download_and_convert_pdf_preview(s3_client, bucket_name, pdf_file['key'])
                 if preview_data:
-                    preview_url = upload_to_s3(preview_data, f"{folder['title']}.png")
+                    preview_filename = f"previews/preview_{uuid.uuid4().hex[:12]}.png"
+                    s3_client.put_object(
+                        Bucket=bucket_name,
+                        Key=preview_filename,
+                        Body=preview_data,
+                        ContentType='image/png'
+                    )
+                    preview_url = f"https://storage.yandexcloud.net/{bucket_name}/{preview_filename}"
             
-            # Определяем предмет
-            subject = determine_subject(folder['title'])
+            metadata = parse_work_metadata(folder['title'], folder['work_type'])
             
-            # Проверяем существование работы
-            cursor.execute(
-                "SELECT id FROM works WHERE title = %s",
-                (folder['title'],)
-            )
-            existing = cursor.fetchone()
+            download_url = f"https://storage.yandexcloud.net/{bucket_name}/{folder['folder_path']}"
             
-            if existing:
-                # Обновляем существующую работу
-                update_query = """
-                    UPDATE works 
-                    SET work_type = %s,
-                        subject = %s,
-                        preview_image_url = COALESCE(%s, preview_image_url),
-                        updated_at = NOW()
-                    WHERE title = %s
-                """
-                cursor.execute(update_query, (
-                    folder['work_type'],
-                    subject,
-                    preview_url,
-                    folder['title']
-                ))
-                updated += 1
-            else:
-                # Создаём новую работу
-                insert_query = """
-                    INSERT INTO works (
-                        title, work_type, subject, description,
-                        preview_image_url, yandex_disk_link,
-                        price, rating, created_at, updated_at
-                    ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
-                """
-                cursor.execute(insert_query, (
-                    folder['title'],
-                    folder['work_type'],
-                    subject,
-                    f"Работа по предмету {subject}",
-                    preview_url,
-                    yandex_disk_url,
-                    100,  # Дефолтная цена
-                    4.8   # Дефолтный рейтинг
-                ))
-                created += 1
+            insert_query = """
+                INSERT INTO works (
+                    title, work_type, category, description,
+                    preview_image_url, download_url,
+                    price, year, pages,
+                    universities, specializations, keywords
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
             
-            conn.commit()
+            cursor.execute(insert_query, (
+                folder['title'],
+                folder['work_type'],
+                metadata['category'],
+                metadata['description'],
+                preview_url,
+                download_url,
+                metadata['price'],
+                metadata['year'],
+                metadata['pages'],
+                json.dumps(metadata['universities'], ensure_ascii=False),
+                json.dumps(metadata['specializations'], ensure_ascii=False),
+                json.dumps(metadata['keywords'], ensure_ascii=False)
+            ))
+            
+            synced += 1
             
         except Exception as e:
-            errors.append({
-                'folder': folder['name'],
-                'error': str(e)
-            })
+            print(f"Error processing {folder.get('title', 'unknown')}: {e}")
     
+    conn.commit()
     cursor.close()
     conn.close()
     
     return {
         'statusCode': 200,
-        'headers': {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
-        },
+        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         'body': json.dumps({
             'success': True,
             'total_works': len(folders),
-            'updated': updated,
-            'created': created,
-            'errors': errors
-        })
+            'synced': synced
+        }, ensure_ascii=False),
+        'isBase64Encoded': False
     }

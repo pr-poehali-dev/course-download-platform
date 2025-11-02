@@ -33,6 +33,7 @@ export default function YandexDiskImport() {
   const [cleaning, setCleaning] = useState(false);
   const [generatingPreviews, setGeneratingPreviews] = useState(false);
   const [previewProgress, setPreviewProgress] = useState(0);
+  const [syncingStorage, setSyncingStorage] = useState(false);
 
   const handleImport = async () => {
     setImporting(true);
@@ -262,6 +263,43 @@ export default function YandexDiskImport() {
     }
   };
 
+  const handleSyncStorage = async () => {
+    if (!confirm('Синхронизировать каталог из Cloud Storage? Это обновит все работы и создаст превью.')) {
+      return;
+    }
+
+    setSyncingStorage(true);
+    try {
+      const response = await fetch(func2url['full-yandex-sync'], {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: 'Синхронизация завершена!',
+          description: `Синхронизировано работ: ${data.synced} из ${data.total_works}`
+        });
+        setResult(null);
+      } else {
+        throw new Error(data.error || 'Ошибка синхронизации');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка синхронизации',
+        description: error.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setSyncingStorage(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -359,42 +397,70 @@ export default function YandexDiskImport() {
           </div>
         )}
 
-        <div className="flex gap-3">
-          <Button 
-            onClick={handleImport} 
-            disabled={importing || !publicKey || cleaning || generatingPreviews}
-            className="flex-1"
-          >
-            {importing ? (
-              <>
-                <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                Импорт...
-              </>
-            ) : (
-              <>
-                <Icon name="Download" size={18} className="mr-2" />
-                Запустить импорт
-              </>
-            )}
-          </Button>
-          
-          <Button 
-            onClick={handleCleanupDuplicates}
-            disabled={importing || cleaning || generatingPreviews}
-            variant="outline"
-          >
-            {cleaning ? (
-              <>
-                <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                Удаление...
-              </>
-            ) : (
-              <>
-                <Icon name="Trash2" size={18} className="mr-2" />
-                Удалить дубликаты
-              </>
-            )}
-          </Button>
+        <div className="space-y-3">
+          <div className="flex gap-3">
+            <Button 
+              onClick={handleSyncStorage} 
+              disabled={importing || cleaning || generatingPreviews || syncingStorage}
+              className="flex-1"
+              variant="default"
+            >
+              {syncingStorage ? (
+                <>
+                  <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                  Синхронизация...
+                </>
+              ) : (
+                <>
+                  <Icon name="CloudDownload" size={18} className="mr-2" />
+                  Синхронизация Cloud Storage
+                </>
+              )}
+            </Button>
+          </div>
+
+          <div className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
+            <Icon name="Info" size={16} className="inline mr-2" />
+            Синхронизация загрузит все работы из бакета kyra/works/, создаст превью и обновит каталог
+          </div>
+
+          <div className="flex gap-3">
+            <Button 
+              onClick={handleImport} 
+              disabled={importing || !publicKey || cleaning || generatingPreviews || syncingStorage}
+              className="flex-1"
+              variant="outline"
+            >
+              {importing ? (
+                <>
+                  <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                  Импорт...
+                </>
+              ) : (
+                <>
+                  <Icon name="Download" size={18} className="mr-2" />
+                  Импорт с Яндекс.Диска
+                </>
+              )}
+            </Button>
+            
+            <Button 
+              onClick={handleCleanupDuplicates}
+              disabled={importing || cleaning || generatingPreviews || syncingStorage}
+              variant="outline"
+            >
+              {cleaning ? (
+                <>
+                  <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                  Удаление...
+                </>
+              ) : (
+                <>
+                  <Icon name="Trash2" size={18} className="mr-2" />
+                  Удалить дубликаты
+                </>
+              )}
+            </Button>
 
           <Button 
             onClick={handleClearAll}

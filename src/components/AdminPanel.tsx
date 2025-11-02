@@ -191,7 +191,7 @@ export default function AdminPanel() {
       </div>
 
       <Tabs defaultValue="analytics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-10">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
           <TabsTrigger value="analytics">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Аналитика
@@ -200,33 +200,17 @@ export default function AdminPanel() {
             <Icon name="FileText" size={18} className="mr-2" />
             Работы
           </TabsTrigger>
-          <TabsTrigger value="batch-upload">
-            <Icon name="Upload" size={18} className="mr-2" />
-            Загрузка
-          </TabsTrigger>
-          <TabsTrigger value="previews">
-            <Icon name="Image" size={18} className="mr-2" />
-            Превью
-          </TabsTrigger>
-          <TabsTrigger value="import">
-            <Icon name="CloudDownload" size={18} className="mr-2" />
-            Импорт
-          </TabsTrigger>
           <TabsTrigger value="users">
             <Icon name="Users" size={18} className="mr-2" />
             Пользователи
           </TabsTrigger>
-          <TabsTrigger value="finance">
-            <Icon name="Coins" size={18} className="mr-2" />
-            Финансы
+          <TabsTrigger value="sync">
+            <Icon name="CloudDownload" size={18} className="mr-2" />
+            Синхронизация
           </TabsTrigger>
           <TabsTrigger value="support">
             <Icon name="MessageSquare" size={18} className="mr-2" />
             Тикеты
-          </TabsTrigger>
-          <TabsTrigger value="add-work">
-            <Icon name="Plus" size={18} className="mr-2" />
-            Добавить
           </TabsTrigger>
           <TabsTrigger value="settings">
             <Icon name="Settings" size={18} className="mr-2" />
@@ -240,35 +224,10 @@ export default function AdminPanel() {
 
         <TabsContent value="works" className="space-y-6">
           <WorksManagement />
+          <WorkManager adminEmail={ADMIN_EMAIL} />
         </TabsContent>
 
-        <TabsContent value="batch-upload" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Icon name="Upload" size={24} />
-                Массовая загрузка работ
-              </CardTitle>
-              <CardDescription>
-                Загрузите ZIP-архивы работ из Яндекс.Диска с автоматическим созданием превью
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild className="w-full">
-                <a href="/batch-upload">
-                  <Icon name="Upload" size={18} className="mr-2" />
-                  Открыть страницу загрузки
-                </a>
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="previews" className="space-y-6">
-          <PreviewGenerator />
-        </TabsContent>
-
-        <TabsContent value="import" className="space-y-6">
+        <TabsContent value="sync" className="space-y-6">
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -323,25 +282,19 @@ export default function AdminPanel() {
           </Card>
           
           <YandexDiskImport />
+          <PreviewGenerator />
         </TabsContent>
 
         <TabsContent value="users" className="space-y-6">
           <UsersManagement />
         </TabsContent>
 
-        <TabsContent value="finance" className="space-y-6">
-          <FinanceManagement />
-        </TabsContent>
-
         <TabsContent value="support" className="space-y-6">
           <SupportAdmin />
         </TabsContent>
 
-        <TabsContent value="add-work" className="space-y-6">
-          <WorkManager adminEmail={ADMIN_EMAIL} />
-        </TabsContent>
-
         <TabsContent value="settings" className="space-y-6">
+          <FinanceManagement />
           <PlatformSettings />
         </TabsContent>
 

@@ -376,40 +376,40 @@ export default function Index() {
     });
 
   return (
-    <div className="min-h-screen" style={{
+    <div className="min-h-screen w-full overflow-x-hidden" style={{
       backgroundImage: `url('https://cdn.poehali.dev/files/b1077a7b-9e1f-4fde-8ee3-c49a7a6cb6a0.PNG')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
     }}>
-      <div className="bg-white/90 backdrop-blur-sm min-h-screen">
-        <header className="border-b bg-white/95 backdrop-blur-md sticky top-0 z-50">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Icon name="Cpu" size={32} className="text-primary" />
-                <h1 className="text-2xl font-bold">Tech Forma</h1>
+      <div className="bg-white/90 backdrop-blur-sm min-h-screen w-full">
+        <header className="border-b bg-white/95 backdrop-blur-md sticky top-0 z-50 w-full">
+          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
+                <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
+                <h1 className="text-lg sm:text-2xl font-bold truncate">Tech Forma</h1>
               </div>
               
-              <nav className="hidden md:flex items-center gap-6">
-                <a href="/" className="hover:text-primary transition-colors">Главная</a>
-                <a href="/catalog" className="hover:text-primary transition-colors">Каталог</a>
-                <a href="#blog" className="hover:text-primary transition-colors">Блог</a>
-                <a href="#support" className="hover:text-primary transition-colors">Поддержка</a>
+              <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
+                <a href="/" className="hover:text-primary transition-colors text-sm">Главная</a>
+                <a href="/catalog" className="hover:text-primary transition-colors text-sm">Каталог</a>
+                <a href="#blog" className="hover:text-primary transition-colors text-sm">Блог</a>
+                <a href="#support" className="hover:text-primary transition-colors text-sm">Поддержка</a>
               </nav>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                 {isLoggedIn ? (
                   <>
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="relative"
+                      className="relative h-8 w-8 sm:h-10 sm:w-10 hidden sm:flex"
                       onClick={() => setFavoritesDialogOpen(true)}
                     >
-                      <Icon name="Heart" size={20} className={favoriteItems.length > 0 ? 'text-red-500' : ''} />
+                      <Icon name="Heart" size={18} className={favoriteItems.length > 0 ? 'text-red-500' : ''} />
                       {favoriteItems.length > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs">
                           {favoriteItems.length}
                         </span>
                       )}
@@ -418,37 +418,39 @@ export default function Index() {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="relative"
+                      className="relative h-8 w-8 sm:h-10 sm:w-10 hidden sm:flex"
                       onClick={() => setCartDialogOpen(true)}
                     >
-                      <Icon name="ShoppingCart" size={20} />
+                      <Icon name="ShoppingCart" size={18} />
                       {cartItems.length > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs">
                           {cartItems.length}
                         </span>
                       )}
                     </Button>
                     
                     <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full cursor-pointer" onClick={() => setPromoDialogOpen(true)}>
-                        <Icon name="Coins" size={20} className="text-primary" />
-                        <span className="font-semibold">{userBalance}</span>
+                      <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-primary/10 rounded-full cursor-pointer" onClick={() => setPromoDialogOpen(true)}>
+                        <Icon name="Coins" size={16} className="text-primary sm:w-5 sm:h-5" />
+                        <span className="font-semibold text-sm sm:text-base">{userBalance}</span>
                       </div>
                     </div>
                     
                     <Button 
                       variant="outline" 
                       size="sm"
+                      className="hidden md:flex text-xs sm:text-sm px-2 sm:px-4"
                       onClick={() => setPaymentDialogOpen(true)}
                     >
-                      <Icon name="Plus" size={16} className="mr-2" />
-                      Пополнить
+                      <Icon name="Plus" size={14} className="mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">Пополнить</span>
+                      <span className="sm:hidden">+</span>
                     </Button>
 
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
-                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white font-semibold flex items-center justify-center text-lg">
+                        <Button variant="ghost" className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full p-0">
+                          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white font-semibold flex items-center justify-center text-sm sm:text-lg">
                             {username ? username[0].toUpperCase() : 'U'}
                           </div>
                         </Button>
@@ -497,7 +499,7 @@ export default function Index() {
                     </DropdownMenu>
                   </>
                 ) : (
-                  <Button onClick={() => setAuthDialogOpen(true)}>
+                  <Button onClick={() => setAuthDialogOpen(true)} size="sm" className="text-xs sm:text-sm px-3 sm:px-4">
                     Войти
                   </Button>
                 )}
@@ -506,72 +508,72 @@ export default function Index() {
           </div>
         </header>
 
-        <section className="relative py-32 overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+        <section className="relative py-12 sm:py-20 lg:py-32 overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDIiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-60"></div>
           
           <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-300/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '1s'}}></div>
           
-          <div className="container mx-auto px-4 relative z-10">
-            <div className="max-w-5xl mx-auto text-center mb-16">
-              <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full mb-8 animate-fade-in backdrop-blur-sm border border-primary/20">
-                <Icon name="Sparkles" size={18} className="text-primary" />
-                <span className="text-sm font-semibold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 relative z-10">
+            <div className="max-w-5xl mx-auto text-center mb-8 sm:mb-16">
+              <div className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full mb-4 sm:mb-8 animate-fade-in backdrop-blur-sm border border-primary/20">
+                <Icon name="Sparkles" size={16} className="text-primary sm:w-[18px] sm:h-[18px]" />
+                <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
                   Платформа нового поколения для студентов
                 </span>
               </div>
               
-              <h2 className="text-6xl md:text-8xl font-bold mb-8 bg-gradient-to-r from-slate-900 via-primary to-purple-600 bg-clip-text text-transparent animate-fade-in leading-tight">
+              <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-8 bg-gradient-to-r from-slate-900 via-primary to-purple-600 bg-clip-text text-transparent animate-fade-in leading-tight px-2">
                 Tech Forma
               </h2>
               
-              <p className="text-2xl md:text-3xl font-semibold text-slate-700 mb-6 animate-fade-in">
+              <p className="text-lg sm:text-2xl md:text-3xl font-semibold text-slate-700 mb-3 sm:mb-6 animate-fade-in px-2">
                 Умная экосистема для студентов
               </p>
               
-              <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
                 Облачный каталог работ + ИИ-помощник + Маркетплейс авторов. Всё в одном месте.
               </p>
               
-              <div className="flex gap-4 justify-center mb-12 flex-wrap animate-fade-in">
-                <Button size="lg" className="h-14 px-8 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-lg shadow-xl" asChild>
+              <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
+                <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
                   <a href="/catalog">
-                    <Icon name="Database" size={20} className="mr-2" />
+                    <Icon name="Database" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
                     Каталог работ
                   </a>
                 </Button>
-                <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 backdrop-blur-sm bg-white/50" asChild>
+                <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg border-2 backdrop-blur-sm bg-white/50" asChild>
                   <a href="/ai-assistant">
-                    <Icon name="Bot" size={20} className="mr-2" />
+                    <Icon name="Bot" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
                     TechMentor Pro
                   </a>
                 </Button>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
-                  <div className="text-3xl font-bold text-primary mb-1">{realWorks.length > 0 ? realWorks.length : '450'}+</div>
-                  <p className="text-sm text-muted-foreground">Готовых работ</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 max-w-4xl mx-auto px-2">
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
+                  <div className="text-xl sm:text-3xl font-bold text-primary mb-1">{realWorks.length > 0 ? realWorks.length : '450'}+</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Готовых работ</p>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-purple-200 hover:border-purple-400 transition-all hover:shadow-lg">
-                  <div className="text-3xl font-bold text-purple-600 mb-1">ИИ</div>
-                  <p className="text-sm text-muted-foreground">Помощник</p>
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-purple-200 hover:border-purple-400 transition-all hover:shadow-lg">
+                  <div className="text-xl sm:text-3xl font-bold text-purple-600 mb-1">ИИ</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Помощник</p>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-blue-200 hover:border-blue-400 transition-all hover:shadow-lg">
-                  <div className="text-3xl font-bold text-blue-600 mb-1">24/7</div>
-                  <p className="text-sm text-muted-foreground">Доступ</p>
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-blue-200 hover:border-blue-400 transition-all hover:shadow-lg">
+                  <div className="text-xl sm:text-3xl font-bold text-blue-600 mb-1">24/7</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Доступ</p>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 text-center border border-green-200 hover:border-green-400 transition-all hover:shadow-lg">
-                  <div className="text-3xl font-bold text-green-600 mb-1">5000+</div>
-                  <p className="text-sm text-muted-foreground">Студентов</p>
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-green-200 hover:border-green-400 transition-all hover:shadow-lg">
+                  <div className="text-xl sm:text-3xl font-bold text-green-600 mb-1">5000+</div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Студентов</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-24 bg-white">
-          <div className="container mx-auto px-4">
+        <section className="py-12 sm:py-16 lg:py-24 bg-white">
+          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4">
             <div className="text-center mb-16">
               <Badge className="mb-4 bg-gradient-to-r from-primary to-purple-600">
                 Возможности платформы

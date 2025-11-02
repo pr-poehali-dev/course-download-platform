@@ -95,14 +95,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             balance = result[0]
             
             # Проверяем является ли пользователь администратором
-            # Админы хранятся в отдельной таблице admins
-            cur.execute(
-                "SELECT id FROM t_p63326274_course_download_plat.admins WHERE id = %s",
-                (user_id,)
-            )
-            admin_result = cur.fetchone()
-            
-            is_admin = bool(admin_result)
+            # ID 999999 - это хардкод админ из фронтенда
+            is_admin = (int(user_id) == 999999)
             
             if not is_admin and balance < price:
                 conn.rollback()

@@ -75,14 +75,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
-            # Сначала проверяем является ли пользователь администратором
-            # Проверяем в таблице admins (админы хранятся отдельно)
-            cur.execute(
-                "SELECT id FROM t_p63326274_course_download_plat.admins WHERE id = %s",
-                (user_id,)
-            )
-            admin_result = cur.fetchone()
-            is_admin = bool(admin_result)
+            # Проверяем является ли пользователь администратором
+            # ID 999999 - это хардкод админ из фронтенда
+            is_admin = (int(user_id) == 999999)
             
             print(f"[DEBUG] User {user_id}, is_admin: {is_admin}")
             

@@ -79,6 +79,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # СНАЧАЛА проверяем является ли пользователь администратором
             # ID 999999 - это хардкод админ из фронтенда (AdminPanel.tsx:95)
             is_admin = (int(user_id) == 999999)
+            print(f"[DEBUG] user_id={user_id}, type={type(user_id)}, is_admin={is_admin}")
             
             # Для не-админов проверяем баланс
             balance = 0

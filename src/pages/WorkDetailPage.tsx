@@ -36,6 +36,7 @@ export default function WorkDetailPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showUploadButton, setShowUploadButton] = useState(false);
+  const [extractingImages, setExtractingImages] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -517,6 +518,48 @@ export default function WorkDetailPage() {
     }
   };
 
+  const handleExtractImagesFromArchive = async () => {
+    if (!workId) return;
+
+    setExtractingImages(true);
+
+    try {
+      const UPDATE_PREVIEW_URL = func2url['update-work-preview'];
+      const response = await fetch(UPDATE_PREVIEW_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          work_id: workId,
+          extract_from_archive: true
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        if (data.all_images && data.all_images.length > 0) {
+          setGallery(data.all_images);
+          setSelectedImage(0);
+          
+          if (work) {
+            setWork({ ...work, previewUrl: data.image_url });
+          }
+          
+          alert(`✅ Извлечено ${data.count} изображений из архива!`);
+        } else {
+          alert('⚠️ PNG изображения не найдены в архиве');
+        }
+      } else {
+        alert('❌ Ошибка: ' + (data.error || data.message));
+      }
+    } catch (error) {
+      console.error('Extract error:', error);
+      alert('❌ Ошибка извлечения изображений');
+    } finally {
+      setExtractingImages(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
@@ -609,7 +652,27 @@ export default function WorkDetailPage() {
               )}
 
               {showUploadButton && (
-                <div className="mt-4">
+                <div className="mt-4 space-y-2">
+                  <Button 
+                    type="button"
+                    variant="default"
+                    disabled={extractingImages}
+                    className="w-full"
+                    onClick={handleExtractImagesFromArchive}
+                  >
+                    {extractingImages ? (
+                      <>
+                        <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />
+                        Извлечение изображений...
+                      </>
+                    ) : (
+                      <>
+                        <Icon name="Image" className="mr-2 h-4 w-4" />
+                        🖼️ Извлечь PNG из архива
+                      </>
+                    )}
+                  </Button>
+                  
                   <label className="cursor-pointer">
                     <Button 
                       type="button"
@@ -627,7 +690,7 @@ export default function WorkDetailPage() {
                         ) : (
                           <>
                             <Icon name="Upload" className="mr-2 h-4 w-4" />
-                            📎 Загрузить файл для работы
+                            📎 Загрузить файл вручную
                           </>
                         )}
                       </span>

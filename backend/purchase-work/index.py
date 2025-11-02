@@ -94,15 +94,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             balance = result[0]
             
-            # Проверяем роль пользователя (админ пропускает проверку баланса)
+            # Проверяем является ли пользователь администратором
+            # Админы хранятся в отдельной таблице admins
             cur.execute(
-                "SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s",
+                "SELECT id FROM t_p63326274_course_download_plat.admins WHERE id = %s",
                 (user_id,)
             )
-            role_result = cur.fetchone()
-            user_role = role_result[0] if role_result else None
+            admin_result = cur.fetchone()
             
-            is_admin = (user_role == 'admin')
+            is_admin = bool(admin_result)
             
             if not is_admin and balance < price:
                 conn.rollback()

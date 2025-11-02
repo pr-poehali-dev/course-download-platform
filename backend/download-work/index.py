@@ -75,19 +75,31 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
-            # Проверяем что работа куплена этим пользователем
+            # Сначала проверяем является ли пользователь администратором
+            # Проверяем в таблице admins (админы хранятся отдельно)
             cur.execute(
-                "SELECT id FROM t_p63326274_course_download_plat.purchases WHERE buyer_id = %s AND work_id = %s",
-                (user_id, work_id)
+                "SELECT id FROM t_p63326274_course_download_plat.admins WHERE id = %s",
+                (user_id,)
             )
+            admin_result = cur.fetchone()
+            is_admin = bool(admin_result)
             
-            if not cur.fetchone():
-                return {
-                    'statusCode': 403,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Work not purchased. Please purchase before downloading.'}),
-                    'isBase64Encoded': False
-                }
+            print(f"[DEBUG] User {user_id}, is_admin: {is_admin}")
+            
+            # Проверяем покупку только для НЕ-админов
+            if not is_admin:
+                cur.execute(
+                    "SELECT id FROM t_p63326274_course_download_plat.purchases WHERE buyer_id = %s AND work_id = %s",
+                    (user_id, work_id)
+                )
+                
+                if not cur.fetchone():
+                    return {
+                        'statusCode': 403,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Work not purchased. Please purchase before downloading.'}),
+                        'isBase64Encoded': False
+                    }
             
             cur.execute(
                 "SELECT title, download_url, file_url FROM t_p63326274_course_download_plat.works WHERE id = %s",

@@ -156,7 +156,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         import openai
         
-        client = openai.OpenAI(api_key=openai_api_key)
+        client = openai.OpenAI(
+            api_key=openai_api_key,
+            default_headers={
+                'User-Agent': 'CourseDownloadPlatform/1.0'
+            }
+        )
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.
 

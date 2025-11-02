@@ -6,13 +6,31 @@
       "path": "/",
       "body": {
         "batch_size": 2,
-        "offset": 0
+        "offset": 0,
+        "mode": "extract"
       },
       "expectedStatus": 200,
       "expectedBody": {
         "success": "boolean",
-        "processed": "number",
+        "mode": "string",
         "has_more": "boolean"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Convert RAR to ZIP",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "batch_size": 1,
+        "offset": 0,
+        "mode": "convert"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": "boolean",
+        "mode": "string",
+        "processed": "number"
       },
       "bodyMatcher": "partial"
     }

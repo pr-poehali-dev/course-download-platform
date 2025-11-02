@@ -186,7 +186,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     conn = psycopg2.connect(database_url)
     cursor = conn.cursor()
     
-    cursor.execute("TRUNCATE TABLE works CASCADE")
+    # Удаляем зависимости перед удалением работ (только существующие таблицы)
+    try:
+        cursor.execute("DELETE FROM purchases")
+    except:
+        pass
+    try:
+        cursor.execute("DELETE FROM work_comments")
+    except:
+        pass
+    try:
+        cursor.execute("DELETE FROM work_ratings")
+    except:
+        pass
+    cursor.execute("DELETE FROM works")
     
     synced = 0
     

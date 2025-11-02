@@ -14,7 +14,7 @@ import uuid
 
 
 def get_cloud_storage_folders() -> tuple:
-    """Получает список всех папок из бакета kyra/works/"""
+    """Получает список всех файлов из бакета kyra (архивы работ)"""
     s3_client = boto3.client(
         's3',
         endpoint_url='https://storage.yandexcloud.net',
@@ -25,25 +25,26 @@ def get_cloud_storage_folders() -> tuple:
     )
     
     bucket_name = 'kyra'
-    works_prefix = 'works/'
     
-    response = s3_client.list_objects_v2(
-        Bucket=bucket_name, 
-        Prefix=works_prefix, 
-        Delimiter='/'
-    )
+    # Получаем все файлы из корня бакета
+    response = s3_client.list_objects_v2(Bucket=bucket_name, MaxKeys=1000)
     
-    folders = []
+    works = []
     
-    if 'CommonPrefixes' in response:
-        for prefix in response['CommonPrefixes']:
-            folder_path = prefix['Prefix']
-            folder_name = folder_path.replace(works_prefix, '').rstrip('/')
+    if 'Contents' in response:
+        for obj in response['Contents']:
+            file_key = obj['Key']
+            file_name = file_key
             
-            if not folder_name:
+            # Пропускаем системные файлы и превью
+            if file_name.startswith('.') or file_name.startswith('previews/'):
                 continue
             
-            match = folder_name.strip()
+            # Убираем расширение для получения названия
+            name_without_ext = file_name.rsplit('.', 1)[0] if '.' in file_name else file_name
+            
+            # Парсим название работы и тип (например: "Автоклав (курсовая работа).rar")
+            match = name_without_ext.strip()
             parts = match.rsplit('(', 1)
             
             if len(parts) == 2:
@@ -53,14 +54,15 @@ def get_cloud_storage_folders() -> tuple:
                 title = match
                 work_type = 'Курсовая работа'
             
-            folders.append({
-                'name': folder_name,
+            works.append({
+                'name': file_name,
                 'title': title,
                 'work_type': work_type,
-                'folder_path': folder_path
+                'file_key': file_key,
+                'size': obj['Size']
             })
     
-    return folders, s3_client
+    return works, s3_client
 
 
 def get_folder_files(s3_client, bucket: str, folder_path: str) -> List[Dict[str, Any]]:
@@ -197,33 +199,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     synced = 0
     skipped = 0
     
-    for folder in folders:
+    for work in folders:
         try:
             # Пропускаем если работа уже есть в базе
-            if folder['title'] in existing_titles:
+            if work['title'] in existing_titles:
                 skipped += 1
                 continue
             
-            files = get_folder_files(s3_client, bucket_name, folder['folder_path'])
-            
-            pdf_file = next((f for f in files if f['name'].lower().endswith('.pdf')), None)
-            
+            # Генерируем превью (пока используем placeholder)
             preview_url = None
-            if pdf_file:
-                preview_data = download_and_convert_pdf_preview(s3_client, bucket_name, pdf_file['key'])
-                if preview_data:
-                    preview_filename = f"previews/preview_{uuid.uuid4().hex[:12]}.png"
-                    s3_client.put_object(
-                        Bucket=bucket_name,
-                        Key=preview_filename,
-                        Body=preview_data,
-                        ContentType='image/png'
-                    )
-                    preview_url = f"https://storage.yandexcloud.net/{bucket_name}/{preview_filename}"
             
-            metadata = parse_work_metadata(folder['title'], folder['work_type'])
+            # Метаданные работы
+            metadata = parse_work_metadata(work['title'], work['work_type'])
             
-            download_url = f"https://storage.yandexcloud.net/{bucket_name}/{folder['folder_path']}"
+            # Прямая ссылка на скачивание файла
+            download_url = f"https://storage.yandexcloud.net/{bucket_name}/{work['file_key']}"
             
             insert_query = """
                 INSERT INTO works (
@@ -235,8 +225,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             """
             
             cursor.execute(insert_query, (
-                folder['title'],
-                folder['work_type'],
+                work['title'],
+                work['work_type'],
                 metadata['category'],
                 metadata['description'],
                 preview_url,
@@ -252,7 +242,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             synced += 1
             
         except Exception as e:
-            print(f"Error processing {folder.get('title', 'unknown')}: {e}")
+            print(f"Error processing {work.get('title', 'unknown')}: {e}")
     
     conn.commit()
     cursor.close()

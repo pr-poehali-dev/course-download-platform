@@ -1,2 +1,2 @@
-openai>=1.0.0
+gigachat>=0.1.25
 psycopg2-binary>=2.9.0

@@ -142,28 +142,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Request limit reached'})
                 }
         
-        openai_api_key = os.environ.get('OPENAI_API_KEY', '')
+        gigachat_credentials = os.environ.get('GIGACHAT_CREDENTIALS', '')
         
-        if not openai_api_key:
+        if not gigachat_credentials:
             return {
                 'statusCode': 500,
                 'headers': {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps({'error': 'OpenAI API key not configured'})
+                'body': json.dumps({'error': 'GigaChat credentials not configured'})
             }
         
-        import openai
-        import httpx
+        from gigachat import GigaChat
         
-        proxy_url = os.environ.get('HTTP_PROXY') or os.environ.get('HTTPS_PROXY')
-        
-        if proxy_url:
-            http_client = httpx.Client(proxy=proxy_url)
-            client = openai.OpenAI(api_key=openai_api_key, http_client=http_client)
-        else:
-            client = openai.OpenAI(api_key=openai_api_key)
+        client = GigaChat(credentials=gigachat_credentials, verify_ssl_certs=False)
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.
 
@@ -212,24 +205,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{safe_content}\n=== END OF FILE ==="
                     break
         
-        print(f"DEBUG: Sending {len(api_messages)} messages to OpenAI", file=sys.stderr)
-        print(f"DEBUG: First message role: {api_messages[0]['role']}", file=sys.stderr)
-        print(f"DEBUG: First message length: {len(api_messages[0]['content'])}", file=sys.stderr)
+        print(f"DEBUG: Sending {len(api_messages)} messages to GigaChat", file=sys.stderr)
         
-        try:
-            response = client.chat.completions.create(
-                model='gpt-4o-mini',
-                messages=api_messages,
-                temperature=0.7,
-                max_tokens=800
-            )
-        except UnicodeEncodeError as ue:
-            print(f"UnicodeError details: {ue}", file=sys.stderr)
-            print(f"Problem string: {ue.object[max(0, ue.start-20):ue.end+20]}", file=sys.stderr)
-            raise
+        response = client.chat(messages=api_messages, temperature=0.7, max_tokens=800)
         
         assistant_message = response.choices[0].message.content
-        total_tokens = response.usage.total_tokens
+        total_tokens = response.usage.total_tokens if hasattr(response, 'usage') else 0
         
         user_content = messages[-1].get('content', '') if messages else ''
         

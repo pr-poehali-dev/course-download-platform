@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Extract previews from RAR archives",
+      "method": "POST",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": "boolean",
+        "total_works": "number",
+        "processed": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

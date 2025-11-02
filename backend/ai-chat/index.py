@@ -142,7 +142,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({'error': 'Request limit reached'})
                 }
         
-        gigachat_credentials = os.environ.get('GIGACHAT_CREDENTIALS', '')
+        gigachat_credentials = os.environ.get('GIGACHAT_CREDENTIAS', '')
         
         if not gigachat_credentials:
             return {

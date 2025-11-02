@@ -94,7 +94,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         else:
             cur.execute("""
                 SELECT id, subscription_type, requests_total, requests_used, expires_at
-                FROM ai_subscriptions
+                FROM t_p63326274_course_download_plat.ai_subscriptions
                 WHERE user_id = %s AND is_active = true
                 ORDER BY created_at DESC
                 LIMIT 1
@@ -117,7 +117,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             sub_id, sub_type, total_requests, used_requests, expires_at = sub_row
             
             if expires_at and datetime.now() > expires_at:
-                cur.execute("UPDATE ai_subscriptions SET is_active = false WHERE id = %s", (sub_id,))
+                cur.execute("UPDATE t_p63326274_course_download_plat.ai_subscriptions SET is_active = false WHERE id = %s", (sub_id,))
                 conn.commit()
                 cur.close()
                 conn.close()
@@ -216,17 +216,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         if not is_admin:
             cur.execute("""
-                INSERT INTO ai_chat_history (user_id, subscription_id, role, content, file_name, tokens_used)
+                INSERT INTO t_p63326274_course_download_plat.ai_chat_history (user_id, subscription_id, role, content, file_name, tokens_used)
                 VALUES (%s, %s, 'user', %s, %s, 0)
             """, (user_id, sub_id, user_content, file_name if file_name else None))
             
             cur.execute("""
-                INSERT INTO ai_chat_history (user_id, subscription_id, role, content, tokens_used)
+                INSERT INTO t_p63326274_course_download_plat.ai_chat_history (user_id, subscription_id, role, content, tokens_used)
                 VALUES (%s, %s, 'assistant', %s, %s)
             """, (user_id, sub_id, assistant_message, total_tokens))
             
             cur.execute("""
-                UPDATE ai_subscriptions
+                UPDATE t_p63326274_course_download_plat.ai_subscriptions
                 SET requests_used = requests_used + 1
                 WHERE id = %s
             """, (sub_id,))

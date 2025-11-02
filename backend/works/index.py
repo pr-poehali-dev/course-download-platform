@@ -215,11 +215,46 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps(work)
                 }
             else:
-                cur.execute("""
+                # Пагинация и фильтрация
+                limit = int(query_params.get('limit', 20))
+                offset = int(query_params.get('offset', 0))
+                category = query_params.get('category')
+                search = query_params.get('search')
+                
+                # Базовый запрос
+                where_clauses = []
+                params = []
+                
+                if category and category != 'all':
+                    where_clauses.append("category = %s")
+                    params.append(category)
+                
+                if search:
+                    where_clauses.append("(title ILIKE %s OR description ILIKE %s)")
+                    search_pattern = f'%{search}%'
+                    params.extend([search_pattern, search_pattern])
+                
+                where_sql = " AND ".join(where_clauses) if where_clauses else "1=1"
+                
+                # Получить общее количество
+                count_query = f"""
+                    SELECT COUNT(*) FROM t_p63326274_course_download_plat.works 
+                    WHERE {where_sql}
+                """
+                cur.execute(count_query, params)
+                total = cur.fetchone()[0]
+                
+                # Получить работы с пагинацией
+                query = f"""
                     SELECT id, title, work_type, subject, description, 
-                           price_points, rating, downloads
-                    FROM t_p63326274_course_download_plat.works ORDER BY created_at DESC
-                """)
+                           price_points, rating, downloads, category, preview_image_url
+                    FROM t_p63326274_course_download_plat.works 
+                    WHERE {where_sql}
+                    ORDER BY created_at DESC
+                    LIMIT %s OFFSET %s
+                """
+                params.extend([limit, offset])
+                cur.execute(query, params)
                 
                 works = []
                 for row in cur.fetchall():
@@ -228,17 +263,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'title': row[1],
                         'work_type': row[2],
                         'subject': row[3],
-                        'preview': row[4][:150] + '...' if len(row[4]) > 150 else row[4],
+                        'preview': row[4][:150] + '...' if row[4] and len(row[4]) > 150 else (row[4] or ''),
                         'price': row[5],
                         'rating': float(row[6]) if row[6] else 0,
-                        'downloads': row[7]
+                        'downloads': row[7] or 0,
+                        'category': row[8],
+                        'preview_image': row[9]
                     }
                     works.append(work)
                 
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'works': works})
+                    'body': json.dumps({
+                        'works': works,
+                        'total': total,
+                        'limit': limit,
+                        'offset': offset
+                    })
                 }
         finally:
             cur.close()

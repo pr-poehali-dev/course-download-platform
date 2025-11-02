@@ -1,12 +1,37 @@
 {
   "tests": [
     {
-      "name": "Get all works",
+      "name": "Get all works with pagination",
       "method": "GET",
-      "path": "/",
+      "path": "/?limit=10&offset=0",
       "expectedStatus": 200,
       "expectedBody": {
-        "works": "array"
+        "works": "array",
+        "total": "number",
+        "limit": 10,
+        "offset": 0
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Filter by category",
+      "method": "GET",
+      "path": "/?category=diploma&limit=5",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "works": "array",
+        "total": "number"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Search works",
+      "method": "GET",
+      "path": "/?search=автомат&limit=5",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "works": "array",
+        "total": "number"
       },
       "bodyMatcher": "partial"
     }

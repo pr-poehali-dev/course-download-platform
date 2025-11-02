@@ -75,11 +75,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
-            # Проверяем является ли пользователь администратором
-            # ID 999999 - это хардкод админ из фронтенда
-            is_admin = (int(user_id) == 999999)
+            # Проверяем роль пользователя из базы данных
+            cur.execute(
+                "SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s",
+                (user_id,)
+            )
+            user_result = cur.fetchone()
             
-            print(f"[DEBUG] User {user_id}, is_admin: {is_admin}")
+            if not user_result:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'User not found'}),
+                    'isBase64Encoded': False
+                }
+            
+            role = user_result[0] if user_result[0] else 'user'
+            is_admin = (role == 'admin')
+            
+            print(f"[DEBUG] User {user_id}, role: {role}, is_admin: {is_admin}")
             
             # Проверяем покупку только для НЕ-админов
             if not is_admin:

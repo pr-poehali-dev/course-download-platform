@@ -111,8 +111,11 @@ def download_and_convert_pdf_preview(s3_client, bucket: str, pdf_key: str) -> by
 def parse_work_metadata(title: str, work_type: str) -> Dict[str, Any]:
     """Создает подробные метаданные для работы"""
     
+    # Нормализуем тип работы (убираем лишние символы и приводим к нижнему регистру для сравнения)
+    work_type_lower = work_type.lower().strip()
+    
     type_mapping = {
-        'Курсовая работа': {
+        'курсовая работа': {
             'category': 'coursework',
             'description': f'Готовая курсовая работа по теме "{title}". Включает теоретическую часть, практические расчеты и выводы. Работа выполнена в соответствии с требованиями ГОСТ.',
             'universities': ['МГУ', 'СПбГУ', 'МГТУ им. Баумана', 'МИФИ', 'НИУ ВШЭ'],
@@ -122,7 +125,7 @@ def parse_work_metadata(title: str, work_type: str) -> Dict[str, Any]:
             'year': 2024,
             'pages': 35
         },
-        'ВКР': {
+        'вкр': {
             'category': 'diploma',
             'description': f'Выпускная квалификационная работа (ВКР) по теме "{title}". Полный комплект: пояснительная записка, графическая часть, презентация. Соответствует требованиям государственной аттестации.',
             'universities': ['МГУ', 'СПбГУ', 'МГТУ им. Баумана', 'МИФИ', 'МАИ', 'МАДИ'],
@@ -132,7 +135,7 @@ def parse_work_metadata(title: str, work_type: str) -> Dict[str, Any]:
             'year': 2024,
             'pages': 80
         },
-        'Диплом': {
+        'диплом': {
             'category': 'diploma',
             'description': f'Дипломная работа по теме "{title}". Полный комплект документов для защиты: пояснительная записка, чертежи, презентация, доклад. Высокое качество оформления.',
             'universities': ['МГУ', 'СПбГУ', 'МГТУ им. Баумана', 'МИФИ', 'МАИ'],
@@ -142,7 +145,7 @@ def parse_work_metadata(title: str, work_type: str) -> Dict[str, Any]:
             'year': 2024,
             'pages': 90
         },
-        'Курсовой проект': {
+        'курсовой проект': {
             'category': 'coursework',
             'description': f'Курсовой проект по теме "{title}". Расчетно-графическая работа с чертежами. Полный комплект: расчеты, пояснительная записка, графическая часть.',
             'universities': ['МГТУ им. Баумана', 'МАИ', 'МАДИ', 'СПбГПУ'],
@@ -151,10 +154,69 @@ def parse_work_metadata(title: str, work_type: str) -> Dict[str, Any]:
             'price': 2000,
             'year': 2024,
             'pages': 40
+        },
+        'дипломная работа': {
+            'category': 'diploma',
+            'description': f'Дипломная работа по теме "{title}". Полный комплект документов для защиты.',
+            'universities': ['МГУ', 'СПбГУ', 'МГТУ им. Баумана'],
+            'specializations': ['Инженерия', 'Экономика', 'Менеджмент'],
+            'keywords': ['диплом', 'защита', 'ГОСТ'],
+            'price': 5000,
+            'year': 2024,
+            'pages': 85
+        },
+        'расчетно-графическая работа': {
+            'category': 'coursework',
+            'description': f'Расчетно-графическая работа по теме "{title}". Включает расчеты и графическую часть.',
+            'universities': ['МГТУ им. Баумана', 'МАИ', 'МАДИ'],
+            'specializations': ['Инженерия', 'Строительство', 'Автоматизация'],
+            'keywords': ['расчеты', 'чертежи', 'графика'],
+            'price': 1800,
+            'year': 2024,
+            'pages': 30
+        },
+        'контрольная работа': {
+            'category': 'test',
+            'description': f'Контрольная работа по теме "{title}". Решение задач и ответы на вопросы.',
+            'universities': ['МГУ', 'СПбГУ', 'НИУ ВШЭ'],
+            'specializations': ['Экономика', 'Математика', 'Физика'],
+            'keywords': ['контрольная', 'задачи', 'решение'],
+            'price': 800,
+            'year': 2024,
+            'pages': 15
+        },
+        'реферат': {
+            'category': 'essay',
+            'description': f'Реферат по теме "{title}". Обзор литературы и анализ темы.',
+            'universities': ['МГУ', 'СПбГУ', 'НИУ ВШЭ'],
+            'specializations': ['Гуманитарные науки', 'Экономика', 'История'],
+            'keywords': ['реферат', 'обзор', 'анализ'],
+            'price': 500,
+            'year': 2024,
+            'pages': 20
         }
     }
     
-    return type_mapping.get(work_type, type_mapping['Курсовая работа'])
+    # Пытаемся найти точное совпадение
+    if work_type_lower in type_mapping:
+        return type_mapping[work_type_lower]
+    
+    # Пытаемся найти частичное совпадение
+    for key in type_mapping.keys():
+        if key in work_type_lower or work_type_lower in key:
+            return type_mapping[key]
+    
+    # Если ничего не найдено - возвращаем дефолт с безопасными значениями
+    return {
+        'category': 'other',
+        'description': f'Студенческая работа по теме "{title}". Тип: {work_type}.',
+        'universities': ['Общие'],
+        'specializations': ['Различные'],
+        'keywords': ['учебная работа', work_type.lower()],
+        'price': 1000,
+        'year': 2024,
+        'pages': 25
+    }
 
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -215,37 +277,56 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # Прямая ссылка на скачивание файла
             download_url = f"https://storage.yandexcloud.net/{bucket_name}/{work['file_key']}"
             
+            # Безопасное получение значений с fallback для обязательных полей
+            title = work.get('title', 'Без названия')
+            work_type = work.get('work_type', 'Курсовая работа')
+            subject = metadata.get('category', 'other')
+            category = metadata.get('category', 'other')
+            description = metadata.get('description', f'Работа по теме: {title}')
+            price = metadata.get('price', 1000)
+            price_points = metadata.get('price', 1000)
+            year = metadata.get('year', 2024)
+            pages = metadata.get('pages', 25)
+            universities = json.dumps(metadata.get('universities', ['Общие']), ensure_ascii=False)
+            specializations = json.dumps(metadata.get('specializations', ['Различные']), ensure_ascii=False)
+            keywords = json.dumps(metadata.get('keywords', ['учебная работа']), ensure_ascii=False)
+            
             insert_query = """
                 INSERT INTO works (
-                    title, work_type, subject, category, description,
-                    preview_image_url, download_url, file_url,
-                    price, price_points, year, pages,
+                    title, work_type, subject, description, price_points,
+                    category, preview_image_url, download_url, file_url,
+                    price, year, pages,
                     universities, specializations, keywords
                 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """
             
             cursor.execute(insert_query, (
-                work['title'],
-                work['work_type'],
-                metadata['category'],  # subject - обязательное поле
-                metadata['category'],
-                metadata['description'],
+                title,
+                work_type,
+                subject,
+                description,
+                price_points,
+                category,
                 preview_url,
                 download_url,
-                download_url,  # file_url - ссылка на файл
-                metadata['price'],
-                metadata['price'],  # price_points - цена в баллах (обязательное)
-                metadata['year'],
-                metadata['pages'],
-                json.dumps(metadata['universities'], ensure_ascii=False),
-                json.dumps(metadata['specializations'], ensure_ascii=False),
-                json.dumps(metadata['keywords'], ensure_ascii=False)
+                download_url,
+                price,
+                year,
+                pages,
+                universities,
+                specializations,
+                keywords
             ))
             
             synced += 1
             
         except Exception as e:
-            print(f"Error processing {work.get('title', 'unknown')}: {e}")
+            error_msg = str(e)
+            print(f"Error processing {work.get('title', 'unknown')}: {error_msg}")
+            print(f"  Work type: {work.get('work_type', 'N/A')}")
+            print(f"  Metadata: {metadata if 'metadata' in locals() else 'N/A'}")
+            import traceback
+            print(f"  Traceback: {traceback.format_exc()}")
     
     conn.commit()
     cursor.close()

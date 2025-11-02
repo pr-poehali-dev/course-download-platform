@@ -113,15 +113,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         works = cursor.fetchall()
         
-        cursor.execute("""
-            SELECT COUNT(*) 
-            FROM works 
-            WHERE file_url IS NOT NULL 
-            AND file_url != ''
-            AND preview_image_url IS NULL
-        """)
-        total_remaining = cursor.fetchone()[0]
-        
         for work_id, title, download_url in works:
             try:
                 file_key = download_url.replace('https://storage.yandexcloud.net/kyra/', '')
@@ -205,10 +196,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 print(f"✗ {error_msg}")
                 continue
         
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM works 
+            WHERE file_url IS NOT NULL 
+            AND file_url != ''
+            AND preview_image_url IS NULL
+        """)
+        total_remaining = cursor.fetchone()[0]
+        
         cursor.close()
         
-        has_more = (offset + batch_size) < total_remaining
-        next_offset = offset + batch_size if has_more else None
+        has_more = total_remaining > 0
         
         return {
             'statusCode': 200,
@@ -222,7 +221,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'skipped_rar': skipped_rar,
                 'total_remaining': total_remaining,
                 'has_more': has_more,
-                'next_offset': next_offset,
                 'errors': errors[:5]
             }, ensure_ascii=False)
         }

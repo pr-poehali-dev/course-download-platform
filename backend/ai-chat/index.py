@@ -83,55 +83,64 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = psycopg2.connect(database_url)
         cur = conn.cursor()
         
-        cur.execute("""
-            SELECT id, subscription_type, requests_total, requests_used, expires_at
-            FROM ai_subscriptions
-            WHERE user_id = %s AND is_active = true
-            ORDER BY created_at DESC
-            LIMIT 1
-        """, (user_id,))
+        is_admin = (user_id == '999999')
         
-        sub_row = cur.fetchone()
-        
-        if not sub_row:
-            cur.close()
-            conn.close()
-            return {
-                'statusCode': 403,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps({'error': 'No active subscription'})
-            }
-        
-        sub_id, sub_type, total_requests, used_requests, expires_at = sub_row
-        
-        if expires_at and datetime.now() > expires_at:
-            cur.execute("UPDATE ai_subscriptions SET is_active = false WHERE id = %s", (sub_id,))
-            conn.commit()
-            cur.close()
-            conn.close()
-            return {
-                'statusCode': 403,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps({'error': 'Subscription expired'})
-            }
-        
-        if total_requests > 0 and used_requests >= total_requests:
-            cur.close()
-            conn.close()
-            return {
-                'statusCode': 403,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps({'error': 'Request limit reached'})
-            }
+        if is_admin:
+            sub_id = 0
+            sub_type = 'unlimited'
+            total_requests = 0
+            used_requests = 0
+            expires_at = None
+        else:
+            cur.execute("""
+                SELECT id, subscription_type, requests_total, requests_used, expires_at
+                FROM ai_subscriptions
+                WHERE user_id = %s AND is_active = true
+                ORDER BY created_at DESC
+                LIMIT 1
+            """, (user_id,))
+            
+            sub_row = cur.fetchone()
+            
+            if not sub_row:
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 403,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'No active subscription'})
+                }
+            
+            sub_id, sub_type, total_requests, used_requests, expires_at = sub_row
+            
+            if expires_at and datetime.now() > expires_at:
+                cur.execute("UPDATE ai_subscriptions SET is_active = false WHERE id = %s", (sub_id,))
+                conn.commit()
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 403,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'Subscription expired'})
+                }
+            
+            if total_requests > 0 and used_requests >= total_requests:
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 403,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'Request limit reached'})
+                }
         
         openai_api_key = os.environ.get('OPENAI_API_KEY', '')
         
@@ -205,21 +214,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         user_content = messages[-1].get('content', '') if messages else ''
         
-        cur.execute("""
-            INSERT INTO ai_chat_history (user_id, subscription_id, role, content, file_name, tokens_used)
-            VALUES (%s, %s, 'user', %s, %s, 0)
-        """, (user_id, sub_id, user_content, file_name if file_name else None))
-        
-        cur.execute("""
-            INSERT INTO ai_chat_history (user_id, subscription_id, role, content, tokens_used)
-            VALUES (%s, %s, 'assistant', %s, %s)
-        """, (user_id, sub_id, assistant_message, total_tokens))
-        
-        cur.execute("""
-            UPDATE ai_subscriptions
-            SET requests_used = requests_used + 1
-            WHERE id = %s
-        """, (sub_id,))
+        if not is_admin:
+            cur.execute("""
+                INSERT INTO ai_chat_history (user_id, subscription_id, role, content, file_name, tokens_used)
+                VALUES (%s, %s, 'user', %s, %s, 0)
+            """, (user_id, sub_id, user_content, file_name if file_name else None))
+            
+            cur.execute("""
+                INSERT INTO ai_chat_history (user_id, subscription_id, role, content, tokens_used)
+                VALUES (%s, %s, 'assistant', %s, %s)
+            """, (user_id, sub_id, assistant_message, total_tokens))
+            
+            cur.execute("""
+                UPDATE ai_subscriptions
+                SET requests_used = requests_used + 1
+                WHERE id = %s
+            """, (sub_id,))
         
         conn.commit()
         cur.close()

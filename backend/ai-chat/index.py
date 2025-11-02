@@ -156,8 +156,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         from gigachat import GigaChat
         
+        print(f"DEBUG: Creating GigaChat client with credentials length: {len(gigachat_credentials)}", file=sys.stderr)
+        
         client = GigaChat(
             credentials=gigachat_credentials, 
+            scope="GIGACHAT_API_PERS",
             verify_ssl_certs=False,
             timeout=25.0
         )

@@ -7,6 +7,7 @@ Returns: ZIP-архив с файлами работы
 import json
 import os
 import urllib.request
+import urllib.parse
 import base64
 from typing import Dict, Any
 
@@ -148,9 +149,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             conn.close()
         
         # Скачиваем файл напрямую с Yandex Cloud Storage
-        print(f"[DEBUG] Downloading file from: {download_url}")
+        print(f"[DEBUG] Original URL: {download_url}")
         
-        req = urllib.request.Request(download_url)
+        # Кодируем URL (кириллицу и пробелы в percent-encoding)
+        parsed = urllib.parse.urlparse(download_url)
+        encoded_path = urllib.parse.quote(parsed.path, safe='/')
+        encoded_url = urllib.parse.urlunparse((
+            parsed.scheme,
+            parsed.netloc,
+            encoded_path,
+            parsed.params,
+            parsed.query,
+            parsed.fragment
+        ))
+        
+        print(f"[DEBUG] Encoded URL: {encoded_url}")
+        
+        req = urllib.request.Request(encoded_url)
         with urllib.request.urlopen(req, timeout=30) as resp:
             file_data = resp.read()
             print(f"[DEBUG] Downloaded file: {len(file_data)} bytes")

@@ -182,6 +182,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     folders, s3_client = get_cloud_storage_folders()
     bucket_name = 'kyra'
     
+    print(f"DEBUG: Found {len(folders)} folders in bucket")
+    for folder in folders[:3]:  # Выводим первые 3 для отладки
+        print(f"  - {folder['title']} ({folder['work_type']})")
+    
     database_url = os.environ.get('DATABASE_URL', '')
     conn = psycopg2.connect(database_url)
     cursor = conn.cursor()

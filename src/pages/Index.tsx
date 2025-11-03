@@ -594,8 +594,12 @@ export default function Index() {
               <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
                 <CardHeader>
-                  <div className="w-14 h-14 bg-gradient-to-br from-primary to-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon name="Database" size={28} className="text-white" />
+                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
+                    <img 
+                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cf4ec9f2-8937-4cdc-8478-e9adb8e7c1e3.jpg" 
+                      alt="Облачный каталог" 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
                   <CardTitle className="text-2xl">Облачный каталог</CardTitle>
                   <CardDescription className="text-base">450+ готовых работ</CardDescription>
@@ -629,8 +633,12 @@ export default function Index() {
               <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
                 <CardHeader>
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon name="Bot" size={28} className="text-white" />
+                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
+                    <img 
+                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/c7b936bf-e40d-4ad4-9b3a-2a34eb9432a2.jpg" 
+                      alt="TechMentor Pro" 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
                   <CardTitle className="text-2xl">TechMentor Pro</CardTitle>
                   <CardDescription className="text-base">ИИ-помощник для адаптации</CardDescription>
@@ -664,8 +672,12 @@ export default function Index() {
               <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-3xl group-hover:bg-green-500/20 transition-all"></div>
                 <CardHeader>
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <Icon name="TrendingUp" size={28} className="text-white" />
+                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
+                    <img 
+                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/36b21e6e-ac19-4040-a50f-ce06216379e7.jpg" 
+                      alt="Маркетплейс" 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
                   <CardTitle className="text-2xl">Маркетплейс</CardTitle>
                   <CardDescription className="text-base">Продавай свои работы</CardDescription>

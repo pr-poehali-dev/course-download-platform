@@ -458,13 +458,6 @@ export default function Index() {
           
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 relative z-10">
             <div className="max-w-5xl mx-auto text-center mb-8 sm:mb-16">
-              <div className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-full mb-4 sm:mb-8 animate-fade-in backdrop-blur-sm border border-blue-500/30">
-                <Icon name="MessageCircle" size={16} className="text-blue-600 sm:w-[18px] sm:h-[18px]" />
-                <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
-                  Теперь с AI-помощником в Telegram 🤖
-                </span>
-              </div>
-              
               <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-8 bg-gradient-to-r from-slate-900 via-primary to-purple-600 bg-clip-text text-transparent animate-fade-in leading-tight px-2">
                 Tech Forma
               </h2>

@@ -437,7 +437,10 @@ export default function CatalogPage() {
               {filteredWorks.map((work) => (
                 <div
                   key={work.id}
-                  onClick={() => navigate(`/work/${work.id}`)}
+                  onClick={(e) => {
+                    console.log('Card clicked!', work.id, e.target);
+                    navigate(`/work/${work.id}`);
+                  }}
                   className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block cursor-pointer"
                 >
                   <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
@@ -480,6 +483,7 @@ export default function CatalogPage() {
 
                     <button
                       onClick={(e) => {
+                        console.log('Eye button clicked!');
                         e.preventDefault();
                         e.stopPropagation();
                         setQuickViewWork(work);

@@ -449,16 +449,10 @@ export default function CatalogPage() {
                   style={{ pointerEvents: 'auto' }}
                 >
                   <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
-                    {work.previewUrls && work.previewUrls.length > 0 ? (
-                      <PreviewCarousel 
-                        images={work.previewUrls} 
-                        title={work.title}
-                        className="w-full h-full"
-                      />
-                    ) : work.previewUrl ? (
+                    {work.previewUrl || (work.previewUrls && work.previewUrls.length > 0) ? (
                       <>
                         <img 
-                          src={work.previewUrl} 
+                          src={work.previewUrl || work.previewUrls?.[0] || ''} 
                           alt={work.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           loading="lazy"

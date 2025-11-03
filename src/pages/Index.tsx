@@ -458,10 +458,10 @@ export default function Index() {
           
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 relative z-10">
             <div className="max-w-5xl mx-auto text-center mb-8 sm:mb-16">
-              <div className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-primary/20 to-purple-500/20 rounded-full mb-4 sm:mb-8 animate-fade-in backdrop-blur-sm border border-primary/20">
-                <Icon name="Sparkles" size={16} className="text-primary sm:w-[18px] sm:h-[18px]" />
-                <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                  Платформа нового поколения для студентов
+              <div className="inline-flex items-center gap-2 px-3 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-full mb-4 sm:mb-8 animate-fade-in backdrop-blur-sm border border-blue-500/30">
+                <Icon name="MessageCircle" size={16} className="text-blue-600 sm:w-[18px] sm:h-[18px]" />
+                <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                  Теперь с AI-помощником в Telegram 🤖
                 </span>
               </div>
               
@@ -474,20 +474,20 @@ export default function Index() {
               </p>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Маркетплейс учебных работ с ИИ-помощником. Покупай работы за баллы, продавай свои и зарабатывай.
+                Маркетплейс учебных работ + AI-ассистент в Telegram. Получай помощь 24/7, покупай работы за баллы, продавай свои и зарабатывай.
               </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
-                <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
-                  <a href="/catalog">
-                    <Icon name="Database" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                    Каталог работ
+                <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
+                  <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+                    <Icon name="MessageCircle" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+                    Открыть бота
                   </a>
                 </Button>
                 <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg border-2 backdrop-blur-sm bg-white/50" asChild>
-                  <a href="/ai-assistant">
-                    <Icon name="Bot" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                    TechMentor Pro
+                  <a href="/catalog">
+                    <Icon name="Database" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+                    Каталог работ
                   </a>
                 </Button>
               </div>
@@ -572,40 +572,44 @@ export default function Index() {
                 </CardContent>
               </Card>
 
-              <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl group-hover:bg-purple-500/20 transition-all"></div>
+              <Card className="relative overflow-hidden border-2 border-blue-200 bg-white/95 backdrop-blur-sm hover:border-blue-400 transition-all group hover:shadow-2xl hover:scale-105">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
+                <div className="absolute top-4 right-4 z-10">
+                  <Badge className="bg-green-500 text-white border-0 shadow-lg">
+                    <span className="flex items-center gap-1">
+                      <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                      НОВИНКА
+                    </span>
+                  </Badge>
+                </div>
                 <CardHeader>
-                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
-                    <img 
-                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/c7b936bf-e40d-4ad4-9b3a-2a34eb9432a2.jpg" 
-                      alt="TechMentor Pro" 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
+                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                    <Icon name="MessageCircle" size={80} className="text-white" />
                   </div>
-                  <CardTitle className="text-2xl">TechMentor Pro</CardTitle>
-                  <CardDescription className="text-base">ИИ-помощник для адаптации</CardDescription>
+                  <CardTitle className="text-2xl">TechMentor AI в Telegram</CardTitle>
+                  <CardDescription className="text-base">Помощник прямо в мессенджере 🤖</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Адаптация под ВУЗ</span>
+                    <span>Ответы на вопросы 24/7</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Переформулирование текста</span>
+                    <span>Помощь с учёбой</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Помощь с оформлением</span>
+                    <span>Консультации по работам</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>GPT-4 под капотом</span>
+                    <span>GigaChat под капотом</span>
                   </div>
-                  <Button className="w-full mt-4 bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700" asChild>
-                    <a href="/ai-assistant">
-                      <Icon name="Sparkles" size={16} className="mr-2" />
-                      Попробовать ИИ
+                  <Button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700" asChild>
+                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+                      <Icon name="MessageCircle" size={16} className="mr-2" />
+                      Открыть бота
                     </a>
                   </Button>
                 </CardContent>
@@ -755,94 +759,102 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
-          <div className="container mx-auto px-4">
+        <section className="py-20 bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100 relative overflow-hidden">
+          <div className="absolute top-10 left-10 w-64 h-64 bg-blue-300/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-10 right-10 w-96 h-96 bg-cyan-300/20 rounded-full blur-3xl"></div>
+          
+          <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-12">
-                <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
-                  <Icon name="Sparkles" size={14} className="mr-1" />
+                <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 mb-4 text-white border-0">
+                  <Icon name="MessageCircle" size={14} className="mr-1" />
                   Новинка
                 </Badge>
-                <h2 className="text-5xl font-bold mb-4">
-                  TechMentor Pro — твой наставник
+                <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
+                  TechMentor AI в Telegram
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  ИИ-помощник поможет адаптировать купленную работу под требования твоего ВУЗа
+                  AI-помощник теперь доступен прямо в мессенджере! Задавай вопросы и получай помощь 24/7 🤖
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <Card className="border-2 border-purple-200 hover:shadow-xl transition-all">
+                <Card className="border-2 border-blue-200 hover:shadow-xl transition-all hover:border-blue-400">
                   <CardHeader>
-                    <Icon name="Bot" size={48} className="text-purple-600 mb-4" />
-                    <CardTitle className="text-2xl">Что умеет TechMentor Pro?</CardTitle>
+                    <Icon name="MessageCircle" size={48} className="text-blue-600 mb-4" />
+                    <CardTitle className="text-2xl">Что умеет бот?</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-start gap-3">
                       <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">Анализирует структуру купленной работы</p>
+                      <p className="text-sm">Отвечает на вопросы по учёбе</p>
                     </div>
                     <div className="flex items-start gap-3">
                       <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">Помогает переформулировать текст под твой стиль</p>
+                      <p className="text-sm">Помогает найти работы в каталоге</p>
                     </div>
                     <div className="flex items-start gap-3">
                       <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">Подсказывает, как адаптировать под требования ВУЗа</p>
+                      <p className="text-sm">Консультирует по оформлению</p>
                     </div>
                     <div className="flex items-start gap-3">
                       <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">Учит работать с источниками и оформлением</p>
+                      <p className="text-sm">Работает круглосуточно</p>
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-blue-200 hover:shadow-xl transition-all">
+                <Card className="border-2 border-cyan-200 hover:shadow-xl transition-all hover:border-cyan-400">
                   <CardHeader>
-                    <Icon name="Lightbulb" size={48} className="text-blue-600 mb-4" />
-                    <CardTitle className="text-2xl">Принцип работы</CardTitle>
+                    <Icon name="Smartphone" size={48} className="text-cyan-600 mb-4" />
+                    <CardTitle className="text-2xl">Как начать?</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
                         1
                       </div>
-                      <p className="text-sm">Загружаешь купленную работу в чат</p>
+                      <p className="text-sm">Открой Telegram на телефоне</p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
                         2
                       </div>
-                      <p className="text-sm">Описываешь требования своего ВУЗа</p>
+                      <p className="text-sm">Найди @TechForma_bot или нажми кнопку ниже</p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
                         3
                       </div>
-                      <p className="text-sm">Получаешь пошаговые инструкции и подсказки</p>
+                      <p className="text-sm">Нажми "Начать" или напиши /start</p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                      <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
                         4
                       </div>
-                      <p className="text-sm">Самостоятельно дорабатываешь текст с помощью ИИ</p>
+                      <p className="text-sm">Задавай вопросы — бот сразу ответит!</p>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              <Card className="border-2 border-orange-200 bg-orange-50/50 mb-8">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <Icon name="AlertCircle" size={32} className="text-orange-600 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-bold text-lg mb-2">Важно: мы учим, а не делаем за тебя!</h3>
-                      <p className="text-muted-foreground text-sm">
-                        Помощник не пишет работу за тебя — он помогает понять, как адаптировать текст самостоятельно. 
-                        Это как репетитор: объясняет, направляет, но главная работа — за тобой. Так ты действительно учишься! 📚
-                      </p>
+              <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 mb-8 hover:shadow-xl transition-all">
+                <CardContent className="p-8 text-center">
+                  <div className="mb-4">
+                    <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4">
+                      <Icon name="MessageCircle" size={40} className="text-white" />
                     </div>
+                    <h3 className="font-bold text-2xl mb-3">Начни общение прямо сейчас!</h3>
+                    <p className="text-muted-foreground text-base max-w-xl mx-auto mb-6">
+                      TechMentor AI ждёт тебя в Telegram. Просто открой бота и задай любой вопрос — ответ придёт мгновенно! 💬
+                    </p>
                   </div>
+                  <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" asChild>
+                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+                      <Icon name="MessageCircle" size={20} className="mr-2" />
+                      Открыть @TechForma_bot
+                    </a>
+                  </Button>
                 </CardContent>
               </Card>
 
@@ -1473,6 +1485,26 @@ export default function Index() {
                   <p className="text-muted-foreground">
                     Банковские карты (Visa, MasterCard, МИР), электронные кошельки, СБП. Все платежи защищены и проходят через безопасные шлюзы.
                   </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="MessageCircle" size={20} className="text-blue-600" />
+                    Что такое TechMentor AI бот?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-3">
+                    Это AI-помощник в Telegram, который отвечает на вопросы, помогает с учёбой и консультирует по работам на платформе 24/7.
+                  </p>
+                  <Button variant="outline" className="mt-2" asChild>
+                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+                      <Icon name="ExternalLink" size={16} className="mr-2" />
+                      Открыть бота
+                    </a>
+                  </Button>
                 </CardContent>
               </Card>
 

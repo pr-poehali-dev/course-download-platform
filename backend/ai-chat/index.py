@@ -162,8 +162,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             credentials=gigachat_credentials,
             scope="GIGACHAT_API_PERS",
             verify_ssl_certs=False,
-            timeout=20,
-            model="GigaChat:latest"
+            timeout=55.0
         )
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.
@@ -216,11 +215,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{safe_content}\n=== END OF FILE ==="
                     break
         
-        payload = {
-            'messages': api_messages,
-            'temperature': 0.7,
-            'max_tokens': 800
-        }
+        from gigachat.models import Chat
+        
+        payload = Chat(
+            messages=api_messages,
+            model="GigaChat",
+            temperature=0.7,
+            max_tokens=800,
+            profanity_check=False
+        )
         response = client.chat(payload)
         
         assistant_message = response.choices[0].message.content

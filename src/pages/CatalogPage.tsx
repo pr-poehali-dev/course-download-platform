@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
@@ -47,6 +47,7 @@ export default function CatalogPage() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const navigate = useNavigate();
   const [priceRange, setPriceRange] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('default');
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -436,7 +437,7 @@ export default function CatalogPage() {
               {filteredWorks.map((work) => (
                 <div
                   key={work.id}
-                  onClick={() => window.location.href = `/work/${work.id}`}
+                  onClick={() => navigate(`/work/${work.id}`)}
                   className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block cursor-pointer"
                 >
                   <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">

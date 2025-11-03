@@ -120,12 +120,12 @@ export default function BotSubscriptionPage() {
               <p className="text-muted-foreground mb-6">
                 У вас есть бесплатный доступ к боту без ограничений
               </p>
-              <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700" asChild>
-                <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+              <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer" className="inline-block">
+                <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 w-full">
                   <Icon name="MessageCircle" size={20} className="mr-2" />
                   Открыть бота
-                </a>
-              </Button>
+                </Button>
+              </a>
             </CardContent>
           </Card>
         )}
@@ -142,12 +142,12 @@ export default function BotSubscriptionPage() {
                   <p className="text-muted-foreground mb-4">
                     {expiresAt ? `Действует до ${expiresAt.toLocaleDateString('ru-RU')}` : 'Бессрочная подписка'}
                   </p>
-                  <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700" asChild>
-                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+                  <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer" className="inline-block">
+                    <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 w-full">
                       <Icon name="MessageCircle" size={20} className="mr-2" />
                       Открыть бота
-                    </a>
-                  </Button>
+                    </Button>
+                  </a>
                 </div>
               </div>
             </CardContent>

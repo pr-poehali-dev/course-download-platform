@@ -66,15 +66,16 @@ export default function CatalogPage() {
     const t = title.toLowerCase().trim();
     
     if (/курсовая|курсовой/.test(wt) || /курсовая|курсовой/.test(t)) return 'Курсовая работа';
-    if ((/дипломная|диплом(?!ная)/.test(wt) && !/часть/.test(wt)) || /дипломная|дипломной/.test(t)) return 'Дипломная работа';
+    if ((/дипломная|диплом/.test(wt) && !/часть/.test(wt)) || /дипломная|дипломной/.test(t)) return 'Дипломная работа';
     if (/диссертация/.test(wt) || /диссертация/.test(t)) return 'Диссертация';
     if (/реферат/.test(wt) || /реферат/.test(t)) return 'Реферат';
-    if (/^практическая\s*(работа)?$/i.test(wt)) return 'Практическая';
-    if (/практика|отчет.*практ/.test(wt) || /практика|отчет.*практ/.test(t)) return 'Практика';
-    if (/вкр|выпускная\s*квалификационная/.test(wt) || /вкр|выпускная\s*квалификационная/.test(t)) return 'Выпускная квалификационная работа';
+    if (/практическая|практика|отчет/.test(wt) || /практика|отчет/.test(t)) return 'Практика';
+    if (/вкр|выпускная\s*квалификационная|аттестационная/.test(wt) || /вкр|выпускная\s*квалификационная/.test(t)) return 'Выпускная квалификационная работа';
     if (/литературный\s*обзор/.test(wt) || /литературный\s*обзор/.test(t)) return 'Литературный обзор';
     if (/чертеж/.test(wt) || /чертеж/.test(t)) return 'Чертежи';
     if (/контрольная/.test(wt) || /контрольная/.test(t)) return 'Контрольная работа';
+    if (/лабораторная/.test(wt) || /лабораторная/.test(t)) return 'Лабораторная работа';
+    if (/расчетно-графическая/.test(wt) || /расчетно-графическая/.test(t)) return 'Расчетно-графическая работа';
     
     return 'Техническая работа';
   };
@@ -116,18 +117,10 @@ export default function CatalogPage() {
 
   const determinePrice = (workType: string, title: string): number => {
     const wt = workType.toLowerCase();
-    const t = title.toLowerCase();
     
-    if (/практическая|практика|отчет/.test(wt)) return 200;
-    if (/реферат/.test(wt)) return 200;
-    if (/курсовая|курсовой/.test(wt)) return 600;
-    if (/дипломная|диплом/.test(wt)) return 1500;
-    if (/контрольная/.test(wt)) return 200;
-    
-    if (/техническая работа/.test(wt)) {
-      if (/проект|модернизация|разработка|расчет|схема|чертеж/.test(t)) return 600;
-      return 600;
-    }
+    if (/дипломная|диплом|вкр|выпускная|диссертация/.test(wt)) return 1500;
+    if (/курсовая/.test(wt)) return 600;
+    if (/практика|отчет|реферат|контрольная|лабораторная|расчетно-графическая/.test(wt)) return 200;
     
     return 600;
   };
@@ -192,7 +185,7 @@ export default function CatalogPage() {
   }, []);
 
   useEffect(() => {
-    const CACHE_KEY = 'catalog_works_cache_v6';
+    const CACHE_KEY = 'catalog_works_cache_v7';
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
     
     localStorage.removeItem('catalog_works_cache');
@@ -200,6 +193,7 @@ export default function CatalogPage() {
     localStorage.removeItem('catalog_works_cache_v3');
     localStorage.removeItem('catalog_works_cache_v4');
     localStorage.removeItem('catalog_works_cache_v5');
+    localStorage.removeItem('catalog_works_cache_v6');
 
     const loadFromCache = (): Work[] | null => {
       try {
@@ -255,19 +249,20 @@ export default function CatalogPage() {
             const discount = Math.random() > 0.75 ? [10, 15, 20, 25][Math.floor(Math.random() * 4)] : 0;
             
             const workInfo = extractWorkInfo(work.title);
-            const rating = work.rating && work.rating > 0 ? parseFloat(String(work.rating)) : determineRating(workInfo.workType);
+            const workType = work.work_type ? normalizeWorkType(work.work_type, work.title) : workInfo.workType;
+            const rating = work.rating && work.rating > 0 ? parseFloat(String(work.rating)) : determineRating(workType);
             const finalRating = rating < 4.7 ? 4.7 : rating;
             
             return {
               id: String(work.id),
               folderName: work.title,
               title: work.title,
-              workType: workInfo.workType,
+              workType: workType,
               subject: determineSubject(work.title, work.subject),
               description: work.preview || `Готовая работа по теме "${work.title}". Включает теоретическую часть, практические расчеты и выводы.`,
-              composition: determineComposition(workInfo.workType, work.title),
+              composition: determineComposition(workType, work.title),
               universities: extractUniversity(work.title),
-              price: determinePrice(workInfo.workType, work.title),
+              price: determinePrice(workType, work.title),
               rating: finalRating,
               previewUrl: previewUrls[0] || work.preview_image_url || null,
               previewUrls: previewUrls,

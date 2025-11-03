@@ -9,6 +9,7 @@ import CatalogFilters from '@/components/catalog/CatalogFilters';
 import PreviewCarousel from '@/components/PreviewCarousel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Work {
   id: string;
@@ -395,8 +396,9 @@ export default function CatalogPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-              {filteredWorks.map((work) => (
+            <TooltipProvider>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+                {filteredWorks.map((work) => (
                 <Link
                   key={work.id}
                   to={`/work/${work.id}`}
@@ -460,16 +462,26 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="p-4 md:p-5">
-                    <div className="flex items-center mb-2">
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-1">
                         <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
                         <span className="text-sm font-bold text-gray-700">{work.rating.toFixed(1)}</span>
                       </div>
+                      <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
+                        {work.workType}
+                      </Badge>
                     </div>
 
-                    <h3 className="font-bold text-sm md:text-[15px] mb-2 line-clamp-2 leading-snug min-h-[42px] group-hover:text-primary transition-colors">
-                      {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
-                    </h3>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <h3 className="font-bold text-sm md:text-[15px] mb-2 line-clamp-2 leading-snug min-h-[42px] group-hover:text-primary transition-colors cursor-help">
+                          {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
+                        </h3>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-md">
+                        <p>{work.title.charAt(0).toUpperCase() + work.title.slice(1)}</p>
+                      </TooltipContent>
+                    </Tooltip>
 
                     <p className="text-xs text-gray-600 line-clamp-2 mb-3 min-h-[32px] leading-relaxed">
                       {work.description}
@@ -492,10 +504,16 @@ export default function CatalogPage() {
                         {work.discount ? (
                           <div className="flex flex-col">
                             <span className="text-xs text-gray-400 line-through">{work.price} б.</span>
-                            <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} б.</span>
+                            <div className="flex flex-col">
+                              <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} б.</span>
+                              <span className="text-xs text-gray-500">({Math.round(work.price * (1 - work.discount / 100)) * 5}₽)</span>
+                            </div>
                           </div>
                         ) : (
-                          <span className="text-xl font-bold text-gray-900">{work.price} б.</span>
+                          <div className="flex flex-col">
+                            <span className="text-xl font-bold text-gray-900">{work.price} б.</span>
+                            <span className="text-xs text-gray-500">({work.price * 5}₽)</span>
+                          </div>
                         )}
                       </div>
                       <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5">
@@ -506,7 +524,8 @@ export default function CatalogPage() {
                   </div>
                 </Link>
               ))}
-            </div>
+              </div>
+            </TooltipProvider>
             
             <QuickViewModal
               work={quickViewWork}

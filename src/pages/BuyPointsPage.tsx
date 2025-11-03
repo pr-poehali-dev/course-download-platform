@@ -22,38 +22,38 @@ export default function BuyPointsPage() {
   const packages: PointsPackage[] = [
     {
       id: 1,
-      points: 100,
-      price: 100,
+      points: 50,
+      price: 250,
       bonus: 0,
       description: 'Для пробы'
     },
     {
       id: 2,
-      points: 500,
-      price: 450,
-      bonus: 50,
+      points: 100,
+      price: 500,
+      bonus: 20,
       popular: true,
       description: 'Самый популярный'
     },
     {
       id: 3,
-      points: 1000,
-      price: 800,
-      bonus: 200,
+      points: 200,
+      price: 1000,
+      bonus: 50,
       description: 'Выгодная сделка'
     },
     {
       id: 4,
-      points: 2000,
-      price: 1500,
-      bonus: 500,
+      points: 500,
+      price: 2500,
+      bonus: 150,
       description: 'Максимальная выгода'
     },
     {
       id: 5,
-      points: 5000,
-      price: 3500,
-      bonus: 1500,
+      points: 1000,
+      price: 5000,
+      bonus: 350,
       description: 'Для профессионалов'
     }
   ];
@@ -86,7 +86,7 @@ export default function BuyPointsPage() {
           </Button>
 
           <h1 className="text-4xl font-bold mb-2">Покупка баллов</h1>
-          <p className="text-muted-foreground">Выберите удобный пакет для пополнения баланса</p>
+          <p className="text-muted-foreground">1 балл = 5₽. Пакеты с бонусами выгоднее</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

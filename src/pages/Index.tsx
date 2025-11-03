@@ -474,7 +474,7 @@ export default function Index() {
               </p>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Облачный каталог работ + ИИ-помощник + Обмен знаниями. Всё в одном месте.
+                Маркетплейс учебных работ с ИИ-помощником. Покупай работы за баллы, продавай свои и зарабатывай.
               </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
@@ -543,8 +543,8 @@ export default function Index() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <CardTitle className="text-2xl">Облачный каталог</CardTitle>
-                  <CardDescription className="text-base">450+ готовых работ</CardDescription>
+                  <CardTitle className="text-2xl">Маркетплейс работ</CardTitle>
+                  <CardDescription className="text-base">Покупай за баллы (1 балл = 5₽)</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
@@ -621,13 +621,13 @@ export default function Index() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <CardTitle className="text-2xl">Библиотека работ</CardTitle>
-                  <CardDescription className="text-base">Делись работами и получай баллы</CardDescription>
+                  <CardTitle className="text-2xl">Стань автором</CardTitle>
+                  <CardDescription className="text-base">Загружай работы и зарабатывай</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>10 баллов за скачивание</span>
+                    <span>Продавай работы, получай 70%</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />

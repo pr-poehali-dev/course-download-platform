@@ -76,7 +76,7 @@ export default function ReferralDialog({
                 <Icon name="Gift" size={48} className="mx-auto text-primary" />
                 <h3 className="text-2xl font-bold">Приглашай друзей</h3>
                 <p className="text-muted-foreground">
-                  Получай <span className="font-bold text-primary">50 баллов</span> за каждого приглашенного друга
+                  Получай <span className="font-bold text-primary">50 баллов (250₽)</span> за каждого приглашенного друга
                 </p>
               </div>
             </CardContent>
@@ -114,8 +114,8 @@ export default function ReferralDialog({
             <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
               <li>Поделитесь ссылкой с друзьями</li>
               <li>Друг регистрируется по вашей ссылке</li>
-              <li>Вы получаете 50 баллов на счет</li>
-              <li>Друг получает бонус 25 баллов</li>
+              <li>Вы получаете 50 баллов (250₽) на счет</li>
+              <li>Друг получает бонус 25 баллов (125₽)</li>
             </ol>
           </div>
 

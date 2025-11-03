@@ -614,7 +614,7 @@ export default function Index() {
                 <CardHeader>
                   <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
                     <img 
-                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/342b033e-fe5b-4497-bfac-d13d286bc550.jpg" 
+                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/816465f3-69d3-4606-aed2-50f897edcaa9.jpg" 
                       alt="Стань автором" 
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />

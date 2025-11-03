@@ -224,7 +224,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{safe_content}\n=== END OF FILE ==="
                     break
         
-            # Отправляем запрос к GigaChat API
+        # Отправляем запрос к GigaChat API
+        with httpx.Client(verify=False, timeout=25.0) as http_client:
             chat_url = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions'
             chat_headers = {
                 'Content-Type': 'application/json',

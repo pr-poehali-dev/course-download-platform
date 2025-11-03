@@ -833,12 +833,20 @@ export default function Index() {
                       Доступ к каталогу работ, AI-ботy в Telegram и консультациям экспертов — всё включено в подписку
                     </p>
                   </div>
-                  <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" asChild>
-                    <a href="/bot-subscription">
-                      <Icon name="Sparkles" size={20} className="mr-2" />
-                      Начать пользоваться
-                    </a>
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" asChild>
+                      <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+                        <Icon name="MessageCircle" size={20} className="mr-2" />
+                        Открыть бота
+                      </a>
+                    </Button>
+                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-blue-500 text-blue-600 hover:bg-blue-50" asChild>
+                      <a href="/bot-subscription">
+                        <Icon name="Sparkles" size={20} className="mr-2" />
+                        Подписка
+                      </a>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
 

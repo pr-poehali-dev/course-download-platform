@@ -411,7 +411,7 @@ export default function CatalogPage() {
           />
         </div>
 
-        {loading ? (
+        {(console.log('Loading:', loading, 'Works count:', filteredWorks.length), loading) ? (
           <div className="text-center py-20">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600 mb-4"></div>
             <p className="text-gray-600 mb-3 text-lg">Загрузка каталога...</p>
@@ -437,8 +437,25 @@ export default function CatalogPage() {
               {filteredWorks.map((work) => (
                 <div
                   key={work.id}
+                  onClick={() => {
+                    console.log('CLICKED WORK:', work.id, work.title);
+                    navigate(`/work/${work.id}`);
+                  }}
+                  className="bg-red-600 text-white p-8 rounded-lg cursor-pointer hover:bg-red-700 transition-colors"
+                >
+                  <h2 className="text-xl font-bold mb-2">TEST: {work.title}</h2>
+                  <p className="text-sm">ID: {work.id}</p>
+                  <p className="mt-2">Click me to navigate!</p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="hidden">
+              {filteredWorks.slice(0, 1).map((work) => (
+                <div
+                  key={`full-${work.id}`}
                   onClick={(e) => {
-                    console.log('=== CARD CLICKED ===');
+                    console.log('=== FULL CARD CLICKED ===');
                     console.log('Work ID:', work.id);
                     console.log('Event target:', e.target);
                     console.log('Current target:', e.currentTarget);

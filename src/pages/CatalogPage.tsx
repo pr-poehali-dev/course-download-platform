@@ -3,9 +3,11 @@ import Navigation from '../components/Navigation';
 import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
-import WorkCard from '@/components/catalog/WorkCard';
 import QuickViewModal from '@/components/catalog/QuickViewModal';
 import CatalogFilters from '@/components/catalog/CatalogFilters';
+import PreviewCarousel from '@/components/PreviewCarousel';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Work {
   id: string;
@@ -423,23 +425,142 @@ export default function CatalogPage() {
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {filteredWorks.map((work) => (
-                <WorkCard
-                  key={work.id}
-                  work={work}
-                  onQuickView={setQuickViewWork}
-                  onAddToFavorite={(workId) => {
-                    if (favorites.has(workId)) {
-                      const newFavorites = new Set(favorites);
-                      newFavorites.delete(workId);
-                      setFavorites(newFavorites);
-                    } else {
-                      setFavorites(new Set([...favorites, workId]));
-                    }
-                  }}
-                  isFavorite={favorites.has(work.id)}
-                />
+                <div 
+                  key={work.id} 
+                  className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+                  onClick={() => window.location.href = `/work/${work.id}`}
+                >
+                  <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
+                    {work.previewUrls && work.previewUrls.length > 0 ? (
+                      <PreviewCarousel 
+                        images={work.previewUrls} 
+                        title={work.title}
+                        className="w-full h-full"
+                      />
+                    ) : work.previewUrl ? (
+                      <>
+                        <img 
+                          src={work.previewUrl} 
+                          alt={work.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                        <Icon name="FileText" className="text-gray-300 group-hover:text-gray-400 transition-colors" size={56} />
+                        <span className="text-sm font-medium text-gray-500">{work.workType}</span>
+                      </div>
+                    )}
+                    
+                    <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
+                      {work.discount && (
+                        <div className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                          −{work.discount}%
+                        </div>
+                      )}
+                      {work.isNew && (
+                        <Badge className="bg-green-500 text-white shadow-lg">
+                          <Icon name="Sparkles" size={12} className="mr-1" />
+                          Новинка
+                        </Badge>
+                      )}
+                      {work.isHit && (
+                        <Badge className="bg-orange-500 text-white shadow-lg">
+                          <Icon name="Flame" size={12} className="mr-1" />
+                          Хит
+                        </Badge>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setQuickViewWork(work);
+                      }}
+                      className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+                    >
+                      <div className="text-white text-center">
+                        <Icon name="Eye" size={32} className="mx-auto mb-2" />
+                        <span className="text-sm font-semibold">Быстрый просмотр</span>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="p-4 md:p-5">
+                    <div className="flex items-center justify-between mb-2 md:mb-3">
+                      <Badge className="bg-primary/10 text-primary text-[10px] md:text-[11px] font-semibold px-2 md:px-3 py-1 rounded-full border-0">
+                        {work.workType}
+                      </Badge>
+                      <div className="flex items-center gap-1">
+                        <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
+                        <span className="text-xs font-semibold text-gray-700">{work.rating.toFixed(1)}</span>
+                      </div>
+                    </div>
+
+                    <h3 className="font-bold text-sm md:text-[15px] mb-2 md:mb-3 line-clamp-3 leading-snug min-h-[60px] md:min-h-[63px] group-hover:text-primary transition-colors">
+                      {work.title.charAt(0).toUpperCase() + work.title.slice(1).toLowerCase()}
+                    </h3>
+                    
+                    <div className="space-y-2 md:space-y-2.5 mb-3 md:mb-4">
+                      <div className="flex items-start gap-2 md:gap-2.5 text-xs md:text-[13px] text-gray-600">
+                        <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <Icon name="Package" size={14} className="text-blue-600" />
+                        </div>
+                        <span className="line-clamp-2 leading-relaxed">{work.composition}</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-2.5 text-[13px] text-gray-600">
+                        <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                          <Icon name="Tag" size={14} className="text-purple-600" />
+                        </div>
+                        <span className="font-medium capitalize">{work.subject}</span>
+                      </div>
+                    </div>
+
+                    {work.purchaseCount && work.purchaseCount > 0 && (
+                      <div className="flex items-center gap-2 mb-3 py-2 px-3 bg-green-50 border border-green-200 rounded-lg">
+                        <Icon name="ShoppingCart" size={14} className="text-green-600" />
+                        <span className="text-xs text-green-700 font-medium">
+                          Купили {work.purchaseCount} {work.purchaseCount === 1 ? 'студент' : work.purchaseCount < 5 ? 'студента' : 'студентов'}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-3 border-t">
+                      <div>
+                        {work.discount ? (
+                          <div className="flex flex-col">
+                            <span className="text-sm text-gray-400 line-through">{work.price} ₽</span>
+                            <span className="text-2xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} ₽</span>
+                          </div>
+                        ) : (
+                          <span className="text-2xl font-bold text-gray-900">{work.price} ₽</span>
+                        )}
+                      </div>
+                      <Button 
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.location.href = `/work/${work.id}`;
+                        }}
+                      >
+                        <Icon name="ShoppingCart" size={18} className="mr-2" />
+                        Купить
+                      </Button>
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex items-center justify-center gap-2 text-xs text-green-600 font-medium">
+                        <Icon name="ShieldCheck" size={14} />
+                        <span>Гарантия возврата 7 дней</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
             

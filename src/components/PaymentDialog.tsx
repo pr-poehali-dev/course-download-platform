@@ -26,9 +26,9 @@ interface PaymentPackage {
 }
 
 const PACKAGES: PaymentPackage[] = [
-  { points: 50, price: 50, bonus: 0 },
-  { points: 200, price: 200, bonus: 50, popular: true },
-  { points: 500, price: 500, bonus: 200 },
+  { points: 50, price: 250, bonus: 0 },
+  { points: 200, price: 1000, bonus: 50, popular: true },
+  { points: 500, price: 2500, bonus: 200 },
 ];
 
 export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail }: PaymentDialogProps) {
@@ -168,7 +168,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
                 <div className="text-center mb-4">
                   <div className="text-3xl font-bold">{pkg.price} ₽</div>
                   <div className="text-xs text-muted-foreground">
-                    {(pkg.price / pkg.points).toFixed(1)} ₽/балл
+                    {pkg.bonus > 0 ? `${(pkg.price / (pkg.points + pkg.bonus)).toFixed(1)} ₽/балл` : '5 ₽/балл'}
                   </div>
                 </div>
 

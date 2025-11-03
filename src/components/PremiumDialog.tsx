@@ -91,7 +91,7 @@ export default function PremiumDialog({
               <div className="text-center space-y-3">
                 <Icon name="Sparkles" size={56} className="mx-auto" />
                 <h3 className="text-3xl font-bold">299₽/месяц</h3>
-                <p className="text-purple-100">Безлимитный доступ ко всем работам</p>
+                <p className="text-purple-100">Скидка 30% + безлимитный ИИ-помощник</p>
               </div>
             </CardContent>
           </Card>
@@ -101,11 +101,11 @@ export default function PremiumDialog({
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Download" size={20} className="text-purple-600" />
+                    <Icon name="Percent" size={20} className="text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Безлимит скачиваний</h4>
-                    <p className="text-sm text-muted-foreground">Скачивайте сколько хотите без ограничений</p>
+                    <h4 className="font-bold mb-1">Скидка 30% на все работы</h4>
+                    <p className="text-sm text-muted-foreground">Работа за 100 баллов = только 70 баллов</p>
                   </div>
                 </div>
               </CardContent>
@@ -115,11 +115,11 @@ export default function PremiumDialog({
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Zap" size={20} className="text-purple-600" />
+                    <Icon name="Bot" size={20} className="text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Мгновенный доступ</h4>
-                    <p className="text-sm text-muted-foreground">Без ожидания и лимитов</p>
+                    <h4 className="font-bold mb-1">Безлимитный ИИ-помощник</h4>
+                    <p className="text-sm text-muted-foreground">Адаптирует работы под твой ВУЗ</p>
                   </div>
                 </div>
               </CardContent>
@@ -154,18 +154,34 @@ export default function PremiumDialog({
             </Card>
           </div>
 
-          <Card className="bg-muted/50">
+          <Card className="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-purple-200">
             <CardContent className="pt-6">
-              <div className="space-y-2 text-sm">
-                <p className="font-medium flex items-center gap-2">
-                  <Icon name="Info" size={16} className="text-primary" />
-                  Бесплатный вариант (без Premium):
+              <div className="space-y-3 text-sm">
+                <p className="font-bold text-lg flex items-center gap-2">
+                  <Icon name="Calculator" size={20} className="text-purple-600" />
+                  Экономия с Premium:
                 </p>
-                <ul className="space-y-1 text-muted-foreground ml-6">
-                  <li>• Только 2 скачивания в неделю</li>
-                  <li>• Загружайте работы, чтобы получить +100 баллов</li>
-                  <li>• Каждое скачивание вашей работы = +10 баллов</li>
-                </ul>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center p-2 bg-white rounded-lg">
+                    <span className="text-muted-foreground">Без Premium: 10 работ по 100 баллов</span>
+                    <span className="font-bold text-red-600">5000₽</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-white rounded-lg">
+                    <span className="text-muted-foreground">С Premium: 10 работ по 70 баллов</span>
+                    <span className="font-bold text-green-600">3500₽</span>
+                  </div>
+                  <div className="flex justify-between items-center p-2 bg-white rounded-lg">
+                    <span className="text-muted-foreground">+ Подписка</span>
+                    <span className="font-bold">+299₽</span>
+                  </div>
+                  <div className="border-t-2 border-purple-300 pt-2 flex justify-between items-center">
+                    <span className="font-bold text-lg">Экономия:</span>
+                    <span className="font-bold text-2xl text-green-600">1201₽!</span>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground italic mt-2">
+                  + Безлимитный ИИ-помощник (стоимость 399₽ отдельно)
+                </p>
               </div>
             </CardContent>
           </Card>

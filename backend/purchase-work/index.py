@@ -136,8 +136,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     (price, user_id)
                 )
             
-            # Создаём запись о покупке
-            commission = int(price * 0.1)
+            # Создаём запись о покупке с комиссией 15%
+            commission = int(price * 0.15)
             cur.execute(
                 """INSERT INTO t_p63326274_course_download_plat.purchases 
                 (buyer_id, work_id, price_paid, commission) VALUES (%s, %s, %s, %s) RETURNING id""",
@@ -148,16 +148,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # author_id уже получен в work_result выше
             author_id = work_result[1]
             
-            # Если есть автор, начисляем ему 90% + бонус за скачивание
+            # Если есть автор, начисляем ему 85% (price - 15% комиссии)
             if author_id:
-                author_share = int(price * 0.9)
-                platform_fee = int(price * 0.1)
-                download_bonus = 10  # Бонус за каждое скачивание
+                author_share = int(price * 0.85)
+                platform_fee = int(price * 0.15)
                 
-                # Начисляем автору 90% + 10 баллов бонуса
+                # Начисляем автору 85% от цены работы
                 cur.execute(
                     "UPDATE t_p63326274_course_download_plat.users SET balance = balance + %s WHERE id = %s",
-                    (author_share + download_bonus, author_id)
+                    (author_share, author_id)
                 )
                 
                 # Записываем транзакцию выплаты
@@ -168,12 +167,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     (author_id, db_work_id, purchase_id, price, author_share, platform_fee, 'paid')
                 )
                 
-                # Записываем бонус за скачивание
+                # Записываем транзакцию списания баллов у покупателя
                 cur.execute(
                     """INSERT INTO t_p63326274_course_download_plat.transactions
                     (user_id, amount, transaction_type, description)
                     VALUES (%s, %s, %s, %s)""",
-                    (author_id, download_bonus, 'download_bonus', f'Бонус за скачивание работы #{db_work_id}')
+                    (user_id, -price, 'purchase', f'Покупка работы #{db_work_id}')
+                )
+                
+                # Записываем транзакцию начисления автору
+                cur.execute(
+                    """INSERT INTO t_p63326274_course_download_plat.transactions
+                    (user_id, amount, transaction_type, description)
+                    VALUES (%s, %s, %s, %s)""",
+                    (author_id, author_share, 'sale', f'Продажа работы #{db_work_id} (комиссия 15%)')
                 )
             
             # Обновляем счётчик скачиваний

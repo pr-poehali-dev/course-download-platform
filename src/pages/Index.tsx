@@ -1480,34 +1480,57 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="Coins" size={20} className="text-blue-600" />
-                    Почему баллы, а не деньги?
+                    Как работает экономика платформы?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground mb-3">
-                    Tech Forma — это <span className="font-semibold text-foreground">студенческое сообщество</span>, а не маркетплейс. Мы создали систему баллов для честного обмена знаниями:
+                    Tech Forma — <span className="font-semibold text-foreground">студенческое сообщество</span> с прозрачной системой баллов:
                   </p>
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-start gap-2">
-                      <Icon name="Check" size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Помогаешь другим</strong> — делишься работой и получаешь баллы</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Icon name="Check" size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Используешь баллы</strong> — покупаешь работы других студентов</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Icon name="Check" size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Без комиссий банков</strong> — обмен внутри платформы</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Icon name="Check" size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Фокус на обучении</strong>, а не на заработке</span>
-                    </li>
-                  </ul>
-                  <p className="text-sm text-muted-foreground mt-3 italic">
-                    💡 Если нужны баллы, а своих работ нет — можно купить баллы за рубли в разделе "Пополнить баланс".
-                  </p>
+                  
+                  <div className="bg-white rounded-lg p-4 mb-3 border">
+                    <p className="font-bold text-lg mb-2 flex items-center gap-2">
+                      <Icon name="TrendingUp" size={18} className="text-primary" />
+                      1 балл = 5 рублей
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Работа за 100 баллов = 500₽ покупательской способности
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <p className="font-semibold text-foreground">💰 Как зарабатывать баллы:</p>
+                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
+                      <li className="flex items-start gap-2">
+                        <Icon name="Upload" size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                        <span>Загружаешь работу → получаешь баллы при каждой продаже</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Icon name="ShoppingCart" size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
+                        <span>Покупаешь пакет баллов → тратишь на нужные работы</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <p className="font-semibold text-foreground">🔄 Как работает покупка:</p>
+                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
+                      <li className="flex items-start gap-2">
+                        <Icon name="User" size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Автор получает 85%</strong> от цены работы</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Icon name="Server" size={14} className="text-purple-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Платформа 15%</strong> — поддержка, хостинг, ИИ</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-3 border border-purple-200">
+                    <p className="text-xs text-muted-foreground">
+                      <strong>Пример:</strong> Работа за 100 баллов → Автор получает 85 баллов (425₽) → 15 баллов на развитие платформы
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>

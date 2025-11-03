@@ -834,12 +834,12 @@ export default function Index() {
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" asChild>
-                      <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer" className="inline-block">
+                      <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl w-full">
                         <Icon name="MessageCircle" size={20} className="mr-2" />
                         Открыть бота
-                      </a>
-                    </Button>
+                      </Button>
+                    </a>
                     <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-blue-500 text-blue-600 hover:bg-blue-50" asChild>
                       <a href="/bot-subscription">
                         <Icon name="Sparkles" size={20} className="mr-2" />

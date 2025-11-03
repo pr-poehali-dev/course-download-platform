@@ -73,7 +73,7 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
         <>
           <button
             onClick={goToPrevious}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
             aria-label="Предыдущее изображение"
           >
             <Icon name="ChevronLeft" size={20} />
@@ -81,13 +81,13 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
 
           <button
             onClick={goToNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10"
             aria-label="Следующее изображение"
           >
             <Icon name="ChevronRight" size={20} />
           </button>
 
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
             {imageList.map((_, idx) => (
               <button
                 key={idx}
@@ -106,7 +106,7 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
             ))}
           </div>
 
-          <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+          <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full z-10">
             {currentIndex + 1} / {imageList.length}
           </div>
         </>

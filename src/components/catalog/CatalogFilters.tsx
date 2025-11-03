@@ -164,10 +164,10 @@ export default function CatalogFilters({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Любые баллы</SelectItem>
-                <SelectItem value="0-300">До 600 б.</SelectItem>
-                <SelectItem value="300-600">600 - 1200 б.</SelectItem>
-                <SelectItem value="600-1000">1200 - 2000 б.</SelectItem>
-                <SelectItem value="1000+">От 2000 б.</SelectItem>
+                <SelectItem value="0-600">До 600 б.</SelectItem>
+                <SelectItem value="600-1200">600 - 1200 б.</SelectItem>
+                <SelectItem value="1200-2000">1200 - 2000 б.</SelectItem>
+                <SelectItem value="2000+">От 2000 б.</SelectItem>
               </SelectContent>
             </Select>
           </div>

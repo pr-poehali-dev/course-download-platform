@@ -160,8 +160,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         client = GigaChat(
             credentials=gigachat_credentials,
+            scope="GIGACHAT_API_PERS",
             verify_ssl_certs=False,
-            timeout=25.0
+            timeout=20,
+            model="GigaChat:latest"
         )
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.

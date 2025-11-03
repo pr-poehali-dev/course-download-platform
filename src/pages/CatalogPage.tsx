@@ -322,10 +322,9 @@ export default function CatalogPage() {
 
     if (priceRange !== 'all') {
       filtered = filtered.filter(work => {
-        if (priceRange === '0-600') return work.price <= 600;
-        if (priceRange === '600-1200') return work.price > 600 && work.price <= 1200;
-        if (priceRange === '1200-2000') return work.price > 1200 && work.price <= 2000;
-        if (priceRange === '2000+') return work.price > 2000;
+        if (priceRange === '0-300') return work.price <= 300;
+        if (priceRange === '300-800') return work.price > 300 && work.price <= 800;
+        if (priceRange === '800+') return work.price > 800;
         return true;
       });
     }
@@ -532,7 +531,6 @@ export default function CatalogPage() {
               open={!!quickViewWork}
               onClose={() => setQuickViewWork(null)}
             />
-          </>
         )}
       </main>
     </div>

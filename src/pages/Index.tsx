@@ -458,6 +458,13 @@ export default function Index() {
           
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 relative z-10">
             <div className="max-w-5xl mx-auto text-center mb-8 sm:mb-16">
+              <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-orange-500/20 via-red-500/20 to-pink-500/20 rounded-full mb-4 sm:mb-8 animate-fade-in backdrop-blur-sm border border-orange-500/40 shadow-lg">
+                <Icon name="Zap" size={18} className="text-orange-600 sm:w-5 sm:h-5 animate-pulse" />
+                <span className="text-xs sm:text-sm font-bold bg-gradient-to-r from-orange-600 via-red-600 to-pink-600 bg-clip-text text-transparent">
+                  Сессия близко? Мы спасём! 🔥
+                </span>
+              </div>
+              
               <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-8 bg-gradient-to-r from-slate-900 via-primary to-purple-600 bg-clip-text text-transparent animate-fade-in leading-tight px-2">
                 Tech Forma
               </h2>

@@ -2,6 +2,9 @@ import json
 from typing import Dict, Any, List
 import urllib.parse
 import urllib.request
+import zipfile
+import io
+import xml.etree.ElementTree as ET
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -131,6 +134,49 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         composition = sorted(list(composition_set))
         
+        # Try to extract description from Word file
+        description = ''
+        docx_file = None
+        for item in items:
+            if item.get('type') == 'file':
+                name = item.get('name', '').lower()
+                if name.endswith('.docx') and ('пз' in name or 'пояснительная' in name):
+                    docx_file = item
+                    break
+        
+        if docx_file:
+            try:
+                file_url = docx_file.get('file')
+                if file_url:
+                    req = urllib.request.Request(file_url)
+                    with urllib.request.urlopen(req, timeout=5) as response:
+                        docx_data = response.read()
+                    
+                    # Extract text from .docx
+                    text_parts = []
+                    with zipfile.ZipFile(io.BytesIO(docx_data)) as zf:
+                        with zf.open('word/document.xml') as xml_file:
+                            tree = ET.parse(xml_file)
+                            root = tree.getroot()
+                            ns = {'w': 'http://schemas.openxmlformats.org/wordprocessingml/2006/main'}
+                            
+                            for paragraph in root.findall('.//w:p', ns):
+                                para_text = []
+                                for text_node in paragraph.findall('.//w:t', ns):
+                                    if text_node.text:
+                                        para_text.append(text_node.text)
+                                if para_text:
+                                    text_parts.append(''.join(para_text))
+                    
+                    full_text = '\n'.join(text_parts)
+                    description = full_text[:500].strip()
+                    if len(full_text) > 500:
+                        last_period = description.rfind('.')
+                        if last_period > 200:
+                            description = description[:last_period + 1]
+            except:
+                pass  # Silently fail, description will be empty
+        
         return {
             'statusCode': 200,
             'headers': {
@@ -141,7 +187,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({
                 'files': files,
                 'composition': composition,
-                'total_files': len(files)
+                'total_files': len(files),
+                'description': description
             })
         }
     

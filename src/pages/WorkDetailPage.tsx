@@ -25,7 +25,6 @@ interface Work {
 export default function WorkDetailPage() {
   const { id, workId } = useParams();
   const actualWorkId = id || workId;
-  console.log('WorkDetailPage params:', { id, workId, actualWorkId });
   const navigate = useNavigate();
   const [work, setWork] = useState<Work | null>(null);
   const [loading, setLoading] = useState(true);
@@ -296,15 +295,32 @@ export default function WorkDetailPage() {
           const price = data.price_points || determinePrice(workType, title);
           const rating = parseFloat(data.rating) || determineRating(workType);
           const universities = data.universities || extractUniversity(title);
-          const composition = data.composition ? data.composition.split(',').map((c: string) => c.trim()) : determineComposition(workType, title);
           const universitiesList = determineUniversities(subject);
           
           const folderPublicUrl = data.yandex_disk_link || data.file_url || YANDEX_DISK_URL;
 
           const previewUrl: string | null = data.preview_image_url || null;
-          const fileFormats: string[] = [];
-          const parsedDescription = data.description || generateDetailedDescription(workType, title, subject);
-          const parsedComposition = composition;
+          
+          // Get real composition and description from Yandex Disk
+          let parsedDescription = data.description || generateDetailedDescription(workType, title, subject);
+          let parsedComposition = data.composition ? data.composition.split(',').map((c: string) => c.trim()) : determineComposition(workType, title);
+          
+          try {
+            const filesResponse = await fetch(
+              `${GET_WORK_FILES_URL}?folder_name=${encodeURIComponent(title)}&public_key=${encodeURIComponent(YANDEX_DISK_URL)}`
+            );
+            if (filesResponse.ok) {
+              const filesData = await filesResponse.json();
+              if (filesData.composition && filesData.composition.length > 0) {
+                parsedComposition = filesData.composition;
+              }
+              if (filesData.description && filesData.description.length > 50) {
+                parsedDescription = filesData.description;
+              }
+            }
+          } catch (err) {
+            console.log('Could not fetch real composition, using default');
+          }
           
           if (previewUrl) {
             setGallery([previewUrl]);
@@ -608,17 +624,17 @@ export default function WorkDetailPage() {
             </div>
 
             <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
-              {work.title}
+              {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
             </h1>
 
             <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
               {gallery.length > 0 ? (
                 <>
-                  <div className="bg-white rounded-lg overflow-hidden border-2 border-gray-200 shadow-sm">
+                  <div className="bg-white rounded-lg overflow-hidden border-2 border-gray-200 shadow-sm max-h-[600px] flex items-center justify-center">
                     <img 
                       src={gallery[selectedImage]} 
                       alt={`${work.title} - страница ${selectedImage + 1}`}
-                      className="w-full h-auto"
+                      className="w-full h-auto max-h-[600px] object-contain"
                       loading="lazy"
                     />
                   </div>

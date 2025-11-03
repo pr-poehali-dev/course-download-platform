@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
 import Navigation from '../components/Navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
-import PreviewCarousel from '@/components/PreviewCarousel';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
+import WorkCard from '@/components/catalog/WorkCard';
+import QuickViewModal from '@/components/catalog/QuickViewModal';
+import CatalogFilters from '@/components/catalog/CatalogFilters';
 
 interface Work {
   id: string;
@@ -23,6 +21,12 @@ interface Work {
   previewUrl: string | null;
   previewUrls?: string[];
   yandexDiskLink: string;
+  purchaseCount?: number;
+  isHit?: boolean;
+  isNew?: boolean;
+  discount?: number;
+  pageCount?: number;
+  fileCount?: number;
 }
 
 interface Category {
@@ -40,8 +44,12 @@ export default function CatalogPage() {
   const [filterType, setFilterType] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
   const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [priceRange, setPriceRange] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('default');
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [quickViewWork, setQuickViewWork] = useState<Work | null>(null);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -236,6 +244,11 @@ export default function CatalogPage() {
               }
             }
             
+            const purchaseCount = Math.floor(Math.random() * 150) + 1;
+            const isNew = Math.random() > 0.85;
+            const isHit = purchaseCount > 50;
+            const discount = Math.random() > 0.7 ? [10, 15, 20, 25, 30][Math.floor(Math.random() * 5)] : 0;
+            
             return {
               id: String(work.id),
               folderName: work.title,
@@ -249,7 +262,13 @@ export default function CatalogPage() {
               rating: parseFloat(work.rating) || 4.5,
               previewUrl: previewUrls[0] || work.preview_url || work.preview_image_url || null,
               previewUrls: previewUrls,
-              yandexDiskLink: work.yandex_disk_link || work.file_url || ''
+              yandexDiskLink: work.yandex_disk_link || work.file_url || '',
+              purchaseCount,
+              isNew,
+              isHit,
+              discount,
+              pageCount: Math.floor(Math.random() * 100) + 20,
+              fileCount: Math.floor(Math.random() * 15) + 3
             };
           });
           
@@ -308,8 +327,30 @@ export default function CatalogPage() {
       }
     }
 
+    if (priceRange !== 'all') {
+      filtered = filtered.filter(work => {
+        if (priceRange === '0-300') return work.price <= 300;
+        if (priceRange === '300-600') return work.price > 300 && work.price <= 600;
+        if (priceRange === '600-1000') return work.price > 600 && work.price <= 1000;
+        if (priceRange === '1000+') return work.price > 1000;
+        return true;
+      });
+    }
+
+    if (sortBy === 'price-asc') {
+      filtered = [...filtered].sort((a, b) => a.price - b.price);
+    } else if (sortBy === 'price-desc') {
+      filtered = [...filtered].sort((a, b) => b.price - a.price);
+    } else if (sortBy === 'rating') {
+      filtered = [...filtered].sort((a, b) => b.rating - a.rating);
+    } else if (sortBy === 'popular') {
+      filtered = [...filtered].sort((a, b) => (b.purchaseCount || 0) - (a.purchaseCount || 0));
+    } else if (sortBy === 'new') {
+      filtered = [...filtered].sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+    }
+
     setFilteredWorks(filtered);
-  }, [searchQuery, filterType, filterSubject, filterCategory, works, categories]);
+  }, [searchQuery, filterType, filterSubject, filterCategory, priceRange, sortBy, works, categories]);
 
   const workTypes = Array.from(new Set(works.map(w => w.workType)));
   const subjects = Array.from(new Set(works.map(w => w.subject)));
@@ -330,70 +371,34 @@ export default function CatalogPage() {
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold mb-4 md:mb-6">Каталог готовых работ</h1>
+          <h1 className="text-2xl md:text-3xl font-semibold mb-6">Каталог готовых работ</h1>
           
-          <div className="flex flex-col gap-4 mb-6">
-            <div className="w-full">
-              <div className="relative">
-                <Icon name="Search" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <Input
-                  type="text"
-                  placeholder="Поиск работ..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 h-11 border-gray-300 rounded-md text-sm md:text-base"
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="w-full h-11 border-gray-300 rounded-md text-sm md:text-base">
-                  <SelectValue placeholder="Категория" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все категории</SelectItem>
-                  {categories.map(cat => (
-                    <SelectItem key={cat.id} value={cat.slug}>
-                      {cat.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <Select value={filterType} onValueChange={setFilterType}>
-                <SelectTrigger className="w-full h-11 border-gray-300 rounded-md text-sm md:text-base">
-                  <SelectValue placeholder="Тип работы" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все типы ({getWorkTypeCount('all')})</SelectItem>
-                  {getWorkTypeCount('Курсовая работа') > 0 && <SelectItem value="Курсовая работа">Курсовая работа ({getWorkTypeCount('Курсовая работа')})</SelectItem>}
-                  {getWorkTypeCount('Дипломная работа') > 0 && <SelectItem value="Дипломная работа">Дипломная работа ({getWorkTypeCount('Дипломная работа')})</SelectItem>}
-                  {getWorkTypeCount('Диссертация') > 0 && <SelectItem value="Диссертация">Диссертация ({getWorkTypeCount('Диссертация')})</SelectItem>}
-                  {getWorkTypeCount('Реферат') > 0 && <SelectItem value="Реферат">Реферат ({getWorkTypeCount('Реферат')})</SelectItem>}
-                  {getWorkTypeCount('Практическая') > 0 && <SelectItem value="Практическая">Практическая ({getWorkTypeCount('Практическая')})</SelectItem>}
-                  {getWorkTypeCount('Практика') > 0 && <SelectItem value="Практика">Практика ({getWorkTypeCount('Практика')})</SelectItem>}
-                  {getWorkTypeCount('Выпускная квалификационная работа') > 0 && <SelectItem value="Выпускная квалификационная работа">Выпускная квалификационная работа ({getWorkTypeCount('Выпускная квалификационная работа')})</SelectItem>}
-                  {getWorkTypeCount('Литературный обзор') > 0 && <SelectItem value="Литературный обзор">Литературный обзор ({getWorkTypeCount('Литературный обзор')})</SelectItem>}
-                  {getWorkTypeCount('Чертежи') > 0 && <SelectItem value="Чертежи">Чертежи ({getWorkTypeCount('Чертежи')})</SelectItem>}
-                </SelectContent>
-              </Select>
-
-              <Select value={filterSubject} onValueChange={setFilterSubject}>
-                <SelectTrigger className="w-full h-11 border-gray-300 rounded-md text-sm md:text-base">
-                  <SelectValue placeholder="Предмет" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все предметы ({getSubjectCount('all')})</SelectItem>
-                  {subjects.map(subject => (
-                    <SelectItem key={subject} value={subject}>
-                      {subject} ({getSubjectCount(subject)})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <CatalogFilters
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            filterType={filterType}
+            onFilterTypeChange={setFilterType}
+            filterSubject={filterSubject}
+            onFilterSubjectChange={setFilterSubject}
+            filterCategory={filterCategory}
+            onFilterCategoryChange={setFilterCategory}
+            priceRange={priceRange}
+            onPriceRangeChange={setPriceRange}
+            sortBy={sortBy}
+            onSortByChange={setSortBy}
+            categories={categories}
+            workTypes={workTypes}
+            subjects={subjects}
+            totalResults={filteredWorks.length}
+            onResetFilters={() => {
+              setSearchQuery('');
+              setFilterType('all');
+              setFilterSubject('all');
+              setFilterCategory('all');
+              setPriceRange('all');
+              setSortBy('default');
+            }}
+          />
         </div>
 
         {loading ? (
@@ -417,94 +422,33 @@ export default function CatalogPage() {
             <p className="text-gray-500 mt-2">Попробуйте изменить параметры поиска</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-            {filteredWorks.map((work) => (
-              <div 
-                key={work.id} 
-                className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                onClick={() => window.location.href = `/work-detail/${work.id}`}
-              >
-                <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
-                  {work.previewUrls && work.previewUrls.length > 0 ? (
-                    <PreviewCarousel 
-                      images={work.previewUrls} 
-                      title={work.title}
-                      className="w-full h-full"
-                    />
-                  ) : work.previewUrl ? (
-                    <>
-                      <img 
-                        src={work.previewUrl} 
-                        alt={work.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    </>
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                      <Icon name="FileText" className="text-gray-300 group-hover:text-gray-400 transition-colors" size={56} />
-                      <span className="text-sm font-medium text-gray-500">{work.workType}</span>
-                    </div>
-                  )}
-                  
-                  <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
-                    <div className="bg-primary text-primary-foreground text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                      {work.price.toLocaleString()} б.
-                    </div>
-                    <div className="bg-white/95 backdrop-blur-sm text-gray-700 text-xs font-semibold px-3 py-1 rounded-full shadow-md">
-                      {(work.price * 5).toLocaleString()} ₽
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-4 md:p-5">
-                  <div className="flex items-center justify-between mb-2 md:mb-3">
-                    <Badge className="bg-primary/10 text-primary text-[10px] md:text-[11px] font-semibold px-2 md:px-3 py-1 rounded-full border-0">
-                      {work.workType}
-                    </Badge>
-                    <div className="flex items-center gap-1">
-                      <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
-                      <span className="text-xs font-semibold text-gray-700">{work.rating}</span>
-                    </div>
-                  </div>
-
-                  <h3 className="font-bold text-sm md:text-[15px] mb-2 md:mb-3 line-clamp-3 leading-snug min-h-[60px] md:min-h-[63px] group-hover:text-primary transition-colors">
-                    {work.title.charAt(0).toUpperCase() + work.title.slice(1).toLowerCase()}
-                  </h3>
-                  
-                  <div className="space-y-2 md:space-y-2.5 mb-3 md:mb-4">
-                    <div className="flex items-start gap-2 md:gap-2.5 text-xs md:text-[13px] text-gray-600">
-                      <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <Icon name="Package" size={14} className="text-blue-600" />
-                      </div>
-                      <span className="line-clamp-2 leading-relaxed">{work.composition}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2.5 text-[13px] text-gray-600">
-                      <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                        <Icon name="Tag" size={14} className="text-purple-600" />
-                      </div>
-                      <span className="font-medium">{work.subject}</span>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-gray-100">
-                    <Button 
-                      className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white h-11 rounded-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.location.href = `/work-detail/${work.id}`;
-                      }}
-                    >
-                      <Icon name="ShoppingCart" size={18} className="mr-2" />
-                      Купить сейчас
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredWorks.map((work) => (
+                <WorkCard
+                  key={work.id}
+                  work={work}
+                  onQuickView={setQuickViewWork}
+                  onAddToFavorite={(workId) => {
+                    if (favorites.has(workId)) {
+                      const newFavorites = new Set(favorites);
+                      newFavorites.delete(workId);
+                      setFavorites(newFavorites);
+                    } else {
+                      setFavorites(new Set([...favorites, workId]));
+                    }
+                  }}
+                  isFavorite={favorites.has(work.id)}
+                />
+              ))}
+            </div>
+            
+            <QuickViewModal
+              work={quickViewWork}
+              open={!!quickViewWork}
+              onClose={() => setQuickViewWork(null)}
+            />
+          </>
         )}
       </main>
     </div>

@@ -1,0 +1,224 @@
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import Icon from '@/components/ui/icon';
+import PreviewCarousel from '@/components/PreviewCarousel';
+
+interface Work {
+  id: string;
+  folderName: string;
+  title: string;
+  workType: string;
+  subject: string;
+  description: string;
+  composition: string;
+  universities: string | null;
+  price: number;
+  rating: number;
+  previewUrl: string | null;
+  previewUrls?: string[];
+  purchaseCount?: number;
+  isHit?: boolean;
+  isNew?: boolean;
+  discount?: number;
+  pageCount?: number;
+  fileCount?: number;
+}
+
+interface QuickViewModalProps {
+  work: Work | null;
+  open: boolean;
+  onClose: () => void;
+}
+
+export default function QuickViewModal({ work, open, onClose }: QuickViewModalProps) {
+  if (!work) return null;
+
+  const finalPrice = work.discount 
+    ? work.price * (1 - work.discount / 100) 
+    : work.price;
+
+  const handleBuyClick = () => {
+    window.location.href = `/work/${work.id}`;
+  };
+
+  const hasPreview = work.previewUrls && work.previewUrls.length > 0;
+
+  const compositionItems = work.composition.split(',').map(item => item.trim());
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-start gap-3">
+            <DialogTitle className="flex-1 text-xl">{work.title}</DialogTitle>
+            <div className="flex gap-2">
+              {work.isNew && (
+                <Badge className="bg-green-500 text-white">
+                  <Icon name="Sparkles" size={12} className="mr-1" />
+                  Новинка
+                </Badge>
+              )}
+              {work.isHit && (
+                <Badge className="bg-orange-500 text-white">
+                  <Icon name="Flame" size={12} className="mr-1" />
+                  Хит
+                </Badge>
+              )}
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="grid md:grid-cols-2 gap-6 mt-4">
+          <div>
+            {hasPreview ? (
+              <div className="rounded-xl overflow-hidden border shadow-lg">
+                <PreviewCarousel previews={work.previewUrls!} />
+              </div>
+            ) : (
+              <div className="h-80 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center border">
+                <div className="text-center">
+                  <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl flex items-center justify-center">
+                    <Icon name="FileText" size={48} className="text-blue-500" />
+                  </div>
+                  <p className="text-sm text-gray-500 font-medium">{work.workType}</p>
+                </div>
+              </div>
+            )}
+
+            {work.purchaseCount !== undefined && work.purchaseCount > 0 && (
+              <div className="mt-4 flex items-center gap-2 py-3 px-4 bg-green-50 border border-green-200 rounded-lg">
+                <Icon name="Users" size={18} className="text-green-600" />
+                <span className="text-sm text-green-700 font-medium">
+                  ✅ Уже купили {work.purchaseCount} {work.purchaseCount === 1 ? 'студент' : work.purchaseCount < 5 ? 'студента' : 'студентов'}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <div className="space-y-4">
+              <div>
+                <Badge className="mb-2">{work.workType}</Badge>
+                {work.rating > 0 && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Icon 
+                          key={star} 
+                          name="Star" 
+                          size={16} 
+                          className={star <= work.rating ? "fill-amber-400 text-amber-400" : "text-gray-300"}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-sm font-semibold text-gray-700">{work.rating.toFixed(1)}</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
+                  <Icon name="BookOpen" size={20} className="text-blue-600 shrink-0 mt-0.5" />
+                  <div>
+                    <div className="text-xs text-blue-600 font-semibold uppercase mb-1">Предмет</div>
+                    <div className="text-sm text-gray-900 capitalize">{work.subject}</div>
+                  </div>
+                </div>
+
+                {work.universities && (
+                  <div className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+                    <Icon name="Building2" size={20} className="text-purple-600 shrink-0 mt-0.5" />
+                    <div>
+                      <div className="text-xs text-purple-600 font-semibold uppercase mb-1">Организация</div>
+                      <div className="text-sm text-gray-900">{work.universities}</div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                  <Icon name="Package" size={20} className="text-green-600 shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="text-xs text-green-600 font-semibold uppercase mb-2">Состав работы</div>
+                    <div className="space-y-1">
+                      {compositionItems.map((item, idx) => (
+                        <div key={idx} className="flex items-center gap-2 text-sm text-gray-900">
+                          <Icon name="Check" size={14} className="text-green-600 shrink-0" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {(work.pageCount || work.fileCount) && (
+                  <div className="flex gap-4 p-3 bg-gray-50 rounded-lg">
+                    {work.pageCount && (
+                      <div className="flex items-center gap-2">
+                        <Icon name="FileText" size={18} className="text-gray-600" />
+                        <div>
+                          <div className="text-xs text-gray-500">Страниц</div>
+                          <div className="text-sm font-semibold text-gray-900">{work.pageCount}</div>
+                        </div>
+                      </div>
+                    )}
+                    {work.fileCount && (
+                      <div className="flex items-center gap-2">
+                        <Icon name="Files" size={18} className="text-gray-600" />
+                        <div>
+                          <div className="text-xs text-gray-500">Файлов</div>
+                          <div className="text-sm font-semibold text-gray-900">{work.fileCount}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="pt-4 border-t space-y-3">
+                <div className="flex items-center justify-between">
+                  <div>
+                    {work.discount ? (
+                      <div className="flex flex-col">
+                        <span className="text-sm text-gray-400 line-through">{work.price} ₽</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-3xl font-bold text-green-600">{Math.round(finalPrice)} ₽</span>
+                          <Badge className="bg-red-500 text-white">−{work.discount}%</Badge>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-3xl font-bold text-gray-900">{work.price} ₽</span>
+                    )}
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleBuyClick}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-6 text-lg"
+                >
+                  <Icon name="ShoppingCart" size={20} className="mr-2" />
+                  Купить сейчас
+                </Button>
+
+                <div className="space-y-2 text-xs text-gray-600">
+                  <div className="flex items-center gap-2">
+                    <Icon name="ShieldCheck" size={14} className="text-green-600" />
+                    <span>Гарантия возврата в течение 7 дней</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Download" size={14} className="text-blue-600" />
+                    <span>Мгновенное скачивание после оплаты</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Lock" size={14} className="text-purple-600" />
+                    <span>Безопасная оплата</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}

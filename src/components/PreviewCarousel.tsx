@@ -2,15 +2,19 @@ import { useState } from 'react';
 import Icon from '@/components/ui/icon';
 
 interface PreviewCarouselProps {
-  images: string[];
-  title: string;
+  images?: string[];
+  previews?: string[];
+  title?: string;
   className?: string;
+  onError?: () => void;
 }
 
-export default function PreviewCarousel({ images, title, className = '' }: PreviewCarouselProps) {
+export default function PreviewCarousel({ images, previews, title = '', className = '', onError }: PreviewCarouselProps) {
+  const imageList = previews || images || [];
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [imageError, setImageError] = useState(false);
 
-  if (!images || images.length === 0) {
+  if (!imageList || imageList.length === 0) {
     return (
       <div className={`bg-muted flex items-center justify-center ${className}`}>
         <Icon name="FileText" size={48} className="text-muted-foreground" />
@@ -18,13 +22,27 @@ export default function PreviewCarousel({ images, title, className = '' }: Previ
     );
   }
 
-  if (images.length === 1) {
+  const handleImageError = () => {
+    setImageError(true);
+    if (onError) onError();
+  };
+
+  if (imageError) {
+    return (
+      <div className={`bg-muted flex items-center justify-center ${className}`}>
+        <Icon name="FileText" size={48} className="text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (imageList.length === 1) {
     return (
       <img
-        src={images[0]}
+        src={imageList[0]}
         alt={title}
         className={`object-cover ${className}`}
         loading="lazy"
+        onError={handleImageError}
       />
     );
   }
@@ -32,25 +50,26 @@ export default function PreviewCarousel({ images, title, className = '' }: Previ
   const goToPrevious = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? imageList.length - 1 : prev - 1));
   };
 
   const goToNext = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === imageList.length - 1 ? 0 : prev + 1));
   };
 
   return (
     <div className={`relative group ${className}`}>
       <img
-        src={images[currentIndex]}
+        src={imageList[currentIndex]}
         alt={`${title} - ${currentIndex + 1}`}
         className="w-full h-full object-cover"
         loading="lazy"
+        onError={handleImageError}
       />
 
-      {images.length > 1 && (
+      {imageList.length > 1 && (
         <>
           <button
             onClick={goToPrevious}
@@ -69,7 +88,7 @@ export default function PreviewCarousel({ images, title, className = '' }: Previ
           </button>
 
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {images.map((_, idx) => (
+            {imageList.map((_, idx) => (
               <button
                 key={idx}
                 onClick={(e) => {
@@ -88,7 +107,7 @@ export default function PreviewCarousel({ images, title, className = '' }: Previ
           </div>
 
           <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
-            {currentIndex + 1} / {images.length}
+            {currentIndex + 1} / {imageList.length}
           </div>
         </>
       )}

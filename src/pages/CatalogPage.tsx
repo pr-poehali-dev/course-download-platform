@@ -434,10 +434,10 @@ export default function CatalogPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {filteredWorks.map((work) => (
-                <Link
+                <div
                   key={work.id}
-                  to={`/work/${work.id}`}
-                  className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block"
+                  onClick={() => window.location.href = `/work/${work.id}`}
+                  className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block cursor-pointer"
                 >
                   <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
                     {work.previewUrls && work.previewUrls.length > 0 ? (
@@ -556,7 +556,7 @@ export default function CatalogPage() {
                       </div>
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
             

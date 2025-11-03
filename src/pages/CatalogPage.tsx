@@ -91,54 +91,58 @@ export default function CatalogPage() {
     };
   };
 
-  const determineSubject = (title: string): string => {
+  const determineSubject = (title: string, apiSubject?: string): string => {
+    if (apiSubject && apiSubject !== 'coursework' && apiSubject !== 'thesis') {
+      return apiSubject;
+    }
+    
     const t = title.toLowerCase();
     
-    if (/электро|электри|энергет|эу|ру/.test(t)) return 'электроэнергетика';
-    if (/автоматиз|управлен|асу|контрол|регулир/.test(t)) return 'автоматизация';
-    if (/строител|бетон|конструк|здание|сооружен/.test(t)) return 'строительство';
-    if (/механ|привод|станок|оборудован/.test(t)) return 'механика';
-    if (/газ|газопровод|нефт/.test(t)) return 'газоснабжение';
-    if (/програм|по|software|алгоритм|дискрет/.test(t)) return 'программирование';
-    if (/безопасн|охран|труд|защит/.test(t)) return 'безопасность';
-    if (/тепло|водоснабжен|вентиляц|отоплен/.test(t)) return 'теплоснабжение';
-    if (/транспорт|дорог|судов|автомобил|локомотив/.test(t)) return 'транспорт';
-    if (/гидравлик|гидро/.test(t)) return 'гидравлика';
+    if (/электро|электри|энергет|эу|ру/.test(t)) return 'Электроэнергетика';
+    if (/автоматиз|управлен|асу|контрол|регулир/.test(t)) return 'Автоматизация';
+    if (/строител|бетон|конструк|здание|сооружен/.test(t)) return 'Строительство';
+    if (/механ|привод|станок|оборудован|экскаватор/.test(t)) return 'Механика';
+    if (/газ|газопровод|нефт/.test(t)) return 'Газоснабжение';
+    if (/програм|по|software|алгоритм|дискрет/.test(t)) return 'Программирование';
+    if (/безопасн|охран|труд|защит/.test(t)) return 'Безопасность';
+    if (/тепло|водоснабжен|вентиляц|отоплен/.test(t)) return 'Теплоснабжение';
+    if (/транспорт|дорог|судов|автомобил|локомотив|комбайн/.test(t)) return 'Транспорт';
+    if (/гидравлик|гидро/.test(t)) return 'Гидравлика';
     
-    return 'общая инженерия';
+    return 'Общая инженерия';
   };
 
   const determinePrice = (workType: string, title: string): number => {
     const wt = workType.toLowerCase();
     const t = title.toLowerCase();
     
-    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 250;
-    if (/отчет.*практ/.test(wt)) return 400;
+    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 500;
+    if (/отчет.*практ/.test(wt)) return 800;
     if (/курсовая|курсовой/.test(wt)) {
-      if (/проектирование|расчет|модернизация|разработка/.test(t)) return 600;
-      return 500;
-    }
-    if (/дипломная|диплом/.test(wt)) {
-      if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 1200;
+      if (/проектирование|расчет|модернизация|разработка/.test(t)) return 1200;
       return 1000;
     }
-    if (/реферат/.test(wt)) return 200;
-    if (/контрольная/.test(wt)) return 300;
+    if (/дипломная|диплом/.test(wt)) {
+      if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 2400;
+      return 2000;
+    }
+    if (/реферат/.test(wt)) return 400;
+    if (/контрольная/.test(wt)) return 600;
     
-    return 350;
+    return 700;
   };
 
   const determineRating = (workType: string): number => {
     const wt = workType.toLowerCase();
     
     if (/дипломная|диплом/.test(wt)) return 5.0;
-    if (/курсовая|курсовой/.test(wt)) return 4.8;
-    if (/отчет.*практ/.test(wt)) return 4.7;
-    if (/практическая|практика/.test(wt)) return 4.6;
-    if (/контрольная/.test(wt)) return 4.5;
-    if (/реферат/.test(wt)) return 4.4;
+    if (/курсовая|курсовой/.test(wt)) return 4.9;
+    if (/отчет.*практ/.test(wt)) return 4.8;
+    if (/практическая|практика/.test(wt)) return 4.7;
+    if (/контрольная/.test(wt)) return 4.7;
+    if (/реферат/.test(wt)) return 4.7;
     
-    return 4.5;
+    return 4.8;
   };
 
   const extractUniversity = (title: string): string | null => {
@@ -188,13 +192,14 @@ export default function CatalogPage() {
   }, []);
 
   useEffect(() => {
-    const CACHE_KEY = 'catalog_works_cache_v5';
+    const CACHE_KEY = 'catalog_works_cache_v6';
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
     
     localStorage.removeItem('catalog_works_cache');
     localStorage.removeItem('catalog_works_cache_v2');
     localStorage.removeItem('catalog_works_cache_v3');
     localStorage.removeItem('catalog_works_cache_v4');
+    localStorage.removeItem('catalog_works_cache_v5');
 
     const loadFromCache = (): Work[] | null => {
       try {
@@ -246,31 +251,32 @@ export default function CatalogPage() {
               }
             }
             
-            const purchaseCount = Math.floor(Math.random() * 150) + 1;
             const isNew = Math.random() > 0.85;
-            const isHit = purchaseCount > 50;
-            const discount = Math.random() > 0.7 ? [10, 15, 20, 25, 30][Math.floor(Math.random() * 5)] : 0;
+            const discount = Math.random() > 0.75 ? [10, 15, 20, 25][Math.floor(Math.random() * 4)] : 0;
+            
+            const workInfo = extractWorkInfo(work.title);
+            const rating = work.rating && work.rating > 0 ? parseFloat(String(work.rating)) : determineRating(workInfo.workType);
+            const finalRating = rating < 4.7 ? 4.7 : rating;
             
             return {
               id: String(work.id),
               folderName: work.title,
               title: work.title,
-              workType: work.work_type || 'другое',
-              subject: work.subject || 'общая инженерия',
-              description: work.description || `${work.work_type} • ${work.subject}`,
-              composition: work.composition || 'Пояснительная записка',
-              universities: work.universities || null,
-              price: work.price_points || 300,
-              rating: parseFloat(work.rating) || 4.5,
-              previewUrl: previewUrls[0] || work.preview_url || work.preview_image_url || null,
+              workType: workInfo.workType,
+              subject: determineSubject(work.title, work.subject),
+              description: work.preview || `Готовая работа по теме "${work.title}". Включает теоретическую часть, практические расчеты и выводы.`,
+              composition: determineComposition(workInfo.workType, work.title),
+              universities: extractUniversity(work.title),
+              price: work.price_points || determinePrice(workInfo.workType, work.title),
+              rating: finalRating,
+              previewUrl: previewUrls[0] || work.preview_image_url || null,
               previewUrls: previewUrls,
-              yandexDiskLink: work.yandex_disk_link || work.file_url || '',
-              purchaseCount,
+              yandexDiskLink: work.file_url || '',
               isNew,
-              isHit,
+              isHit: false,
               discount,
-              pageCount: Math.floor(Math.random() * 100) + 20,
-              fileCount: Math.floor(Math.random() * 15) + 3
+              pageCount: work.page_count || 0,
+              fileCount: work.file_count || 0
             };
           });
           
@@ -319,7 +325,7 @@ export default function CatalogPage() {
     }
 
     if (filterSubject !== 'all') {
-      filtered = filtered.filter(work => work.subject === filterSubject);
+      filtered = filtered.filter(work => work.subject.toLowerCase() === filterSubject.toLowerCase());
     }
 
     if (filterCategory !== 'all') {
@@ -331,10 +337,10 @@ export default function CatalogPage() {
 
     if (priceRange !== 'all') {
       filtered = filtered.filter(work => {
-        if (priceRange === '0-300') return work.price <= 300;
-        if (priceRange === '300-600') return work.price > 300 && work.price <= 600;
-        if (priceRange === '600-1000') return work.price > 600 && work.price <= 1000;
-        if (priceRange === '1000+') return work.price > 1000;
+        if (priceRange === '0-300') return work.price <= 600;
+        if (priceRange === '300-600') return work.price > 600 && work.price <= 1200;
+        if (priceRange === '600-1000') return work.price > 1200 && work.price <= 2000;
+        if (priceRange === '1000+') return work.price > 2000;
         return true;
       });
     }
@@ -491,73 +497,70 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="p-4 md:p-5">
-                    <div className="flex items-center justify-between mb-2 md:mb-3">
-                      <Badge className="bg-primary/10 text-primary text-[10px] md:text-[11px] font-semibold px-2 md:px-3 py-1 rounded-full border-0">
-                        {work.workType}
-                      </Badge>
+                    <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-1">
-                        <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
-                        <span className="text-xs font-semibold text-gray-700">{work.rating.toFixed(1)}</span>
+                        <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
+                        <span className="text-sm font-bold text-gray-700">{work.rating.toFixed(1)}</span>
                       </div>
+                      {(work.pageCount > 0 || work.fileCount > 0) && (
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                          {work.pageCount > 0 && (
+                            <span className="flex items-center gap-1">
+                              <Icon name="FileText" size={12} />
+                              {work.pageCount} стр.
+                            </span>
+                          )}
+                          {work.fileCount > 0 && (
+                            <span className="flex items-center gap-1">
+                              <Icon name="Files" size={12} />
+                              {work.fileCount} файл.
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
 
-                    <h3 className="font-bold text-sm md:text-[15px] mb-2 md:mb-3 line-clamp-3 leading-snug min-h-[60px] md:min-h-[63px] group-hover:text-primary transition-colors">
+                    <h3 className="font-bold text-sm md:text-[15px] mb-2 line-clamp-2 leading-snug min-h-[42px] group-hover:text-primary transition-colors">
                       {work.title.charAt(0).toUpperCase() + work.title.slice(1).toLowerCase()}
                     </h3>
+
+                    <p className="text-xs text-gray-600 line-clamp-2 mb-3 min-h-[32px] leading-relaxed">
+                      {work.description}
+                    </p>
                     
-                    <div className="space-y-2 md:space-y-2.5 mb-3 md:mb-4">
-                      <div className="flex items-start gap-2 md:gap-2.5 text-xs md:text-[13px] text-gray-600">
-                        <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                          <Icon name="Package" size={14} className="text-blue-600" />
-                        </div>
-                        <span className="line-clamp-2 leading-relaxed">{work.composition}</span>
+                    <div className="space-y-2 mb-3">
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <Icon name="Package" size={14} className="text-blue-600" />
+                        <span className="line-clamp-1">{work.composition}</span>
                       </div>
                       
-                      <div className="flex items-center gap-2.5 text-[13px] text-gray-600">
-                        <div className="w-5 h-5 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                          <Icon name="Tag" size={14} className="text-purple-600" />
-                        </div>
-                        <span className="font-medium capitalize">{work.subject}</span>
+                      <div className="flex items-center gap-2 text-xs text-gray-600">
+                        <Icon name="Tag" size={14} className="text-purple-600" />
+                        <span className="font-medium">{work.subject}</span>
                       </div>
                     </div>
-
-                    {work.purchaseCount && work.purchaseCount > 0 && (
-                      <div className="flex items-center gap-2 mb-3 py-2 px-3 bg-green-50 border border-green-200 rounded-lg">
-                        <Icon name="ShoppingCart" size={14} className="text-green-600" />
-                        <span className="text-xs text-green-700 font-medium">
-                          Купили {work.purchaseCount} {work.purchaseCount === 1 ? 'студент' : work.purchaseCount < 5 ? 'студента' : 'студентов'}
-                        </span>
-                      </div>
-                    )}
 
                     <div className="flex items-center justify-between pt-3 border-t">
                       <div>
                         {work.discount ? (
                           <div className="flex flex-col">
-                            <span className="text-sm text-gray-400 line-through">{work.price} ₽</span>
-                            <span className="text-2xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} ₽</span>
+                            <span className="text-xs text-gray-400 line-through">{work.price} б.</span>
+                            <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} б.</span>
                           </div>
                         ) : (
-                          <span className="text-2xl font-bold text-gray-900">{work.price} ₽</span>
+                          <span className="text-xl font-bold text-gray-900">{work.price} б.</span>
                         )}
                       </div>
                       <Button 
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-6"
+                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-4 text-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           window.location.href = `/work/${work.id}`;
                         }}
                       >
-                        <Icon name="ShoppingCart" size={18} className="mr-2" />
+                        <Icon name="ShoppingCart" size={16} className="mr-1.5" />
                         Купить
                       </Button>
-                    </div>
-
-                    <div className="mt-3 pt-3 border-t border-gray-100">
-                      <div className="flex items-center justify-center gap-2 text-xs text-green-600 font-medium">
-                        <Icon name="ShieldCheck" size={14} />
-                        <span>Гарантия возврата 7 дней</span>
-                      </div>
                     </div>
                   </div>
                 </div>

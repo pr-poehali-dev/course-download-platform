@@ -156,18 +156,18 @@ export default function CatalogFilters({
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">
               <Icon name="Coins" size={14} className="inline mr-1" />
-              Цена
+              Баллы
             </label>
             <Select value={priceRange} onValueChange={onPriceRangeChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Любая цена" />
+                <SelectValue placeholder="Любые баллы" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Любая цена</SelectItem>
-                <SelectItem value="0-300">До 300 ₽</SelectItem>
-                <SelectItem value="300-600">300 - 600 ₽</SelectItem>
-                <SelectItem value="600-1000">600 - 1000 ₽</SelectItem>
-                <SelectItem value="1000+">От 1000 ₽</SelectItem>
+                <SelectItem value="all">Любые баллы</SelectItem>
+                <SelectItem value="0-300">До 600 б.</SelectItem>
+                <SelectItem value="300-600">600 - 1200 б.</SelectItem>
+                <SelectItem value="600-1000">1200 - 2000 б.</SelectItem>
+                <SelectItem value="1000+">От 2000 б.</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -186,7 +186,6 @@ export default function CatalogFilters({
                 <SelectItem value="price-asc">Сначала дешевле</SelectItem>
                 <SelectItem value="price-desc">Сначала дороже</SelectItem>
                 <SelectItem value="rating">По рейтингу</SelectItem>
-                <SelectItem value="popular">По популярности</SelectItem>
                 <SelectItem value="new">Сначала новые</SelectItem>
               </SelectContent>
             </Select>

@@ -85,23 +85,13 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
                 </div>
               </div>
             )}
-
-            {work.purchaseCount !== undefined && work.purchaseCount > 0 && (
-              <div className="mt-4 flex items-center gap-2 py-3 px-4 bg-green-50 border border-green-200 rounded-lg">
-                <Icon name="Users" size={18} className="text-green-600" />
-                <span className="text-sm text-green-700 font-medium">
-                  ✅ Уже купили {work.purchaseCount} {work.purchaseCount === 1 ? 'студент' : work.purchaseCount < 5 ? 'студента' : 'студентов'}
-                </span>
-              </div>
-            )}
           </div>
 
           <div>
             <div className="space-y-4">
               <div>
-                <Badge className="mb-2">{work.workType}</Badge>
                 {work.rating > 0 && (
-                  <div className="flex items-center gap-2 mt-2">
+                  <div className="flex items-center gap-2 mb-3">
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Icon 
@@ -115,6 +105,9 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
                     <span className="text-sm font-semibold text-gray-700">{work.rating.toFixed(1)}</span>
                   </div>
                 )}
+                <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+                  {work.description}
+                </p>
               </div>
 
               <div className="space-y-3">
@@ -180,14 +173,14 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
                   <div>
                     {work.discount ? (
                       <div className="flex flex-col">
-                        <span className="text-sm text-gray-400 line-through">{work.price} ₽</span>
+                        <span className="text-sm text-gray-400 line-through">{work.price} б.</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-3xl font-bold text-green-600">{Math.round(finalPrice)} ₽</span>
+                          <span className="text-3xl font-bold text-green-600">{Math.round(finalPrice)} б.</span>
                           <Badge className="bg-red-500 text-white">−{work.discount}%</Badge>
                         </div>
                       </div>
                     ) : (
-                      <span className="text-3xl font-bold text-gray-900">{work.price} ₽</span>
+                      <span className="text-3xl font-bold text-gray-900">{work.price} б.</span>
                     )}
                   </div>
                 </div>

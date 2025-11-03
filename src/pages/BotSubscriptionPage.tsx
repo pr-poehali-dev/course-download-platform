@@ -93,6 +93,13 @@ export default function BotSubscriptionPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-100">
       <div className="container mx-auto px-4 py-12 max-w-4xl">
+        <div className="mb-6">
+          <Button variant="ghost" onClick={() => navigate('/')} className="gap-2">
+            <Icon name="ArrowLeft" size={16} />
+            Вернуться на главную
+          </Button>
+        </div>
+        
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-full mb-6 backdrop-blur-sm border border-blue-500/30">
             <Icon name="MessageCircle" size={20} className="text-blue-600" />

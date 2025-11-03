@@ -23,7 +23,9 @@ interface Work {
 }
 
 export default function WorkDetailPage() {
-  const { workId } = useParams();
+  const { id, workId } = useParams();
+  const actualWorkId = id || workId;
+  console.log('WorkDetailPage params:', { id, workId, actualWorkId });
   const navigate = useNavigate();
   const [work, setWork] = useState<Work | null>(null);
   const [loading, setLoading] = useState(true);
@@ -276,14 +278,14 @@ export default function WorkDetailPage() {
 
   useEffect(() => {
     const fetchWork = async () => {
-      if (!workId) {
+      if (!actualWorkId) {
         navigate('/catalog');
         return;
       }
 
       try {
         const response = await fetch(
-          `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?id=${workId}`
+          `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?id=${actualWorkId}`
         );
         const data = await response.json();
 
@@ -335,10 +337,10 @@ export default function WorkDetailPage() {
     };
 
     fetchWork();
-  }, [workId, navigate]);
+  }, [actualWorkId, navigate]);
 
   const handlePurchaseAndDownload = async () => {
-    if (!workId || !work) return;
+    if (!actualWorkId || !work) return;
     
     // Получаем userId из localStorage (предполагается, что пользователь авторизован)
     const userStr = localStorage.getItem('user');
@@ -361,7 +363,7 @@ export default function WorkDetailPage() {
           'X-User-Id': String(userId)
         },
         body: JSON.stringify({
-          workId: workId,
+          workId: actualWorkId,
           userId: userId,
           price: work.price
         })
@@ -379,7 +381,7 @@ export default function WorkDetailPage() {
       
       // Шаг 2: Получение ссылки на скачивание
       const downloadResponse = await fetch(
-        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`,
+        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(actualWorkId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`,
         {
           headers: {
             'X-User-Id': String(userId)

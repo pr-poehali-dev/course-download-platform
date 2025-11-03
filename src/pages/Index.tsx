@@ -327,7 +327,10 @@ export default function Index() {
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
-                <h1 className="text-lg sm:text-2xl font-bold truncate">Tech Forma</h1>
+                <div className="flex flex-col min-w-0">
+                  <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Обмен знаниями без границ</p>
+                </div>
               </div>
               
               <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
@@ -467,7 +470,7 @@ export default function Index() {
               </h2>
               
               <p className="text-lg sm:text-2xl md:text-3xl font-semibold text-slate-700 mb-3 sm:mb-6 animate-fade-in px-2">
-                Умная экосистема для студентов
+                Обмен знаниями без границ
               </p>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">

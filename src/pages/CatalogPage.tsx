@@ -261,7 +261,7 @@ export default function CatalogPage() {
               description: work.preview || `Готовая работа по теме "${work.title}". Включает теоретическую часть, практические расчеты и выводы.`,
               composition: determineComposition(workInfo.workType, work.title),
               universities: extractUniversity(work.title),
-              price: work.price_points || determinePrice(workInfo.workType, work.title),
+              price: determinePrice(workInfo.workType, work.title),
               rating: finalRating,
               previewUrl: previewUrls[0] || work.preview_image_url || null,
               previewUrls: previewUrls,

@@ -284,7 +284,7 @@ export default function WorkDetailPage() {
           const title = data.title;
           const workType = data.work_type || 'другое';
           const subject = data.subject || determineSubject(title);
-          const price = data.price_points || determinePrice(workType, title);
+          const price = determinePrice(workType, title);
           const rating = parseFloat(data.rating) || determineRating(workType);
           const universities = data.universities || extractUniversity(title);
           const universitiesList = determineUniversities(subject);

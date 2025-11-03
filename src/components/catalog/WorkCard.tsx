@@ -81,12 +81,11 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
 
       <div className="relative h-56 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
         {hasPreview ? (
-          <div className="h-full w-full">
-            <PreviewCarousel 
-              previews={work.previewUrls!} 
-              onError={() => setImageError(true)}
-            />
-          </div>
+          <PreviewCarousel 
+            previews={work.previewUrls!} 
+            onError={() => setImageError(true)}
+            className="h-full w-full"
+          />
         ) : (
           <div className="h-full flex flex-col items-center justify-center p-6 text-center">
             <div className="w-20 h-20 mb-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl flex items-center justify-center">

@@ -438,17 +438,13 @@ export default function CatalogPage() {
                 <div
                   key={work.id}
                   onClick={(e) => {
-                    console.log('=== FULL CARD CLICKED ===');
+                    console.log('=== CARD CLICKED ===');
                     console.log('Work ID:', work.id);
-                    console.log('Event target:', e.target);
-                    console.log('Current target:', e.currentTarget);
-                    console.log('Navigating to:', `/work/${work.id}`);
                     navigate(`/work/${work.id}`);
                   }}
                   className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block cursor-pointer"
-                  style={{ pointerEvents: 'auto' }}
                 >
-                  <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
+                  <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden pointer-events-none">
                     {work.previewUrl || (work.previewUrls && work.previewUrls.length > 0) ? (
                       <>
                         <img 
@@ -498,7 +494,7 @@ export default function CatalogPage() {
                     </button>
                   </div>
 
-                  <div className="p-4 md:p-5">
+                  <div className="p-4 md:p-5 pointer-events-none">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-1">
                         <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />

@@ -1472,6 +1472,41 @@ export default function Index() {
                   </p>
                 </CardContent>
               </Card>
+
+              <Card className="border-2 border-blue-500/30 bg-blue-50/50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Coins" size={20} className="text-blue-600" />
+                    Почему баллы, а не деньги?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground mb-3">
+                    Tech Forma — это <span className="font-semibold text-foreground">студенческое сообщество</span>, а не маркетплейс. Мы создали систему баллов для честного обмена знаниями:
+                  </p>
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-start gap-2">
+                      <Icon name="Check" size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Помогаешь другим</strong> — делишься работой и получаешь баллы</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Icon name="Check" size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Используешь баллы</strong> — покупаешь работы других студентов</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Icon name="Check" size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Без комиссий банков</strong> — обмен внутри платформы</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Icon name="Check" size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Фокус на обучении</strong>, а не на заработке</span>
+                    </li>
+                  </ul>
+                  <p className="text-sm text-muted-foreground mt-3 italic">
+                    💡 Если нужны баллы, а своих работ нет — можно купить баллы за рубли в разделе "Пополнить баланс".
+                  </p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>

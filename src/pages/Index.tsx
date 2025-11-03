@@ -598,10 +598,6 @@ export default function Index() {
                     <Icon name="Check" size={16} className="text-green-600" />
                     <span>Консультации по работам</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>GigaChat под капотом</span>
-                  </div>
                   <Button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700" asChild>
                     <a href="/bot-subscription">
                       <Icon name="ShoppingCart" size={16} className="mr-2" />

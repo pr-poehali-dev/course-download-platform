@@ -465,9 +465,11 @@ export default function Index() {
                 </span>
               </div>
               
-              <h2 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold mb-4 sm:mb-8 bg-gradient-to-r from-slate-900 via-primary to-purple-600 bg-clip-text text-transparent animate-fade-in leading-tight px-2">
-                Tech Forma
-              </h2>
+              <div className="hero-glow mb-4 sm:mb-8">
+                <h2 className="hero-title text-5xl sm:text-7xl md:text-8xl lg:text-9xl leading-tight px-2">
+                  Tech Forma
+                </h2>
+              </div>
               
               <p className="text-lg sm:text-2xl md:text-3xl font-semibold text-slate-700 mb-3 sm:mb-6 animate-fade-in px-2">
                 Обмен знаниями без границ

@@ -471,7 +471,7 @@ export default function Index() {
               </p>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Облачный каталог работ + ИИ-помощник + Маркетплейс авторов. Всё в одном месте.
+                Облачный каталог работ + ИИ-помощник + Обмен знаниями. Всё в одном месте.
               </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
@@ -503,7 +503,7 @@ export default function Index() {
                   <p className="text-xs sm:text-sm text-muted-foreground">Доступ</p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-green-200 hover:border-green-400 transition-all hover:shadow-lg">
-                  <div className="text-xl sm:text-3xl font-bold text-green-600 mb-1">5000+</div>
+                  <div className="text-xl sm:text-3xl font-bold text-green-600 mb-1">1000+</div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Студентов</p>
                 </div>
               </div>
@@ -618,13 +618,13 @@ export default function Index() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <CardTitle className="text-2xl">Маркетплейс</CardTitle>
-                  <CardDescription className="text-base">Продавай свои работы</CardDescription>
+                  <CardTitle className="text-2xl">Библиотека работ</CardTitle>
+                  <CardDescription className="text-base">Делись работами и получай баллы</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>До 70% от продаж</span>
+                    <span>10 баллов за скачивание</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
@@ -632,16 +632,16 @@ export default function Index() {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Статистика продаж</span>
+                    <span>Статистика скачиваний</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Быстрый вывод</span>
+                    <span>Обмен знаниями</span>
                   </div>
                   <Button className="w-full mt-4" variant="outline" asChild>
                     <a href="/marketplace">
                       <Icon name="Upload" size={16} className="mr-2" />
-                      Стать автором
+                      Загрузить работу
                     </a>
                   </Button>
                 </CardContent>

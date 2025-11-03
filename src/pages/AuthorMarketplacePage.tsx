@@ -23,8 +23,8 @@ export default function AuthorMarketplacePage() {
   const features = [
     {
       icon: 'TrendingUp',
-      title: 'Высокий процент',
-      description: 'Получайте 90% от каждой продажи, мы берём всего 10%'
+      title: 'Высокие баллы',
+      description: 'Получайте 90% баллов от каждого скачивания, 10% — комиссия платформы'
     },
     {
       icon: 'Shield',
@@ -33,8 +33,8 @@ export default function AuthorMarketplacePage() {
     },
     {
       icon: 'Zap',
-      title: 'Баллы для покупок',
-      description: 'Тратьте заработанные баллы на работы других авторов'
+      title: 'Обмен баллами',
+      description: 'Используйте заработанные баллы для покупки работ других студентов'
     },
     {
       icon: 'Users',
@@ -48,13 +48,13 @@ export default function AuthorMarketplacePage() {
     },
     {
       icon: 'RefreshCw',
-      title: 'Постоянный обмен',
-      description: 'Одна работа может продаваться неограниченное количество раз'
+      title: 'Постоянный доход баллов',
+      description: 'Получайте баллы каждый раз, когда вашу работу скачивают'
     }
   ];
 
   const stats = [
-    { value: '5000+', label: 'Работ в каталоге' },
+    { value: '487', label: 'Работ в каталоге' },
     { value: '90%', label: 'Баллов автору' },
     { value: '24/7', label: 'Обмен работает' }
   ];
@@ -78,7 +78,7 @@ export default function AuthorMarketplacePage() {
     {
       step: 4,
       title: 'Получайте баллы',
-      description: 'Работа появится в каталоге, вы получаете 90% баллов с каждой продажи'
+      description: 'Работа появится в каталоге, вы получаете 90% баллов с каждого скачивания'
     }
   ];
 
@@ -89,11 +89,11 @@ export default function AuthorMarketplacePage() {
       <main className="container mx-auto px-4 py-12 mt-16 max-w-7xl">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Продавайте свои студенческие работы
+            Делитесь работами и получайте баллы
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Загружайте готовые курсовые, дипломы и контрольные — получайте баллы для покупки работ других авторов. 
-            90% баллов с каждой продажи остаются у вас!
+            Загружайте готовые курсовые, дипломы и контрольные — получайте баллы за каждое скачивание. 
+            90% баллов остаются у вас, используй их для покупки других работ!
           </p>
           <div className="flex gap-4 justify-center">
             <Button 

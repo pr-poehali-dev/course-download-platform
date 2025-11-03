@@ -36,7 +36,7 @@ interface Upload {
   id: number;
   title: string;
   price: number;
-  sales: number;
+  downloads: number;
   status: 'active' | 'moderation' | 'rejected';
   uploadDate: string;
 }
@@ -250,7 +250,7 @@ export default function ProfilePage() {
             </CardHeader>
             <CardContent>
               <div className="text-4xl font-bold text-white mb-1">{user.worksUploaded}</div>
-              <p className="text-sm text-white/80">загружено на продажу</p>
+              <p className="text-sm text-white/80">работ в библиотеке</p>
             </CardContent>
           </Card>
 
@@ -422,7 +422,7 @@ export default function ProfilePage() {
             <Card>
               <CardHeader>
                 <CardTitle>Мои работы ({uploads.length})</CardTitle>
-                <CardDescription>Загруженные работы и статистика продаж</CardDescription>
+                <CardDescription>Загруженные работы и статистика скачиваний</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -439,8 +439,8 @@ export default function ProfilePage() {
                             {upload.price} баллов
                           </span>
                           <span className="flex items-center gap-1">
-                            <Icon name="ShoppingCart" size={14} />
-                            {upload.sales} продаж
+                            <Icon name="Download" size={14} />
+                            {upload.downloads} скачиваний
                           </span>
                           <span className="flex items-center gap-1">
                             <Icon name="Calendar" size={14} />

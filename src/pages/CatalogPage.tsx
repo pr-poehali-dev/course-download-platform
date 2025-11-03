@@ -515,7 +515,7 @@ export default function CatalogPage() {
                     </div>
 
                     <h3 className="font-bold text-sm md:text-[15px] mb-2 line-clamp-2 leading-snug min-h-[42px] group-hover:text-primary transition-colors">
-                      {work.title.charAt(0).toUpperCase() + work.title.slice(1).toLowerCase()}
+                      {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
                     </h3>
 
                     <p className="text-xs text-gray-600 line-clamp-2 mb-3 min-h-[32px] leading-relaxed">

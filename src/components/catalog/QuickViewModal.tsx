@@ -51,7 +51,7 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start gap-3">
-            <DialogTitle className="flex-1 text-xl">{work.title}</DialogTitle>
+            <DialogTitle className="flex-1 text-xl">{work.title.charAt(0).toUpperCase() + work.title.slice(1)}</DialogTitle>
             <div className="flex gap-2">
               {work.isNew && (
                 <Badge className="bg-green-500 text-white">

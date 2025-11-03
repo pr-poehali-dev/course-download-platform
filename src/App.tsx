@@ -32,6 +32,7 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SupportAdmin from "./components/SupportAdmin";
 import TelegramChatButton from "./components/TelegramChatButton";
+import BotSubscriptionPage from "./pages/BotSubscriptionPage";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +71,7 @@ const App = () => (
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/blog/:id" element={<BlogPost />} />
+          <Route path="/bot-subscription" element={<BotSubscriptionPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

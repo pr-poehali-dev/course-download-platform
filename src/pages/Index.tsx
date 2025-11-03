@@ -479,9 +479,9 @@ export default function Index() {
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
                 <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
-                  <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
+                  <a href="/bot-subscription">
                     <Icon name="MessageCircle" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                    Открыть бота
+                    Подписаться на бота
                   </a>
                 </Button>
                 <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg border-2 backdrop-blur-sm bg-white/50" asChild>
@@ -607,9 +607,9 @@ export default function Index() {
                     <span>GigaChat под капотом</span>
                   </div>
                   <Button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700" asChild>
-                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
-                      <Icon name="MessageCircle" size={16} className="mr-2" />
-                      Открыть бота
+                    <a href="/bot-subscription">
+                      <Icon name="ShoppingCart" size={16} className="mr-2" />
+                      Подписаться
                     </a>
                   </Button>
                 </CardContent>
@@ -850,9 +850,9 @@ export default function Index() {
                     </p>
                   </div>
                   <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" asChild>
-                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
-                      <Icon name="MessageCircle" size={20} className="mr-2" />
-                      Открыть @TechForma_bot
+                    <a href="/bot-subscription">
+                      <Icon name="ShoppingCart" size={20} className="mr-2" />
+                      Оформить подписку
                     </a>
                   </Button>
                 </CardContent>

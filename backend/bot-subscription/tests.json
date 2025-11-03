@@ -1,0 +1,36 @@
+{
+  "tests": [
+    {
+      "name": "Check subscription without parameters",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Check subscription with user_id",
+      "method": "GET",
+      "path": "/?user_id=999999",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "has_access": "boolean",
+        "status": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Activate subscription without user_id",
+      "method": "POST",
+      "path": "/",
+      "body": {},
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

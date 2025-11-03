@@ -1,8 +1,8 @@
 {
+  "bot-subscription": "https://functions.poehali.dev/d541c063-af19-4f29-9b8b-5e034ebe425d",
   "extract-all-previews": "https://functions.poehali.dev/3ff96e7e-431a-4357-ace4-20a15ad58403",
   "ai-chat-history": "https://functions.poehali.dev/6838d17d-6341-42fc-b078-8e1dfef68333",
   "ai-subscription": "https://functions.poehali.dev/28f94286-1fca-46c5-9d1c-93d7ab973d61",
-  "full-yandex-sync": "https://functions.poehali.dev/e87de681-bad3-4d65-b601-1746bdee6e4e",
   "premium": "https://functions.poehali.dev/5909592c-afca-4205-9f4e-2e0f97dd49ca",
   "user-data": "https://functions.poehali.dev/c605690e-3ba9-40eb-86cd-4c470a0b3387",
   "activate-promo": "https://functions.poehali.dev/1b298243-0b0f-4838-b260-bb90308d904a",

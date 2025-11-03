@@ -87,11 +87,16 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
             className="h-full w-full"
           />
         ) : (
-          <div className="h-full flex flex-col items-center justify-center p-6 text-center">
-            <div className="w-20 h-20 mb-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl flex items-center justify-center">
-              <Icon name="FileText" size={40} className="text-blue-500" />
+          <div className="h-full relative">
+            <img 
+              src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
+              alt={work.workType}
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end justify-center pb-6">
+              <p className="text-sm text-white font-semibold drop-shadow-lg">{work.workType}</p>
             </div>
-            <p className="text-sm text-gray-500 font-medium">{work.workType}</p>
           </div>
         )}
         

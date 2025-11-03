@@ -662,15 +662,15 @@ export default function WorkDetailPage() {
                   )}
                 </>
               ) : (
-                <div className="w-full aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-gray-200 overflow-hidden relative">
+                <div className="w-full aspect-[4/3] flex items-center justify-center rounded-lg border-2 border-gray-200 overflow-hidden relative">
                   <img 
-                    src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/19ac9e0b-9145-4da7-857b-67c1b1be4ca0.jpg"
+                    src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
                     alt="Превью работы"
-                    className="w-full h-full object-cover opacity-40"
+                    className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/30 backdrop-blur-sm">
-                    <span className="text-lg font-medium text-gray-700">{work.workType}</span>
-                    <span className="text-sm text-gray-500 mt-2">{work.subject}</span>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                    <span className="text-xl font-bold text-white drop-shadow-lg">{work.workType}</span>
+                    <span className="text-sm text-white/90 mt-2 drop-shadow-md">{work.subject}</span>
                   </div>
                 </div>
               )}

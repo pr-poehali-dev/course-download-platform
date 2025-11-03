@@ -16,8 +16,13 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
 
   if (!imageList || imageList.length === 0) {
     return (
-      <div className={`bg-muted flex items-center justify-center ${className}`}>
-        <Icon name="FileText" size={48} className="text-muted-foreground" />
+      <div className={`relative ${className}`}>
+        <img 
+          src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
+          alt="Превью документа"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
     );
   }
@@ -29,8 +34,13 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
 
   if (imageError) {
     return (
-      <div className={`bg-muted flex items-center justify-center ${className}`}>
-        <Icon name="FileText" size={48} className="text-muted-foreground" />
+      <div className={`relative ${className}`}>
+        <img 
+          src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
+          alt="Превью документа"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
     );
   }

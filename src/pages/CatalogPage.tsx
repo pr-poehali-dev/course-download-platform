@@ -452,9 +452,16 @@ export default function CatalogPage() {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                       </>
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-3">
-                        <Icon name="FileText" className="text-gray-300 group-hover:text-gray-400 transition-colors" size={56} />
-                        <span className="text-sm font-medium text-gray-500">{work.workType}</span>
+                      <div className="w-full h-full relative">
+                        <img 
+                          src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
+                          alt={work.workType}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end justify-center pb-4">
+                          <span className="text-sm font-semibold text-white drop-shadow-lg">{work.workType}</span>
+                        </div>
                       </div>
                     )}
                     

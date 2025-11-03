@@ -76,12 +76,14 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
                 <PreviewCarousel previews={work.previewUrls!} />
               </div>
             ) : (
-              <div className="h-80 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center border">
-                <div className="text-center">
-                  <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-br from-blue-100 to-blue-50 rounded-2xl flex items-center justify-center">
-                    <Icon name="FileText" size={48} className="text-blue-500" />
-                  </div>
-                  <p className="text-sm text-gray-500 font-medium">{work.workType}</p>
+              <div className="h-80 rounded-xl overflow-hidden border relative">
+                <img 
+                  src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
+                  alt={work.workType}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-8">
+                  <p className="text-lg text-white font-bold drop-shadow-lg">{work.workType}</p>
                 </div>
               </div>
             )}

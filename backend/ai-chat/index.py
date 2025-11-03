@@ -155,11 +155,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         from gigachat import GigaChat
+        import base64
         
         gigachat_credentials = gigachat_credentials.strip()
         
+        try:
+            decoded_creds = base64.b64decode(gigachat_credentials).decode('utf-8')
+        except Exception:
+            decoded_creds = gigachat_credentials
+        
         client = GigaChat(
-            credentials=gigachat_credentials,
+            credentials=decoded_creds,
             verify_ssl_certs=False
         )
         

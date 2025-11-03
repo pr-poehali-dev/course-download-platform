@@ -15,6 +15,7 @@ import PlatformSettings from '@/components/PlatformSettings';
 import YandexDiskImport from '@/components/YandexDiskImport';
 import PreviewGenerator from '@/components/PreviewGenerator';
 import SupportAdmin from '@/components/SupportAdmin';
+import ArchiveImagesChecker from '@/components/ArchiveImagesChecker';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import func2url from '../../backend/func2url.json';
 
@@ -305,6 +306,8 @@ export default function AdminPanel() {
               </Button>
             </CardContent>
           </Card>
+
+          <ArchiveImagesChecker />
           
           <YandexDiskImport />
           <PreviewGenerator />

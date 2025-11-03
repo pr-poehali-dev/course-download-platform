@@ -198,8 +198,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             {'role': 'system', 'content': system_prompt}
         ]
         
-        # Берем только последние 10 сообщений для контекста (экономим токены и время)
-        recent_messages = messages[-10:] if len(messages) > 10 else messages
+        # Берем только последние 4 сообщения для контекста (экономим токены и время)
+        recent_messages = messages[-4:] if len(messages) > 4 else messages
         
         for msg in recent_messages:
             role = msg.get('role', 'user')
@@ -211,7 +211,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             for i in range(len(api_messages) - 1, -1, -1):
                 if api_messages[i]['role'] == 'user':
                     file_label = "UPLOADED FILE"
-                    safe_content = file_content[:15000].encode('utf-8', errors='ignore').decode('utf-8')
+                    safe_content = file_content[:5000].encode('utf-8', errors='ignore').decode('utf-8')
                     api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{safe_content}\n=== END OF FILE ==="
                     break
         
@@ -220,9 +220,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         payload = Chat(
             messages=api_messages,
             model="GigaChat",
-            temperature=0.7,
-            max_tokens=800,
-            profanity_check=False
+            temperature=0.5,
+            max_tokens=500,
+            profanity_check=False,
+            top_p=0.9
         )
         response = client.chat(payload)
         

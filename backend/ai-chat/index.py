@@ -154,16 +154,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': json.dumps({'error': 'GigaChat credentials not configured'})
             }
         
-        from gigachat import GigaChat
+        import httpx
+        import uuid
         
         gigachat_credentials = gigachat_credentials.strip()
         
-        client = GigaChat(
-            credentials=gigachat_credentials,
-            scope="GIGACHAT_API_PERS",
-            verify_ssl_certs=False,
-            timeout=55.0
-        )
+        # Получаем Access Token
+        token_url = 'https://ngw.devices.sberbank.ru:9443/api/v2/oauth'
+        token_headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
+            'RqUID': str(uuid.uuid4()),
+            'Authorization': f'Basic {gigachat_credentials}'
+        }
+        token_data = 'scope=GIGACHAT_API_PERS'
+        
+        with httpx.Client(verify=False, timeout=25.0) as http_client:
+            token_response = http_client.post(token_url, headers=token_headers, content=token_data)
+            token_response.raise_for_status()
+            access_token = token_response.json()['access_token']
         
         system_prompt = """Ты — умный помощник для студентов, который помогает адаптировать купленные работы под требования их ВУЗа.
 
@@ -215,20 +224,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     api_messages[i]['content'] += f"\n\n=== {file_label} ===\n{safe_content}\n=== END OF FILE ==="
                     break
         
-        from gigachat.models import Chat
-        
-        payload = Chat(
-            messages=api_messages,
-            model="GigaChat",
-            temperature=0.5,
-            max_tokens=500,
-            profanity_check=False,
-            top_p=0.9
-        )
-        response = client.chat(payload)
-        
-        assistant_message = response.choices[0].message.content
-        total_tokens = response.usage.total_tokens if hasattr(response, 'usage') else 0
+            # Отправляем запрос к GigaChat API
+            chat_url = 'https://gigachat.devices.sberbank.ru/api/v1/chat/completions'
+            chat_headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'Authorization': f'Bearer {access_token}'
+            }
+            chat_payload = {
+                'model': 'GigaChat',
+                'messages': api_messages,
+                'temperature': 0.5,
+                'max_tokens': 500,
+                'top_p': 0.9
+            }
+            
+            chat_response = http_client.post(chat_url, headers=chat_headers, json=chat_payload)
+            chat_response.raise_for_status()
+            chat_data = chat_response.json()
+            
+            assistant_message = chat_data['choices'][0]['message']['content']
+            total_tokens = chat_data.get('usage', {}).get('total_tokens', 0)
         
         user_content = messages[-1].get('content', '') if messages else ''
         

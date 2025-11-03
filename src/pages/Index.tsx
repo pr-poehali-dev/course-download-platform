@@ -329,7 +329,7 @@ export default function Index() {
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
                 <div className="flex flex-col min-w-0">
                   <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Обмен знаниями без границ</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Твой помощник в учёбе</p>
                 </div>
               </div>
               

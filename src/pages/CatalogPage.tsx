@@ -435,10 +435,12 @@ export default function CatalogPage() {
               {filteredWorks.map((work) => (
                 <div 
                   key={work.id} 
-                  className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                  onClick={() => window.location.href = `/work/${work.id}`}
+                  className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                 >
-                  <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
+                  <div 
+                    className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden cursor-pointer"
+                    onClick={() => window.location.href = `/work/${work.id}`}
+                  >
                     {work.previewUrls && work.previewUrls.length > 0 ? (
                       <PreviewCarousel 
                         images={work.previewUrls} 
@@ -462,7 +464,7 @@ export default function CatalogPage() {
                       </div>
                     )}
                     
-                    <div className="absolute top-3 right-3 flex flex-col items-end gap-2">
+                    <div className="absolute top-3 right-3 flex flex-col items-end gap-2 pointer-events-none">
                       {work.discount && (
                         <div className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                           −{work.discount}%
@@ -487,16 +489,16 @@ export default function CatalogPage() {
                         e.stopPropagation();
                         setQuickViewWork(work);
                       }}
-                      className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+                      className="absolute bottom-4 right-4 p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110 z-10"
                     >
-                      <div className="text-white text-center">
-                        <Icon name="Eye" size={32} className="mx-auto mb-2" />
-                        <span className="text-sm font-semibold">Быстрый просмотр</span>
-                      </div>
+                      <Icon name="Eye" size={20} className="text-blue-600" />
                     </button>
                   </div>
 
-                  <div className="p-4 md:p-5">
+                  <div 
+                    className="p-4 md:p-5 cursor-pointer"
+                    onClick={() => window.location.href = `/work/${work.id}`}
+                  >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-1">
                         <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />

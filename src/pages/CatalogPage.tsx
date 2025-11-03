@@ -61,20 +61,22 @@ export default function CatalogPage() {
     checkAuth();
   }, []);
 
-  const normalizeWorkType = (workType: string): string => {
+  const normalizeWorkType = (workType: string, title: string = ''): string => {
     const wt = workType.toLowerCase().trim();
+    const t = title.toLowerCase().trim();
     
-    if (/курсовая|курсовой/.test(wt)) return 'Курсовая работа';
-    if (/дипломная|диплом(?!ная)/.test(wt) && !/часть/.test(wt)) return 'Дипломная работа';
-    if (/диссертация/.test(wt)) return 'Диссертация';
-    if (/реферат/.test(wt)) return 'Реферат';
+    if (/курсовая|курсовой/.test(wt) || /курсовая|курсовой/.test(t)) return 'Курсовая работа';
+    if ((/дипломная|диплом(?!ная)/.test(wt) && !/часть/.test(wt)) || /дипломная|дипломной/.test(t)) return 'Дипломная работа';
+    if (/диссертация/.test(wt) || /диссертация/.test(t)) return 'Диссертация';
+    if (/реферат/.test(wt) || /реферат/.test(t)) return 'Реферат';
     if (/^практическая\s*(работа)?$/i.test(wt)) return 'Практическая';
-    if (/практика|отчет.*практ/.test(wt)) return 'Практика';
-    if (/вкр|выпускная\s*квалификационная/.test(wt)) return 'Выпускная квалификационная работа';
-    if (/литературный\s*обзор/.test(wt)) return 'Литературный обзор';
-    if (/чертеж/.test(wt)) return 'Чертежи';
+    if (/практика|отчет.*практ/.test(wt) || /практика|отчет.*практ/.test(t)) return 'Практика';
+    if (/вкр|выпускная\s*квалификационная/.test(wt) || /вкр|выпускная\s*квалификационная/.test(t)) return 'Выпускная квалификационная работа';
+    if (/литературный\s*обзор/.test(wt) || /литературный\s*обзор/.test(t)) return 'Литературный обзор';
+    if (/чертеж/.test(wt) || /чертеж/.test(t)) return 'Чертежи';
+    if (/контрольная/.test(wt) || /контрольная/.test(t)) return 'Контрольная работа';
     
-    return workType;
+    return 'Техническая работа';
   };
 
   const extractWorkInfo = (folderName: string) => {
@@ -82,12 +84,12 @@ export default function CatalogPage() {
     if (match) {
       return {
         title: match[1].trim(),
-        workType: normalizeWorkType(match[2].trim())
+        workType: normalizeWorkType(match[2].trim(), match[1].trim())
       };
     }
     return {
       title: folderName,
-      workType: 'Другое'
+      workType: normalizeWorkType('', folderName)
     };
   };
 
@@ -233,12 +235,7 @@ export default function CatalogPage() {
         setLoadingProgress(80);
         
         if (data.works && Array.isArray(data.works)) {
-          const transformedWorks: Work[] = data.works
-            .filter((work: any) => {
-              const workInfo = extractWorkInfo(work.title);
-              return workInfo.workType !== 'Другое';
-            })
-            .map((work: any) => {
+          const transformedWorks: Work[] = data.works.map((work: any) => {
             let previewUrls = [];
             if (work.preview_urls) {
               try {

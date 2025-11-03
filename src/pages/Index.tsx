@@ -26,7 +26,7 @@ import ReferralDialog from '@/components/ReferralDialog';
 import PremiumDialog from '@/components/PremiumDialog';
 import BlogSection from '@/components/BlogSection';
 import AboutSection from '@/components/AboutSection';
-import TestimonialsSection from '@/components/TestimonialsSection';
+
 import AgeBadge from '@/components/AgeBadge';
 import CookieBanner from '@/components/CookieBanner';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
@@ -1411,8 +1411,6 @@ export default function Index() {
         </section>
 
         <AboutSection />
-
-        <TestimonialsSection />
 
         <BlogSection />
 

@@ -437,23 +437,6 @@ export default function CatalogPage() {
               {filteredWorks.map((work) => (
                 <div
                   key={work.id}
-                  onClick={() => {
-                    console.log('CLICKED WORK:', work.id, work.title);
-                    navigate(`/work/${work.id}`);
-                  }}
-                  className="bg-red-600 text-white p-8 rounded-lg cursor-pointer hover:bg-red-700 transition-colors"
-                >
-                  <h2 className="text-xl font-bold mb-2">TEST: {work.title}</h2>
-                  <p className="text-sm">ID: {work.id}</p>
-                  <p className="mt-2">Click me to navigate!</p>
-                </div>
-              ))}
-            </div>
-            
-            <div className="hidden">
-              {filteredWorks.slice(0, 1).map((work) => (
-                <div
-                  key={`full-${work.id}`}
                   onClick={(e) => {
                     console.log('=== FULL CARD CLICKED ===');
                     console.log('Work ID:', work.id);

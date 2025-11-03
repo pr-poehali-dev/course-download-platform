@@ -14,7 +14,6 @@ interface CatalogFiltersProps {
   sortBy: string;
   onSortByChange: (value: string) => void;
   subjects: string[];
-  totalResults: number;
   onResetFilters: () => void;
 }
 
@@ -28,7 +27,6 @@ export default function CatalogFilters({
   sortBy,
   onSortByChange,
   subjects,
-  totalResults,
   onResetFilters
 }: CatalogFiltersProps) {
   const activeFiltersCount = [
@@ -129,12 +127,6 @@ export default function CatalogFilters({
                 <SelectItem value="new">Сначала новые</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-        </div>
-
-        <div className="pt-4 border-t flex items-center justify-between">
-          <div className="text-sm text-gray-600">
-            Найдено работ: <span className="font-semibold text-gray-900">{totalResults}</span>
           </div>
         </div>
       </div>

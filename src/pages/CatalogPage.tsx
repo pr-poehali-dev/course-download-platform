@@ -114,22 +114,14 @@ export default function CatalogPage() {
 
   const determinePrice = (workType: string, title: string): number => {
     const wt = workType.toLowerCase();
-    const t = title.toLowerCase();
     
-    if (/практическая|практика/.test(wt) && !/отчет/.test(wt)) return 500;
-    if (/отчет.*практ/.test(wt)) return 800;
-    if (/курсовая|курсовой/.test(wt)) {
-      if (/проектирование|расчет|модернизация|разработка/.test(t)) return 1200;
-      return 1000;
-    }
-    if (/дипломная|диплом/.test(wt)) {
-      if (/модернизация|проектирование системы|разработка|автоматизация/.test(t)) return 2400;
-      return 2000;
-    }
-    if (/реферат/.test(wt)) return 400;
-    if (/контрольная/.test(wt)) return 600;
+    if (/практическая|практика|отчет/.test(wt)) return 200;
+    if (/реферат/.test(wt)) return 200;
+    if (/курсовая|курсовой/.test(wt)) return 600;
+    if (/дипломная|диплом/.test(wt)) return 1500;
+    if (/контрольная/.test(wt)) return 200;
     
-    return 700;
+    return 200;
   };
 
   const determineRating = (workType: string): number => {
@@ -374,7 +366,6 @@ export default function CatalogPage() {
             sortBy={sortBy}
             onSortByChange={setSortBy}
             subjects={subjects}
-            totalResults={filteredWorks.length}
             onResetFilters={() => {
               setSearchQuery('');
               setFilterSubject('all');
@@ -471,27 +462,11 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="p-4 md:p-5">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center mb-2">
                       <div className="flex items-center gap-1">
                         <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
                         <span className="text-sm font-bold text-gray-700">{work.rating.toFixed(1)}</span>
                       </div>
-                      {(work.pageCount > 0 || work.fileCount > 0) && (
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          {work.pageCount > 0 && (
-                            <span className="flex items-center gap-1">
-                              <Icon name="FileText" size={12} />
-                              {work.pageCount} стр.
-                            </span>
-                          )}
-                          {work.fileCount > 0 && (
-                            <span className="flex items-center gap-1">
-                              <Icon name="Files" size={12} />
-                              {work.fileCount} файл.
-                            </span>
-                          )}
-                        </div>
-                      )}
                     </div>
 
                     <h3 className="font-bold text-sm md:text-[15px] mb-2 line-clamp-2 leading-snug min-h-[42px] group-hover:text-primary transition-colors">

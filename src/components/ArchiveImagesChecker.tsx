@@ -49,7 +49,7 @@ export default function ArchiveImagesChecker() {
       
       const worksWithoutPreview = data.works
         ?.filter((w: any) => !w.preview_url && w.download_url)
-        .slice(0, 10) || [];
+        .slice(0, 50) || [];
 
       const results: WorkResult[] = [];
       let totalImages = 0;
@@ -145,7 +145,7 @@ export default function ArchiveImagesChecker() {
           Проверка изображений в архивах
         </CardTitle>
         <CardDescription>
-          Проверяет первые 10 работ без превью на наличие PNG/JPG/JPEG файлов в архивах
+          Проверяет первые 50 работ без превью на наличие PNG/JPG/JPEG файлов в архивах
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -163,7 +163,7 @@ export default function ArchiveImagesChecker() {
           ) : (
             <>
               <Icon name="Search" size={20} className="mr-2" />
-              Проверить 10 архивов
+              Проверить 50 архивов
             </>
           )}
         </Button>

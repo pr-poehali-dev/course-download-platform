@@ -767,92 +767,76 @@ export default function Index() {
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-12">
                 <Badge className="bg-gradient-to-r from-blue-500 to-blue-600 mb-4 text-white border-0">
-                  <Icon name="MessageCircle" size={14} className="mr-1" />
-                  Новинка
+                  <Icon name="Sparkles" size={14} className="mr-1" />
+                  Новая платформа
                 </Badge>
                 <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">
-                  TechMentor AI в Telegram
+                  Технологичная экосистема для студентов
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  AI-помощник теперь доступен прямо в мессенджере! Задавай вопросы и получай помощь 24/7 🤖
+                  Всё для учёбы в одном месте: готовые работы, онлайн-консультации и умный AI-помощник 🚀
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <Card className="border-2 border-blue-200 hover:shadow-xl transition-all hover:border-blue-400">
-                  <CardHeader>
-                    <Icon name="MessageCircle" size={48} className="text-blue-600 mb-4" />
-                    <CardTitle className="text-2xl">Что умеет бот?</CardTitle>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <Card className="border-2 border-blue-200 hover:shadow-xl transition-all hover:border-blue-400 hover:scale-105">
+                  <CardHeader className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
+                      <Icon name="BookOpen" size={32} className="text-white" />
+                    </div>
+                    <CardTitle className="text-xl">Каталог работ</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">Отвечает на вопросы по учёбе</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">Помогает найти работы в каталоге</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">Консультирует по оформлению</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                      <p className="text-sm">Работает круглосуточно</p>
-                    </div>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground text-center">
+                      Тысячи готовых курсовых, дипломов и рефератов по всем дисциплинам
+                    </p>
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-cyan-200 hover:shadow-xl transition-all hover:border-cyan-400">
-                  <CardHeader>
-                    <Icon name="Smartphone" size={48} className="text-cyan-600 mb-4" />
-                    <CardTitle className="text-2xl">Как начать?</CardTitle>
+                <Card className="border-2 border-cyan-200 hover:shadow-xl transition-all hover:border-cyan-400 hover:scale-105">
+                  <CardHeader className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center">
+                      <Icon name="Bot" size={32} className="text-white" />
+                    </div>
+                    <CardTitle className="text-xl">AI-помощник</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                        1
-                      </div>
-                      <p className="text-sm">Открой Telegram на телефоне</p>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground text-center">
+                      Умный бот в Telegram отвечает на вопросы по учёбе 24/7
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-2 border-purple-200 hover:shadow-xl transition-all hover:border-purple-400 hover:scale-105">
+                  <CardHeader className="text-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center">
+                      <Icon name="Users" size={32} className="text-white" />
                     </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                        2
-                      </div>
-                      <p className="text-sm">Найди @TechForma_bot или нажми кнопку ниже</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                        3
-                      </div>
-                      <p className="text-sm">Нажми "Начать" или напиши /start</p>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-cyan-100 text-cyan-600 flex items-center justify-center font-bold text-xs flex-shrink-0">
-                        4
-                      </div>
-                      <p className="text-sm">Задавай вопросы — бот сразу ответит!</p>
-                    </div>
+                    <CardTitle className="text-xl">Эксперты онлайн</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground text-center">
+                      Консультации преподавателей по любым предметам в реальном времени
+                    </p>
                   </CardContent>
                 </Card>
               </div>
 
               <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 mb-8 hover:shadow-xl transition-all">
                 <CardContent className="p-8 text-center">
-                  <div className="mb-4">
+                  <div className="mb-6">
                     <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4">
-                      <Icon name="MessageCircle" size={40} className="text-white" />
+                      <Icon name="Rocket" size={40} className="text-white" />
                     </div>
-                    <h3 className="font-bold text-2xl mb-3">Начни общение прямо сейчас!</h3>
+                    <h3 className="font-bold text-2xl mb-3">Попробуй все возможности платформы</h3>
                     <p className="text-muted-foreground text-base max-w-xl mx-auto mb-6">
-                      TechMentor AI ждёт тебя в Telegram. Просто открой бота и задай любой вопрос — ответ придёт мгновенно! 💬
+                      Доступ к каталогу работ, AI-ботy в Telegram и консультациям экспертов — всё включено в подписку
                     </p>
                   </div>
                   <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" asChild>
                     <a href="/bot-subscription">
-                      <Icon name="ShoppingCart" size={20} className="mr-2" />
-                      Оформить подписку
+                      <Icon name="Sparkles" size={20} className="mr-2" />
+                      Начать пользоваться
                     </a>
                   </Button>
                 </CardContent>

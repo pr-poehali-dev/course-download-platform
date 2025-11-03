@@ -1,0 +1,238 @@
+================================================================================
+ZIP INVESTIGATION FLOW DIAGRAM
+================================================================================
+
+                              START
+                                |
+                                v
+                    +-----------------------+
+                    | Set Environment Vars  |
+                    | - DATABASE_URL        |
+                    | - YANDEX_S3_KEY_ID   |
+                    | - YANDEX_S3_SECRET_KEY|
+                    +-----------------------+
+                                |
+                                v
+                    +-----------------------+
+                    | Optional: Test Setup  |
+                    | python                |
+                    | test_environment.py   |
+                    +-----------------------+
+                                |
+                                v
+                    +-----------------------+
+                    | Run Investigation     |
+                    | python                |
+                    | investigate_zip.py    |
+                    +-----------------------+
+                                |
+                                v
+        +---------------------------------------------------+
+        |           INVESTIGATION PROCESS                   |
+        +---------------------------------------------------+
+        |                                                   |
+        |  1. CONNECT TO DATABASE                          |
+        |     +---------------------------------+           |
+        |     | psycopg2.connect()             |           |
+        |     | Using DATABASE_URL             |           |
+        |     +---------------------------------+           |
+        |                 |                                 |
+        |                 v                                 |
+        |  2. SEARCH FOR WORK                              |
+        |     +---------------------------------+           |
+        |     | SELECT id, title, download_url |           |
+        |     | FROM works                      |           |
+        |     | WHERE title ILIKE               |           |
+        |     |   '%износостойкост%' OR        |           |
+        |     |   '%экскаватор%'               |           |
+        |     +---------------------------------+           |
+        |                 |                                 |
+        |                 v                                 |
+        |  3. EXTRACT S3 DETAILS                           |
+        |     +---------------------------------+           |
+        |     | Parse download_url:             |           |
+        |     | https://storage.yandexcloud.net/|           |
+        |     |   bucket/path/to/file.zip       |           |
+        |     |                                 |           |
+        |     | Extract:                        |           |
+        |     | - Bucket: kyra                  |           |
+        |     | - Key: path/to/file.zip         |           |
+        |     +---------------------------------+           |
+        |                 |                                 |
+        |                 v                                 |
+        |  4. CONNECT TO S3                                |
+        |     +---------------------------------+           |
+        |     | boto3.client()                  |           |
+        |     | Endpoint: storage.yandexcloud.net|          |
+        |     | Credentials: YANDEX_S3_*        |           |
+        |     +---------------------------------+           |
+        |                 |                                 |
+        |                 v                                 |
+        |  5. DOWNLOAD ZIP FILE                            |
+        |     +---------------------------------+           |
+        |     | s3.get_object(                  |           |
+        |     |   Bucket='kyra',                |           |
+        |     |   Key='path/to/file.zip'        |           |
+        |     | )                               |           |
+        |     +---------------------------------+           |
+        |                 |                                 |
+        |                 v                                 |
+        |  6. PARSE ZIP ARCHIVE                            |
+        |     +---------------------------------+           |
+        |     | zipfile.ZipFile(                |           |
+        |     |   io.BytesIO(data)              |           |
+        |     | )                               |           |
+        |     |                                 |           |
+        |     | List all files:                 |           |
+        |     | - Full paths                    |           |
+        |     | - File sizes                    |           |
+        |     | - File types                    |           |
+        |     +---------------------------------+           |
+        |                 |                                 |
+        |                 v                                 |
+        |  7. IDENTIFY PNG FILES                           |
+        |     +---------------------------------+           |
+        |     | Filter files ending with .png   |           |
+        |     | Case-insensitive search         |           |
+        |     +---------------------------------+           |
+        |                 |                                 |
+        |                 v                                 |
+        |  8. OUTPUT RESULTS                               |
+        |     +---------------------------------+           |
+        |     | Display:                        |           |
+        |     | - Work ID and Title             |           |
+        |     | - S3 Bucket and Key             |           |
+        |     | - Complete file listing         |           |
+        |     | - PNG files highlighted         |           |
+        |     +---------------------------------+           |
+        |                                                   |
+        +---------------------------------------------------+
+                                |
+                                v
+                    +-----------------------+
+                    |    OUTPUT SAVED       |
+                    |  (Console/Terminal)   |
+                    +-----------------------+
+                                |
+                                v
+                              END
+
+
+================================================================================
+DATA FLOW
+================================================================================
+
+Database (PostgreSQL)
+        |
+        | SQL Query
+        v
+  Work Record
+  (id, title, download_url)
+        |
+        | Parse URL
+        v
+  S3 Location
+  (bucket: kyra, key: file.zip)
+        |
+        | boto3 download
+        v
+  ZIP File (bytes)
+        |
+        | zipfile.ZipFile
+        v
+  File List
+  (paths, sizes, types)
+        |
+        | Filter .png
+        v
+  Results
+  (work info + files + PNG list)
+
+
+================================================================================
+COMPONENTS INTERACTION
+================================================================================
+
+    +------------------+
+    |   User/Script    |
+    +------------------+
+            |
+            | Environment Vars
+            v
+    +------------------+
+    |  Python Script   |<--------+
+    +------------------+         |
+            |                    |
+            | psycopg2           |
+            v                    |
+    +------------------+         |
+    |   PostgreSQL     |         | boto3
+    |    Database      |         |
+    +------------------+         |
+            |                    |
+            | Returns work info  |
+            v                    |
+    +------------------+         |
+    | Parse S3 Details |         |
+    +------------------+         |
+            |                    |
+            +--------------------+
+            |
+            v
+    +------------------+
+    |  Yandex S3 API  |
+    | (kyra bucket)   |
+    +------------------+
+            |
+            | ZIP file
+            v
+    +------------------+
+    |  zipfile module  |
+    |  (Parse ZIP)     |
+    +------------------+
+            |
+            | File list
+            v
+    +------------------+
+    |  Console Output  |
+    +------------------+
+
+
+================================================================================
+ERROR HANDLING FLOW
+================================================================================
+
+    Connect to DB
+         |
+         +--[FAIL]--> "DATABASE_URL not set or invalid"
+         |
+         v
+    Query works table
+         |
+         +--[FAIL]--> "No work found matching criteria"
+         |
+         v
+    Parse download_url
+         |
+         +--[FAIL]--> "Invalid URL format"
+         |
+         v
+    Connect to S3
+         |
+         +--[FAIL]--> "S3 credentials invalid"
+         |
+         v
+    Download file
+         |
+         +--[FAIL]--> "File not found in S3"
+         |
+         v
+    Parse ZIP
+         |
+         +--[FAIL]--> "Not a valid ZIP file"
+         |
+         v
+    SUCCESS --> Display results
+
+
+================================================================================

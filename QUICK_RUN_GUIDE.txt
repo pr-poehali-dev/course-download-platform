@@ -1,0 +1,122 @@
+================================================================================
+ZIP INVESTIGATION - QUICK RUN GUIDE
+================================================================================
+
+STEP 1: Set Environment Variables
+----------------------------------
+Copy and paste these commands, replacing with your actual values:
+
+export DATABASE_URL='postgresql://username:password@host:port/database'
+export YANDEX_S3_KEY_ID='your_yandex_access_key_id'
+export YANDEX_S3_SECRET_KEY='your_yandex_secret_access_key'
+
+
+STEP 2: Install Dependencies
+-----------------------------
+pip install -r investigate_zip_requirements.txt
+
+
+STEP 3: Test Environment (Optional but Recommended)
+----------------------------------------------------
+python test_environment.py
+
+
+STEP 4: Run Investigation
+--------------------------
+Choose ONE of these options:
+
+Option A - Main Script (Recommended):
+  python investigate_zip.py
+
+Option B - Alternative Script (if Option A fails):
+  python investigate_zip_alternative.py
+
+Option C - Automated with Virtual Environment:
+  chmod +x run_investigate_zip.sh
+  ./run_investigate_zip.sh
+
+
+================================================================================
+WHAT YOU'LL GET
+================================================================================
+
+The script will output:
+
+1. Work Information:
+   - Work ID
+   - Work Title
+   - Download URL/File Key
+
+2. S3 Details:
+   - Bucket name
+   - Object key
+   - Downloaded file size
+
+3. Complete ZIP Contents:
+   - All files with full paths
+   - File sizes
+   - Directory structure
+
+4. PNG File List:
+   - Exact paths to all PNG files in the archive
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Error: "DATABASE_URL is not set"
+→ Run: export DATABASE_URL='your_connection_string'
+
+Error: "YANDEX_S3_KEY_ID is not set"
+→ Run: export YANDEX_S3_KEY_ID='your_key'
+→ Run: export YANDEX_S3_SECRET_KEY='your_secret'
+
+Error: "No module named 'psycopg2'"
+→ Run: pip install -r investigate_zip_requirements.txt
+
+Error: "No work found matching the criteria"
+→ Check that works exist in database with titles containing:
+  - "износостойкост" OR
+  - "экскаватор"
+
+Error: "Database connection failed"
+→ Verify your DATABASE_URL is correct
+→ Check database is accessible
+
+Error: "S3 connection failed"
+→ Verify your S3 credentials
+→ Check bucket 'kyra' exists and is accessible
+
+
+================================================================================
+FILES OVERVIEW
+================================================================================
+
+investigate_zip.py              - Main investigation script
+investigate_zip_alternative.py  - Fallback script with auto-detection
+test_environment.py             - Environment verification script
+run_investigate_zip.sh          - Automated runner with venv
+investigate_zip_requirements.txt - Python dependencies
+INVESTIGATE_ZIP_README.md       - Full documentation
+ZIP_INVESTIGATION_SUMMARY.md    - Complete technical summary
+QUICK_RUN_GUIDE.txt            - This file
+
+
+================================================================================
+QUICK COPY-PASTE SOLUTION
+================================================================================
+
+If you just want to run it quickly:
+
+# 1. Set your credentials (edit these first!)
+export DATABASE_URL='your_database_url_here'
+export YANDEX_S3_KEY_ID='your_key_here'
+export YANDEX_S3_SECRET_KEY='your_secret_here'
+
+# 2. Install and run
+pip install psycopg2-binary==2.9.9 boto3==1.34.0
+python investigate_zip.py
+
+
+================================================================================

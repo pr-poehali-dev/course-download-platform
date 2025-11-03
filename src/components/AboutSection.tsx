@@ -42,7 +42,7 @@ export default function AboutSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
-                Все работы проходят модерацию и проверку уникальности на базе ИИ ГигаЧат. 
+                Все работы проходят модерацию и проверку уникальности с помощью ИИ. 
                 Мы проверяем соответствие описанию, качество оформления и оригинальность.
               </p>
             </CardContent>

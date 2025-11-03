@@ -35,7 +35,7 @@ export default function AISubscriptionModal({ open, onClose, onSubscribe, userPo
       icon: 'Zap',
       description: '100 запросов к AI помощнику',
       features: [
-        '100 запросов к ГигаЧат',
+        '100 запросов к AI помощнику',
         'Загрузка файлов',
         'История чата',
         'Действует 30 дней'

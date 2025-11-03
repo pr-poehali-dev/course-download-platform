@@ -136,7 +136,7 @@ export default function PlagiarismChecker({
           Проверка на плагиат
         </CardTitle>
         <CardDescription>
-          Проверка уникальности на базе ИИ ГигаЧат перед публикацией
+          Проверка уникальности с помощью ИИ перед публикацией
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

@@ -4,27 +4,15 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
-}
-
 interface CatalogFiltersProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  filterType: string;
-  onFilterTypeChange: (value: string) => void;
   filterSubject: string;
   onFilterSubjectChange: (value: string) => void;
-  filterCategory: string;
-  onFilterCategoryChange: (value: string) => void;
   priceRange: string;
   onPriceRangeChange: (value: string) => void;
   sortBy: string;
   onSortByChange: (value: string) => void;
-  categories: Category[];
-  workTypes: string[];
   subjects: string[];
   totalResults: number;
   onResetFilters: () => void;
@@ -33,26 +21,18 @@ interface CatalogFiltersProps {
 export default function CatalogFilters({
   searchQuery,
   onSearchChange,
-  filterType,
-  onFilterTypeChange,
   filterSubject,
   onFilterSubjectChange,
-  filterCategory,
-  onFilterCategoryChange,
   priceRange,
   onPriceRangeChange,
   sortBy,
   onSortByChange,
-  categories,
-  workTypes,
   subjects,
   totalResults,
   onResetFilters
 }: CatalogFiltersProps) {
   const activeFiltersCount = [
-    filterType !== 'all',
     filterSubject !== 'all',
-    filterCategory !== 'all',
     priceRange !== 'all',
     searchQuery.length > 0
   ].filter(Boolean).length;
@@ -95,28 +75,8 @@ export default function CatalogFilters({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label className="text-sm font-medium text-gray-700 mb-2 block">
-              <Icon name="FileText" size={14} className="inline mr-1" />
-              Тип работы
-            </label>
-            <Select value={filterType} onValueChange={onFilterTypeChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Все типы" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все типы</SelectItem>
-                {workTypes.map((type) => (
-                  <SelectItem key={type} value={type}>
-                    {type}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
               <Icon name="BookOpen" size={14} className="inline mr-1" />
-              Предмет
+              Предметная область
             </label>
             <Select value={filterSubject} onValueChange={onFilterSubjectChange}>
               <SelectTrigger>
@@ -127,26 +87,6 @@ export default function CatalogFilters({
                 {subjects.map((subject) => (
                   <SelectItem key={subject} value={subject}>
                     {subject}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div>
-            <label className="text-sm font-medium text-gray-700 mb-2 block">
-              <Icon name="Tag" size={14} className="inline mr-1" />
-              Категория
-            </label>
-            <Select value={filterCategory} onValueChange={onFilterCategoryChange}>
-              <SelectTrigger>
-                <SelectValue placeholder="Все категории" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Все категории</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.slug} value={category.slug}>
-                    {category.name}
                   </SelectItem>
                 ))}
               </SelectContent>

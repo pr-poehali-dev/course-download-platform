@@ -44,9 +44,7 @@ export default function CatalogPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
-  const [filterCategory, setFilterCategory] = useState<string>('all');
   const navigate = useNavigate();
   const [priceRange, setPriceRange] = useState<string>('all');
   const [sortBy, setSortBy] = useState<string>('default');
@@ -89,12 +87,12 @@ export default function CatalogPage() {
     }
     return {
       title: folderName,
-      workType: 'неизвестный тип'
+      workType: 'Другое'
     };
   };
 
   const determineSubject = (title: string, apiSubject?: string): string => {
-    if (apiSubject && apiSubject !== 'coursework' && apiSubject !== 'thesis') {
+    if (apiSubject && apiSubject !== 'coursework' && apiSubject !== 'thesis' && apiSubject !== 'unknown') {
       return apiSubject;
     }
     
@@ -105,7 +103,7 @@ export default function CatalogPage() {
     if (/строител|бетон|конструк|здание|сооружен/.test(t)) return 'Строительство';
     if (/механ|привод|станок|оборудован|экскаватор/.test(t)) return 'Механика';
     if (/газ|газопровод|нефт/.test(t)) return 'Газоснабжение';
-    if (/програм|по|software|алгоритм|дискрет/.test(t)) return 'Программирование';
+    if (/програм|по|алгоритм|дискрет/.test(t)) return 'Программирование';
     if (/безопасн|охран|труд|защит/.test(t)) return 'Безопасность';
     if (/тепло|водоснабжен|вентиляц|отоплен/.test(t)) return 'Теплоснабжение';
     if (/транспорт|дорог|судов|автомобил|локомотив|комбайн/.test(t)) return 'Транспорт';
@@ -243,7 +241,12 @@ export default function CatalogPage() {
         setLoadingProgress(80);
         
         if (data.works && Array.isArray(data.works)) {
-          const transformedWorks: Work[] = data.works.map((work: any) => {
+          const transformedWorks: Work[] = data.works
+            .filter((work: any) => {
+              const workInfo = extractWorkInfo(work.title);
+              return workInfo.workType !== 'Другое';
+            })
+            .map((work: any) => {
             let previewUrls = [];
             if (work.preview_urls) {
               try {
@@ -322,19 +325,8 @@ export default function CatalogPage() {
       );
     }
 
-    if (filterType !== 'all') {
-      filtered = filtered.filter(work => work.workType === filterType);
-    }
-
     if (filterSubject !== 'all') {
       filtered = filtered.filter(work => work.subject.toLowerCase() === filterSubject.toLowerCase());
-    }
-
-    if (filterCategory !== 'all') {
-      const category = categories.find(c => c.slug === filterCategory);
-      if (category) {
-        filtered = filtered.filter(work => work.workType.toLowerCase().includes(category.name.toLowerCase()));
-      }
     }
 
     if (priceRange !== 'all') {
@@ -360,20 +352,9 @@ export default function CatalogPage() {
     }
 
     setFilteredWorks(filtered);
-  }, [searchQuery, filterType, filterSubject, filterCategory, priceRange, sortBy, works, categories]);
+  }, [searchQuery, filterSubject, priceRange, sortBy, works]);
 
-  const workTypes = Array.from(new Set(works.map(w => w.workType)));
   const subjects = Array.from(new Set(works.map(w => w.subject)));
-  
-  const getWorkTypeCount = (type: string) => {
-    if (type === 'all') return works.length;
-    return works.filter(w => w.workType === type).length;
-  };
-  
-  const getSubjectCount = (subject: string) => {
-    if (subject === 'all') return works.length;
-    return works.filter(w => w.subject === subject).length;
-  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -386,25 +367,17 @@ export default function CatalogPage() {
           <CatalogFilters
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            filterType={filterType}
-            onFilterTypeChange={setFilterType}
             filterSubject={filterSubject}
             onFilterSubjectChange={setFilterSubject}
-            filterCategory={filterCategory}
-            onFilterCategoryChange={setFilterCategory}
             priceRange={priceRange}
             onPriceRangeChange={setPriceRange}
             sortBy={sortBy}
             onSortByChange={setSortBy}
-            categories={categories}
-            workTypes={workTypes}
             subjects={subjects}
             totalResults={filteredWorks.length}
             onResetFilters={() => {
               setSearchQuery('');
-              setFilterType('all');
               setFilterSubject('all');
-              setFilterCategory('all');
               setPriceRange('all');
               setSortBy('default');
             }}

@@ -494,7 +494,7 @@ export default function Index() {
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 max-w-4xl mx-auto px-2">
                 <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
-                  <div className="text-xl sm:text-3xl font-bold text-primary mb-1">{realWorks.length > 0 ? realWorks.length : '450'}+</div>
+                  <div className="text-xl sm:text-3xl font-bold text-primary mb-1">{realWorks.length > 0 ? realWorks.length : '500'}+</div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Готовых работ</p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-purple-200 hover:border-purple-400 transition-all hover:shadow-lg">

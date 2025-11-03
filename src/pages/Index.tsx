@@ -1599,8 +1599,11 @@ export default function Index() {
             </div>
 
             <div className="border-t mt-8 pt-8">
-              <div className="text-center text-sm text-muted-foreground">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-sm text-muted-foreground">
                 <p>© 2024 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
+                <div className="flex items-center justify-center">
+                  <AgeBadge />
+                </div>
               </div>
             </div>
           </div>
@@ -1679,7 +1682,6 @@ export default function Index() {
         }}
       />
 
-      <AgeBadge />
       <CookieBanner />
     </div>
   );

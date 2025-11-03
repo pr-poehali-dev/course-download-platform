@@ -532,7 +532,42 @@ export default function Index() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
+              <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
+                <CardHeader>
+                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
+                    <img 
+                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cf4ec9f2-8937-4cdc-8478-e9adb8e7c1e3.jpg" 
+                      alt="Облачный каталог" 
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  <CardTitle className="text-2xl">Маркетплейс работ</CardTitle>
+                  <CardDescription className="text-base">Покупай за баллы (1 балл = 5₽)</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Курсовые, дипломы, чертежи</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Мгновенный доступ</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="Check" size={16} className="text-green-600" />
+                    <span>Обмен знаниями</span>
+                  </div>
+                  <Button className="w-full mt-4" variant="outline" asChild>
+                    <a href="/catalog">
+                      <Icon name="ArrowRight" size={16} className="mr-2" />
+                      Смотреть каталог
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+
               <Card className="relative overflow-hidden border-2 border-blue-200 bg-white/95 backdrop-blur-sm hover:border-blue-400 transition-all group hover:shadow-2xl hover:scale-105">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
                 <div className="absolute top-4 right-4 z-10">

@@ -149,7 +149,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         try:
             print(f"Processing work #{work_id}: {title}")
             
-            from urllib.parse import urlparse, unquote
+            from urllib.parse import urlparse, unquote, quote
             parsed = urlparse(download_url)
             path_parts = parsed.path.lstrip('/').split('/', 1)
             
@@ -158,9 +158,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 continue
             
             bucket_name = path_parts[0]
-            object_key = unquote(path_parts[1])
+            object_key = path_parts[1]
             
-            response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+            try:
+                response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+            except:
+                try:
+                    object_key = f"works/{object_key}"
+                    response = s3_client.get_object(Bucket=bucket_name, Key=object_key)
+                except:
+                    errors.append(f"Work {work_id}: object not found")
+                    continue
             zip_data = response['Body'].read()
             
             images = extract_all_images_from_zip(zip_data)

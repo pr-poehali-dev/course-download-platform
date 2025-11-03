@@ -185,7 +185,8 @@ export default function WorkDetailPage() {
   const determinePrice = (workType: string, title: string): number => {
     const wt = workType.toLowerCase();
     
-    if (/дипломная|диплом|вкр|выпускная|диссертация/.test(wt)) return 1500;
+    if (/диссертация/.test(wt)) return 3000;
+    if (/дипломная|диплом|вкр|выпускная/.test(wt)) return 1500;
     if (/курсовая/.test(wt)) return 600;
     if (/практика|отчет|реферат|контрольная|лабораторная|расчетно-графическая/.test(wt)) return 200;
     

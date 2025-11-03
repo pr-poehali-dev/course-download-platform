@@ -119,7 +119,8 @@ export default function CatalogPage() {
   const determinePrice = (workType: string, title: string): number => {
     const wt = workType.toLowerCase();
     
-    if (/дипломная|диплом|вкр|выпускная|диссертация/.test(wt)) return 1500;
+    if (/диссертация/.test(wt)) return 3000;
+    if (/дипломная|диплом|вкр|выпускная/.test(wt)) return 1500;
     if (/курсовая/.test(wt)) return 600;
     if (/практика|отчет|реферат|контрольная|лабораторная|расчетно-графическая/.test(wt)) return 200;
     
@@ -186,7 +187,7 @@ export default function CatalogPage() {
   }, []);
 
   useEffect(() => {
-    const CACHE_KEY = 'catalog_works_cache_v7';
+    const CACHE_KEY = 'catalog_works_cache_v8';
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
     
     localStorage.removeItem('catalog_works_cache');
@@ -195,6 +196,7 @@ export default function CatalogPage() {
     localStorage.removeItem('catalog_works_cache_v4');
     localStorage.removeItem('catalog_works_cache_v5');
     localStorage.removeItem('catalog_works_cache_v6');
+    localStorage.removeItem('catalog_works_cache_v7');
 
     const loadFromCache = (): Work[] | null => {
       try {
@@ -324,7 +326,8 @@ export default function CatalogPage() {
       filtered = filtered.filter(work => {
         if (priceRange === '0-300') return work.price <= 300;
         if (priceRange === '300-800') return work.price > 300 && work.price <= 800;
-        if (priceRange === '800+') return work.price > 800;
+        if (priceRange === '800-2000') return work.price > 800 && work.price <= 2000;
+        if (priceRange === '2000+') return work.price > 2000;
         return true;
       });
     }

@@ -104,7 +104,8 @@ export default function CatalogFilters({
                 <SelectItem value="all">Любые баллы</SelectItem>
                 <SelectItem value="0-300">До 300 б. (Практика, Реферат)</SelectItem>
                 <SelectItem value="300-800">300 - 800 б. (Курсовая)</SelectItem>
-                <SelectItem value="800+">От 800 б. (Дипломная)</SelectItem>
+                <SelectItem value="800-2000">800 - 2000 б. (Дипломная)</SelectItem>
+                <SelectItem value="2000+">От 2000 б. (Диссертация)</SelectItem>
               </SelectContent>
             </Select>
           </div>

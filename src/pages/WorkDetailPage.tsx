@@ -184,6 +184,7 @@ export default function WorkDetailPage() {
 
   const determinePrice = (workType: string, title: string): number => {
     const wt = workType.toLowerCase();
+    const t = title.toLowerCase();
     
     if (/практическая|практика|отчет/.test(wt)) return 200;
     if (/реферат/.test(wt)) return 200;
@@ -191,7 +192,12 @@ export default function WorkDetailPage() {
     if (/дипломная|диплом/.test(wt)) return 1500;
     if (/контрольная/.test(wt)) return 200;
     
-    return 200;
+    if (/техническая работа/.test(wt)) {
+      if (/проект|модернизация|разработка|расчет|схема|чертеж/.test(t)) return 600;
+      return 600;
+    }
+    
+    return 600;
   };
 
   const determineRating = (workType: string): number => {

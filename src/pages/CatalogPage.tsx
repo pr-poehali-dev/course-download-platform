@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
@@ -433,14 +434,12 @@ export default function CatalogPage() {
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
               {filteredWorks.map((work) => (
-                <div 
-                  key={work.id} 
-                  className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                <Link
+                  key={work.id}
+                  to={`/work/${work.id}`}
+                  className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block"
                 >
-                  <div 
-                    className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden cursor-pointer"
-                    onClick={() => window.location.href = `/work/${work.id}`}
-                  >
+                  <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
                     {work.previewUrls && work.previewUrls.length > 0 ? (
                       <PreviewCarousel 
                         images={work.previewUrls} 
@@ -495,10 +494,7 @@ export default function CatalogPage() {
                     </button>
                   </div>
 
-                  <div 
-                    className="p-4 md:p-5 cursor-pointer"
-                    onClick={() => window.location.href = `/work/${work.id}`}
-                  >
+                  <div className="p-4 md:p-5">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-1">
                         <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
@@ -553,19 +549,13 @@ export default function CatalogPage() {
                           <span className="text-xl font-bold text-gray-900">{work.price} б.</span>
                         )}
                       </div>
-                      <Button 
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold px-4 text-sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `/work/${work.id}`;
-                        }}
-                      >
-                        <Icon name="ShoppingCart" size={16} className="mr-1.5" />
-                        Купить
-                      </Button>
+                      <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5">
+                        <Icon name="ArrowRight" size={16} />
+                        Подробнее
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
             

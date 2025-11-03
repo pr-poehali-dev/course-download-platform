@@ -60,12 +60,7 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
   };
 
   return (
-    <div 
-      className={`relative group ${className}`}
-      onClick={(e) => {
-        console.log('PreviewCarousel clicked, NOT stopping propagation');
-      }}
-    >
+    <div className={`relative group ${className}`}>
       <img
         src={imageList[currentIndex]}
         alt={`${title} - ${currentIndex + 1}`}

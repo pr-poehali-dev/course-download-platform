@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+import PreviewCarousel from '@/components/PreviewCarousel';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 
@@ -20,6 +21,7 @@ interface Work {
   price: number;
   rating: number;
   previewUrl: string | null;
+  previewUrls?: string[];
   yandexDiskLink: string;
 }
 
@@ -224,20 +226,32 @@ export default function CatalogPage() {
         setLoadingProgress(80);
         
         if (data.works && Array.isArray(data.works)) {
-          const transformedWorks: Work[] = data.works.map((work: any) => ({
-            id: String(work.id),
-            folderName: work.title,
-            title: work.title,
-            workType: work.work_type || 'другое',
-            subject: work.subject || 'общая инженерия',
-            description: work.description || `${work.work_type} • ${work.subject}`,
-            composition: work.composition || 'Пояснительная записка',
-            universities: work.universities || null,
-            price: work.price_points || 300,
-            rating: parseFloat(work.rating) || 4.5,
-            previewUrl: work.preview_image_url || null,
-            yandexDiskLink: work.yandex_disk_link || work.file_url || ''
-          }));
+          const transformedWorks: Work[] = data.works.map((work: any) => {
+            let previewUrls = [];
+            if (work.preview_urls) {
+              try {
+                previewUrls = JSON.parse(work.preview_urls);
+              } catch (e) {
+                previewUrls = [];
+              }
+            }
+            
+            return {
+              id: String(work.id),
+              folderName: work.title,
+              title: work.title,
+              workType: work.work_type || 'другое',
+              subject: work.subject || 'общая инженерия',
+              description: work.description || `${work.work_type} • ${work.subject}`,
+              composition: work.composition || 'Пояснительная записка',
+              universities: work.universities || null,
+              price: work.price_points || 300,
+              rating: parseFloat(work.rating) || 4.5,
+              previewUrl: previewUrls[0] || work.preview_url || work.preview_image_url || null,
+              previewUrls: previewUrls,
+              yandexDiskLink: work.yandex_disk_link || work.file_url || ''
+            };
+          });
           
           saveToCache(transformedWorks);
           setWorks(transformedWorks);
@@ -411,7 +425,13 @@ export default function CatalogPage() {
                 onClick={() => window.location.href = `/work-detail/${work.id}`}
               >
                 <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
-                  {work.previewUrl ? (
+                  {work.previewUrls && work.previewUrls.length > 0 ? (
+                    <PreviewCarousel 
+                      images={work.previewUrls} 
+                      title={work.title}
+                      className="w-full h-full"
+                    />
+                  ) : work.previewUrl ? (
                     <>
                       <img 
                         src={work.previewUrl} 

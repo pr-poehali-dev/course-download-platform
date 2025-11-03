@@ -3,15 +3,11 @@
     {
       "name": "Extract previews batch",
       "method": "POST",
-      "path": "/",
-      "body": {
-        "batch_size": 2,
-        "offset": 0
-      },
+      "path": "/?batch_size=2&offset=0",
       "expectedStatus": 200,
       "expectedBody": {
-        "success": "boolean",
-        "has_more": "boolean"
+        "success": true,
+        "processed": "number"
       },
       "bodyMatcher": "partial"
     }

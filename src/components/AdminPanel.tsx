@@ -16,6 +16,7 @@ import YandexDiskImport from '@/components/YandexDiskImport';
 import PreviewGenerator from '@/components/PreviewGenerator';
 import SupportAdmin from '@/components/SupportAdmin';
 import ArchiveImagesChecker from '@/components/ArchiveImagesChecker';
+import MultiPreviewExtractor from '@/components/MultiPreviewExtractor';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import func2url from '../../backend/func2url.json';
 
@@ -282,30 +283,7 @@ export default function AdminPanel() {
             </CardContent>
           </Card>
           
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Icon name="Image" size={24} />
-                Извлечение превью из RAR
-              </CardTitle>
-              <CardDescription>
-                Автоматическое извлечение первого PNG из каждого RAR архива для создания превью работ
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => {
-                  window.open('/extract-previews', '_blank');
-                }}
-                className="w-full"
-                size="lg"
-                variant="secondary"
-              >
-                <Icon name="ImagePlus" size={20} className="mr-2" />
-                Запустить извлечение превью (487 работ)
-              </Button>
-            </CardContent>
-          </Card>
+          <MultiPreviewExtractor />
 
           <ArchiveImagesChecker />
           

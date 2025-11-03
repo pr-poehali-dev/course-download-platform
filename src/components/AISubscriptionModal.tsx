@@ -29,24 +29,24 @@ export default function AISubscriptionModal({ open, onClose, onSubscribe, userPo
   const plans = [
     {
       type: 'single' as const,
-      name: 'Разовый доступ',
-      price: 300,
-      requests: 10,
+      name: 'Стандарт',
+      price: 50,
+      requests: 100,
       icon: 'Zap',
-      description: '10 запросов к AI помощнику',
+      description: '100 запросов к AI помощнику',
       features: [
-        '10 запросов к GPT-4',
+        '100 запросов к ГигаЧат',
         'Загрузка файлов',
         'История чата',
-        'Без ограничений по времени'
+        'Действует 30 дней'
       ]
     },
     {
       type: 'monthly' as const,
-      name: 'Месячная подписка',
-      price: 800,
+      name: 'Безлимит',
+      price: 100,
       requests: -1,
-      icon: 'Calendar',
+      icon: 'Infinity',
       description: 'Безлимитные запросы на 30 дней',
       features: [
         'Безлимитные запросы',
@@ -59,20 +59,17 @@ export default function AISubscriptionModal({ open, onClose, onSubscribe, userPo
     },
     {
       type: 'yearly' as const,
-      name: 'Годовая подписка',
-      price: 7200,
-      requests: -1,
-      icon: 'Trophy',
-      description: 'Безлимитные запросы на год',
+      name: 'Бесплатно',
+      price: 0,
+      requests: 0,
+      icon: 'Gift',
+      description: 'Доступен всем пользователям',
       features: [
-        'Безлимитные запросы',
-        'Загрузка файлов',
-        'История чата',
-        'Приоритетная поддержка',
-        'Ранний доступ к функциям',
-        'Действует 365 дней'
+        'Ограниченный доступ',
+        'Базовые функции',
+        'Без поддержки файлов'
       ],
-      badge: 'Лучшее предложение'
+      badge: 'Для знакомства'
     }
   ];
 
@@ -141,7 +138,7 @@ export default function AISubscriptionModal({ open, onClose, onSubscribe, userPo
             Подписка на AI помощника
           </DialogTitle>
           <DialogDescription>
-            Выберите подходящий тариф для работы с TechMentor Pro
+            Выберите подходящий тариф. 1 балл = 5₽ (Стандарт 249₽, Безлимит 499₽)
           </DialogDescription>
         </DialogHeader>
 
@@ -191,24 +188,38 @@ export default function AISubscriptionModal({ open, onClose, onSubscribe, userPo
                   className="w-full"
                   variant={plan.popular ? 'default' : 'outline'}
                   onClick={() => handleSubscribe(plan.type)}
-                  disabled={loading || userPoints < plan.price}
+                  disabled={plan.price === 0 || loading || (plan.price > 0 && userPoints < plan.price)}
                 >
-                  {loading ? 'Оформление...' : 'Оформить подписку'}
+                  {plan.price === 0 ? 'Доступен всем' : loading ? 'Оформление...' : 'Оформить подписку'}
                 </Button>
               </CardFooter>
             </Card>
           ))}
         </div>
 
-        <div className="mt-6 p-4 bg-muted rounded-lg">
-          <div className="flex items-start gap-3">
-            <Icon name="Info" size={20} className="text-primary mt-0.5" />
-            <div className="text-sm space-y-1">
-              <p className="font-medium">Как работает помощник?</p>
-              <p className="text-muted-foreground">
-                TechMentor Pro помогает адаптировать купленные работы под требования вашего ВУЗа. 
-                Он не пишет за вас, а учит работать самостоятельно через пошаговые инструкции.
-              </p>
+        <div className="space-y-4 mt-6">
+          <div className="p-4 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-300 rounded-lg">
+            <div className="flex items-start gap-3">
+              <Icon name="Crown" size={20} className="text-yellow-600 mt-0.5" />
+              <div className="text-sm space-y-1">
+                <p className="font-bold">💡 Выгоднее с Premium!</p>
+                <p className="text-muted-foreground">
+                  Premium (399₽/мес) = Безлимитный ИИ + Скидка 30% на работы. Выгоднее, чем покупать ИИ отдельно!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 bg-muted rounded-lg">
+            <div className="flex items-start gap-3">
+              <Icon name="Info" size={20} className="text-primary mt-0.5" />
+              <div className="text-sm space-y-1">
+                <p className="font-medium">Как работает помощник?</p>
+                <p className="text-muted-foreground">
+                  TechMentor Pro помогает адаптировать купленные работы под требования вашего ВУЗа. 
+                  Он не пишет за вас, а учит работать самостоятельно через пошаговые инструкции.
+                </p>
+              </div>
             </div>
           </div>
         </div>

@@ -319,13 +319,13 @@ export default function AIAssistantPage() {
       return <Badge variant="secondary">Нет подписки</Badge>;
     }
     if (subscription.type === 'single') {
-      return <Badge variant="outline">Разовый доступ ({subscription.requestsLeft} запросов)</Badge>;
+      return <Badge variant="outline">Стандарт ({subscription.requestsLeft} запросов)</Badge>;
     }
     if (subscription.type === 'monthly') {
-      return <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">Месячная подписка</Badge>;
+      return <Badge className="bg-gradient-to-r from-purple-500 to-pink-500">Безлимит ∞</Badge>;
     }
     if (subscription.type === 'yearly') {
-      return <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500">Годовая подписка ⭐</Badge>;
+      return <Badge className="bg-gradient-to-r from-green-500 to-emerald-500">Бесплатный доступ</Badge>;
     }
   };
 

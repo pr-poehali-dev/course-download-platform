@@ -437,8 +437,16 @@ export default function CatalogPage() {
               {filteredWorks.map((work) => (
                 <div
                   key={work.id}
-                  onClick={() => navigate(`/work/${work.id}`)}
+                  onClick={(e) => {
+                    console.log('=== CARD CLICKED ===');
+                    console.log('Work ID:', work.id);
+                    console.log('Event target:', e.target);
+                    console.log('Current target:', e.currentTarget);
+                    console.log('Navigating to:', `/work/${work.id}`);
+                    navigate(`/work/${work.id}`);
+                  }}
                   className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block cursor-pointer"
+                  style={{ pointerEvents: 'auto' }}
                 >
                   <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
                     {work.previewUrls && work.previewUrls.length > 0 ? (

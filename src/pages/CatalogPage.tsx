@@ -188,7 +188,7 @@ export default function CatalogPage() {
 
   useEffect(() => {
     const CACHE_KEY = 'catalog_works_cache_v8';
-    const CACHE_DURATION = 24 * 60 * 60 * 1000;
+    const CACHE_DURATION = 24 * 60 * 60 * 1000; 
     
     localStorage.removeItem('catalog_works_cache');
     localStorage.removeItem('catalog_works_cache_v2');
@@ -534,6 +534,7 @@ export default function CatalogPage() {
               open={!!quickViewWork}
               onClose={() => setQuickViewWork(null)}
             />
+          </>
         )}
       </main>
     </div>

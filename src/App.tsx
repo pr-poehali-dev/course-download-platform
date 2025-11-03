@@ -31,6 +31,7 @@ import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SupportAdmin from "./components/SupportAdmin";
+import TelegramChatButton from "./components/TelegramChatButton";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <TelegramChatButton />
         <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

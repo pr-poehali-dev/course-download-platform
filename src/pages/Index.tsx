@@ -618,12 +618,12 @@ export default function Index() {
                     />
                   </div>
                   <CardTitle className="text-2xl">Стань автором</CardTitle>
-                  <CardDescription className="text-base">Загружай работы и зарабатывай</CardDescription>
+                  <CardDescription className="text-base">Делись знаниями с сообществом</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Продавай работы, получай 70%</span>
+                    <span>Публикуй свои работы</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />

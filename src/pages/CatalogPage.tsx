@@ -130,6 +130,7 @@ export default function CatalogPage() {
   const determineRating = (workType: string): number => {
     const wt = workType.toLowerCase();
     
+    if (/диссертация/.test(wt)) return 5.0;
     if (/дипломная|диплом/.test(wt)) return 5.0;
     if (/курсовая|курсовой/.test(wt)) return 4.9;
     if (/отчет.*практ/.test(wt)) return 4.8;
@@ -152,6 +153,9 @@ export default function CatalogPage() {
     const wt = workType.toLowerCase();
     const t = title.toLowerCase();
     
+    if (/диссертация/.test(wt)) {
+      return 'Диссертация, автореферат, презентация, раздаточный материал';
+    }
     if (/дипломная/.test(wt)) {
       if (/газопровод|электро|система|модернизация/.test(t)) {
         return 'ПЗ, графика, чертежи';
@@ -187,7 +191,7 @@ export default function CatalogPage() {
   }, []);
 
   useEffect(() => {
-    const CACHE_KEY = 'catalog_works_cache_v8';
+    const CACHE_KEY = 'catalog_works_cache_v9';
     const CACHE_DURATION = 24 * 60 * 60 * 1000; 
     
     localStorage.removeItem('catalog_works_cache');
@@ -197,6 +201,7 @@ export default function CatalogPage() {
     localStorage.removeItem('catalog_works_cache_v5');
     localStorage.removeItem('catalog_works_cache_v6');
     localStorage.removeItem('catalog_works_cache_v7');
+    localStorage.removeItem('catalog_works_cache_v8');
 
     const loadFromCache = (): Work[] | null => {
       try {
@@ -249,6 +254,7 @@ export default function CatalogPage() {
             }
             
             const isNew = Math.random() > 0.85;
+            const isHit = Math.random() > 0.80;
             const discount = Math.random() > 0.75 ? [10, 15, 20, 25][Math.floor(Math.random() * 4)] : 0;
             
             const workInfo = extractWorkInfo(work.title);
@@ -271,7 +277,7 @@ export default function CatalogPage() {
               previewUrls: previewUrls,
               yandexDiskLink: work.file_url || '',
               isNew,
-              isHit: false,
+              isHit,
               discount,
               pageCount: work.page_count || 0,
               fileCount: work.file_count || 0

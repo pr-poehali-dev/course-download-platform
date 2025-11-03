@@ -45,7 +45,7 @@ export default function PremiumDialog({
           action: 'create_payment',
           user_email: userEmail,
           user_id: userId,
-          price: 299,
+          price: 399,
           payment_type: 'premium',
           return_url: window.location.origin + '/?payment=success'
         })
@@ -90,7 +90,7 @@ export default function PremiumDialog({
             <CardContent className="pt-6">
               <div className="text-center space-y-3">
                 <Icon name="Sparkles" size={56} className="mx-auto" />
-                <h3 className="text-3xl font-bold">299₽/месяц</h3>
+                <h3 className="text-3xl font-bold">399₽/месяц</h3>
                 <p className="text-purple-100">Скидка 30% + безлимитный ИИ-помощник</p>
               </div>
             </CardContent>
@@ -172,15 +172,15 @@ export default function PremiumDialog({
                   </div>
                   <div className="flex justify-between items-center p-2 bg-white rounded-lg">
                     <span className="text-muted-foreground">+ Подписка</span>
-                    <span className="font-bold">+299₽</span>
+                    <span className="font-bold">+399₽</span>
                   </div>
                   <div className="border-t-2 border-purple-300 pt-2 flex justify-between items-center">
                     <span className="font-bold text-lg">Экономия:</span>
-                    <span className="font-bold text-2xl text-green-600">1201₽!</span>
+                    <span className="font-bold text-2xl text-green-600">1101₽!</span>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground italic mt-2">
-                  + Безлимитный ИИ-помощник (стоимость 399₽ отдельно)
+                  + Безлимитный ИИ-помощник (стоимость 499₽ отдельно)
                 </p>
               </div>
             </CardContent>
@@ -199,7 +199,7 @@ export default function PremiumDialog({
             ) : (
               <>
                 <Icon name="Crown" size={20} className="mr-2" />
-                Оформить Premium за 299₽
+                Оформить Premium за 399₽
               </>
             )}
           </Button>

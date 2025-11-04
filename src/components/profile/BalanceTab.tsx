@@ -151,34 +151,6 @@ export default function BalanceTab() {
               </Card>
             ))}
           </div>
-
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <Icon name="Info" size={20} className="text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-900">
-                <p className="font-semibold mb-2">Как это работает:</p>
-                <ul className="space-y-1 list-disc list-inside">
-                  <li>Выберите пакет и нажмите «Купить»</li>
-                  <li>Вы будете перенаправлены на страницу оплаты ЮКасса</li>
-                  <li>Оплатите удобным способом (карта, СБП, электронные кошельки)</li>
-                  <li>После успешной оплаты баллы автоматически зачислятся на ваш счёт</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <Icon name="Shield" size={20} className="text-amber-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-amber-900">
-                <p className="font-semibold mb-1">Безопасность платежей</p>
-                <p>
-                  Все платежи защищены технологией 3D-Secure. Мы не храним данные ваших карт.
-                  Платежи обрабатывает ЮКасса — сертифицированный платёжный сервис.
-                </p>
-              </div>
-            </div>
-          </div>
         </CardContent>
       </Card>
     </div>

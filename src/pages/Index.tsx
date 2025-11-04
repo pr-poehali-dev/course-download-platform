@@ -22,7 +22,7 @@ import CartDialog from '@/components/CartDialog';
 import FavoritesDialog from '@/components/FavoritesDialog';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
 import ReferralDialog from '@/components/ReferralDialog';
-import PremiumDialog from '@/components/PremiumDialog';
+
 import BlogSection from '@/components/BlogSection';
 import AboutSection from '@/components/AboutSection';
 
@@ -45,7 +45,7 @@ export default function Index() {
   const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false);
   const [promoDialogOpen, setPromoDialogOpen] = useState(false);
   const [referralDialogOpen, setReferralDialogOpen] = useState(false);
-  const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
+
 
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<any[]>([]);
@@ -463,10 +463,7 @@ export default function Index() {
                             Профиль
                           </a>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setPremiumDialogOpen(true)} className="text-purple-600 font-medium">
-                          <Icon name="Crown" size={16} className="mr-2" />
-                          Premium подписка
-                        </DropdownMenuItem>
+
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setPaymentDialogOpen(true)}>
                           <Icon name="Wallet" size={16} className="mr-2" />
@@ -1740,17 +1737,6 @@ export default function Index() {
         onOpenChange={setReferralDialogOpen}
         username={username}
         userId={currentUser?.id}
-      />
-
-      <PremiumDialog
-        open={premiumDialogOpen}
-        onOpenChange={setPremiumDialogOpen}
-        userId={currentUser?.id}
-        onSuccess={() => {
-          if (currentUser) {
-            setCurrentUser({ ...currentUser, is_premium: true });
-          }
-        }}
       />
 
       <CookieBanner />

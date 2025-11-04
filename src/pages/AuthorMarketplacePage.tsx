@@ -54,7 +54,7 @@ export default function AuthorMarketplacePage() {
   ];
 
   const stats = [
-    { value: '487', label: 'Работ в каталоге' },
+    { value: '500+', label: 'Работ в каталоге' },
     { value: '90%', label: 'Баллов автору' },
     { value: '24/7', label: 'Обмен работает' }
   ];

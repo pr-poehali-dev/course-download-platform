@@ -179,7 +179,7 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
                         <div className="flex items-center gap-2">
                           <div className="flex flex-col">
                             <span className="text-3xl font-bold text-green-600">{Math.round(finalPrice)} б.</span>
-                            <span className="text-xs text-gray-500">≈ {Math.round(finalPrice * 5)}₽</span>
+                            <span className="text-xs text-gray-500">= {Math.round(finalPrice * 5)}₽</span>
                           </div>
                           <Badge className="bg-red-500 text-white">−{work.discount}%</Badge>
                         </div>
@@ -187,7 +187,7 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
                     ) : (
                       <div className="flex flex-col">
                         <span className="text-3xl font-bold text-gray-900">{work.price} б.</span>
-                        <span className="text-xs text-gray-500">≈ {work.price * 5}₽</span>
+                        <span className="text-xs text-gray-500">= {work.price * 5}₽</span>
                       </div>
                     )}
                   </div>

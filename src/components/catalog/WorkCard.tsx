@@ -182,13 +182,13 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
                 <span className="text-sm text-gray-400 line-through">{work.price} б. ({work.price * 5}₽)</span>
                 <div className="flex flex-col">
                   <span className="text-2xl font-bold text-green-600">{Math.round(finalPrice)} б.</span>
-                  <span className="text-xs text-gray-500">≈ {Math.round(finalPrice * 5)}₽</span>
+                  <span className="text-xs text-gray-500">= {Math.round(finalPrice * 5)}₽</span>
                 </div>
               </div>
             ) : (
               <div className="flex flex-col">
                 <span className="text-2xl font-bold text-gray-900">{work.price} б.</span>
-                <span className="text-xs text-gray-500">≈ {work.price * 5}₽</span>
+                <span className="text-xs text-gray-500">= {work.price * 5}₽</span>
               </div>
             )}
           </div>

@@ -37,10 +37,6 @@ export default function Navigation({
           <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm">
             <a href="/" className="hover:text-primary transition-colors">Главная</a>
             <a href="/catalog" className="hover:text-primary transition-colors">Каталог</a>
-            <a href="/ai-assistant" className="hover:text-primary transition-colors flex items-center gap-1">
-              <Icon name="Bot" size={16} />
-              TechMentor Pro
-            </a>
             <a href="/marketplace" className="hover:text-primary transition-colors">Авторам</a>
             <a href="/#blog" className="hover:text-primary transition-colors">Блог</a>
             <a href="/#support" className="hover:text-primary transition-colors">Поддержка</a>
@@ -155,14 +151,6 @@ export default function Navigation({
               >
                 <Icon name="BookOpen" size={20} className="text-primary" />
                 <span className="font-medium">Каталог</span>
-              </a>
-              <a 
-                href="/ai-assistant" 
-                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Icon name="Bot" size={20} className="text-primary" />
-                <span className="font-medium">TechMentor Pro</span>
               </a>
               <a 
                 href="/marketplace" 

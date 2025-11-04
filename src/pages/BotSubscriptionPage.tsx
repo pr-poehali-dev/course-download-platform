@@ -195,10 +195,6 @@ export default function BotSubscriptionPage() {
                   <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
                   <p className="text-sm">Неограниченное количество запросов</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <Icon name="Check" size={20} className="text-green-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm">GigaChat AI под капотом</p>
-                </div>
               </div>
 
               <Button 

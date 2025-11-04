@@ -1,17 +1,21 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { useNavigate } from 'react-router-dom';
 
 export default function TelegramChatButton() {
   const [isHovered, setIsHovered] = useState(false);
-  const botUsername = 'TechForma_bot';
-  const telegramUrl = `https://t.me/${botUsername}`;
+  const navigate = useNavigate();
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigate('/bot-subscription');
+  };
 
   return (
     <a
-      href={telegramUrl}
-      target="_blank"
-      rel="noopener noreferrer"
+      href="/bot-subscription"
+      onClick={handleClick}
       className="fixed bottom-6 right-6 z-50 inline-block"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

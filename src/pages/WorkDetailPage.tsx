@@ -804,7 +804,7 @@ export default function WorkDetailPage() {
                     </span>
                     <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
                   </div>
-                  <span className="text-xs md:text-sm text-gray-500">≈ {(work.price * 5).toLocaleString()}₽</span>
+                  <span className="text-xs md:text-sm text-gray-500">= {(work.price * 5).toLocaleString()}₽</span>
                 </div>
               </div>
 

@@ -174,7 +174,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute("""
                     SELECT id, title, work_type, subject, description, composition, 
                            price_points, rating, downloads, created_at, yandex_disk_link, 
-                           preview_image_url, file_url
+                           preview_image_url, file_url, author_id
                     FROM t_p63326274_course_download_plat.works WHERE id = %s
                 """, (work_id,))
                 row = cur.fetchone()
@@ -199,7 +199,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'created_at': row[9].isoformat() if row[9] else None,
                     'yandex_disk_link': row[10],
                     'preview_image_url': row[11],
-                    'file_url': row[12]
+                    'file_url': row[12],
+                    'author_id': row[13]
                 }
                 
                 cur.execute("""
@@ -255,7 +256,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 # Получить работы с пагинацией
                 query = f"""
                     SELECT id, title, work_type, subject, description, 
-                           price_points, rating, downloads, category, preview_image_url
+                           price_points, rating, downloads, category, preview_image_url, author_id
                     FROM t_p63326274_course_download_plat.works 
                     WHERE {where_sql}
                     ORDER BY created_at DESC
@@ -276,7 +277,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'rating': float(row[6]) if row[6] else 0,
                         'downloads': row[7] or 0,
                         'category': row[8],
-                        'preview_image_url': row[9]
+                        'preview_image_url': row[9],
+                        'author_id': row[10]
                     }
                     works.append(work)
                 

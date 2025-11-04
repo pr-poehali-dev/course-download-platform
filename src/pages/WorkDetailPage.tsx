@@ -21,6 +21,7 @@ interface Work {
   previewUrl: string | null;
   yandexDiskLink: string;
   fileFormats?: string[];
+  authorId?: number | null;
 }
 
 export default function WorkDetailPage() {
@@ -321,7 +322,8 @@ export default function WorkDetailPage() {
             rating,
             previewUrl,
             yandexDiskLink: folderPublicUrl,
-            fileFormats: undefined
+            fileFormats: undefined,
+            authorId: data.author_id
           });
           setLoading(false);
         } else {
@@ -601,9 +603,16 @@ export default function WorkDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2">
             <div className="mb-6">
-              <Badge className="bg-gray-100 text-gray-700 text-[10px] md:text-xs font-medium px-2 md:px-3 py-1 rounded-sm border-0 mb-3">
-                {work.workType}
-              </Badge>
+              <div className="flex gap-2 mb-3">
+                <Badge className="bg-gray-100 text-gray-700 text-[10px] md:text-xs font-medium px-2 md:px-3 py-1 rounded-sm border-0">
+                  {work.workType}
+                </Badge>
+                {(work.authorId === 999999 || work.authorId === null) && (
+                  <Badge className="bg-green-600 text-white text-[10px] md:text-xs font-medium px-2 md:px-3 py-1 rounded-sm border-0">
+                    🛡️ Официальная работа
+                  </Badge>
+                )}
+              </div>
               
               <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
                 {work.title.charAt(0).toUpperCase() + work.title.slice(1)}

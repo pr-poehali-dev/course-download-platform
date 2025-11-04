@@ -32,6 +32,7 @@ interface Work {
   discount?: number;
   pageCount?: number;
   fileCount?: number;
+  authorId?: number | null;
 }
 
 interface Category {
@@ -445,6 +446,11 @@ export default function CatalogPage() {
                         <Badge className="bg-orange-500 text-white shadow-lg">
                           <Icon name="Flame" size={12} className="mr-1" />
                           Хит
+                        </Badge>
+                      )}
+                      {(work.authorId === 999999 || work.authorId === null) && (
+                        <Badge className="bg-green-600 text-white shadow-lg">
+                          🛡️ Официальная
                         </Badge>
                       )}
                     </div>

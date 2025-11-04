@@ -1,5 +1,5 @@
 """
-Business: Покупка работы — проверка баланса, списание баллов, создание записи о покупке
+Business: Покупка работы — проверка баланса, списание баллов, создание записи о покупке, уведомление автора
 Args: event - dict с httpMethod, body (workId, userId, price)
       context - объект с request_id
 Returns: Статус покупки и разрешение на скачивание
@@ -8,6 +8,13 @@ import json
 import os
 from typing import Dict, Any
 import psycopg2
+
+# Загружаем func2url для отправки email через support API
+try:
+    with open('/function/backend/func2url.json', 'r') as f:
+        func2url = json.load(f)
+except:
+    func2url = {}
 
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
@@ -58,9 +65,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
-            # Проверяем существование работы
+            # Проверяем существование работы и получаем информацию о ней
             cur.execute(
-                "SELECT id, author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                "SELECT id, author_id, title FROM t_p63326274_course_download_plat.works WHERE id = %s",
                 (work_id,)
             )
             work_result = cur.fetchone()
@@ -75,10 +82,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             db_work_id = work_result[0]
+            work_author_id = work_result[1]
+            work_title = work_result[2]
             
             # Проверяем роль пользователя из базы данных
             cur.execute(
-                "SELECT balance, role FROM t_p63326274_course_download_plat.users WHERE id = %s",
+                "SELECT balance, role, email FROM t_p63326274_course_download_plat.users WHERE id = %s",
                 (user_id,)
             )
             user_result = cur.fetchone()
@@ -94,6 +103,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             balance = user_result[0]
             role = user_result[1] if user_result[1] else 'user'
+            buyer_email = user_result[2] if len(user_result) > 2 else None
             is_admin = (role == 'admin')
             
             # Проверяем баланс только для не-админов
@@ -146,7 +156,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             purchase_id = cur.fetchone()[0]
             
             # author_id уже получен в work_result выше
-            author_id = work_result[1]
+            author_id = work_author_id
             
             # Если есть автор, начисляем ему 90% (price - 10% комиссии)
             if author_id:
@@ -182,6 +192,44 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     VALUES (%s, %s, %s, %s)""",
                     (author_id, author_share, 'sale', f'Продажа работы #{db_work_id} (комиссия 15%)')
                 )
+                
+                # Получаем email автора для уведомления
+                cur.execute(
+                    "SELECT email, username FROM t_p63326274_course_download_plat.users WHERE id = %s",
+                    (author_id,)
+                )
+                author_result = cur.fetchone()
+                author_email = author_result[0] if author_result else None
+                author_username = author_result[1] if author_result else 'Автор'
+                
+                # Отправляем email автору о продаже его работы
+                if author_email:
+                    try:
+                        import requests
+                        support_url = func2url.get('support')
+                        if support_url:
+                            requests.post(
+                                support_url,
+                                json={
+                                    'email': author_email,
+                                    'subject': f'🎉 Ваша работа "{work_title}" куплена!',
+                                    'message': f'''Здравствуйте, {author_username}!
+                                    
+Отличная новость! Вашу работу "{work_title}" только что приобрели.
+
+💰 Начислено на баланс: {author_share} баллов
+📊 Комиссия платформы: {platform_fee} баллов (10%)
+💳 Стоимость работы: {price} баллов
+
+Теперь у вас на балансе ещё больше баллов для покупки других работ!
+
+С уважением,
+Команда платформы'''
+                                },
+                                timeout=5
+                            )
+                    except Exception as email_err:
+                        print(f"[WARN] Failed to send author notification: {email_err}")
             
             # Обновляем счётчик скачиваний
             cur.execute(

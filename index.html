@@ -30,6 +30,19 @@
 
     <meta name="pp-name" value="course-download-platform">
       <script src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
+      
+      <script>
+        // Автоматическое принятие системных соглашений платформы
+        window.addEventListener('DOMContentLoaded', function() {
+          setTimeout(function() {
+            // Проверяем, показано ли уже согласие
+            if (!localStorage.getItem('pp_terms_accepted')) {
+              localStorage.setItem('pp_terms_accepted', 'true');
+              localStorage.setItem('pp_privacy_accepted', 'true');
+            }
+          }, 100);
+        });
+      </script>
   </head>
 
 <body>

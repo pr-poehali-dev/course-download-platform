@@ -821,8 +821,8 @@ export default function Index() {
                           </p>
                           <div className="flex items-center gap-4 mt-4 pt-4 border-t">
                             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                              <Icon name="Download" size={16} className="text-primary" />
-                              <span className="font-medium">{work.downloads || 0}</span>
+                              <Icon name="Download" size={18} className="text-primary" />
+                              <span className="font-bold text-base">{work.downloads || 0}</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-sm text-green-600">
                               <Icon name="TrendingUp" size={16} />

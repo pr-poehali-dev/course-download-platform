@@ -11,6 +11,7 @@ import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import { useState, useEffect } from 'react';
 import SupportTab from '@/components/profile/SupportTab';
+import SalesTab from '@/components/profile/SalesTab';
 
 interface ProfileDialogProps {
   open: boolean;
@@ -208,7 +209,7 @@ export default function ProfileDialog({
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="profile">
               <Icon name="UserCircle" size={16} className="mr-2" />
               Профиль
@@ -220,6 +221,10 @@ export default function ProfileDialog({
             <TabsTrigger value="uploads">
               <Icon name="FileUp" size={16} className="mr-2" />
               Мои работы
+            </TabsTrigger>
+            <TabsTrigger value="sales">
+              <Icon name="TrendingUp" size={16} className="mr-2" />
+              Мои продажи
             </TabsTrigger>
             <TabsTrigger value="referral">
               <Icon name="Users" size={16} className="mr-2" />
@@ -604,6 +609,10 @@ export default function ProfileDialog({
                 </div>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="sales">
+            <SalesTab userId={userId} />
           </TabsContent>
 
           <TabsContent value="referral" className="pt-4">

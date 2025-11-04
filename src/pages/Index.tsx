@@ -26,6 +26,7 @@ import ReferralDialog from '@/components/ReferralDialog';
 import PremiumDialog from '@/components/PremiumDialog';
 import BlogSection from '@/components/BlogSection';
 import AboutSection from '@/components/AboutSection';
+import PriceCalculator from '@/components/PriceCalculator';
 
 import AgeBadge from '@/components/AgeBadge';
 import CookieBanner from '@/components/CookieBanner';
@@ -772,6 +773,12 @@ export default function Index() {
                 </CardContent>
               </Card>
             </div>
+          </div>
+        </section>
+
+        <section className="py-20 bg-gradient-to-br from-slate-50 via-purple-50 to-pink-50">
+          <div className="container mx-auto px-4">
+            <PriceCalculator />
           </div>
         </section>
 

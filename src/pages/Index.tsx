@@ -680,7 +680,7 @@ export default function Index() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground text-center">
-                      Тысячи готовых курсовых, дипломов и рефератов по всем дисциплинам
+                      Более 500 готовых курсовых, дипломов и рефератов по разным дисциплинам
                     </p>
                   </CardContent>
                 </Card>

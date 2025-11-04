@@ -702,13 +702,13 @@ export default function Index() {
                 <Card className="border-2 border-purple-200 hover:shadow-xl transition-all hover:border-purple-400 hover:scale-105">
                   <CardHeader className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                      <Icon name="Users" size={32} className="text-white" />
+                      <Icon name="Upload" size={32} className="text-white" />
                     </div>
-                    <CardTitle className="text-xl">Эксперты онлайн</CardTitle>
+                    <CardTitle className="text-xl">Публикация работ</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground text-center">
-                      Консультации преподавателей по любым предметам в реальном времени
+                      Делись своими работами с сообществом и помогай другим студентам
                     </p>
                   </CardContent>
                 </Card>
@@ -722,7 +722,7 @@ export default function Index() {
                     </div>
                     <h3 className="font-bold text-2xl mb-3">Попробуй все возможности платформы</h3>
                     <p className="text-muted-foreground text-base max-w-xl mx-auto mb-6">
-                      Доступ к каталогу работ, AI-ботy в Telegram и консультациям экспертов — всё включено в подписку
+                      Доступ к каталогу работ и AI-помощнику в Telegram — всё что нужно для успешной учёбы
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">

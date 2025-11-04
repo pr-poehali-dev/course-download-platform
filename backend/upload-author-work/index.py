@@ -192,6 +192,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 user_id, title, work_type, subject, description, price_points, file_url = result
                 
                 cursor.execute('''
+                    SELECT email FROM t_p63326274_course_download_plat.users WHERE id = %s
+                ''', (user_id,))
+                
+                email_result = cursor.fetchone()
+                user_email = email_result[0] if email_result else None
+                
+                cursor.execute('''
                     INSERT INTO t_p63326274_course_download_plat.works
                     (title, work_type, subject, description, price_points, author_id, file_url, status, rating, downloads, views_count)
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -204,12 +211,74 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cursor.close()
                 conn.close()
                 
+                email_sent = False
+                if user_email:
+                    try:
+                        smtp_user = os.environ.get('SMTP_USER', '')
+                        smtp_pass = os.environ.get('SMTP_PASS', '')
+                        smtp_host = os.environ.get('SMTP_HOST', 'smtp.yandex.ru')
+                        smtp_port = int(os.environ.get('SMTP_PORTSMTP_PORT', '465'))
+                        
+                        if smtp_user and smtp_pass:
+                            import smtplib
+                            from email.mime.text import MIMEText
+                            from email.mime.multipart import MIMEMultipart
+                            
+                            msg = MIMEMultipart('alternative')
+                            msg['Subject'] = f'Ваша работа "{title}" одобрена и опубликована! 🎉'
+                            msg['From'] = smtp_user
+                            msg['To'] = user_email
+                            
+                            html = f'''
+                            <html>
+                            <body style="font-family: Arial, sans-serif;">
+                                <h2 style="color: #10b981;">Поздравляем! Работа опубликована 🎉</h2>
+                                <p>Ваша работа "<strong>{title}</strong>" успешно прошла модерацию и теперь доступна в каталоге!</p>
+                                
+                                <div style="background: #f0fdf4; padding: 20px; border-left: 4px solid #10b981; margin: 20px 0; border-radius: 4px;">
+                                    <h3 style="margin-top: 0; color: #059669;">Что дальше?</h3>
+                                    <ul style="line-height: 1.8;">
+                                        <li>Работа теперь видна всем пользователям платформы</li>
+                                        <li>За каждую покупку вы будете получать <strong>{price_points} баллов</strong></li>
+                                        <li>Отслеживайте статистику в личном кабинете (скачивания, заработок)</li>
+                                        <li>Продолжайте загружать работы и помогайте сообществу!</li>
+                                    </ul>
+                                </div>
+                                
+                                <p style="margin-top: 30px;">
+                                    <a href="https://techforma.ru" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
+                                        Открыть личный кабинет
+                                    </a>
+                                </p>
+                                
+                                <p style="margin-top: 30px; color: #6b7280; font-size: 14px;">
+                                    Спасибо, что делитесь знаниями с другими студентами! 💙
+                                </p>
+                                
+                                <p>С уважением,<br>Команда TechForma</p>
+                            </body>
+                            </html>
+                            '''
+                            
+                            msg.attach(MIMEText(html, 'html'))
+                            
+                            server = smtplib.SMTP_SSL(smtp_host, smtp_port)
+                            server.login(smtp_user, smtp_pass)
+                            server.send_message(msg)
+                            server.quit()
+                            
+                            email_sent = True
+                    except Exception as email_error:
+                        print(f'Email error on approve: {email_error}')
+                
                 return {
                     'statusCode': 200,
                     'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
                     'body': json.dumps({
                         'success': True,
                         'publishedWorkId': published_work_id,
+                        'userEmail': user_email,
+                        'emailSent': email_sent,
                         'message': 'Работа одобрена и опубликована'
                     })
                 }

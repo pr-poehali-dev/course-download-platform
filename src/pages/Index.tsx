@@ -1341,6 +1341,28 @@ export default function Index() {
                     </ul>
                   </div>
 
+                  <div className="bg-white rounded-lg p-4 mb-3 border">
+                    <p className="font-semibold text-foreground mb-2">📊 Рекомендованные цены:</p>
+                    <ul className="space-y-1.5 text-sm text-muted-foreground">
+                      <li className="flex justify-between items-center">
+                        <span>Курсовая работа</span>
+                        <span className="font-bold text-primary">600 баллов</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Дипломная работа</span>
+                        <span className="font-bold text-primary">1000-1500 баллов</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Практическая работа</span>
+                        <span className="font-bold text-primary">200-400 баллов</span>
+                      </li>
+                      <li className="flex justify-between items-center">
+                        <span>Чертёж</span>
+                        <span className="font-bold text-primary">150-300 баллов</span>
+                      </li>
+                    </ul>
+                  </div>
+
                   <div className="space-y-2 mb-3">
                     <p className="font-semibold text-foreground">🔄 Как работает покупка:</p>
                     <ul className="space-y-2 text-sm text-muted-foreground ml-4">

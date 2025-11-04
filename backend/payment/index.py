@@ -15,6 +15,14 @@ SHOP_ID = os.environ.get('YOOKASSA_SHOP_ID', '')
 SECRET_KEY = os.environ.get('YOOKASSA_SECRET_KEY', '')
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
+BALANCE_PACKAGES = {
+    '100': {'points': 100, 'price': '99.00'},
+    '300': {'points': 300, 'price': '249.00'},
+    '500': {'points': 500, 'price': '399.00'},
+    '1000': {'points': 1000, 'price': '699.00'},
+    '2000': {'points': 2000, 'price': '1299.00'},
+}
+
 if SHOP_ID and SECRET_KEY:
     Configuration.account_id = SHOP_ID
     Configuration.secret_key = SECRET_KEY
@@ -58,9 +66,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if action == 'create_payment':
             user_email = body_data.get('user_email')
             user_id = body_data.get('user_id')
+            package_id = body_data.get('package_id')
             points = body_data.get('points', 0)
             price = body_data.get('price', 0)
             payment_type = body_data.get('payment_type', 'points')  # 'points' or 'premium'
+            
+            if package_id and package_id in BALANCE_PACKAGES:
+                package = BALANCE_PACKAGES[package_id]
+                points = package['points']
+                price = package['price']
             
             if not user_email or not price:
                 return {

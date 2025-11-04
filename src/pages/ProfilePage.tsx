@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
+import BalanceTab from '@/components/profile/BalanceTab';
 
 interface UserProfile {
   name: string;
@@ -232,11 +233,17 @@ export default function ProfilePage() {
             <CardContent>
               <div className="text-4xl font-bold text-white mb-1">{user.balance}</div>
               <p className="text-sm text-white/80">баллов для покупок</p>
-              <Button variant="secondary" size="sm" className="mt-3 w-full" asChild>
-                <Link to="/buy-points">
-                  <Icon name="Plus" size={14} className="mr-1" />
-                  Пополнить
-                </Link>
+              <Button 
+                variant="secondary" 
+                size="sm" 
+                className="mt-3 w-full"
+                onClick={() => {
+                  const balanceTab = document.querySelector('[value="balance"]') as HTMLElement;
+                  balanceTab?.click();
+                }}
+              >
+                <Icon name="Plus" size={14} className="mr-1" />
+                Пополнить
               </Button>
             </CardContent>
           </Card>
@@ -269,10 +276,14 @@ export default function ProfilePage() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview">
               <Icon name="User" size={18} className="mr-2" />
               Профиль
+            </TabsTrigger>
+            <TabsTrigger value="balance">
+              <Icon name="Wallet" size={18} className="mr-2" />
+              Баланс
             </TabsTrigger>
             <TabsTrigger value="uploads">
               <Icon name="Upload" size={18} className="mr-2" />
@@ -463,6 +474,9 @@ export default function ProfilePage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="balance">
+            <BalanceTab />
+          </TabsContent>
 
         </Tabs>
       </div>

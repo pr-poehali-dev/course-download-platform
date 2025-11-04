@@ -250,6 +250,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     try:
                         smtp_user = os.environ.get('SMTP_USER', '')
                         smtp_pass = os.environ.get('SMTP_PASS', '')
+                        smtp_host = os.environ.get('SMTP_HOST', 'smtp.yandex.ru')
+                        smtp_port = int(os.environ.get('SMTP_PORTSMTP_PORT', '465'))
                         
                         if smtp_user and smtp_pass:
                             import smtplib
@@ -278,7 +280,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             
                             msg.attach(MIMEText(html, 'html'))
                             
-                            server = smtplib.SMTP_SSL('smtp.yandex.ru', 465)
+                            server = smtplib.SMTP_SSL(smtp_host, smtp_port)
                             server.login(smtp_user, smtp_pass)
                             server.send_message(msg)
                             server.quit()

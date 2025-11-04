@@ -7,6 +7,7 @@ import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import TrustRating from '@/components/TrustRating';
+import SEO from '@/components/SEO';
 
 interface Work {
   id: string;

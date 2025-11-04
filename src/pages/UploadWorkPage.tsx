@@ -29,16 +29,16 @@ export default function UploadWorkPage() {
     file: null as File | null
   });
 
-  const categories = [
-    'Информатика',
-    'Экономика',
-    'Менеджмент',
-    'Маркетинг',
-    'Юриспруденция',
-    'Медицина',
-    'Психология',
-    'Социология',
-    'Другое'
+  const workTypes = [
+    { value: 'coursework', label: 'Курсовая работа', price: 600 },
+    { value: 'diploma', label: 'Дипломная работа', price: 1500 },
+    { value: 'dissertation', label: 'Диссертация', price: 3000 },
+    { value: 'practice', label: 'Отчёт по практике', price: 200 },
+    { value: 'report', label: 'Отчёт', price: 200 },
+    { value: 'referat', label: 'Реферат', price: 200 },
+    { value: 'control', label: 'Контрольная работа', price: 200 },
+    { value: 'lab', label: 'Лабораторная работа', price: 200 },
+    { value: 'other', label: 'Другое', price: 600 }
   ];
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -157,20 +157,33 @@ export default function UploadWorkPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="category">
-                    Категория <span className="text-destructive">*</span>
+                    Тип работы <span className="text-destructive">*</span>
                   </Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                  <Select 
+                    value={formData.category} 
+                    onValueChange={(value) => {
+                      const selectedType = workTypes.find(t => t.value === value);
+                      setFormData({ 
+                        ...formData, 
+                        category: value,
+                        price: selectedType ? selectedType.price.toString() : formData.price
+                      });
+                    }}
+                  >
                     <SelectTrigger>
-                      <SelectValue placeholder="Выберите категорию" />
+                      <SelectValue placeholder="Выберите тип работы" />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat} value={cat}>
-                          {cat}
+                      {workTypes.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label} ({type.price} баллов)
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Цена установится автоматически
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -182,13 +195,13 @@ export default function UploadWorkPage() {
                     type="number"
                     min="50"
                     max="5000"
-                    placeholder="150"
+                    placeholder="600"
                     value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    Минимум 50, максимум 5000 баллов
+                    Рекомендуемая цена автоматически подставлена
                   </p>
                 </div>
               </div>

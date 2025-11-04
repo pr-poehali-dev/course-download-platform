@@ -1246,21 +1246,84 @@ export default function Index() {
                         }
 
                         setUploadLoading(true);
-                        setTimeout(() => {
+                        
+                        try {
+                          const reader = new FileReader();
+                          reader.readAsDataURL(uploadForm.file!);
+                          
+                          reader.onload = async () => {
+                            const base64Data = reader.result as string;
+                            
+                            const uploadData = {
+                              title: uploadForm.title,
+                              workType: uploadForm.workType,
+                              subject: uploadForm.subject,
+                              description: uploadForm.description,
+                              price: parseInt(uploadForm.price),
+                              fileName: uploadForm.file!.name,
+                              fileSize: uploadForm.file!.size,
+                              fileData: base64Data
+                            };
+                            
+                            const response = await fetch('https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'X-User-Id': currentUser?.id?.toString() || ''
+                              },
+                              body: JSON.stringify(uploadData)
+                            });
+                            
+                            const result = await response.json();
+                            
+                            setUploadLoading(false);
+                            
+                            if (response.ok && result.success) {
+                              if (result.newBalance) {
+                                setCurrentUser({
+                                  ...currentUser!,
+                                  balance: result.newBalance
+                                });
+                              }
+                              
+                              toast({
+                                title: 'Работа загружена!',
+                                description: `${result.message}. Начислено +${result.bonusEarned} баллов!`
+                              });
+                              
+                              setUploadForm({
+                                title: '',
+                                workType: '',
+                                price: '',
+                                subject: '',
+                                description: '',
+                                file: null
+                              });
+                            } else {
+                              toast({
+                                title: 'Ошибка загрузки',
+                                description: result.error || 'Не удалось загрузить работу',
+                                variant: 'destructive'
+                              });
+                            }
+                          };
+                          
+                          reader.onerror = () => {
+                            setUploadLoading(false);
+                            toast({
+                              title: 'Ошибка чтения файла',
+                              description: 'Не удалось прочитать файл',
+                              variant: 'destructive'
+                            });
+                          };
+                        } catch (error) {
                           setUploadLoading(false);
                           toast({
-                            title: 'Работа загружена!',
-                            description: 'Работа отправлена на модерацию. Вы получите уведомление после проверки.'
+                            title: 'Ошибка',
+                            description: 'Произошла ошибка при загрузке',
+                            variant: 'destructive'
                           });
-                          setUploadForm({
-                            title: '',
-                            workType: '',
-                            price: '',
-                            subject: '',
-                            description: '',
-                            file: null
-                          });
-                        }, 2000);
+                        }
                       }}
                     >
                       {uploadLoading ? (

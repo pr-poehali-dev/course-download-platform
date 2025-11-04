@@ -1535,20 +1535,6 @@ export default function Index() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Icon name="CreditCard" size={20} className="text-primary" />
-                    Какие способы оплаты доступны?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Банковские карты (Visa, MasterCard, МИР), электронные кошельки, СБП. Все платежи защищены и проходят через безопасные шлюзы.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
                     <Icon name="MessageCircle" size={20} className="text-blue-600" />
                     Что такое TechMentor AI бот?
                   </CardTitle>

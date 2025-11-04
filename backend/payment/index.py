@@ -16,11 +16,11 @@ SECRET_KEY = os.environ.get('YOOKASSA_SECRET_KEY', '')
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 BALANCE_PACKAGES = {
-    '100': {'points': 100, 'price': '99.00'},
-    '300': {'points': 300, 'price': '249.00'},
-    '500': {'points': 500, 'price': '399.00'},
-    '1000': {'points': 1000, 'price': '699.00'},
-    '2000': {'points': 2000, 'price': '1299.00'},
+    '100': {'points': 100, 'price': '500.00'},
+    '300': {'points': 300, 'price': '1500.00'},
+    '500': {'points': 500, 'price': '2500.00'},
+    '1000': {'points': 1000, 'price': '5000.00'},
+    '2000': {'points': 2000, 'price': '10000.00'},
 }
 
 if SHOP_ID and SECRET_KEY:

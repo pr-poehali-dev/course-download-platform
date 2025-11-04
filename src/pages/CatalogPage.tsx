@@ -117,16 +117,7 @@ export default function CatalogPage() {
     return 'Общая инженерия';
   };
 
-  const determinePrice = (workType: string, title: string): number => {
-    const wt = workType.toLowerCase();
-    
-    if (/диссертация/.test(wt)) return 3000;
-    if (/дипломная|диплом|вкр|выпускная/.test(wt)) return 1500;
-    if (/курсовая/.test(wt)) return 600;
-    if (/практика|отчет|реферат|контрольная|лабораторная|расчетно-графическая/.test(wt)) return 200;
-    
-    return 600;
-  };
+
 
   const determineRating = (workType: string): number => {
     const wt = workType.toLowerCase();
@@ -272,7 +263,7 @@ export default function CatalogPage() {
               description: work.preview || `Готовая работа по теме "${work.title}". Включает теоретическую часть, практические расчеты и выводы.`,
               composition: determineComposition(workType, work.title),
               universities: extractUniversity(work.title),
-              price: determinePrice(workType, work.title),
+              price: work.price_points || work.price || 600,
               rating: finalRating,
               previewUrl: previewUrls[0] || work.preview_image_url || null,
               previewUrls: previewUrls,

@@ -137,7 +137,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 )
             
             # Создаём запись о покупке с комиссией 15%
-            commission = int(price * 0.15)
+            commission = int(price * 0.10)
             cur.execute(
                 """INSERT INTO t_p63326274_course_download_plat.purchases 
                 (buyer_id, work_id, price_paid, commission) VALUES (%s, %s, %s, %s) RETURNING id""",
@@ -148,12 +148,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # author_id уже получен в work_result выше
             author_id = work_result[1]
             
-            # Если есть автор, начисляем ему 85% (price - 15% комиссии)
+            # Если есть автор, начисляем ему 90% (price - 10% комиссии)
             if author_id:
-                author_share = int(price * 0.85)
-                platform_fee = int(price * 0.15)
+                author_share = int(price * 0.90)
+                platform_fee = int(price * 0.10)
                 
-                # Начисляем автору 85% от цены работы
+                # Начисляем автору 90% от цены работы
                 cur.execute(
                     "UPDATE t_p63326274_course_download_plat.users SET balance = balance + %s WHERE id = %s",
                     (author_share, author_id)

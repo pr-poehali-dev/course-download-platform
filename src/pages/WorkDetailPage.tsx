@@ -183,16 +183,7 @@ export default function WorkDetailPage() {
     }
   };
 
-  const determinePrice = (workType: string, title: string): number => {
-    const wt = workType.toLowerCase();
-    
-    if (/диссертация/.test(wt)) return 3000;
-    if (/дипломная|диплом|вкр|выпускная/.test(wt)) return 1500;
-    if (/курсовая/.test(wt)) return 600;
-    if (/практика|отчет|реферат|контрольная|лабораторная|расчетно-графическая/.test(wt)) return 200;
-    
-    return 600;
-  };
+
 
   const determineRating = (workType: string): number => {
     const wt = workType.toLowerCase();
@@ -284,7 +275,7 @@ export default function WorkDetailPage() {
           const title = data.title;
           const workType = data.work_type || 'Техническая работа';
           const subject = data.subject || determineSubject(title);
-          const price = determinePrice(workType, title);
+          const price = data.price_points || data.price || 600;
           const rating = parseFloat(data.rating) || determineRating(workType);
           const universities = data.universities || extractUniversity(title);
           const universitiesList = determineUniversities(subject);
@@ -791,11 +782,14 @@ export default function WorkDetailPage() {
             <div className="bg-card rounded-lg md:rounded-xl p-4 md:p-6 lg:sticky lg:top-20 border-2 border-border shadow-sm hover:shadow-md transition-shadow">
               <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
                 <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
-                <div className="flex items-baseline justify-center gap-1.5">
-                  <span className="text-3xl md:text-4xl font-extrabold text-primary">
-                    {work.price.toLocaleString()}
-                  </span>
-                  <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
+                <div className="flex flex-col items-center gap-0.5">
+                  <div className="flex items-baseline justify-center gap-1.5">
+                    <span className="text-3xl md:text-4xl font-extrabold text-primary">
+                      {work.price.toLocaleString()}
+                    </span>
+                    <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
+                  </div>
+                  <span className="text-xs md:text-sm text-gray-500">≈ {(work.price * 5).toLocaleString()}₽</span>
                 </div>
               </div>
 

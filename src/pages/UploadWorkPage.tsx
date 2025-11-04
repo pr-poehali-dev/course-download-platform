@@ -280,7 +280,7 @@ export default function UploadWorkPage() {
               </div>
               <div className="flex gap-2">
                 <Icon name="CheckCircle2" size={16} className="text-green-600 mt-0.5" />
-                <p>После модерации вы получите 85% от каждой продажи</p>
+                <p>После модерации вы получите 90% от каждой продажи (комиссия платформы 10%)</p>
               </div>
             </CardContent>
           </Card>

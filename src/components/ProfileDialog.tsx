@@ -3,11 +3,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ProfileDialogProps {
   open: boolean;
@@ -18,14 +20,9 @@ interface ProfileDialogProps {
   onLogout: () => void;
   purchases: any[];
   onOpenReferral: () => void;
+  userId: number | null;
+  onBalanceUpdate: (newBalance: number) => void;
 }
-
-
-
-const MOCK_UPLOADS = [
-  { id: 1, title: 'Проектирование базы данных', downloads: 45, earned: 675 },
-  { id: 2, title: 'Курсовая по менеджменту', downloads: 23, earned: 345 },
-];
 
 export default function ProfileDialog({ 
   open, 
@@ -35,10 +32,141 @@ export default function ProfileDialog({
   balance,
   onLogout,
   purchases,
-  onOpenReferral
+  onOpenReferral,
+  userId,
+  onBalanceUpdate
 }: ProfileDialogProps) {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ username, email });
+  const [uploadForm, setUploadForm] = useState({
+    title: '',
+    workType: '',
+    price: '',
+    subject: '',
+    description: '',
+    file: null as File | null
+  });
+  const [uploadLoading, setUploadLoading] = useState(false);
+  const [userWorks, setUserWorks] = useState<any[]>([]);
+  const [worksLoading, setWorksLoading] = useState(false);
+
+  useEffect(() => {
+    if (open && userId) {
+      loadUserWorks();
+    }
+  }, [open, userId]);
+
+  const loadUserWorks = async () => {
+    if (!userId) return;
+    
+    setWorksLoading(true);
+    try {
+      const response = await fetch(`https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0/user/${userId}`, {
+        headers: { 'X-User-Id': userId.toString() }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUserWorks(data.works || []);
+      }
+    } catch (error) {
+      console.error('Error loading user works:', error);
+    } finally {
+      setWorksLoading(false);
+    }
+  };
+
+  const handleUploadWork = async () => {
+    if (!userId) return;
+    
+    if (!email) {
+      toast({
+        title: 'Требуется подтверждение почты',
+        description: 'Подтвердите email для загрузки работ',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    setUploadLoading(true);
+    
+    try {
+      const reader = new FileReader();
+      reader.readAsDataURL(uploadForm.file!);
+      
+      reader.onload = async () => {
+        const base64Data = reader.result as string;
+        
+        const uploadData = {
+          title: uploadForm.title,
+          workType: uploadForm.workType,
+          subject: uploadForm.subject,
+          description: uploadForm.description,
+          price: parseInt(uploadForm.price),
+          fileName: uploadForm.file!.name,
+          fileSize: uploadForm.file!.size,
+          fileData: base64Data
+        };
+        
+        const response = await fetch('https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId.toString()
+          },
+          body: JSON.stringify(uploadData)
+        });
+        
+        const result = await response.json();
+        
+        setUploadLoading(false);
+        
+        if (response.ok && result.success) {
+          if (result.newBalance) {
+            onBalanceUpdate(result.newBalance);
+          }
+          
+          toast({
+            title: 'Работа загружена!',
+            description: `${result.message}. Начислено +${result.bonusEarned} баллов!`
+          });
+          
+          setUploadForm({
+            title: '',
+            workType: '',
+            price: '',
+            subject: '',
+            description: '',
+            file: null
+          });
+          
+          loadUserWorks();
+        } else {
+          toast({
+            title: 'Ошибка загрузки',
+            description: result.error || 'Не удалось загрузить работу',
+            variant: 'destructive'
+          });
+        }
+      };
+      
+      reader.onerror = () => {
+        setUploadLoading(false);
+        toast({
+          title: 'Ошибка чтения файла',
+          description: 'Не удалось прочитать файл',
+          variant: 'destructive'
+        });
+      };
+    } catch (error) {
+      setUploadLoading(false);
+      toast({
+        title: 'Ошибка',
+        description: 'Произошла ошибка при загрузке',
+        variant: 'destructive'
+      });
+    }
+  };
 
   const handleSaveProfile = () => {
     toast({
@@ -55,6 +183,17 @@ export default function ProfileDialog({
       title: 'Вы вышли из системы',
       description: 'До скорой встречи!',
     });
+  };
+
+  const getStatusBadge = (status: string) => {
+    const statusMap: {[key: string]: {label: string, variant: any}} = {
+      'pending': { label: 'На модерации', variant: 'secondary' },
+      'approved': { label: 'Одобрено', variant: 'default' },
+      'rejected': { label: 'Отклонено', variant: 'destructive' }
+    };
+    
+    const statusInfo = statusMap[status] || statusMap['pending'];
+    return <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>;
   };
 
   return (
@@ -229,51 +368,234 @@ export default function ProfileDialog({
             </div>
           </TabsContent>
 
-          <TabsContent value="uploads" className="pt-4">
+          <TabsContent value="uploads" className="pt-4 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Загрузить новую работу</CardTitle>
+                <CardDescription>
+                  {email ? 'Поделись своей работой и получай баллы за каждое скачивание' : 'Подтвердите email для загрузки работ'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="upload-title">Название работы <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="upload-title"
+                    placeholder="Анализ рынка недвижимости..." 
+                    value={uploadForm.title}
+                    onChange={(e) => setUploadForm({...uploadForm, title: e.target.value})}
+                    disabled={!email}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="upload-type">Тип работы <span className="text-red-500">*</span></Label>
+                    <Select 
+                      value={uploadForm.workType}
+                      onValueChange={(value) => {
+                        const prices: {[key: string]: string} = {
+                          'coursework': '600',
+                          'diploma': '1500',
+                          'dissertation': '3000',
+                          'practice': '200',
+                          'report': '200',
+                          'referat': '200',
+                          'control': '200',
+                          'lab': '200'
+                        };
+                        setUploadForm({...uploadForm, workType: value, price: prices[value] || '600'});
+                      }}
+                      disabled={!email}
+                    >
+                      <SelectTrigger id="upload-type">
+                        <SelectValue placeholder="Выберите тип" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="coursework">Курсовая работа (600₽)</SelectItem>
+                        <SelectItem value="diploma">Дипломная работа (1500₽)</SelectItem>
+                        <SelectItem value="dissertation">Диссертация (3000₽)</SelectItem>
+                        <SelectItem value="practice">Отчёт по практике (200₽)</SelectItem>
+                        <SelectItem value="report">Отчёт (200₽)</SelectItem>
+                        <SelectItem value="referat">Реферат (200₽)</SelectItem>
+                        <SelectItem value="control">Контрольная работа (200₽)</SelectItem>
+                        <SelectItem value="lab">Лабораторная работа (200₽)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="upload-price">Цена в баллах <span className="text-red-500">*</span></Label>
+                    <Input 
+                      id="upload-price"
+                      type="number" 
+                      placeholder="600"
+                      value={uploadForm.price}
+                      onChange={(e) => setUploadForm({...uploadForm, price: e.target.value})}
+                      disabled={!email}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="upload-subject">Предмет <span className="text-red-500">*</span></Label>
+                  <Input 
+                    id="upload-subject"
+                    placeholder="Маркетинг"
+                    value={uploadForm.subject}
+                    onChange={(e) => setUploadForm({...uploadForm, subject: e.target.value})}
+                    disabled={!email}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="upload-description">Описание <span className="text-red-500">*</span></Label>
+                  <Textarea 
+                    id="upload-description"
+                    placeholder="Краткое описание работы, что включено..."
+                    rows={4}
+                    value={uploadForm.description}
+                    onChange={(e) => setUploadForm({...uploadForm, description: e.target.value})}
+                    disabled={!email}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="upload-file">Файл работы <span className="text-red-500">*</span></Label>
+                  <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                    <input
+                      id="upload-file"
+                      type="file"
+                      className="hidden"
+                      accept=".pdf,.doc,.docx,.dwg,.xls,.xlsx"
+                      disabled={!email}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 50 * 1024 * 1024) {
+                            toast({
+                              title: 'Файл слишком большой',
+                              description: 'Максимальный размер 50 МБ',
+                              variant: 'destructive'
+                            });
+                            return;
+                          }
+                          setUploadForm({...uploadForm, file});
+                        }
+                      }}
+                    />
+                    <label htmlFor="upload-file" className="cursor-pointer">
+                      {uploadForm.file ? (
+                        <>
+                          <Icon name="FileCheck" size={32} className="mx-auto text-green-600 mb-2" />
+                          <p className="text-sm font-medium text-foreground">
+                            {uploadForm.file.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {(uploadForm.file.size / 1024 / 1024).toFixed(2)} МБ
+                          </p>
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="Upload" size={32} className="mx-auto text-muted-foreground mb-2" />
+                          <p className="text-sm text-muted-foreground">
+                            Перетащите файл сюда или нажмите для выбора
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-2">
+                            PDF, DOC, DOCX, DWG до 50 МБ
+                          </p>
+                        </>
+                      )}
+                    </label>
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  disabled={!email || uploadLoading || !uploadForm.title || !uploadForm.workType || !uploadForm.price || !uploadForm.subject || !uploadForm.description || !uploadForm.file}
+                  onClick={handleUploadWork}
+                >
+                  {uploadLoading ? (
+                    <>
+                      <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                      Загрузка...
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="Upload" size={18} className="mr-2" />
+                      Загрузить работу
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </Card>
+
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Загруженные работы</h3>
-                <Badge variant="secondary">{MOCK_UPLOADS.length} работ</Badge>
+                <h3 className="text-lg font-semibold">Мои загруженные работы</h3>
+                <Badge variant="secondary">{userWorks.length} работ</Badge>
               </div>
 
-              {MOCK_UPLOADS.map((upload) => (
-                <Card key={upload.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <CardTitle className="text-base">{upload.title}</CardTitle>
-                        <CardDescription className="flex items-center gap-4 mt-2">
-                          <span className="flex items-center gap-1">
-                            <Icon name="Download" size={14} />
-                            {upload.downloads} скачиваний
-                          </span>
-                          <span className="flex items-center gap-1 text-green-600">
-                            <Icon name="TrendingUp" size={14} />
-                            Заработано: {upload.earned} баллов
-                          </span>
-                        </CardDescription>
+              {worksLoading ? (
+                <div className="text-center py-12">
+                  <Icon name="Loader2" size={48} className="mx-auto text-muted-foreground mb-4 animate-spin" />
+                  <p className="text-muted-foreground">Загрузка...</p>
+                </div>
+              ) : userWorks.length > 0 ? (
+                userWorks.map((work) => (
+                  <Card key={work.id}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <CardTitle className="text-base">{work.title}</CardTitle>
+                            {getStatusBadge(work.moderation_status)}
+                          </div>
+                          <CardDescription className="space-y-1">
+                            <div className="flex items-center gap-4 flex-wrap">
+                              <span className="flex items-center gap-1">
+                                <Icon name="BookOpen" size={14} />
+                                {work.work_type}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Icon name="GraduationCap" size={14} />
+                                {work.subject}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <Icon name="Coins" size={14} />
+                                {work.price_points} баллов
+                              </span>
+                            </div>
+                            {work.moderation_status === 'approved' && (
+                              <div className="flex items-center gap-4 mt-2">
+                                <span className="flex items-center gap-1 text-green-600">
+                                  <Icon name="Download" size={14} />
+                                  {work.downloads_count || 0} скачиваний
+                                </span>
+                                <span className="flex items-center gap-1 text-green-600">
+                                  <Icon name="TrendingUp" size={14} />
+                                  Заработано: {work.earnings_total || 0} баллов
+                                </span>
+                              </div>
+                            )}
+                            {work.moderation_comment && work.moderation_status === 'rejected' && (
+                              <p className="text-red-600 text-sm mt-2">
+                                <Icon name="AlertCircle" size={14} className="inline mr-1" />
+                                {work.moderation_comment}
+                              </p>
+                            )}
+                          </CardDescription>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button size="sm" variant="outline">
-                          <Icon name="Edit" size={14} />
-                        </Button>
-                        <Button size="sm" variant="outline">
-                          <Icon name="Trash2" size={14} />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              ))}
-
-              {MOCK_UPLOADS.length === 0 && (
+                    </CardHeader>
+                  </Card>
+                ))
+              ) : (
                 <div className="text-center py-12">
                   <Icon name="FileUp" size={48} className="mx-auto text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground mb-4">Вы ещё не загружали работы</p>
-                  <Button>
-                    <Icon name="Upload" size={16} className="mr-2" />
-                    Загрузить первую работу
-                  </Button>
+                  <p className="text-muted-foreground">Загрузите свою первую работу выше</p>
                 </div>
               )}
             </div>

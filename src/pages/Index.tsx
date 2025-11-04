@@ -648,11 +648,32 @@ export default function Index() {
                     <Icon name="Check" size={16} className="text-green-600" />
                     <span>Обмен знаниями</span>
                   </div>
-                  <Button className="w-full mt-4" variant="outline" asChild>
-                    <a href="/marketplace">
-                      <Icon name="Upload" size={16} className="mr-2" />
-                      Загрузить работу
-                    </a>
+                  <Button 
+                    className="w-full mt-4" 
+                    variant="outline"
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        toast({
+                          title: 'Требуется авторизация',
+                          description: 'Войдите в аккаунт для загрузки работ',
+                          variant: 'destructive'
+                        });
+                        setAuthDialogOpen(true);
+                        return;
+                      }
+                      if (!currentUser?.email) {
+                        toast({
+                          title: 'Требуется подтверждение почты',
+                          description: 'Подтвердите почту для загрузки работ',
+                          variant: 'destructive'
+                        });
+                        return;
+                      }
+                      setProfileDialogOpen(true);
+                    }}
+                  >
+                    <Icon name="Upload" size={16} className="mr-2" />
+                    Загрузить работу
                   </Button>
                 </CardContent>
               </Card>
@@ -912,11 +933,11 @@ export default function Index() {
 
         <section className="py-20 bg-slate-50">
           <div className="container mx-auto px-4">
-            <Tabs defaultValue="upload" className="w-full">
+            <Tabs defaultValue="catalog" className="w-full">
               <TabsList className="grid w-full max-w-md mx-auto grid-cols-1 mb-8">
-                <TabsTrigger value="upload">
-                  <Icon name="Upload" size={18} className="mr-2" />
-                  Загрузить работу
+                <TabsTrigger value="catalog">
+                  <Icon name="BookOpen" size={18} className="mr-2" />
+                  Каталог работ
                 </TabsTrigger>
               </TabsList>
 
@@ -1092,7 +1113,7 @@ export default function Index() {
                 )}
               </TabsContent>
 
-              <TabsContent value="upload">
+              <TabsContent value="catalog-removed">
                 <Card className="max-w-2xl mx-auto">
                   <CardHeader>
                     <CardTitle>Загрузить свою работу</CardTitle>
@@ -1651,6 +1672,12 @@ export default function Index() {
         onLogout={handleLogout}
         purchases={purchases}
         onOpenReferral={() => setReferralDialogOpen(true)}
+        userId={currentUser?.id || null}
+        onBalanceUpdate={(newBalance) => {
+          if (currentUser) {
+            setCurrentUser({ ...currentUser, balance: newBalance });
+          }
+        }}
       />
 
       <PaymentDialog

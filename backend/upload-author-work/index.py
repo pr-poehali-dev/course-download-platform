@@ -1,38 +1,320 @@
 import json
 import psycopg2
 import os
-import base64
+import requests
 from datetime import datetime
 from typing import Dict, Any
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: Upload author work with file to database and moderation
-    Args: event with body (title, description, work_type, subject, price, fileName, fileSize, fileData), headers with X-User-Id
-    Returns: Work ID, status and new balance with bonus
+    Business: Upload author works, get user/pending works, moderate works
+    Args: event with httpMethod POST/GET, url path, body, headers with X-User-Id or X-Admin
+    Returns: Upload result, works list, or moderation result with email notification
     '''
-    method: str = event.get('httpMethod', 'POST')
+    method: str = event.get('httpMethod', 'GET')
+    url: str = event.get('url', '')
+    query_params = event.get('queryStringParameters', {}) or {}
     
     if method == 'OPTIONS':
         return {
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id, X-Admin',
                 'Access-Control-Max-Age': '86400'
             },
             'body': ''
         }
     
+    headers = event.get('headers', {})
+    dsn = os.environ.get('DATABASE_URL')
+    
+    if not dsn:
+        return {
+            'statusCode': 500,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Database not configured'})
+        }
+    
+    if method == 'GET':
+        if 'user' in url or query_params.get('user_id'):
+            user_id = query_params.get('user_id') or headers.get('X-User-Id') or headers.get('x-user-id')
+            
+            if not user_id:
+                return {
+                    'statusCode': 401,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'Требуется авторизация'})
+                }
+            
+            try:
+                conn = psycopg2.connect(dsn)
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    SELECT id, title, work_type, subject, description, price_points,
+                           file_name, file_size, moderation_status, moderation_comment,
+                           downloads_count, earnings_total, created_at
+                    FROM t_p63326274_course_download_plat.uploaded_works
+                    WHERE user_id = %s
+                    ORDER BY created_at DESC
+                ''', (int(user_id),))
+                
+                rows = cursor.fetchall()
+                works = []
+                for row in rows:
+                    works.append({
+                        'id': row[0],
+                        'title': row[1],
+                        'work_type': row[2],
+                        'subject': row[3],
+                        'description': row[4],
+                        'price_points': row[5],
+                        'file_name': row[6],
+                        'file_size': row[7],
+                        'moderation_status': row[8],
+                        'moderation_comment': row[9],
+                        'downloads_count': row[10] or 0,
+                        'earnings_total': row[11] or 0,
+                        'created_at': row[12].isoformat() if row[12] else None
+                    })
+                
+                cursor.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'works': works})
+                }
+            except Exception as e:
+                return {
+                    'statusCode': 500,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': f'Ошибка загрузки: {str(e)}'})
+                }
+        
+        elif 'pending' in url:
+            try:
+                conn = psycopg2.connect(dsn)
+                cursor = conn.cursor()
+                
+                cursor.execute('''
+                    SELECT id, user_id, title, work_type, subject, description, price_points,
+                           file_name, file_size, moderation_status, created_at
+                    FROM t_p63326274_course_download_plat.uploaded_works
+                    WHERE moderation_status = %s
+                    ORDER BY created_at ASC
+                ''', ('pending',))
+                
+                rows = cursor.fetchall()
+                works = []
+                for row in rows:
+                    works.append({
+                        'id': row[0],
+                        'user_id': row[1],
+                        'title': row[2],
+                        'work_type': row[3],
+                        'subject': row[4],
+                        'description': row[5],
+                        'price_points': row[6],
+                        'file_name': row[7],
+                        'file_size': row[8],
+                        'moderation_status': row[9],
+                        'created_at': row[10].isoformat() if row[10] else None
+                    })
+                
+                cursor.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'works': works})
+                }
+            except Exception as e:
+                return {
+                    'statusCode': 500,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': f'Ошибка загрузки: {str(e)}'})
+                }
+        
+        return {
+            'statusCode': 404,
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+            'body': json.dumps({'error': 'Not found'})
+        }
+    
     if method != 'POST':
         return {
             'statusCode': 405,
-            'headers': {'Content-Type': 'application/json'},
+            'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
             'body': json.dumps({'error': 'Method not allowed'})
         }
     
-    headers = event.get('headers', {})
+    body_data = json.loads(event.get('body', '{}'))
+    
+    if 'moderate' in url:
+        work_id = body_data.get('workId')
+        action = body_data.get('action')
+        comment = body_data.get('comment', '')
+        
+        if not work_id or not action:
+            return {
+                'statusCode': 400,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'workId и action обязательны'})
+            }
+        
+        try:
+            conn = psycopg2.connect(dsn)
+            cursor = conn.cursor()
+            
+            if action == 'approve':
+                cursor.execute('''
+                    UPDATE t_p63326274_course_download_plat.uploaded_works
+                    SET moderation_status = %s, moderated_at = %s, published_at = %s
+                    WHERE id = %s
+                    RETURNING user_id, title, work_type, subject, description, price_points, file_url
+                ''', ('approved', datetime.now(), datetime.now(), int(work_id)))
+                
+                result = cursor.fetchone()
+                if not result:
+                    cursor.close()
+                    conn.close()
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'Работа не найдена'})
+                    }
+                
+                user_id, title, work_type, subject, description, price_points, file_url = result
+                
+                cursor.execute('''
+                    INSERT INTO t_p63326274_course_download_plat.works
+                    (title, work_type, subject, description, price_points, author_id, file_url, status, rating, downloads, views_count)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id
+                ''', (title, work_type, subject, description, price_points, user_id, file_url or '', 'active', 0, 0, 0))
+                
+                published_work_id = cursor.fetchone()[0]
+                
+                conn.commit()
+                cursor.close()
+                conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({
+                        'success': True,
+                        'publishedWorkId': published_work_id,
+                        'message': 'Работа одобрена и опубликована'
+                    })
+                }
+            
+            elif action == 'reject':
+                cursor.execute('''
+                    UPDATE t_p63326274_course_download_plat.uploaded_works
+                    SET moderation_status = %s, moderation_comment = %s, moderated_at = %s
+                    WHERE id = %s
+                    RETURNING user_id, title
+                ''', ('rejected', comment, datetime.now(), int(work_id)))
+                
+                result = cursor.fetchone()
+                if not result:
+                    cursor.close()
+                    conn.close()
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                        'body': json.dumps({'error': 'Работа не найдена'})
+                    }
+                
+                user_id, work_title = result
+                
+                cursor.execute('''
+                    SELECT email FROM t_p63326274_course_download_plat.users WHERE id = %s
+                ''', (user_id,))
+                
+                email_result = cursor.fetchone()
+                user_email = email_result[0] if email_result else None
+                
+                conn.commit()
+                cursor.close()
+                conn.close()
+                
+                email_sent = False
+                if user_email:
+                    try:
+                        smtp_user = os.environ.get('SMTP_USER', '')
+                        smtp_pass = os.environ.get('SMTP_PASS', '')
+                        
+                        if smtp_user and smtp_pass:
+                            import smtplib
+                            from email.mime.text import MIMEText
+                            from email.mime.multipart import MIMEMultipart
+                            
+                            msg = MIMEMultipart('alternative')
+                            msg['Subject'] = f'Ваша работа "{work_title}" отклонена модератором'
+                            msg['From'] = smtp_user
+                            msg['To'] = user_email
+                            
+                            html = f'''
+                            <html>
+                            <body style="font-family: Arial, sans-serif;">
+                                <h2>Работа не прошла модерацию</h2>
+                                <p>К сожалению, ваша работа "<strong>{work_title}</strong>" была отклонена модератором.</p>
+                                <h3>Причина отклонения:</h3>
+                                <p style="background: #f5f5f5; padding: 15px; border-left: 4px solid #e53e3e;">
+                                    {comment}
+                                </p>
+                                <p>Вы можете внести исправления и загрузить работу заново через ваш личный кабинет.</p>
+                                <p>С уважением,<br>Команда TechForma</p>
+                            </body>
+                            </html>
+                            '''
+                            
+                            msg.attach(MIMEText(html, 'html'))
+                            
+                            server = smtplib.SMTP_SSL('smtp.yandex.ru', 465)
+                            server.login(smtp_user, smtp_pass)
+                            server.send_message(msg)
+                            server.quit()
+                            
+                            email_sent = True
+                    except Exception as email_error:
+                        print(f'Email error: {email_error}')
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                    'body': json.dumps({
+                        'success': True,
+                        'userEmail': user_email,
+                        'workTitle': work_title,
+                        'rejectionComment': comment,
+                        'emailSent': email_sent,
+                        'message': 'Работа отклонена' + (' и отправлено уведомление на email' if email_sent else '')
+                    })
+                }
+            
+            cursor.close()
+            conn.close()
+            return {
+                'statusCode': 400,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'Неизвестное действие'})
+            }
+            
+        except Exception as e:
+            return {
+                'statusCode': 500,
+                'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': f'Ошибка модерации: {str(e)}'})
+            }
+    
     user_id = headers.get('X-User-Id') or headers.get('x-user-id')
     
     if not user_id:
@@ -41,8 +323,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
             'body': json.dumps({'error': 'Требуется авторизация'})
         }
-    
-    body_data = json.loads(event.get('body', '{}'))
     
     title = body_data.get('title', '').strip()
     description = body_data.get('description', '').strip()
@@ -65,14 +345,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 400,
             'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
             'body': json.dumps({'error': 'Файл не загружен'})
-        }
-    
-    dsn = os.environ.get('DATABASE_URL')
-    if not dsn:
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'Database configuration missing'})
         }
     
     try:

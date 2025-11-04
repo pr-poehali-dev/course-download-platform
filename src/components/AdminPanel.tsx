@@ -17,6 +17,7 @@ import PreviewGenerator from '@/components/PreviewGenerator';
 import SupportAdmin from '@/components/SupportAdmin';
 import ArchiveImagesChecker from '@/components/ArchiveImagesChecker';
 import MultiPreviewExtractor from '@/components/MultiPreviewExtractor';
+import ModerationPanel from '@/components/ModerationPanel';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import func2url from '../../backend/func2url.json';
 
@@ -198,6 +199,10 @@ export default function AdminPanel() {
             <Icon name="BarChart3" size={18} className="mr-2" />
             Аналитика
           </TabsTrigger>
+          <TabsTrigger value="moderation">
+            <Icon name="CheckCircle" size={18} className="mr-2" />
+            Модерация
+          </TabsTrigger>
           <TabsTrigger value="works">
             <Icon name="FileText" size={18} className="mr-2" />
             Работы
@@ -222,6 +227,10 @@ export default function AdminPanel() {
 
         <TabsContent value="analytics" className="space-y-6">
           <AnalyticsDashboard />
+        </TabsContent>
+
+        <TabsContent value="moderation" className="space-y-6">
+          <ModerationPanel />
         </TabsContent>
 
         <TabsContent value="works" className="space-y-6">

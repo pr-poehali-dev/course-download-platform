@@ -17,7 +17,6 @@ import AuthDialog from '@/components/AuthDialog';
 import ProfileDialog from '@/components/ProfileDialog';
 import SupportPage from '@/components/SupportPage';
 import AdminPanel from '@/components/AdminPanel';
-import TermsAcceptanceDialog from '@/components/TermsAcceptanceDialog';
 import PaymentDialog from '@/components/PaymentDialog';
 import CartDialog from '@/components/CartDialog';
 import FavoritesDialog from '@/components/FavoritesDialog';
@@ -40,14 +39,14 @@ export default function Index() {
   const email = currentUser?.email || '';
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [profileDialogOpen, setProfileDialogOpen] = useState(false);
-  const [termsDialogOpen, setTermsDialogOpen] = useState(false);
+
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
   const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false);
   const [promoDialogOpen, setPromoDialogOpen] = useState(false);
   const [referralDialogOpen, setReferralDialogOpen] = useState(false);
   const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
-  const [pendingUser, setPendingUser] = useState({ username: '', email: '', password: '' });
+
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<any[]>([]);
   const [purchases, setPurchases] = useState<any[]>([]);
@@ -114,22 +113,11 @@ export default function Index() {
     loadUserData();
   }, [currentUser]);
 
-  const handleShowTerms = (user: string, userEmail: string, password: string) => {
-    setPendingUser({ username: user, email: userEmail, password });
-    setTermsDialogOpen(true);
-  };
-
-  const handleAcceptTerms = async () => {
+  const handleRegister = async (username: string, email: string, password: string) => {
     try {
-      const data = await authService.register(
-        pendingUser.username,
-        pendingUser.email,
-        (pendingUser as any).password
-      );
+      const data = await authService.register(username, email, password);
       setCurrentUser(data.user);
-      setTermsDialogOpen(false);
       setAuthDialogOpen(false);
-      setPendingUser({ username: '', email: '', password: '' });
       toast({
         title: 'Регистрация успешна!',
         description: `Добро пожаловать, ${data.user.username}! Вам начислено 100 баллов.`,
@@ -1696,12 +1684,7 @@ export default function Index() {
         open={authDialogOpen} 
         onOpenChange={setAuthDialogOpen}
         onLogin={handleLogin}
-        onShowTerms={(user, email) => handleShowTerms(user, email)}
-      />
-
-      <TermsAcceptanceDialog
-        open={termsDialogOpen}
-        onAccept={handleAcceptTerms}
+        onRegister={handleRegister}
       />
 
       <ProfileDialog

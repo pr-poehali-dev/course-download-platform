@@ -11,10 +11,10 @@ interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onLogin: (username: string, password: string) => void;
-  onShowTerms?: (username: string, email: string, password: string) => void;
+  onRegister: (username: string, email: string, password: string) => void;
 }
 
-export default function AuthDialog({ open, onOpenChange, onLogin, onShowTerms }: AuthDialogProps) {
+export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: AuthDialogProps) {
   const [isResetMode, setIsResetMode] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   
@@ -81,9 +81,7 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onShowTerms }:
       return;
     }
 
-    if (onShowTerms) {
-      onShowTerms(registerData.username, registerData.email, registerData.password);
-    }
+    onRegister(registerData.username, registerData.email, registerData.password);
   };
 
   const handleResetPassword = (e: React.FormEvent) => {

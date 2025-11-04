@@ -1342,7 +1342,7 @@ export default function Index() {
                   </div>
 
                   <div className="bg-white rounded-lg p-4 mb-3 border">
-                    <p className="font-semibold text-foreground mb-2">📊 Рекомендованные цены:</p>
+                    <p className="font-semibold text-foreground mb-2">📊 Стандартные цены:</p>
                     <ul className="space-y-1.5 text-sm text-muted-foreground">
                       <li className="flex justify-between items-center">
                         <span>Курсовая работа</span>
@@ -1350,15 +1350,11 @@ export default function Index() {
                       </li>
                       <li className="flex justify-between items-center">
                         <span>Дипломная работа</span>
-                        <span className="font-bold text-primary">1000-1500 баллов</span>
+                        <span className="font-bold text-primary">1500 баллов</span>
                       </li>
                       <li className="flex justify-between items-center">
-                        <span>Практическая работа</span>
-                        <span className="font-bold text-primary">200-400 баллов</span>
-                      </li>
-                      <li className="flex justify-between items-center">
-                        <span>Чертёж</span>
-                        <span className="font-bold text-primary">150-300 баллов</span>
+                        <span>Отчёт, практика, реферат</span>
+                        <span className="font-bold text-primary">200 баллов</span>
                       </li>
                     </ul>
                   </div>

@@ -10,6 +10,7 @@ import PreviewCarousel from '@/components/PreviewCarousel';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import TrustRating from '@/components/TrustRating';
 
 interface Work {
   id: string;
@@ -470,11 +471,14 @@ export default function CatalogPage() {
                   </div>
 
                   <div className="p-4 md:p-5">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-1">
-                        <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
-                        <span className="text-sm font-bold text-gray-700">{work.rating.toFixed(1)}</span>
-                      </div>
+                    <div className="flex items-center justify-between mb-3">
+                      <TrustRating 
+                        rating={work.rating}
+                        purchaseCount={work.purchaseCount}
+                        isHit={work.isHit}
+                        isNew={work.isNew}
+                        compact
+                      />
                       <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
                         {work.workType}
                       </Badge>

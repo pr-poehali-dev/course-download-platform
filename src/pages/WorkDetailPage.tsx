@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
+import TrustRating from '@/components/TrustRating';
 
 interface Work {
   id: string;
@@ -603,20 +604,24 @@ export default function WorkDetailPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-3 md:mb-4">
-              <Badge className="bg-gray-100 text-gray-700 text-[10px] md:text-xs font-medium px-2 md:px-3 py-1 rounded-sm border-0">
+            <div className="mb-6">
+              <Badge className="bg-gray-100 text-gray-700 text-[10px] md:text-xs font-medium px-2 md:px-3 py-1 rounded-sm border-0 mb-3">
                 {work.workType}
               </Badge>
-              <div className="flex items-center gap-1.5">
-                <Icon name="Star" size={16} className="text-yellow-500 fill-yellow-500" />
-                <span className="text-base md:text-lg font-bold text-gray-800">{work.rating}</span>
-                <span className="text-xs md:text-sm text-gray-500">/5.0</span>
+              
+              <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
+              </h1>
+
+              <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
+                <TrustRating 
+                  rating={work.rating}
+                  purchaseCount={0}
+                  isHit={false}
+                  isNew={false}
+                />
               </div>
             </div>
-
-            <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
-              {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
-            </h1>
 
             <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
               {gallery.length > 0 ? (

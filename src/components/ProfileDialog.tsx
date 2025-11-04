@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import { useState, useEffect } from 'react';
+import SupportTab from '@/components/profile/SupportTab';
 
 interface ProfileDialogProps {
   open: boolean;
@@ -207,7 +208,7 @@ export default function ProfileDialog({
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="profile">
               <Icon name="UserCircle" size={16} className="mr-2" />
               Профиль
@@ -223,6 +224,10 @@ export default function ProfileDialog({
             <TabsTrigger value="referral">
               <Icon name="Users" size={16} className="mr-2" />
               Рефералы
+            </TabsTrigger>
+            <TabsTrigger value="support">
+              <Icon name="HelpCircle" size={16} className="mr-2" />
+              Поддержка
             </TabsTrigger>
           </TabsList>
 
@@ -617,6 +622,10 @@ export default function ProfileDialog({
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="support">
+            <SupportTab userEmail={email} />
           </TabsContent>
         </Tabs>
       </DialogContent>

@@ -59,6 +59,15 @@ export default function Index() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [realWorks, setRealWorks] = useState<any[]>([]);
   const [worksLoading, setWorksLoading] = useState(true);
+  const [uploadForm, setUploadForm] = useState({
+    title: '',
+    workType: '',
+    price: '',
+    subject: '',
+    description: '',
+    file: null as File | null
+  });
+  const [uploadLoading, setUploadLoading] = useState(false);
   
   const userBalance = currentUser?.balance || 0;
   const availableWorks = realWorks.filter(work => (work.price_points || work.price || 0) <= userBalance).length;
@@ -1093,65 +1102,178 @@ export default function Index() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="work-title">Название работы</Label>
-                      <Input id="work-title" placeholder="Анализ рынка недвижимости..." />
+                      <Label htmlFor="work-title">Название работы <span className="text-red-500">*</span></Label>
+                      <Input 
+                        id="work-title" 
+                        placeholder="Анализ рынка недвижимости..." 
+                        value={uploadForm.title}
+                        onChange={(e) => setUploadForm({...uploadForm, title: e.target.value})}
+                      />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="work-type">Тип работы</Label>
-                        <Select>
+                        <Label htmlFor="work-type">Тип работы <span className="text-red-500">*</span></Label>
+                        <Select 
+                          value={uploadForm.workType}
+                          onValueChange={(value) => {
+                            const prices: {[key: string]: string} = {
+                              'coursework': '600',
+                              'diploma': '1500',
+                              'dissertation': '3000',
+                              'practice': '200',
+                              'report': '200',
+                              'referat': '200',
+                              'control': '200',
+                              'lab': '200'
+                            };
+                            setUploadForm({...uploadForm, workType: value, price: prices[value] || '600'});
+                          }}
+                        >
                           <SelectTrigger id="work-type">
                             <SelectValue placeholder="Выберите тип" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="coursework">Курсовая работа</SelectItem>
-                            <SelectItem value="diploma">Дипломная работа</SelectItem>
-                            <SelectItem value="practical">Практическая работа</SelectItem>
-                            <SelectItem value="drawing">Чертеж</SelectItem>
+                            <SelectItem value="coursework">Курсовая работа (600₽)</SelectItem>
+                            <SelectItem value="diploma">Дипломная работа (1500₽)</SelectItem>
+                            <SelectItem value="dissertation">Диссертация (3000₽)</SelectItem>
+                            <SelectItem value="practice">Отчёт по практике (200₽)</SelectItem>
+                            <SelectItem value="report">Отчёт (200₽)</SelectItem>
+                            <SelectItem value="referat">Реферат (200₽)</SelectItem>
+                            <SelectItem value="control">Контрольная работа (200₽)</SelectItem>
+                            <SelectItem value="lab">Лабораторная работа (200₽)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="work-price">Цена в баллах</Label>
-                        <Input id="work-price" type="number" placeholder="150" />
+                        <Label htmlFor="work-price">Цена в баллах <span className="text-red-500">*</span></Label>
+                        <Input 
+                          id="work-price" 
+                          type="number" 
+                          placeholder="600"
+                          value={uploadForm.price}
+                          onChange={(e) => setUploadForm({...uploadForm, price: e.target.value})}
+                        />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="work-subject">Предмет</Label>
-                      <Input id="work-subject" placeholder="Маркетинг" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="work-description">Описание</Label>
-                      <Textarea 
-                        id="work-description" 
-                        placeholder="Краткое описание работы, что включено..."
-                        rows={4}
+                      <Label htmlFor="work-subject">Предмет <span className="text-red-500">*</span></Label>
+                      <Input 
+                        id="work-subject" 
+                        placeholder="Маркетинг"
+                        value={uploadForm.subject}
+                        onChange={(e) => setUploadForm({...uploadForm, subject: e.target.value})}
                       />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="work-file">Файл работы</Label>
+                      <Label htmlFor="work-description">Описание <span className="text-red-500">*</span></Label>
+                      <Textarea 
+                        id="work-description" 
+                        placeholder="Краткое описание работы, что включено..."
+                        rows={4}
+                        value={uploadForm.description}
+                        onChange={(e) => setUploadForm({...uploadForm, description: e.target.value})}
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="work-file">Файл работы <span className="text-red-500">*</span></Label>
                       <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
-                        <Icon name="Upload" size={32} className="mx-auto text-muted-foreground mb-2" />
-                        <p className="text-sm text-muted-foreground">
-                          Перетащите файл сюда или нажмите для выбора
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-2">
-                          PDF, DOC, DOCX, DWG до 50 МБ
-                        </p>
+                        <input
+                          id="work-file"
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.doc,.docx,.dwg,.xls,.xlsx"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              if (file.size > 50 * 1024 * 1024) {
+                                toast({
+                                  title: 'Файл слишком большой',
+                                  description: 'Максимальный размер 50 МБ',
+                                  variant: 'destructive'
+                                });
+                                return;
+                              }
+                              setUploadForm({...uploadForm, file});
+                            }
+                          }}
+                        />
+                        <label htmlFor="work-file" className="cursor-pointer">
+                          {uploadForm.file ? (
+                            <>
+                              <Icon name="FileCheck" size={32} className="mx-auto text-green-600 mb-2" />
+                              <p className="text-sm font-medium text-foreground">
+                                {uploadForm.file.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {(uploadForm.file.size / 1024 / 1024).toFixed(2)} МБ
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <Icon name="Upload" size={32} className="mx-auto text-muted-foreground mb-2" />
+                              <p className="text-sm text-muted-foreground">
+                                Перетащите файл сюда или нажмите для выбора
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-2">
+                                PDF, DOC, DOCX, DWG до 50 МБ
+                              </p>
+                            </>
+                          )}
+                        </label>
                       </div>
                     </div>
 
-
                   </CardContent>
                   <CardFooter>
-                    <Button className="w-full" size="lg">
-                      <Icon name="Upload" size={18} className="mr-2" />
-                      Загрузить работу
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      disabled={uploadLoading || !uploadForm.title || !uploadForm.workType || !uploadForm.price || !uploadForm.subject || !uploadForm.description || !uploadForm.file}
+                      onClick={async () => {
+                        if (!isLoggedIn) {
+                          toast({
+                            title: 'Требуется авторизация',
+                            description: 'Войдите в аккаунт для загрузки работ',
+                            variant: 'destructive'
+                          });
+                          setAuthDialogOpen(true);
+                          return;
+                        }
+
+                        setUploadLoading(true);
+                        setTimeout(() => {
+                          setUploadLoading(false);
+                          toast({
+                            title: 'Работа загружена!',
+                            description: 'Работа отправлена на модерацию. Вы получите уведомление после проверки.'
+                          });
+                          setUploadForm({
+                            title: '',
+                            workType: '',
+                            price: '',
+                            subject: '',
+                            description: '',
+                            file: null
+                          });
+                        }, 2000);
+                      }}
+                    >
+                      {uploadLoading ? (
+                        <>
+                          <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                          Загрузка...
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="Upload" size={18} className="mr-2" />
+                          Загрузить работу
+                        </>
+                      )}
                     </Button>
                   </CardFooter>
                 </Card>

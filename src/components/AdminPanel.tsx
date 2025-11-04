@@ -18,6 +18,7 @@ import SupportAdmin from '@/components/SupportAdmin';
 import ArchiveImagesChecker from '@/components/ArchiveImagesChecker';
 import MultiPreviewExtractor from '@/components/MultiPreviewExtractor';
 import ModerationPanel from '@/components/ModerationPanel';
+import PlatformFinances from '@/components/PlatformFinances';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import func2url from '../../backend/func2url.json';
 
@@ -193,8 +194,12 @@ export default function AdminPanel() {
         </div>
       </div>
 
-      <Tabs defaultValue="analytics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+      <Tabs defaultValue="finances" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+          <TabsTrigger value="finances">
+            <Icon name="DollarSign" size={18} className="mr-2" />
+            Финансы
+          </TabsTrigger>
           <TabsTrigger value="analytics">
             <Icon name="BarChart3" size={18} className="mr-2" />
             Аналитика
@@ -219,11 +224,11 @@ export default function AdminPanel() {
             <Icon name="MessageSquare" size={18} className="mr-2" />
             Тикеты
           </TabsTrigger>
-          <TabsTrigger value="settings">
-            <Icon name="Settings" size={18} className="mr-2" />
-            Настройки
-          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="finances" className="space-y-6">
+          <PlatformFinances />
+        </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
           <AnalyticsDashboard />

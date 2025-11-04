@@ -1,0 +1,23 @@
+{
+  "tests": [
+    {
+      "name": "Get platform finances",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "totalPurchases": "number",
+        "totalRevenue": "number",
+        "totalCommission": "number",
+        "topAuthors": "array"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "OPTIONS request",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

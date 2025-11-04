@@ -802,11 +802,11 @@ export default function Index() {
                             <Badge variant="secondary" className="font-medium">{workType}</Badge>
                             <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-full">
                               <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
-                              <span className="text-sm font-bold text-yellow-700">{work.rating}</span>
+                              <span className="text-sm font-bold text-yellow-700">{work.rating || 5.0}</span>
                             </div>
                           </div>
                           <CardTitle className="text-xl group-hover:text-primary transition-colors line-clamp-2">
-                            {work.title}
+                            {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
                           </CardTitle>
                           <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
                             <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
@@ -822,7 +822,7 @@ export default function Index() {
                           <div className="flex items-center gap-4 mt-4 pt-4 border-t">
                             <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                               <Icon name="Download" size={16} className="text-primary" />
-                              <span className="font-medium">{work.downloads}</span>
+                              <span className="font-medium">{work.downloads || 0}</span>
                             </div>
                             <div className="flex items-center gap-1.5 text-sm text-green-600">
                               <Icon name="TrendingUp" size={16} />
@@ -892,7 +892,7 @@ export default function Index() {
                   >
                     <a href="/catalog">
                       <Icon name="Database" size={22} className="mr-2" />
-                      Открыть полный каталог ({realWorks.length} работ)
+                      Открыть полный каталог
                     </a>
                   </Button>
                 </div>

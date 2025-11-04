@@ -190,14 +190,58 @@ export default function Index() {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
+    if (!currentUser?.id) {
+      toast({
+        title: 'Требуется авторизация',
+        description: 'Войдите, чтобы совершить покупку',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     const totalPrice = cartItems.reduce((sum, item) => sum + (item.price_points || item.price || 0), 0);
-    if (userBalance >= totalPrice) {
-      setUserBalance(userBalance - totalPrice);
-      setPurchases([...purchases, ...cartItems.map(item => ({
+    
+    if (userBalance < totalPrice) {
+      toast({
+        title: 'Недостаточно баллов',
+        description: `Не хватает ${totalPrice - userBalance} баллов для покупки`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const purchasePromises = cartItems.map(async (item) => {
+        const response = await fetch(func2url['purchase-work'], {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            workId: item.id,
+            userId: currentUser.id,
+            price: item.price_points || item.price || 0
+          })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Ошибка покупки');
+        }
+
+        return await response.json();
+      });
+
+      await Promise.all(purchasePromises);
+
+      const newPurchases = cartItems.map(item => ({
         ...item,
         date: new Date().toLocaleDateString('ru-RU')
-      }))]);
+      }));
+
+      setPurchases([...purchases, ...newPurchases]);
+      setUserBalance(userBalance - totalPrice);
       
       if (email) {
         cartItems.forEach(item => {
@@ -206,9 +250,20 @@ export default function Index() {
       }
       
       setCartItems([]);
+      
       toast({
         title: 'Покупка успешна!',
-        description: `Куплено работ: ${cartItems.length}. Проверьте email.`,
+        description: `Куплено работ: ${cartItems.length}. Баллы списаны, работы доступны для скачивания.`,
+      });
+
+      await fetchUserData();
+      
+    } catch (error) {
+      console.error('Ошибка при покупке:', error);
+      toast({
+        title: 'Ошибка покупки',
+        description: error instanceof Error ? error.message : 'Не удалось завершить покупку',
+        variant: 'destructive',
       });
     }
   };

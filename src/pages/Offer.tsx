@@ -65,9 +65,9 @@ export default function Offer() {
                     Самозанятый гражданин, предоставляющий информационные услуги через платформу Tech Forma:
                   </p>
                   <div className="bg-muted p-3 rounded-lg mt-2 text-sm">
-                    <p><strong>ФИО:</strong> Гагарская Елизавета Александровна</p>
-                    <p><strong>ИНН:</strong> 290540407146</p>
-                    <p><strong>Email:</strong> gagarskaal@gmail.com</p>
+                    <p><strong>ФИО:</strong> Рекрутив Максим Станиславович</p>
+                    <p><strong>ИНН:</strong> 380416803984</p>
+                    <p><strong>Email:</strong> rekrutiw@yandex.ru</p>
                   </div>
                 </div>
 
@@ -369,9 +369,9 @@ export default function Offer() {
             <CardContent className="space-y-4">
               <div className="bg-muted p-4 rounded-lg space-y-2">
                 <p className="font-semibold text-foreground">Самозанятый гражданин:</p>
-                <p><strong>ФИО:</strong> Гагарская Елизавета Александровна</p>
-                <p><strong>ИНН:</strong> 290540407146</p>
-                <p><strong>Email:</strong> gagarskaal@gmail.com</p>
+                <p><strong>ФИО:</strong> Рекрутив Максим Станиславович</p>
+                <p><strong>ИНН:</strong> 380416803984</p>
+                <p><strong>Email:</strong> rekrutiw@yandex.ru</p>
               </div>
 
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">

@@ -44,7 +44,7 @@ export default function Requisites() {
                   <Icon name="User" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">ФИО:</p>
-                    <p className="text-sm text-muted-foreground">Гагарская Елизавета Александровна</p>
+                    <p className="text-sm text-muted-foreground">Рекрутив Максим Станиславович</p>
                   </div>
                 </div>
                 
@@ -52,7 +52,7 @@ export default function Requisites() {
                   <Icon name="FileText" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">ИНН:</p>
-                    <p className="text-sm text-muted-foreground">290540407146</p>
+                    <p className="text-sm text-muted-foreground">380416803984</p>
                   </div>
                 </div>
                 
@@ -60,7 +60,7 @@ export default function Requisites() {
                   <Icon name="Mail" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Email:</p>
-                    <p className="text-sm text-muted-foreground">gagarskaal@gmail.com</p>
+                    <p className="text-sm text-muted-foreground">rekrutiw@yandex.ru</p>
                   </div>
                 </div>
               </div>

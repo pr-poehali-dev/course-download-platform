@@ -102,9 +102,9 @@ export default function RoskomnadzorGuidePage() {
                     </p>
                     <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground ml-4">
                       <li>Паспорт (серия, номер, кем выдан, дата выдачи)</li>
-                      <li>ИНН самозанятого (290540407146)</li>
+                      <li>ИНН самозанятого (380416803984)</li>
                       <li>Адрес регистрации</li>
-                      <li>Email для связи (gagarskaal@gmail.com)</li>
+                      <li>Email для связи (rekrutiw@yandex.ru)</li>
                       <li>Описание деятельности ("Информационная платформа Tech Forma")</li>
                     </ul>
                   </div>
@@ -125,10 +125,10 @@ export default function RoskomnadzorGuidePage() {
                         <p className="text-xs font-semibold text-muted-foreground mb-1">РАЗДЕЛ 1: Сведения об операторе</p>
                         <div className="space-y-1 text-sm">
                           <p><strong>Организационно-правовая форма:</strong> Физическое лицо (самозанятый)</p>
-                          <p><strong>ФИО:</strong> Гагарская Елизавета Александровна</p>
-                          <p><strong>ИНН:</strong> 290540407146</p>
+                          <p><strong>ФИО:</strong> Рекрутив Максим Станиславович</p>
+                          <p><strong>ИНН:</strong> 380416803984</p>
                           <p><strong>Адрес:</strong> [ваш адрес регистрации по паспорту]</p>
-                          <p><strong>Email:</strong> gagarskaal@gmail.com</p>
+                          <p><strong>Email:</strong> rekrutiw@yandex.ru</p>
                         </div>
                       </div>
 
@@ -214,7 +214,7 @@ export default function RoskomnadzorGuidePage() {
                         3. Нажмите кнопку <strong>"Направить уведомление"</strong>
                       </p>
                       <p className="mt-3">
-                        ✅ На ваш email <strong>gagarskaal@gmail.com</strong> придет электронная квитанция с номером обращения.
+                        ✅ На ваш email <strong>rekrutiw@yandex.ru</strong> придет электронная квитанция с номером обращения.
                       </p>
                     </div>
                   </div>
@@ -228,7 +228,7 @@ export default function RoskomnadzorGuidePage() {
                     <p className="font-semibold text-foreground mb-2">Получите регистрационный номер</p>
                     <div className="space-y-2 text-sm text-muted-foreground">
                       <p>
-                        В течение <strong>1-2 рабочих дней</strong> на email <strong>gagarskaal@gmail.com</strong> придет письмо с регистрационным номером.
+                        В течение <strong>1-2 рабочих дней</strong> на email <strong>rekrutiw@yandex.ru</strong> придет письмо с регистрационным номером.
                       </p>
                       <p>
                         Номер выглядит так: <code className="bg-muted px-2 py-1 rounded">77-22-012345</code>

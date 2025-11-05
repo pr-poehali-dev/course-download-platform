@@ -41,8 +41,8 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <TelegramChatButton />
         <BrowserRouter>
+        <TelegramChatButton />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />

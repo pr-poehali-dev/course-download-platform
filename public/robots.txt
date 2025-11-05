@@ -12,4 +12,4 @@ Disallow: /full-sync
 Disallow: /batch-upload
 Disallow: /extract-previews
 
-Sitemap: https://course-download-platform.poehali.app/sitemap.xml
+Sitemap: https://techforma.pro/sitemap.xml

@@ -94,11 +94,12 @@ export default function UsageRules() {
           <CardContent className="space-y-3">
             <div className="space-y-4">
               <div className="flex gap-3">
-                <Icon name="Copy" size={20} className="text-red-600 flex-shrink-0 mt-1" />
+                <Icon name="Copyright" size={20} className="text-red-600 flex-shrink-0 mt-1" />
                 <div>
-                  <p className="font-semibold">Загружать чужие работы</p>
+                  <p className="font-semibold">Загружать пиратский контент и чужие работы</p>
                   <p className="text-sm text-muted-foreground">
-                    Запрещено выдавать чужие работы за свои. Размещайте только авторские материалы или работы с разрешением автора
+                    Строго запрещено: чужие курсовые/дипломы, платные курсы из интернета, учебники издательств без разрешения, 
+                    скачанные работы с других сайтов. Только ваши авторские материалы! Нарушение = блокировка + передача данных правообладателю.
                   </p>
                 </div>
               </div>
@@ -193,6 +194,66 @@ export default function UsageRules() {
                 <span><strong>Цена:</strong> установите справедливую цену в баллах</span>
               </li>
             </ul>
+          </CardContent>
+        </Card>
+
+        <Card className="border-l-4 border-l-red-500 bg-red-50/30">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="Copyright" size={20} className="text-red-600" />
+                Защита авторских прав — это серьёзно!
+              </CardTitle>
+              <Badge className="bg-red-500">Критично</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4 text-muted-foreground">
+            <div className="bg-red-100 border-l-4 border-red-600 p-4 rounded">
+              <p className="font-bold text-red-800 mb-2">
+                ⚠️ ВНИМАНИЕ: Последствия нарушения авторских прав
+              </p>
+              <p className="text-sm text-red-700">
+                Загрузка пиратского контента — это не просто нарушение правил платформы, 
+                это уголовное преступление по статье 146 УК РФ (до 2 лет лишения свободы + штраф до 200 тыс. руб.)
+              </p>
+            </div>
+
+            <ul className="space-y-3 mt-4">
+              <li className="flex items-start gap-2">
+                <Icon name="AlertTriangle" size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-red-700">1-е нарушение:</span> Предупреждение + удаление материала + штраф 1000 баллов
+                </div>
+              </li>
+              <li className="flex items-start gap-2">
+                <Icon name="XOctagon" size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-red-700">2-е нарушение:</span> Блокировка аккаунта на 30 дней без возврата баллов
+                </div>
+              </li>
+              <li className="flex items-start gap-2">
+                <Icon name="Ban" size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-red-700">3-е нарушение:</span> Перманентная блокировка без права восстановления
+                </div>
+              </li>
+              <li className="flex items-start gap-2">
+                <Icon name="Scale" size={18} className="text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold text-red-700">Жалоба правообладателя:</span> Передача ваших данных (ФИО, email, IP) + возмещение убытков
+                </div>
+              </li>
+            </ul>
+
+            <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mt-4">
+              <p className="font-bold text-yellow-800 mb-2">
+                📧 Жалоба на пиратский контент: copyright@techforma.ru
+              </p>
+              <p className="text-sm text-yellow-700">
+                Если вы правообладатель или обнаружили пиратский контент — отправьте жалобу. 
+                Материал будет удалён в течение 24 часов, нарушитель заблокирован.
+              </p>
+            </div>
           </CardContent>
         </Card>
 

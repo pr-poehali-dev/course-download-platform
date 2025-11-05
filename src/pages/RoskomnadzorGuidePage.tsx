@@ -104,7 +104,7 @@ export default function RoskomnadzorGuidePage() {
                       <li>Паспорт (серия, номер, кем выдан, дата выдачи)</li>
                       <li>ИНН самозанятого (380416803984)</li>
                       <li>Адрес регистрации</li>
-                      <li>Email для связи (rekrutiw@yandex.ru)</li>
+                      <li>Email для связи (tech.forma@yandex.ru)</li>
                       <li>Описание деятельности ("Информационная платформа Tech Forma")</li>
                     </ul>
                   </div>
@@ -128,7 +128,7 @@ export default function RoskomnadzorGuidePage() {
                           <p><strong>ФИО:</strong> Рекрутив Максим Станиславович</p>
                           <p><strong>ИНН:</strong> 380416803984</p>
                           <p><strong>Адрес:</strong> [ваш адрес регистрации по паспорту]</p>
-                          <p><strong>Email:</strong> rekrutiw@yandex.ru</p>
+                          <p><strong>Email:</strong> tech.forma@yandex.ru</p>
                         </div>
                       </div>
 
@@ -214,7 +214,7 @@ export default function RoskomnadzorGuidePage() {
                         3. Нажмите кнопку <strong>"Направить уведомление"</strong>
                       </p>
                       <p className="mt-3">
-                        ✅ На ваш email <strong>rekrutiw@yandex.ru</strong> придет электронная квитанция с номером обращения.
+                        ✅ На ваш email <strong>tech.forma@yandex.ru</strong> придет электронная квитанция с номером обращения.
                       </p>
                     </div>
                   </div>
@@ -228,7 +228,7 @@ export default function RoskomnadzorGuidePage() {
                     <p className="font-semibold text-foreground mb-2">Получите регистрационный номер</p>
                     <div className="space-y-2 text-sm text-muted-foreground">
                       <p>
-                        В течение <strong>1-2 рабочих дней</strong> на email <strong>rekrutiw@yandex.ru</strong> придет письмо с регистрационным номером.
+                        В течение <strong>1-2 рабочих дней</strong> на email <strong>tech.forma@yandex.ru</strong> придет письмо с регистрационным номером.
                       </p>
                       <p>
                         Номер выглядит так: <code className="bg-muted px-2 py-1 rounded">77-22-012345</code>

@@ -22,7 +22,7 @@ import PlatformFinances from '@/components/PlatformFinances';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import func2url from '../../backend/func2url.json';
 
-const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
+const ADMIN_EMAIL = 'tech.forma@yandex.ru';
 const ADMIN_PASSWORD = 'stas221974';
 
 interface StatData {

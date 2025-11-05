@@ -48,7 +48,7 @@ export default function TermsOfService() {
                 Если вы не согласны с каким-либо пунктом, пожалуйста, не используйте сервис.
               </p>
               <p className="text-sm">
-                Контакты Исполнителя: Email — rekrutiw@yandex.ru
+                Контакты Исполнителя: Email — tech.forma@yandex.ru
               </p>
             </CardContent>
           </Card>
@@ -73,7 +73,7 @@ export default function TermsOfService() {
               </p>
               <p>
                 2.4. В случае обнаружения несанкционированного доступа к аккаунту, необходимо 
-                незамедлительно сообщить об этом по email: rekrutiw@yandex.ru
+                незамедлительно сообщить об этом по email: tech.forma@yandex.ru
               </p>
             </CardContent>
           </Card>
@@ -323,7 +323,7 @@ export default function TermsOfService() {
                 <p className="text-sm font-mono">
                   <strong>ИП Рекрутив Максим Станиславович</strong><br />
                   ИНН: 380416803984<br />
-                  Email: rekrutiw@yandex.ru<br />
+                  Email: tech.forma@yandex.ru<br />
                   Статус: Самозанятый (НПД)
                 </p>
               </div>
@@ -594,7 +594,7 @@ export default function TermsOfService() {
                 <div>
                   <p className="font-semibold mb-2">Остались вопросы?</p>
                   <p className="text-sm text-muted-foreground">
-                    Если у вас возникли вопросы по Пользовательскому соглашению, свяжитесь с нами по email: rekrutiw@yandex.ru
+                    Если у вас возникли вопросы по Пользовательскому соглашению, свяжитесь с нами по email: tech.forma@yandex.ru
                   </p>
                 </div>
               </div>

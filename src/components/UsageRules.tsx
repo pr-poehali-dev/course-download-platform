@@ -247,7 +247,7 @@ export default function UsageRules() {
 
             <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded mt-4">
               <p className="font-bold text-yellow-800 mb-2">
-                📧 Жалоба на пиратский контент: copyright@techforma.ru
+                📧 Жалоба на пиратский контент: tech.forma@yandex.ru
               </p>
               <p className="text-sm text-yellow-700">
                 Если вы правообладатель или обнаружили пиратский контент — отправьте жалобу. 

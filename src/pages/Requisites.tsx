@@ -60,7 +60,7 @@ export default function Requisites() {
                   <Icon name="Mail" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Email:</p>
-                    <p className="text-sm text-muted-foreground">rekrutiw@yandex.ru</p>
+                    <p className="text-sm text-muted-foreground">tech.forma@yandex.ru</p>
                   </div>
                 </div>
               </div>

@@ -331,7 +331,7 @@ export default function Offer() {
               </p>
               <p>
                 Если вы являетесь правообладателем и обнаружили на Платформе материал, 
-                нарушающий ваши права, отправьте уведомление на email: <strong className="text-foreground">copyright@techforma.ru</strong>
+                нарушающий ваши права, отправьте уведомление на email: <strong className="text-foreground">tech.forma@yandex.ru</strong>
               </p>
               
               <p className="font-semibold text-foreground mt-3">
@@ -461,8 +461,8 @@ export default function Offer() {
                 <p className="font-semibold text-foreground">Самозанятый гражданин:</p>
                 <p><strong>ФИО:</strong> Рекрутив Максим Станиславович</p>
                 <p><strong>ИНН:</strong> 380416803984</p>
-                <p><strong>Email для связи:</strong> rekrutiw@yandex.ru</p>
-                <p><strong>Email для жалоб правообладателей:</strong> copyright@techforma.ru</p>
+                <p><strong>Email для связи:</strong> tech.forma@yandex.ru</p>
+                <p><strong>Email для жалоб правообладателей:</strong> tech.forma@yandex.ru</p>
               </div>
 
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">

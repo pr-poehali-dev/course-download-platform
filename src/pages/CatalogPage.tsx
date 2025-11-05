@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import TrustRating from '@/components/TrustRating';
+import Footer from '@/components/Footer';
 
 interface Work {
   id: string;
@@ -533,6 +534,7 @@ export default function CatalogPage() {
           </>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

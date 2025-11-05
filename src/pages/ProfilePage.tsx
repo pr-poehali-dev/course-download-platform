@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import BalanceTab from '@/components/profile/BalanceTab';
+import Footer from '@/components/Footer';
 
 interface UserProfile {
   name: string;
@@ -480,6 +481,7 @@ export default function ProfilePage() {
 
         </Tabs>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
+import Footer from '@/components/Footer';
 
 export default function PrivacyPolicyPage() {
   const navigate = useNavigate();
@@ -24,12 +25,7 @@ export default function PrivacyPolicyPage() {
       </header>
 
       <PrivacyPolicy />
-
-      <footer className="border-t py-8 mt-16">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 Tech Forma. Все права защищены.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

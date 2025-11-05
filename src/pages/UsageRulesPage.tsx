@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import UsageRules from '@/components/UsageRules';
+import Footer from '@/components/Footer';
 
 export default function UsageRulesPage() {
   const navigate = useNavigate();
@@ -26,12 +27,7 @@ export default function UsageRulesPage() {
       <main className="container mx-auto px-4 py-16">
         <UsageRules />
       </main>
-
-      <footer className="border-t py-8 mt-16">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 Студенческая биржа работ. Все права защищены.</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

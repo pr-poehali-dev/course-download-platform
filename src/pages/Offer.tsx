@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
+import Footer from '@/components/Footer';
 
 export default function Offer() {
   return (
@@ -478,6 +479,7 @@ export default function Offer() {
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -208,7 +208,7 @@ export default function PrivacyPolicy() {
                 <li>Обжаловать действия администрации в надзорных органах</li>
               </ul>
               <p className="mt-4">
-                Для реализации своих прав свяжитесь с нами по email: rekrutiw@yandex.ru или через форму техподдержки.
+                Для реализации своих прав свяжитесь с нами по email: tech.forma@yandex.ru или через форму техподдержки.
               </p>
             </CardContent>
           </Card>

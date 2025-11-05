@@ -67,7 +67,7 @@ export default function Offer() {
                   <div className="bg-muted p-3 rounded-lg mt-2 text-sm">
                     <p><strong>ФИО:</strong> Рекрутив Максим Станиславович</p>
                     <p><strong>ИНН:</strong> 380416803984</p>
-                    <p><strong>Email:</strong> rekrutiw@yandex.ru</p>
+                    <p><strong>Email:</strong> tech.forma@yandex.ru</p>
                   </div>
                 </div>
 

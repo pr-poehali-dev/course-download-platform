@@ -25,7 +25,7 @@ export default function TelegramChatButton() {
         
         {isHovered && (
           <div className="absolute right-full mr-4 whitespace-nowrap bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-xl animate-in fade-in slide-in-from-right-2 duration-200">
-            Задать вопрос TechMentor AI 🤖
+            Telegram бот с ИИ 🤖
             <div className="absolute right-[-6px] top-1/2 -translate-y-1/2 w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-l-[6px] border-l-gray-900"></div>
           </div>
         )}

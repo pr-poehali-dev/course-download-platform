@@ -171,10 +171,12 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
                 <Label htmlFor="login-email">Email</Label>
                 <Input
                   id="login-email"
+                  name="email"
                   type="email"
                   placeholder="example@mail.ru"
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                  autoComplete="email"
                 />
               </div>
 
@@ -182,10 +184,12 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
                 <Label htmlFor="login-password">Пароль</Label>
                 <Input
                   id="login-password"
+                  name="password"
                   type="password"
                   placeholder="••••••••"
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                  autoComplete="current-password"
                 />
               </div>
 
@@ -211,10 +215,12 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
                 <Label htmlFor="register-username">Никнейм</Label>
                 <Input
                   id="register-username"
+                  name="username"
                   type="text"
                   placeholder="Ваш никнейм"
                   value={registerData.username}
                   onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
+                  autoComplete="username"
                 />
               </div>
 
@@ -222,10 +228,12 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
                 <Label htmlFor="register-email">Email</Label>
                 <Input
                   id="register-email"
+                  name="email"
                   type="email"
                   placeholder="example@mail.ru"
                   value={registerData.email}
                   onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                  autoComplete="email"
                 />
               </div>
 
@@ -233,10 +241,12 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
                 <Label htmlFor="register-password">Пароль</Label>
                 <Input
                   id="register-password"
+                  name="password"
                   type="password"
                   placeholder="Минимум 6 символов"
                   value={registerData.password}
                   onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                  autoComplete="new-password"
                 />
               </div>
 
@@ -244,10 +254,12 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
                 <Label htmlFor="register-confirm">Подтверждение пароля</Label>
                 <Input
                   id="register-confirm"
+                  name="password-confirm"
                   type="password"
                   placeholder="Повторите пароль"
                   value={registerData.confirmPassword}
                   onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
+                  autoComplete="new-password"
                 />
               </div>
 

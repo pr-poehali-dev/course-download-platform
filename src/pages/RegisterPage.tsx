@@ -127,11 +127,13 @@ export default function RegisterPage() {
                   <Icon name="User" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="name"
+                    name="username"
                     type="text"
                     placeholder="Иван Иванов"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="pl-10"
+                    autoComplete="username"
                     required
                   />
                 </div>
@@ -143,11 +145,13 @@ export default function RegisterPage() {
                   <Icon name="Mail" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="your@email.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="pl-10"
+                    autoComplete="email"
                     required
                   />
                 </div>
@@ -159,11 +163,13 @@ export default function RegisterPage() {
                   <Icon name="Lock" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="password"
+                    name="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     className="pl-10 pr-10"
+                    autoComplete="new-password"
                     required
                   />
                   <button
@@ -183,11 +189,13 @@ export default function RegisterPage() {
                   <Icon name="Lock" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
+                    name="password-confirm"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••••"
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     className="pl-10"
+                    autoComplete="new-password"
                     required
                   />
                 </div>

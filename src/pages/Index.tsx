@@ -607,24 +607,9 @@ export default function Index() {
                 </h2>
               </div>
               
-              <p className="text-lg sm:text-2xl md:text-3xl font-semibold text-slate-700 mb-3 sm:mb-6 animate-fade-in px-2">
+              <p className="text-lg sm:text-2xl md:text-3xl font-semibold text-slate-700 mb-6 sm:mb-12 animate-fade-in px-2">
                 Обмен знаниями без границ
               </p>
-              
-              <div className="flex gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 animate-fade-in">
-                <Button size="lg" className="h-12 sm:h-14 lg:h-16 px-6 sm:px-8 lg:px-10 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-700 text-base sm:text-lg lg:text-xl shadow-2xl" asChild>
-                  <a href="#catalog">
-                    <Icon name="BookOpen" size={20} className="mr-2 sm:w-6 sm:h-6" />
-                    Смотреть работы
-                  </a>
-                </Button>
-                <Button size="lg" variant="outline" className="h-12 sm:h-14 lg:h-16 px-6 sm:px-8 lg:px-10 text-base sm:text-lg lg:text-xl border-2 backdrop-blur-sm bg-white/80 hover:bg-white" asChild>
-                  <a href="#support">
-                    <Icon name="MessageCircle" size={20} className="mr-2 sm:w-6 sm:h-6" />
-                    Обсудить проект
-                  </a>
-                </Button>
-              </div>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
                 Маркетплейс учебных работ + AI-ассистент в Telegram. Получай помощь 24/7, покупай работы за баллы, продавай свои и зарабатывай.

@@ -12,6 +12,7 @@ import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import BalanceTab from '@/components/profile/BalanceTab';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 interface UserProfile {
   name: string;
@@ -199,7 +200,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
+      <SEO 
+        title="Личный кабинет"
+        description="Управление профилем, балансом, загруженными и купленными работами"
+        noindex={true}
+      />
+      <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16 max-w-6xl">
         <div className="mb-8">
           <Button variant="ghost" className="mb-4" asChild>
@@ -483,5 +490,6 @@ export default function ProfilePage() {
       </div>
       <Footer />
     </div>
+    </>
   );
 }

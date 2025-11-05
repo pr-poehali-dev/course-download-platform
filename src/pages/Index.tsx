@@ -29,6 +29,7 @@ import AboutSection from '@/components/AboutSection';
 import AgeBadge from '@/components/AgeBadge';
 import CookieBanner from '@/components/CookieBanner';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
+import SEO from '@/components/SEO';
 
 
 
@@ -42,6 +43,7 @@ export default function Index() {
 
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [cartDialogOpen, setCartDialogOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [favoritesDialogOpen, setFavoritesDialogOpen] = useState(false);
   const [promoDialogOpen, setPromoDialogOpen] = useState(false);
   const [referralDialogOpen, setReferralDialogOpen] = useState(false);
@@ -367,8 +369,14 @@ export default function Index() {
     });
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden" style={{
-      backgroundImage: `url('https://cdn.poehali.dev/files/b1077a7b-9e1f-4fde-8ee3-c49a7a6cb6a0.PNG')`,
+    <>
+      <SEO 
+        title="Главная"
+        description="Маркетплейс студенческих работ + AI-помощник в Telegram. Покупай работы за баллы, продавай свои и получай помощь 24/7"
+        keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, ИИ ассистент для учебы, telegram бот, учебные материалы"
+      />
+      <div className="min-h-screen w-full overflow-x-hidden" style={{
+      backgroundImage: `url('https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/1e62c804-3d33-4e1b-801f-92c5358091e1.jpg')`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
@@ -391,6 +399,15 @@ export default function Index() {
                 <a href="#blog" className="hover:text-primary transition-colors text-sm">Блог</a>
                 <a href="#support" className="hover:text-primary transition-colors text-sm">Поддержка</a>
               </nav>
+              
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="lg:hidden h-8 w-8 sm:h-10 sm:w-10"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              >
+                <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
+              </Button>
 
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                 {isLoggedIn ? (
@@ -496,6 +513,76 @@ export default function Index() {
                 )}
               </div>
             </div>
+            
+            {mobileMenuOpen && (
+              <div className="lg:hidden border-t bg-white/95 backdrop-blur-md">
+                <nav className="flex flex-col py-4 px-4 gap-2">
+                  <a 
+                    href="/" 
+                    className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Главная
+                  </a>
+                  <a 
+                    href="/catalog" 
+                    className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Каталог
+                  </a>
+                  <a 
+                    href="#blog" 
+                    className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Блог
+                  </a>
+                  <a 
+                    href="#support" 
+                    className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Поддержка
+                  </a>
+                  {isLoggedIn && (
+                    <>
+                      <div className="border-t my-2"></div>
+                      <button 
+                        className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium text-left flex items-center gap-2"
+                        onClick={() => {
+                          setFavoritesDialogOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <Icon name="Heart" size={18} />
+                        Избранное {favoriteItems.length > 0 && `(${favoriteItems.length})`}
+                      </button>
+                      <button 
+                        className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium text-left flex items-center gap-2"
+                        onClick={() => {
+                          setCartDialogOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <Icon name="ShoppingCart" size={18} />
+                        Корзина {cartItems.length > 0 && `(${cartItems.length})`}
+                      </button>
+                      <button 
+                        className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium text-left flex items-center gap-2"
+                        onClick={() => {
+                          setPaymentDialogOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
+                      >
+                        <Icon name="Plus" size={18} />
+                        Пополнить баланс
+                      </button>
+                    </>
+                  )}
+                </nav>
+              </div>
+            )}
           </div>
         </header>
 
@@ -523,6 +610,21 @@ export default function Index() {
               <p className="text-lg sm:text-2xl md:text-3xl font-semibold text-slate-700 mb-3 sm:mb-6 animate-fade-in px-2">
                 Обмен знаниями без границ
               </p>
+              
+              <div className="flex gap-3 sm:gap-4 justify-center mb-6 sm:mb-8 animate-fade-in">
+                <Button size="lg" className="h-12 sm:h-14 lg:h-16 px-6 sm:px-8 lg:px-10 bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-700 text-base sm:text-lg lg:text-xl shadow-2xl" asChild>
+                  <a href="#catalog">
+                    <Icon name="BookOpen" size={20} className="mr-2 sm:w-6 sm:h-6" />
+                    Смотреть работы
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" className="h-12 sm:h-14 lg:h-16 px-6 sm:px-8 lg:px-10 text-base sm:text-lg lg:text-xl border-2 backdrop-blur-sm bg-white/80 hover:bg-white" asChild>
+                  <a href="#support">
+                    <Icon name="MessageCircle" size={20} className="mr-2 sm:w-6 sm:h-6" />
+                    Обсудить проект
+                  </a>
+                </Button>
+              </div>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
                 Маркетплейс учебных работ + AI-ассистент в Telegram. Получай помощь 24/7, покупай работы за баллы, продавай свои и зарабатывай.
@@ -1741,5 +1843,6 @@ export default function Index() {
 
       <CookieBanner />
     </div>
+    </>
   );
 }

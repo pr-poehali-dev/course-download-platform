@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
+import SEO from '@/components/SEO';
 
 interface Work {
   id: string;
@@ -350,7 +351,13 @@ export default function CatalogPage() {
   const subjects = Array.from(new Set(works.map(w => w.subject)));
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
+      <SEO 
+        title="Каталог работ"
+        description="Каталог студенческих работ: курсовые, дипломы, рефераты, чертежи. Купить готовые работы за баллы по выгодным ценам"
+        keywords="курсовые работы, дипломы, рефераты, чертежи, купить студенческие работы, каталог работ, готовые работы"
+      />
+      <div className="min-h-screen bg-white">
       <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
@@ -536,5 +543,6 @@ export default function CatalogPage() {
       </main>
       <Footer />
     </div>
+    </>
   );
 }

@@ -54,6 +54,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         if method == 'GET':
+            params = event.get('queryStringParameters', {}) or {}
+            check_user_id = params.get('user_id') or user_id
+            
             cur.execute("""
                 SELECT id, subscription_type, requests_total, requests_used, 
                        expires_at, is_active, created_at, price_points
@@ -61,7 +64,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 WHERE user_id = %s AND is_active = true
                 ORDER BY created_at DESC
                 LIMIT 1
-            """, (user_id,))
+            """, (check_user_id,))
             
             row = cur.fetchone()
             
@@ -74,6 +77,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     },
                     'body': json.dumps({
                         'subscription': None,
+                        'has_access': False,
                         'hasSubscription': False
                     })
                 }
@@ -96,6 +100,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     },
                     'body': json.dumps({
                         'subscription': None,
+                        'has_access': False,
                         'hasSubscription': False,
                         'expired': True
                     })
@@ -120,6 +125,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'createdAt': created_at.isoformat(),
                         'price': price
                     },
+                    'has_access': True,
                     'hasSubscription': True
                 })
             }
@@ -128,9 +134,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body = event.get('body', '{}')
             body_data = json.loads(body)
             
-            sub_type = body_data.get('subscriptionType')
+            sub_type = body_data.get('plan') or body_data.get('subscriptionType')
+            post_user_id = body_data.get('user_id') or user_id
             
-            if sub_type not in ['single', 'monthly', 'yearly']:
+            if sub_type not in ['monthly', 'yearly']:
                 return {
                     'statusCode': 400,
                     'headers': {
@@ -141,52 +148,70 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             pricing = {
-                'single': {'points': 300, 'requests': 10, 'days': None},
-                'monthly': {'points': 800, 'requests': 0, 'days': 30},
-                'yearly': {'points': 7200, 'requests': 0, 'days': 365}
+                'monthly': {'price_rub': 299, 'days': 30},
+                'yearly': {'price_rub': 2490, 'days': 365}
             }
             
             plan = pricing[sub_type]
             
-            cur.execute("SELECT balance FROM t_p63326274_course_download_plat.users WHERE id = %s", (user_id,))
-            user_row = cur.fetchone()
+            yookassa_secret = os.environ.get('YOOKASSA_SECRET_KEY')
+            yookassa_shop_id = os.environ.get('YOOKASSA_SHOP_ID')
             
-            if not user_row or user_row[0] < plan['points']:
+            if not yookassa_secret or not yookassa_shop_id:
                 return {
-                    'statusCode': 400,
+                    'statusCode': 500,
                     'headers': {
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
-                    'body': json.dumps({'error': 'Insufficient points'})
+                    'body': json.dumps({'error': 'Payment system not configured'})
                 }
             
-            cur.execute("""
-                UPDATE ai_subscriptions 
-                SET is_active = false 
-                WHERE user_id = %s AND is_active = true
-            """, (user_id,))
+            import requests
+            import base64
+            from uuid import uuid4
             
-            expires_at = None
-            if plan['days']:
-                expires_at = datetime.now() + timedelta(days=plan['days'])
+            auth_string = f"{yookassa_shop_id}:{yookassa_secret}"
+            auth_b64 = base64.b64encode(auth_string.encode()).decode()
             
-            cur.execute("""
-                INSERT INTO ai_subscriptions 
-                (user_id, subscription_type, requests_total, requests_used, price_points, expires_at)
-                VALUES (%s, %s, %s, 0, %s, %s)
-                RETURNING id
-            """, (user_id, sub_type, plan['requests'], plan['points'], expires_at))
+            payment_data = {
+                "amount": {
+                    "value": f"{plan['price_rub']}.00",
+                    "currency": "RUB"
+                },
+                "confirmation": {
+                    "type": "redirect",
+                    "return_url": "https://techforma.ru/mentor?payment=success"
+                },
+                "capture": True,
+                "description": f"TechMentor подписка ({sub_type})",
+                "metadata": {
+                    "user_id": str(post_user_id),
+                    "plan": sub_type
+                }
+            }
             
-            new_sub_id = cur.fetchone()[0]
+            response = requests.post(
+                'https://api.yookassa.ru/v3/payments',
+                json=payment_data,
+                headers={
+                    'Authorization': f'Basic {auth_b64}',
+                    'Idempotence-Key': str(uuid4()),
+                    'Content-Type': 'application/json'
+                }
+            )
             
-            cur.execute("""
-                UPDATE t_p63326274_course_download_plat.users 
-                SET balance = balance - %s 
-                WHERE id = %s
-            """, (plan['points'], user_id))
+            if response.status_code != 200:
+                return {
+                    'statusCode': 500,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'Failed to create payment'})
+                }
             
-            conn.commit()
+            payment_result = response.json()
             
             return {
                 'statusCode': 200,
@@ -196,8 +221,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 },
                 'body': json.dumps({
                     'success': True,
-                    'subscriptionId': new_sub_id,
-                    'pointsSpent': plan['points']
+                    'payment_url': payment_result['confirmation']['confirmation_url'],
+                    'payment_id': payment_result['id']
                 })
             }
         

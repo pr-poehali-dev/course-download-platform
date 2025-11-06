@@ -10,6 +10,8 @@ export interface User {
   balance: number;
   referral_code: string;
   role?: string;
+  subscription_active?: boolean;
+  subscription_end?: string;
 }
 
 export interface AuthResponse {

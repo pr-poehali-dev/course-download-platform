@@ -612,17 +612,11 @@ export default function Index() {
               </p>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Маркетплейс учебных работ + AI-ассистент в Telegram. Получай помощь 24/7, покупай работы за баллы, продавай свои и зарабатывай.
+                Маркетплейс учебных работ. Покупай работы за баллы, продавай свои и зарабатывай.
               </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
                 <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
-                  <a href="/bot-subscription">
-                    <Icon name="MessageCircle" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                    Подписаться на бота
-                  </a>
-                </Button>
-                <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg border-2 backdrop-blur-sm bg-white/50" asChild>
                   <a href="/catalog">
                     <Icon name="Database" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
                     Каталог работ
@@ -630,14 +624,10 @@ export default function Index() {
                 </Button>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 max-w-4xl mx-auto px-2">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2 sm:gap-4 max-w-4xl mx-auto px-2">
                 <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-primary/10 hover:border-primary/30 transition-all hover:shadow-lg">
                   <div className="text-xl sm:text-3xl font-bold text-primary mb-1">500+</div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Готовых работ</p>
-                </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-purple-200 hover:border-purple-400 transition-all hover:shadow-lg">
-                  <div className="text-xl sm:text-3xl font-bold text-purple-600 mb-1">ИИ</div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Помощник</p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-blue-200 hover:border-blue-400 transition-all hover:shadow-lg">
                   <div className="text-xl sm:text-3xl font-bold text-blue-600 mb-1">24/7</div>
@@ -666,11 +656,11 @@ export default function Index() {
                 Всё, что нужно студенту
               </h2>
               <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto">
-                Три мощных инструмента в единой экосистеме
+                Два мощных инструмента в единой экосистеме
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto">
               <Card className="relative overflow-hidden border-2 border-white/20 bg-white/95 backdrop-blur-sm hover:border-white transition-all group hover:shadow-2xl hover:scale-105">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
                 <CardHeader>
@@ -701,45 +691,6 @@ export default function Index() {
                     <a href="/catalog">
                       <Icon name="ArrowRight" size={16} className="mr-2" />
                       Смотреть каталог
-                    </a>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="relative overflow-hidden border-2 border-blue-200 bg-white/95 backdrop-blur-sm hover:border-blue-400 transition-all group hover:shadow-2xl hover:scale-105">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-all"></div>
-                <div className="absolute top-4 right-4 z-10">
-                  <Badge className="bg-green-500 text-white border-0 shadow-lg">
-                    <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-                      НОВИНКА
-                    </span>
-                  </Badge>
-                </div>
-                <CardHeader>
-                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                    <Icon name="MessageCircle" size={80} className="text-white" />
-                  </div>
-                  <CardTitle className="text-2xl">TechMentor AI в Telegram</CardTitle>
-                  <CardDescription className="text-base">Помощник прямо в мессенджере 🤖</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Ответы на вопросы 24/7</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Помощь с учёбой</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Консультации по работам</span>
-                  </div>
-                  <Button className="w-full mt-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700" asChild>
-                    <a href="/bot-subscription">
-                      <Icon name="ShoppingCart" size={16} className="mr-2" />
-                      Подписаться
                     </a>
                   </Button>
                 </CardContent>

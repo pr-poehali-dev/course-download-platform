@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>TechMentor — чат-репетитор</title>
+<style>
+:root{--bg:#0b0e14;--panel:#121723;--ink:#e6e6e6;--muted:#8a8f98;--acc:#4da3ff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+.tabs{display:flex;gap:8px;margin-bottom:12px}
+.tab{padding:8px 12px;border:1px solid #2a3550;border-radius:999px;cursor:pointer;color:var(--muted)}
+.tab.active{background:var(--acc);color:#0a0a0a;border-color:transparent}
+.grid{display:grid;grid-template-columns:320px 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid #1b2333;border-radius:16px;overflow:hidden;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.h{padding:14px 16px;border-bottom:1px solid #1b2333;font-weight:700}
+.box{padding:14px 16px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 6px}
+input[type=text],textarea,select{width:100%;background:#0f1522;color:var(--ink);border:1px solid #263147;border-radius:10px;padding:10px}
+.small{font-size:12px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--acc);color:#0a0a0a;border:0;border-radius:10px;padding:10px 12px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.6;cursor:default}
+#chat{height:60vh;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:80%;padding:10px 12px;border-radius:12px;white-space:pre-wrap;line-height:1.45}
+.u{align-self:flex-end;background:#1b2333;border:1px solid #253048}
+.a{align-self:flex-start;background:#101726;border:1px solid #212b42}
+form#send{display:flex;gap:10px;border-top:1px solid #1b2333;padding:12px}
+#q{flex:1;resize:none;height:64px}
+.badge{display:inline-block;padding:4px 8px;border:1px solid #2a3550;border-radius:999px;font-size:12px;color:var(--muted)}
+.drop{border:2px dashed #2a3550;border-radius:12px;padding:18px;text-align:center;margin-top:8px}
+.hidden{display:none}
+.notice{font-size:12px;color:#d2d2d2;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" data-tab="chat">Чат</div>
+    <div class="tab" data-tab="check">Проверка работы</div>
+  </div>
+  
+  <div class="grid" id="pane-chat">
+    <div class="card">
+      <div class="h">Контекст работы</div>
+      <div class="box">
+        <label>Название/дисциплина</label>
+        <input id="ctx-title" type="text" placeholder="Напр.: Курсовая по ТОиР / Материаловедение">
+        <label>Требования вуза (кратко)</label>
+        <textarea id="ctx-req" rows="5" placeholder="Объём, ГОСТы, структура, число источников и т.д."></textarea>
+        <div class="small">Откройте эту страницу из карточки — параметры подтянутся автоматически.</div>
+        <hr style="border:none;border-top:1px solid #1b2333;margin:14px 0">
+        <label>Режим</label>
+        <select id="mode">
+          <option value="tutor">Репетитор</option>
+          <option value="outline">План</option>
+          <option value="rewrite">Переформулирование</option>
+        </select>
+        <div class="small" style="margin-top:10px">
+          <span class="badge">Не пишет за студента</span>
+          <span class="badge">Планы, чек-листы, мини-примеры</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="h">TechMentor — чат-репетитор</div>
+      <div id="chat"></div>
+      <form id="send">
+        <textarea id="q" placeholder="Опиши тему/задание или вставь фрагмент."></textarea>
+        <button class="btn" id="go">Отправить</button>
+      </form>
+      <div class="notice" id="srvNotice"></div>
+    </div>
+  </div>
+  
+  <div class="grid hidden" id="pane-check">
+    <div class="card">
+      <div class="h">Параметры проверки</div>
+      <div class="box">
+        <label>Требования вуза (методичка кратко)</label>
+        <textarea id="check-req" rows="6" placeholder="Структура, объём, оформление, число источников, ГОСТы и т.д."></textarea>
+        <hr style="border:none;border-top:1px solid #1b2333;margin:14px 0">
+        <label>Загрузка файла (PDF или DOCX, до 10 МБ)</label>
+        <input id="file" type="file" accept=".pdf,.docx" />
+        <div class="drop" id="drop">или перетащите файл сюда</div>
+        <button class="btn" id="run-check" style="margin-top:12px">Проверить</button>
+        <div class="small" style="margin-top:10px">Мы не проверяем плагиат; даём учебную обратную связь по структуре, логике, методике и оформлению.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="h">Отчёт проверки</div>
+      <div id="report" style="padding:16px; white-space:pre-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tabs = document.querySelectorAll('.tab');
+  const paneChat = document.getElementById('pane-chat');
+  const paneCheck = document.getElementById('pane-check');
+  tabs.forEach(t => t.onclick = () => {
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    const k = t.dataset.tab;
+    paneChat.classList.toggle('hidden', k!=='chat');
+    paneCheck.classList.toggle('hidden', k!=='check');
+  });
+  
+  const chat = document.getElementById('chat');
+  const form = document.getElementById('send');
+  const input = document.getElementById('q');
+  const titleEl = document.getElementById('ctx-title');
+  const reqEl = document.getElementById('ctx-req');
+  const modeEl = document.getElementById('mode');
+  const srvNotice = document.getElementById('srvNotice');
+  
+  const SID_KEY = 'tm_session_id';
+  let SID = localStorage.getItem(SID_KEY);
+  if (!SID) { SID = crypto.randomUUID(); localStorage.setItem(SID_KEY, SID); }
+  
+  const p = new URLSearchParams(location.search);
+  const qpTitle = [p.get('title'), p.get('subject')].filter(Boolean).join(' / ');
+  const qpReq = p.get('req') || '';
+  if (qpTitle && !titleEl.value) titleEl.value = decodeURIComponent(qpTitle);
+  if (qpReq && !reqEl.value) reqEl.value = decodeURIComponent(qpReq);
+  
+  function pageContext(){
+    return { title: titleEl.value.trim(), subject: '', uniReq: reqEl.value.trim(), link: location.href };
+  }
+  function push(role, text){
+    const div = document.createElement('div');
+    div.className = 'msg '+(role==='user'?'u':'a');
+    div.textContent = text;
+    chat.appendChild(div);
+    chat.scrollTop = chat.scrollHeight;
+    return div;
+  }
+  push('assistant', 'Привет! Я помогу составить план, чек-лист и мини-пример под требования твоего вуза. Введи тему/требования — начнём.');
+  
+  async function send(message){
+    const res = await fetch('/api/mentor/stream', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ sessionId: SID, userText: message, mode: modeEl.value, pageContext: pageContext() })
+    });
+    if (!res.ok || !res.body) {
+      let msg = 'Сбой сервера.';
+      try {
+        const j = await res.json();
+        msg = j.error || msg;
+      } catch {}
+      if (res.status === 429) msg = 'Лимит модели. Попробуйте чуть позже.';
+      if (res.status === 503) msg = 'Сервер перегружен. Повторите позже.';
+      if (res.status === 504) msg = 'Таймаут ответа. Повторите запрос.';
+      throw new Error(msg);
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder('utf-8');
+    let full = '', chunk, done;
+    const bubble = push('assistant', '');
+    while (true){
+      ({value: chunk, done} = await reader.read());
+      if (done) break;
+      const text = decoder.decode(chunk, {stream:true});
+      full += text;
+      bubble.textContent = full;
+      chat.scrollTop = chat.scrollHeight;
+    }
+  }
+  
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    const txt = input.value.trim();
+    if (!txt) return;
+    push('user', txt);
+    input.value = '';
+    input.disabled = true; form.querySelector('button').disabled = true;
+    try { await send(txt); srvNotice.textContent = ''; }
+    catch (err){ push('assistant', 'Ошибка: '+(err.message||err)); srvNotice.textContent = String(err.message||''); }
+    finally { input.disabled = false; form.querySelector('button').disabled = false; input.focus(); }
+  });
+  
+  // ---- Проверка работы
+  const fileInput = document.getElementById('file');
+  const drop = document.getElementById('drop');
+  const runBtn = document.getElementById('run-check');
+  const report = document.getElementById('report');
+  const reqCheck = document.getElementById('check-req');
+  
+  ['dragenter','dragover','dragleave','drop'].forEach(evt=>{
+    drop.addEventListener(evt, e=>{ e.preventDefault(); e.stopPropagation(); });
+  });
+  ['dragenter','dragover'].forEach(evt=> drop.addEventListener(evt, ()=> drop.style.borderColor = '#4da3ff'));
+  ['dragleave','drop'].forEach(evt=> drop.addEventListener(evt, ()=> drop.style.borderColor = '#2a3550'));
+  drop.addEventListener('drop', e=>{
+    const f = e.dataTransfer.files?.[0];
+    if (f) fileInput.files = e.dataTransfer.files;
+  });
+  
+  runBtn.onclick = async (e)=>{
+    e.preventDefault();
+    const f = fileInput.files?.[0];
+    if (!f) { report.textContent = 'Выберите файл (PDF/DOCX) до 10 МБ.'; return; }
+    report.textContent = 'Загружаю и анализирую…';
+    runBtn.disabled = true;
+    
+    try{
+      const fd = new FormData();
+      fd.append('file', f);
+      fd.append('sessionId', SID);
+      fd.append('uniReq', reqCheck.value.trim() || reqEl.value.trim());
+      
+      const res = await fetch('/api/mentor/upload', { method:'POST', body: fd });
+      const data = await res.json();
+      if (res.ok) {
+        report.textContent = data.reply || 'Пустой отчёт.';
+      } else {
+        report.textContent = 'Ошибка: ' + (data.error || 'не удалось обработать файл');
+      }
+    }catch(err){
+      report.textContent = 'Ошибка запроса: ' + (err.message||err);
+    }finally{
+      runBtn.disabled = false;
+    }
+  };
+  
+  // ---- Пинг серверной готовности
+  async function pingReady(){
+    try{
+      const r = await fetch('/readyz');
+      srvNotice.textContent = r.ok ? '' : 'Сервис занят, попробуйте позже.';
+    }catch{ srvNotice.textContent = 'Нет связи с сервером.'; }
+  }
+  setInterval(pingReady, 15000);
+  pingReady();
+})();
+</script>
+</body>
+</html>

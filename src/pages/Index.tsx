@@ -793,16 +793,16 @@ export default function Index() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-cyan-200 hover:shadow-xl transition-all hover:border-cyan-400 hover:scale-105">
+                <Card className="border-2 border-cyan-200 hover:shadow-xl transition-all hover:border-cyan-400 hover:scale-105 cursor-pointer" onClick={() => window.location.href = '/mentor'}>
                   <CardHeader className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center">
                       <Icon name="Bot" size={32} className="text-white" />
                     </div>
-                    <CardTitle className="text-xl">AI-помощник</CardTitle>
+                    <CardTitle className="text-xl">TechMentor</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground text-center">
-                      Умный бот в Telegram отвечает на вопросы по учёбе 24/7
+                      ИИ-репетитор помогает разобраться в материале и составить план работы
                     </p>
                   </CardContent>
                 </Card>
@@ -830,21 +830,17 @@ export default function Index() {
                     </div>
                     <h3 className="font-bold text-2xl mb-3">Попробуй все возможности платформы</h3>
                     <p className="text-muted-foreground text-base max-w-xl mx-auto mb-6">
-                      Доступ к каталогу работ и AI-помощнику в Telegram — всё что нужно для успешной учёбы
+                      Доступ к каталогу работ и умному AI-репетитору — всё что нужно для успешной учёбы
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer" className="inline-block">
-                      <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl w-full">
-                        <Icon name="MessageCircle" size={20} className="mr-2" />
-                        Открыть бота
-                      </Button>
-                    </a>
-                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-blue-500 text-blue-600 hover:bg-blue-50" asChild>
-                      <a href="/bot-subscription">
-                        <Icon name="Sparkles" size={20} className="mr-2" />
-                        Подписка
-                      </a>
+                    <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" onClick={() => window.location.href = '/mentor'}>
+                      <Icon name="Bot" size={20} className="mr-2" />
+                      Открыть TechMentor
+                    </Button>
+                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-blue-500 text-blue-600 hover:bg-blue-50" onClick={() => window.location.href = '/catalog'}>
+                      <Icon name="BookOpen" size={20} className="mr-2" />
+                      Каталог работ
                     </Button>
                   </div>
                 </CardContent>

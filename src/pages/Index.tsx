@@ -372,8 +372,8 @@ export default function Index() {
     <>
       <SEO 
         title="Главная"
-        description="Маркетплейс студенческих работ + AI-помощник в Telegram. Покупай работы за баллы, продавай свои и получай помощь 24/7"
-        keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, ИИ ассистент для учебы, telegram бот, учебные материалы"
+        description="Маркетплейс студенческих работ + AI-помощник для студентов. Покупай работы за баллы, продавай свои и получай помощь от AI 24/7"
+        keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, ИИ ассистент для учебы, AI помощник, учебные материалы, искусственный интеллект"
       />
       <div className="min-h-screen w-full overflow-x-hidden" style={{
       backgroundImage: `url('https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/1e62c804-3d33-4e1b-801f-92c5358091e1.jpg')`,
@@ -389,13 +389,17 @@ export default function Index() {
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
                 <div className="flex flex-col min-w-0">
                   <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Твой помощник в учёбе</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Работы + AI-помощник</p>
                 </div>
               </div>
               
               <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
                 <a href="/" className="hover:text-primary transition-colors text-sm">Главная</a>
                 <a href="/catalog" className="hover:text-primary transition-colors text-sm">Каталог</a>
+                <a href="/ai-chat" className="hover:text-primary transition-colors text-sm flex items-center gap-1">
+                  <Icon name="Bot" size={14} />
+                  AI-помощник
+                </a>
                 <a href="#blog" className="hover:text-primary transition-colors text-sm">Блог</a>
                 <a href="#support" className="hover:text-primary transition-colors text-sm">Поддержка</a>
               </nav>
@@ -612,11 +616,17 @@ export default function Index() {
               </p>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Маркетплейс учебных работ. Покупай работы за баллы, продавай свои и зарабатывай.
+                Маркетплейс учебных работ + AI-помощник. Покупай работы за баллы, продавай свои и получай помощь от AI 24/7.
               </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
-                <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
+                <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
+                  <a href="/ai-chat">
+                    <Icon name="Bot" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+                    AI-помощник
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg shadow-xl border-2" asChild>
                   <a href="/catalog">
                     <Icon name="Database" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
                     Каталог работ
@@ -629,9 +639,12 @@ export default function Index() {
                   <div className="text-xl sm:text-3xl font-bold text-primary mb-1">500+</div>
                   <p className="text-xs sm:text-sm text-muted-foreground">Готовых работ</p>
                 </div>
-                <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-blue-200 hover:border-blue-400 transition-all hover:shadow-lg">
-                  <div className="text-xl sm:text-3xl font-bold text-blue-600 mb-1">24/7</div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Доступ</p>
+                <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-purple-200 hover:border-purple-400 transition-all hover:shadow-lg">
+                  <div className="text-xl sm:text-3xl font-bold text-purple-600 mb-1 flex items-center justify-center gap-2">
+                    <Icon name="Bot" size={28} />
+                    AI
+                  </div>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Помощник 24/7</p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-green-200 hover:border-green-400 transition-all hover:shadow-lg">
                   <div className="text-xl sm:text-3xl font-bold text-green-600 mb-1">1000+</div>
@@ -793,16 +806,16 @@ export default function Index() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-2 border-cyan-200 hover:shadow-xl transition-all hover:border-cyan-400 hover:scale-105 cursor-pointer" onClick={() => window.location.href = '/mentor'}>
+                <Card className="border-2 border-purple-200 hover:shadow-xl transition-all hover:border-purple-400 hover:scale-105 cursor-pointer" onClick={() => window.location.href = '/ai-chat'}>
                   <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl flex items-center justify-center">
+                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center">
                       <Icon name="Bot" size={32} className="text-white" />
                     </div>
-                    <CardTitle className="text-xl">TechMentor</CardTitle>
+                    <CardTitle className="text-xl">AI-помощник</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-muted-foreground text-center">
-                      ИИ-репетитор помогает разобраться в материале и составить план работы
+                      Персональный AI-репетитор помогает разобраться в материале и составить план работы
                     </p>
                   </CardContent>
                 </Card>
@@ -822,23 +835,23 @@ export default function Index() {
                 </Card>
               </div>
 
-              <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 mb-8 hover:shadow-xl transition-all">
+              <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 mb-8 hover:shadow-xl transition-all">
                 <CardContent className="p-8 text-center">
                   <div className="mb-6">
-                    <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4">
-                      <Icon name="Rocket" size={40} className="text-white" />
+                    <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
+                      <Icon name="Sparkles" size={40} className="text-white" />
                     </div>
                     <h3 className="font-bold text-2xl mb-3">Попробуй все возможности платформы</h3>
                     <p className="text-muted-foreground text-base max-w-xl mx-auto mb-6">
-                      Доступ к каталогу работ и умному AI-репетитору — всё что нужно для успешной учёбы
+                      Доступ к каталогу работ и умному AI-помощнику — всё что нужно для успешной учёбы
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" onClick={() => window.location.href = '/mentor'}>
+                    <Button size="lg" className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 h-14 px-8 text-lg shadow-xl" onClick={() => window.location.href = '/ai-chat'}>
                       <Icon name="Bot" size={20} className="mr-2" />
-                      Открыть TechMentor
+                      Открыть AI-помощник
                     </Button>
-                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-blue-500 text-blue-600 hover:bg-blue-50" onClick={() => window.location.href = '/catalog'}>
+                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-purple-500 text-purple-600 hover:bg-purple-50" onClick={() => window.location.href = '/catalog'}>
                       <Icon name="BookOpen" size={20} className="mr-2" />
                       Каталог работ
                     </Button>
@@ -1554,18 +1567,18 @@ export default function Index() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Icon name="MessageCircle" size={20} className="text-blue-600" />
-                    Что такое TechMentor AI бот?
+                    <Icon name="Bot" size={20} className="text-purple-600" />
+                    Что такое AI-помощник?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground mb-3">
-                    Это AI-помощник в Telegram, который отвечает на вопросы, помогает с учёбой и консультирует по работам на платформе 24/7.
+                    Это персональный AI-репетитор, который отвечает на вопросы, помогает с учёбой, проверяет работы и составляет планы 24/7.
                   </p>
                   <Button variant="outline" className="mt-2" asChild>
-                    <a href="https://t.me/TechForma_bot" target="_blank" rel="noopener noreferrer">
-                      <Icon name="ExternalLink" size={16} className="mr-2" />
-                      Открыть бота
+                    <a href="/ai-chat">
+                      <Icon name="Sparkles" size={16} className="mr-2" />
+                      Попробовать AI-помощник
                     </a>
                   </Button>
                 </CardContent>

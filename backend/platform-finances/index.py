@@ -47,13 +47,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = psycopg2.connect(dsn)
         cur = conn.cursor()
         
-        # Общая статистика продаж
+        # Общая статистика продаж (исключаем тестовые покупки админа)
         cur.execute("""
             SELECT 
                 COUNT(*) as total_purchases,
                 COALESCE(SUM(price_paid), 0) as total_revenue,
                 COALESCE(SUM(commission), 0) as total_commission
             FROM t_p63326274_course_download_plat.purchases
+            WHERE buyer_id != 999999
         """)
         purchases_stats = cur.fetchone()
         total_purchases = int(purchases_stats[0]) if purchases_stats else 0
@@ -103,7 +104,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'salesCount': int(row[3])
             })
         
-        # Продажи по дням (последние 30 дней)
+        # Продажи по дням (последние 30 дней, исключаем тестовые покупки админа)
         cur.execute("""
             SELECT 
                 DATE(created_at) as sale_date,
@@ -111,6 +112,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 COALESCE(SUM(price_paid), 0) as daily_revenue
             FROM t_p63326274_course_download_plat.purchases
             WHERE created_at >= NOW() - INTERVAL '30 days'
+                AND buyer_id != 999999
             GROUP BY DATE(created_at)
             ORDER BY sale_date DESC
         """)
@@ -123,7 +125,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'revenue': int(row[2])
             })
         
-        # Топ работ по продажам
+        # Топ работ по продажам (исключаем тестовые покупки админа)
         cur.execute("""
             SELECT 
                 w.title,
@@ -132,6 +134,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 COALESCE(SUM(p.price_paid), 0) as total_revenue
             FROM t_p63326274_course_download_plat.purchases p
             JOIN t_p63326274_course_download_plat.works w ON p.work_id = w.id
+            WHERE p.buyer_id != 999999
             GROUP BY w.id, w.title, w.price_points
             ORDER BY sales_count DESC
             LIMIT 10
@@ -146,7 +149,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'totalRevenue': int(row[3])
             })
         
-        # Последние транзакции
+        # Последние транзакции (исключаем тестовые покупки админа)
         cur.execute("""
             SELECT 
                 p.id,
@@ -160,6 +163,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             JOIN t_p63326274_course_download_plat.users u_buyer ON p.buyer_id = u_buyer.id
             JOIN t_p63326274_course_download_plat.works w ON p.work_id = w.id
             LEFT JOIN t_p63326274_course_download_plat.users u_author ON w.author_id = u_author.id
+            WHERE p.buyer_id != 999999
             ORDER BY p.created_at DESC
             LIMIT 50
         """)

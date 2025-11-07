@@ -436,21 +436,31 @@ export default function AIChatPage() {
               </Card>
             </div>
 
-            {currentUser?.role === 'admin' && (
-              <div className="mb-12 text-center">
-                <Card className="border-2 border-green-500 bg-green-50">
-                  <CardContent className="py-8">
-                    <Icon name="Shield" size={48} className="mx-auto mb-4 text-green-600" />
-                    <h3 className="text-2xl font-bold mb-2">Привет, Администратор!</h3>
-                    <p className="text-muted-foreground mb-6">У вас есть полный доступ к AI помощнику</p>
-                    <Button size="lg" className="bg-green-600 hover:bg-green-700" onClick={() => setHasAccess(true)}>
-                      <Icon name="ArrowRight" size={20} className="mr-2" />
-                      Открыть AI помощник
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
+            <div className="mb-12 text-center">
+              <Card className="border-2 border-blue-500 bg-blue-50">
+                <CardContent className="py-8">
+                  <Icon name="Info" size={48} className="mx-auto mb-4 text-blue-600" />
+                  <h3 className="text-xl font-bold mb-2">Отладочная информация</h3>
+                  <div className="text-left max-w-md mx-auto mb-4 space-y-2">
+                    <p className="text-sm">admin_authenticated: {localStorage.getItem('admin_authenticated') || 'null'}</p>
+                    <p className="text-sm">currentUser: {currentUser ? JSON.stringify({id: currentUser.id, role: currentUser.role}) : 'null'}</p>
+                    <p className="text-sm">hasAccess: {hasAccess.toString()}</p>
+                    <p className="text-sm">user in localStorage: {localStorage.getItem('user') ? 'exists' : 'null'}</p>
+                  </div>
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => {
+                    const isAdmin = localStorage.getItem('admin_authenticated') === 'true';
+                    if (isAdmin) {
+                      setHasAccess(true);
+                    } else {
+                      alert('Вы не админ! admin_authenticated = ' + localStorage.getItem('admin_authenticated'));
+                    }
+                  }}>
+                    <Icon name="ArrowRight" size={20} className="mr-2" />
+                    Принудительно открыть чат (если админ)
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
 
             <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-2">
               <CardHeader>

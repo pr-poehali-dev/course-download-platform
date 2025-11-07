@@ -30,6 +30,7 @@ export default function AIChatPage() {
   const [loading, setLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
   const [subscription, setSubscription] = useState<any>(null);
+  const [debugInfo, setDebugInfo] = useState<any>({});
   
   const [sessionId] = useState(() => {
     const stored = localStorage.getItem('tm_session_id');
@@ -59,24 +60,32 @@ export default function AIChatPage() {
   useEffect(() => {
     const initAuth = async () => {
       const isAdminAuth = localStorage.getItem('admin_authenticated') === 'true';
+      const storedUser = localStorage.getItem('user');
+      
+      setDebugInfo({
+        admin_authenticated: isAdminAuth,
+        user_exists: !!storedUser
+      });
       
       if (isAdminAuth) {
-        const storedUser = localStorage.getItem('user');
         if (storedUser) {
           try {
             const adminUser = JSON.parse(storedUser);
             setCurrentUser(adminUser);
             setHasAccess(true);
             setLoading(false);
+            setDebugInfo(prev => ({...prev, admin_parsed: true, admin_role: adminUser.role}));
             return;
           } catch (e) {
             console.error('Failed to parse admin user');
+            setDebugInfo(prev => ({...prev, parse_error: true}));
           }
         }
       }
       
       const user = await authService.verify();
       setCurrentUser(user);
+      setDebugInfo(prev => ({...prev, user_role: user?.role}));
       
       if (!user) {
         setLoading(false);
@@ -441,22 +450,18 @@ export default function AIChatPage() {
                 <CardContent className="py-8">
                   <Icon name="Info" size={48} className="mx-auto mb-4 text-blue-600" />
                   <h3 className="text-xl font-bold mb-2">Отладочная информация</h3>
-                  <div className="text-left max-w-md mx-auto mb-4 space-y-2">
-                    <p className="text-sm">admin_authenticated: {localStorage.getItem('admin_authenticated') || 'null'}</p>
-                    <p className="text-sm">currentUser: {currentUser ? JSON.stringify({id: currentUser.id, role: currentUser.role}) : 'null'}</p>
-                    <p className="text-sm">hasAccess: {hasAccess.toString()}</p>
-                    <p className="text-sm">user in localStorage: {localStorage.getItem('user') ? 'exists' : 'null'}</p>
+                  <div className="text-left max-w-md mx-auto mb-4 space-y-2 font-mono text-xs">
+                    <p>admin_auth: {String(debugInfo.admin_authenticated)}</p>
+                    <p>user_exists: {String(debugInfo.user_exists)}</p>
+                    <p>admin_parsed: {String(debugInfo.admin_parsed)}</p>
+                    <p>admin_role: {debugInfo.admin_role || 'null'}</p>
+                    <p>user_role: {debugInfo.user_role || 'null'}</p>
+                    <p>hasAccess: {String(hasAccess)}</p>
+                    <p>currentUser.id: {currentUser?.id || 'null'}</p>
                   </div>
-                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700" onClick={() => {
-                    const isAdmin = localStorage.getItem('admin_authenticated') === 'true';
-                    if (isAdmin) {
-                      setHasAccess(true);
-                    } else {
-                      alert('Вы не админ! admin_authenticated = ' + localStorage.getItem('admin_authenticated'));
-                    }
-                  }}>
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700" onClick={() => setHasAccess(true)}>
                     <Icon name="ArrowRight" size={20} className="mr-2" />
-                    Принудительно открыть чат (если админ)
+                    Открыть чат принудительно
                   </Button>
                 </CardContent>
               </Card>

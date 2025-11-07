@@ -93,7 +93,7 @@ def _send_email_via_resend(*, to: str, subject: str, html: str) -> str:
     if not key:
         raise RuntimeError('RESEND_API_KEY is not set')
     
-    mail_from = os.environ.get('MAIL_FROM', 'TechForma <noreply@techforma.ru>')
+    mail_from = os.environ.get('MAIL_FROM', 'TechForma <noreply@techforma.pro>')
     
     resp = requests.post(
         RESEND_API,
@@ -132,7 +132,7 @@ def send_welcome_email(email: str, username: str):
             <li>Загружать свои работы и зарабатывать баллы</li>
             <li>Использовать AI-помощника для учёбы</li>
         </ul>
-        <p><a href="https://techforma.ru" style="display:inline-block;background:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin-top:16px">Перейти на платформу</a></p>
+        <p><a href="https://techforma.pro" style="display:inline-block;background:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin-top:16px">Перейти на платформу</a></p>
         <p>С уважением,<br>Команда TechForma</p>
     </div>
     '''
@@ -140,7 +140,7 @@ def send_welcome_email(email: str, username: str):
 
 def send_reset_password_email(email: str, username: str, reset_token: str):
     """Send password reset email via Resend API"""
-    base = os.environ.get('FRONTEND_RESET_URL', 'https://techforma.ru/reset-password')
+    base = os.environ.get('FRONTEND_RESET_URL', 'https://techforma.pro/reset-password')
     reset_url = f"{base}?token={reset_token}"
     
     html = f'''

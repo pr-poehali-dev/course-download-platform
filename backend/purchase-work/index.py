@@ -25,13 +25,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
                 'Access-Control-Max-Age': '86400'
             },
             'body': '',
             'isBase64Encoded': False
         }
+    
+    params = event.get('queryStringParameters', {})
+    action = params.get('action', 'purchase')
+    
+    if method == 'GET' and action == 'order-status':
+        return get_order_status(event)
+    
+    if method == 'POST' and action == 'create-order':
+        return create_order(event)
+    
+    if method == 'POST' and action == 'mock-pay':
+        return mock_payment(event)
     
     if method != 'POST':
         return {
@@ -264,5 +276,344 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({'error': f'Purchase failed: {str(e)}'}),
+            'isBase64Encoded': False
+        }
+
+def get_db_connection():
+    database_url = os.environ.get('DATABASE_URL')
+    conn = psycopg2.connect(database_url)
+    conn.autocommit = False
+    return conn
+
+def user_has_paid(cur, user_id: int, work_id: int) -> bool:
+    cur.execute(
+        """
+        SELECT 1 FROM t_p63326274_course_download_plat.purchases 
+        WHERE buyer_id = %s AND work_id = %s
+        UNION
+        SELECT 1 FROM t_p63326274_course_download_plat.orders 
+        WHERE user_id = %s AND work_id = %s AND status = 'paid'
+        LIMIT 1
+        """,
+        (user_id, work_id, user_id, work_id)
+    )
+    return cur.fetchone() is not None
+
+def create_order(event: Dict[str, Any]) -> Dict[str, Any]:
+    headers = event.get('headers', {})
+    user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+    
+    if not user_id:
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Требуется авторизация'}),
+            'isBase64Encoded': False
+        }
+    
+    body_data = json.loads(event.get('body', '{}'))
+    work_id = body_data.get('workId')
+    
+    if not work_id:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'workId обязателен'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        cur.execute(
+            "SELECT id, title, price FROM t_p63326274_course_download_plat.works WHERE id = %s",
+            (work_id,)
+        )
+        work = cur.fetchone()
+        
+        if not work:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Работа не найдена'}),
+                'isBase64Encoded': False
+            }
+        
+        work_id_db, title, price = work
+        
+        if user_has_paid(cur, int(user_id), work_id_db):
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'ok': True,
+                    'alreadyPaid': True,
+                    'message': 'Работа уже куплена'
+                }),
+                'isBase64Encoded': False
+            }
+        
+        cur.execute(
+            """
+            SELECT id, status, amount_cents FROM t_p63326274_course_download_plat.orders 
+            WHERE user_id = %s AND work_id = %s AND status = 'pending'
+            ORDER BY created_at DESC LIMIT 1
+            """,
+            (user_id, work_id)
+        )
+        existing_order = cur.fetchone()
+        
+        if existing_order:
+            order_id, status, amount_cents = existing_order
+            site_url = os.environ.get('SITE_URL', 'https://techforma.pro')
+            pay_url = f"{site_url}/payment?orderId={order_id}"
+            
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'ok': True,
+                    'orderId': order_id,
+                    'amount_cents': amount_cents,
+                    'payUrl': pay_url
+                }),
+                'isBase64Encoded': False
+            }
+        
+        amount_cents = price
+        site_url = os.environ.get('SITE_URL', 'https://techforma.pro')
+        
+        cur.execute(
+            """
+            INSERT INTO t_p63326274_course_download_plat.orders 
+            (user_id, work_id, status, amount_cents) 
+            VALUES (%s, %s, 'pending', %s) 
+            RETURNING id
+            """,
+            (user_id, work_id, amount_cents)
+        )
+        order_id = cur.fetchone()[0]
+        
+        pay_url = f"{site_url}/payment?orderId={order_id}"
+        
+        cur.execute(
+            "UPDATE t_p63326274_course_download_plat.orders SET payment_url = %s WHERE id = %s",
+            (pay_url, order_id)
+        )
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({
+                'ok': True,
+                'orderId': order_id,
+                'amount_cents': amount_cents,
+                'payUrl': pay_url
+            }),
+            'isBase64Encoded': False
+        }
+    
+    except Exception as e:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        print(f"Create order error: {repr(e)}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Ошибка создания заказа'}),
+            'isBase64Encoded': False
+        }
+
+def get_order_status(event: Dict[str, Any]) -> Dict[str, Any]:
+    headers = event.get('headers', {})
+    user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+    
+    if not user_id:
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Требуется авторизация'}),
+            'isBase64Encoded': False
+        }
+    
+    params = event.get('queryStringParameters', {})
+    order_id = params.get('orderId')
+    
+    if not order_id:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'orderId required'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    cur.execute(
+        """
+        SELECT id, status, work_id, amount_cents FROM t_p63326274_course_download_plat.orders 
+        WHERE id = %s AND user_id = %s
+        """,
+        (order_id, user_id)
+    )
+    order = cur.fetchone()
+    cur.close()
+    conn.close()
+    
+    if not order:
+        return {
+            'statusCode': 404,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Заказ не найден'}),
+            'isBase64Encoded': False
+        }
+    
+    order_id_db, status, work_id, amount_cents = order
+    
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        'body': json.dumps({
+            'ok': True,
+            'orderId': order_id_db,
+            'status': status,
+            'work_id': work_id,
+            'amount_cents': amount_cents
+        }),
+        'isBase64Encoded': False
+    }
+
+def mock_payment(event: Dict[str, Any]) -> Dict[str, Any]:
+    headers = event.get('headers', {})
+    user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+    
+    if not user_id:
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Требуется авторизация'}),
+            'isBase64Encoded': False
+        }
+    
+    body_data = json.loads(event.get('body', '{}'))
+    order_id = body_data.get('orderId')
+    
+    if not order_id:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'orderId обязателен'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        cur.execute(
+            """
+            SELECT id, user_id, work_id, status, amount_cents 
+            FROM t_p63326274_course_download_plat.orders 
+            WHERE id = %s AND user_id = %s
+            """,
+            (order_id, user_id)
+        )
+        order = cur.fetchone()
+        
+        if not order:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Заказ не найден'}),
+                'isBase64Encoded': False
+            }
+        
+        order_id_db, user_id_db, work_id, status, amount_cents = order
+        
+        if status == 'paid':
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'ok': True,
+                    'status': 'paid',
+                    'message': 'Заказ уже оплачен'
+                }),
+                'isBase64Encoded': False
+            }
+        
+        cur.execute(
+            "UPDATE t_p63326274_course_download_plat.orders SET status = 'paid', paid_at = NOW() WHERE id = %s",
+            (order_id,)
+        )
+        
+        cur.execute(
+            """
+            SELECT balance FROM t_p63326274_course_download_plat.users 
+            WHERE id = %s
+            """,
+            (user_id,)
+        )
+        user = cur.fetchone()
+        current_balance = user[0] if user else 0
+        
+        new_balance = current_balance - (amount_cents // 100)
+        
+        cur.execute(
+            "UPDATE t_p63326274_course_download_plat.users SET balance = %s WHERE id = %s",
+            (new_balance, user_id)
+        )
+        
+        cur.execute(
+            """
+            INSERT INTO t_p63326274_course_download_plat.transactions 
+            (user_id, type, amount, description) 
+            VALUES (%s, 'purchase', %s, %s)
+            """,
+            (user_id, -(amount_cents // 100), f'Покупка работы #{work_id}')
+        )
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({
+                'ok': True,
+                'status': 'paid',
+                'message': 'Оплата прошла успешно',
+                'new_balance': new_balance
+            }),
+            'isBase64Encoded': False
+        }
+    
+    except Exception as e:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        print(f"Mock payment error: {repr(e)}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Ошибка обработки оплаты'}),
             'isBase64Encoded': False
         }

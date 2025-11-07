@@ -32,6 +32,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import SupportAdmin from "./components/SupportAdmin";
 import MentorPage from "./pages/MentorPage";
 import AIChatPage from "./pages/AIChatPage";
+import PaymentPage from "./pages/PaymentPage";
 
 
 const queryClient = new QueryClient();
@@ -72,6 +73,7 @@ const App = () => (
           <Route path="/blog/:id" element={<BlogPost />} />
           <Route path="/mentor" element={<MentorPage />} />
           <Route path="/ai-chat" element={<AIChatPage />} />
+          <Route path="/payment" element={<PaymentPage />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

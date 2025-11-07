@@ -105,15 +105,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # Проверяем покупку только для НЕ-админов
             if not is_admin:
                 cur.execute(
-                    "SELECT id FROM t_p63326274_course_download_plat.purchases WHERE buyer_id = %s AND work_id = %s",
-                    (user_id, work_id)
+                    """
+                    SELECT id FROM t_p63326274_course_download_plat.purchases 
+                    WHERE buyer_id = %s AND work_id = %s
+                    UNION
+                    SELECT id FROM t_p63326274_course_download_plat.orders 
+                    WHERE user_id = %s AND work_id = %s AND status = 'paid'
+                    LIMIT 1
+                    """,
+                    (user_id, work_id, user_id, work_id)
                 )
                 
                 if not cur.fetchone():
                     return {
-                        'statusCode': 403,
+                        'statusCode': 402,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Work not purchased. Please purchase before downloading.'}),
+                        'body': json.dumps({
+                            'error': 'Payment required',
+                            'message': 'Скачивание доступно только после оплаты. Оформите заказ и оплатите, потом вернитесь к скачиванию.'
+                        }),
                         'isBase64Encoded': False
                     }
             

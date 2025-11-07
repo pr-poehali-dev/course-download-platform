@@ -345,7 +345,6 @@ export default function WorkDetailPage() {
   const handlePurchaseAndDownload = async () => {
     if (!actualWorkId || !work) return;
     
-    // Получаем userId из localStorage (предполагается, что пользователь авторизован)
     const userStr = localStorage.getItem('user');
     if (!userStr) {
       alert('Войдите в систему для покупки работы');
@@ -358,28 +357,28 @@ export default function WorkDetailPage() {
     
     setDownloading(true);
     try {
-      // Шаг 1: Покупка работы
-      const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
+      const orderResponse = await fetch(`${PURCHASE_WORK_URL}?action=create-order`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-User-Id': String(userId)
         },
         body: JSON.stringify({
-          workId: actualWorkId,
-          userId: userId,
-          price: work.price
+          workId: actualWorkId
         })
       });
       
-      const purchaseData = await purchaseResponse.json();
+      const orderData = await orderResponse.json();
       
-      if (!purchaseResponse.ok) {
-        if (purchaseData.error === 'Insufficient balance') {
-          alert(`Недостаточно баллов. У вас: ${purchaseData.balance}, нужно: ${purchaseData.required}`);
-          return;
-        }
-        throw new Error(purchaseData.error || 'Ошибка покупки');
+      if (!orderResponse.ok) {
+        throw new Error(orderData.error || 'Ошибка создания заказа');
+      }
+      
+      if (orderData.alreadyPaid) {
+        setDownloading(false);
+      } else if (orderData.payUrl) {
+        window.location.href = orderData.payUrl;
+        return;
       }
       
       // Шаг 2: Получение ссылки на скачивание

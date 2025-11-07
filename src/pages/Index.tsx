@@ -76,8 +76,13 @@ export default function Index() {
 
   useEffect(() => {
     const initAuth = async () => {
-      const user = await authService.verify();
-      setCurrentUser(user);
+      try {
+        const user = await authService.verify();
+        setCurrentUser(user);
+      } catch (error) {
+        console.error('Auth verification failed:', error);
+        setCurrentUser(null);
+      }
     };
     initAuth();
   }, []);

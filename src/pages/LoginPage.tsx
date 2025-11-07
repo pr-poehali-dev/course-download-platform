@@ -37,7 +37,7 @@ export default function LoginPage() {
           description: 'Вы успешно вошли в систему'
         });
         
-        navigate('/');
+        navigate('/test-login');
       } else {
         toast({
           title: 'Ошибка входа',

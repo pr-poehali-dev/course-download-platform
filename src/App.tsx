@@ -29,6 +29,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import TestLoginPage from "./pages/TestLoginPage";
 import SupportAdmin from "./components/SupportAdmin";
 import MentorPage from "./pages/MentorPage";
 import AIChatPage from "./pages/AIChatPage";
@@ -70,6 +71,7 @@ const App = () => (
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/test-login" element={<TestLoginPage />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           <Route path="/mentor" element={<MentorPage />} />
           <Route path="/ai-chat" element={<AIChatPage />} />

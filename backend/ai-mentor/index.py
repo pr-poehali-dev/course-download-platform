@@ -45,14 +45,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
+    groq_key = os.environ.get('GROQ_API_KEY')
     openai_key = os.environ.get('OPENAI_API_KEY')
-    if not openai_key:
+    
+    if not groq_key and not openai_key:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'OpenAI API key not configured'}),
+            'body': json.dumps({'error': 'AI API key not configured'}),
             'isBase64Encoded': False
         }
+    
+    use_groq = bool(groq_key)
+    api_key = groq_key if use_groq else openai_key
+    api_url = 'https://api.groq.com/openai/v1/chat/completions' if use_groq else 'https://api.openai.com/v1/chat/completions'
+    model = 'llama-3.1-70b-versatile' if use_groq else 'gpt-4o-mini'
     
     system_prompt = """Ты TechMentor — умный помощник для студентов платформы TechForma.
 
@@ -83,13 +90,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         response = requests.post(
-            'https://api.openai.com/v1/chat/completions',
+            api_url,
             headers={
-                'Authorization': f'Bearer {openai_key}',
+                'Authorization': f'Bearer {api_key}',
                 'Content-Type': 'application/json'
             },
             json={
-                'model': 'gpt-4o-mini',
+                'model': model,
                 'messages': messages,
                 'temperature': 0.7,
                 'max_tokens': 800

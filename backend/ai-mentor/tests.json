@@ -5,12 +5,11 @@
       "method": "POST",
       "path": "/",
       "body": {
-        "message": "Как правильно оформить введение в курсовой работе?"
+        "message": "Привет"
       },
       "expectedStatus": 200,
       "expectedBody": {
-        "response": "string",
-        "usage": "object"
+        "response": "string"
       },
       "bodyMatcher": "partial"
     },

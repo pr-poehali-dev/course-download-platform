@@ -267,6 +267,8 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     username = body_data.get('username', '').strip()
     password = body_data.get('password', '')
     
+    print(f"LOGIN: username={username}, password_len={len(password)}")
+    
     if not username or not password:
         return {
             'statusCode': 400,
@@ -291,6 +293,7 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     conn.close()
     
     if not user:
+        print(f"LOGIN FAIL: user not found for {username}")
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -299,8 +302,12 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
         }
     
     user_id, db_username, email, password_hash, balance, referral_code = user
+    print(f"LOGIN: found user_id={user_id}, hash_start={password_hash[:20]}")
     
-    if not verify_password(password, password_hash):
+    verified = verify_password(password, password_hash)
+    print(f"LOGIN: password verified={verified}")
+    
+    if not verified:
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

@@ -59,6 +59,7 @@ export default function AIChatPage() {
   useEffect(() => {
     const initAuth = async () => {
       const user = await authService.verify();
+      console.log('AIChatPage: Current user:', user);
       setCurrentUser(user);
       
       if (!user) {
@@ -66,7 +67,9 @@ export default function AIChatPage() {
         return;
       }
       
+      console.log('AIChatPage: User role:', user.role);
       if (user.role === 'admin') {
+        console.log('AIChatPage: Admin detected, granting access');
         setHasAccess(true);
         setLoading(false);
         return;
@@ -75,6 +78,7 @@ export default function AIChatPage() {
       try {
         const response = await fetch(`${func2url['ai-subscription']}?user_id=${user.id}`);
         const data = await response.json();
+        console.log('AIChatPage: Subscription data:', data);
         setHasAccess(data.has_access || false);
         setSubscription(data.subscription);
       } catch (error) {

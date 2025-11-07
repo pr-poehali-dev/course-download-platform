@@ -30,6 +30,7 @@ import AgeBadge from '@/components/AgeBadge';
 import CookieBanner from '@/components/CookieBanner';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 import SEO from '@/components/SEO';
+import HomeHeader from '@/components/home/HomeHeader';
 
 
 

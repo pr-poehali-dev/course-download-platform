@@ -300,7 +300,11 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     
     user_id, db_username, email, password_hash, balance, referral_code = user
     
-    if not verify_password(password, password_hash):
+    print(f"LOGIN ATTEMPT: user_id={user_id}, password_hash_starts={password_hash[:10]}, password_len={len(password)}")
+    verification_result = verify_password(password, password_hash)
+    print(f"PASSWORD VERIFICATION: result={verification_result}")
+    
+    if not verification_result:
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

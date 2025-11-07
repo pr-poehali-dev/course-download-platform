@@ -18,18 +18,15 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      const response = await fetch(func2url['auth-email'], {
+      const response = await fetch(`${func2url.auth}?action=reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'forgot-password',
-          email
-        })
+        body: JSON.stringify({ email })
       });
 
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok) {
         setEmailSent(true);
         toast({
           title: 'Письмо отправлено!',
@@ -38,7 +35,7 @@ export default function ForgotPasswordPage() {
       } else {
         toast({
           title: 'Ошибка',
-          description: data.error || 'Пользователь с таким email не найден',
+          description: data.error || 'Не удалось отправить письмо',
           variant: 'destructive'
         });
       }

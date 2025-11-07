@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
+import func2url from '../../backend/func2url.json';
 
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -52,10 +53,10 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       toast({
         title: 'Ошибка',
-        description: 'Пароль должен быть минимум 6 символов',
+        description: 'Пароль должен быть минимум 8 символов',
         variant: 'destructive',
       });
       return;
@@ -65,7 +66,7 @@ const ResetPasswordPage = () => {
 
     try {
       const response = await fetch(
-        'https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46?action=reset-password',
+        `${func2url.auth}?action=confirm-reset`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -118,7 +119,7 @@ const ResetPasswordPage = () => {
               <Input
                 id="password"
                 type="password"
-                placeholder="Минимум 6 символов"
+                placeholder="Минимум 8 символов"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

@@ -101,11 +101,11 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    if len(password) < 6:
+    if len(password) < 8:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Пароль должен быть минимум 6 символов'}),
+            'body': json.dumps({'error': 'Пароль должен быть не короче 8 символов'}),
             'isBase64Encoded': False
         }
     
@@ -444,6 +444,14 @@ def confirm_reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({'error': 'Токен и новый пароль обязательны'}),
+            'isBase64Encoded': False
+        }
+    
+    if len(new_password) < 8:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Пароль должен быть не короче 8 символов'}),
             'isBase64Encoded': False
         }
     

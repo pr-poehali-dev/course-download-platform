@@ -41,10 +41,10 @@ export default function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 6) {
+    if (formData.password.length < 8) {
       toast({
         title: 'Ошибка',
-        description: 'Пароль должен быть не менее 6 символов',
+        description: 'Пароль должен быть не менее 8 символов',
         variant: 'destructive'
       });
       return;
@@ -69,19 +69,9 @@ export default function RegisterPage() {
         localStorage.setItem('authToken', data.token);
         localStorage.setItem('userId', data.user.id);
         
-        fetch(func2url['auth-email'], {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'welcome',
-            email: formData.email,
-            name: formData.name
-          })
-        }).catch(() => {});
-        
         toast({
           title: 'Регистрация успешна!',
-          description: 'Добро пожаловать! Вам начислено 100 бонусных баллов'
+          description: 'Добро пожаловать! Вам начислено 100 бонусных баллов. Проверьте email!'
         });
         
         navigate('/profile');
@@ -180,7 +170,7 @@ export default function RegisterPage() {
                     <Icon name={showPassword ? "EyeOff" : "Eye"} size={18} />
                   </button>
                 </div>
-                <p className="text-xs text-muted-foreground">Минимум 6 символов</p>
+                <p className="text-xs text-muted-foreground">Минимум 8 символов</p>
               </div>
 
               <div className="space-y-2">

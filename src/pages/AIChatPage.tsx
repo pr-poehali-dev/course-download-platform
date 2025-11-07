@@ -29,6 +29,7 @@ export default function AIChatPage() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
+  const [subscription, setSubscription] = useState<any>(null);
   
   const [sessionId] = useState(() => {
     const stored = localStorage.getItem('tm_session_id');
@@ -75,6 +76,7 @@ export default function AIChatPage() {
         const response = await fetch(`${func2url['ai-subscription']}?user_id=${user.id}`);
         const data = await response.json();
         setHasAccess(data.has_access || false);
+        setSubscription(data.subscription);
       } catch (error) {
         console.error('Failed to check subscription:', error);
         setHasAccess(false);
@@ -416,6 +418,22 @@ export default function AIChatPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {currentUser?.role === 'admin' && (
+              <div className="mb-12 text-center">
+                <Card className="border-2 border-green-500 bg-green-50">
+                  <CardContent className="py-8">
+                    <Icon name="Shield" size={48} className="mx-auto mb-4 text-green-600" />
+                    <h3 className="text-2xl font-bold mb-2">Привет, Администратор!</h3>
+                    <p className="text-muted-foreground mb-6">У вас есть полный доступ к AI помощнику</p>
+                    <Button size="lg" className="bg-green-600 hover:bg-green-700" onClick={() => setHasAccess(true)}>
+                      <Icon name="ArrowRight" size={20} className="mr-2" />
+                      Открыть AI помощник
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
 
             <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-2">
               <CardHeader>

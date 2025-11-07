@@ -18,8 +18,8 @@ import AdminTabs from '@/components/admin/AdminTabs';
 import SyncTab from '@/components/admin/SyncTab';
 import func2url from '../../backend/func2url.json';
 
-const ADMIN_EMAIL = 'tech.forma@yandex.ru';
-const ADMIN_PASSWORD = 'stas221974';
+const ADMIN_EMAIL = 'admin@system.local';
+const ADMIN_PASSWORD = 'admin123';
 
 interface StatData {
   totalWorks: number;

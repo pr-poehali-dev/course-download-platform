@@ -58,6 +58,35 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             check_user_id = params.get('user_id') or user_id
             
             cur.execute("""
+                SELECT role FROM users WHERE id = %s
+            """, (check_user_id,))
+            user_row = cur.fetchone()
+            
+            if user_row and user_row[0] == 'admin':
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({
+                        'subscription': {
+                            'id': 'admin',
+                            'type': 'unlimited',
+                            'requestsTotal': -1,
+                            'requestsUsed': 0,
+                            'requestsLeft': -1,
+                            'expiresAt': None,
+                            'createdAt': None,
+                            'price': 0
+                        },
+                        'has_access': True,
+                        'hasSubscription': True,
+                        'isAdmin': True
+                    })
+                }
+            
+            cur.execute("""
                 SELECT id, subscription_type, requests_total, requests_used, 
                        expires_at, is_active, created_at, price_points
                 FROM ai_subscriptions 

@@ -34,7 +34,8 @@ import SupportAdmin from "./components/SupportAdmin";
 import MentorPage from "./pages/MentorPage";
 import AIChatPage from "./pages/AIChatPage";
 import PaymentPage from "./pages/PaymentPage";
-import AIMentorWidget from "./components/AIMentorWidget";
+import DefenseKitBuilder from "./pages/DefenseKitBuilder";
+
 
 
 const queryClient = new QueryClient();
@@ -77,11 +78,12 @@ const App = () => (
           <Route path="/mentor" element={<MentorPage />} />
           <Route path="/ai-chat" element={<AIChatPage />} />
           <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/defense-kit" element={<DefenseKitBuilder />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <AIMentorWidget />
+
       </BrowserRouter>
     </TooltipProvider>
     </ThemeProvider>

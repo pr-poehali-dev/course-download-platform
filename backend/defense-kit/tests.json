@@ -1,0 +1,18 @@
+{
+  "tests": [
+    {
+      "name": "Missing required fields",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "title": "Test",
+        "relevance": ""
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

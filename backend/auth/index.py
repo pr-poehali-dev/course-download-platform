@@ -38,6 +38,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return login_user(event)
         elif path == 'reset-password':
             return reset_password(event)
+        elif path == 'confirm-reset':
+            return confirm_reset_password(event)
     
     if method == 'GET' and path == 'verify':
         return verify_token(event)
@@ -431,3 +433,87 @@ def send_reset_password_email(email: str, username: str, reset_token: str):
         },
         timeout=5
     )
+
+def confirm_reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
+    body_data = json.loads(event.get('body', '{}'))
+    token = body_data.get('token', '').strip()
+    new_password = body_data.get('password', '')
+    
+    if not token or not new_password:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Токен и новый пароль обязательны'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    token_esc = sql_escape(token)
+    cur.execute(f"""
+        SELECT user_id, expires_at, used_at 
+        FROM t_p63326274_course_download_plat.password_reset_tokens 
+        WHERE token = '{token_esc}'
+    """)
+    reset_record = cur.fetchone()
+    
+    if not reset_record:
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Недействительный токен'}),
+            'isBase64Encoded': False
+        }
+    
+    user_id, expires_at, used_at = reset_record
+    
+    if used_at is not None:
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Токен уже использован'}),
+            'isBase64Encoded': False
+        }
+    
+    if datetime.utcnow() > expires_at:
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Токен истёк'}),
+            'isBase64Encoded': False
+        }
+    
+    new_hash = hash_password(new_password)
+    new_hash_esc = sql_escape(new_hash)
+    
+    try:
+        cur.execute(f"UPDATE t_p63326274_course_download_plat.users SET password_hash = '{new_hash_esc}' WHERE id = {user_id}")
+        cur.execute(f"UPDATE t_p63326274_course_download_plat.password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE token = '{token_esc}'")
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'message': 'Пароль успешно изменён'}),
+            'isBase64Encoded': False
+        }
+    except Exception as e:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        print(f"Password reset error: {e}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Ошибка при сбросе пароля'}),
+            'isBase64Encoded': False
+        }

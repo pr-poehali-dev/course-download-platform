@@ -1,0 +1,13 @@
+{
+  "tests": [
+    {
+      "name": "Delete test users",
+      "method": "POST",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

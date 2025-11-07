@@ -353,9 +353,81 @@ def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    email_esc = sql_escape(email)
+    cur.execute(f"SELECT id, username, email FROM t_p63326274_course_download_plat.users WHERE email = '{email_esc}'")
+    user = cur.fetchone()
+    
+    cur.close()
+    conn.close()
+    
+    if not user:
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'message': 'Инструкции по сбросу пароля отправлены на email'}),
+            'isBase64Encoded': False
+        }
+    
+    user_id, username, user_email = user
+    
+    reset_token = hashlib.sha256(f"{user_id}{email}{datetime.utcnow().timestamp()}".encode()).hexdigest()
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    token_esc = sql_escape(reset_token)
+    expires_at = datetime.utcnow() + timedelta(hours=1)
+    cur.execute(f"""
+        INSERT INTO t_p63326274_course_download_plat.password_reset_tokens (user_id, token, expires_at)
+        VALUES ({user_id}, '{token_esc}', '{expires_at.isoformat()}')
+    """)
+    conn.commit()
+    cur.close()
+    conn.close()
+    
+    try:
+        send_reset_password_email(user_email, username, reset_token)
+    except Exception as e:
+        print(f"Failed to send reset password email: {e}")
+    
     return {
         'statusCode': 200,
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         'body': json.dumps({'message': 'Инструкции по сбросу пароля отправлены на email'}),
         'isBase64Encoded': False
     }
+
+def send_reset_password_email(email: str, username: str, reset_token: str):
+    """Send password reset email via Resend API"""
+    resend_key = os.environ.get('RESEND_API_KEY')
+    if not resend_key:
+        return
+    
+    import requests
+    
+    reset_url = f"https://techforma.ru/reset-password?token={reset_token}"
+    
+    response = requests.post(
+        'https://api.resend.com/emails',
+        headers={
+            'Authorization': f'Bearer {resend_key}',
+            'Content-Type': 'application/json'
+        },
+        json={
+            'from': 'TechForma <noreply@techforma.ru>',
+            'to': [email],
+            'subject': 'Сброс пароля TechForma',
+            'html': f'''
+            <h1>Здравствуйте, {username}!</h1>
+            <p>Вы запросили сброс пароля на платформе TechForma.</p>
+            <p>Для сброса пароля перейдите по ссылке:</p>
+            <p><a href="{reset_url}" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px;">Сбросить пароль</a></p>
+            <p>Ссылка действительна в течение 1 часа.</p>
+            <p>Если вы не запрашивали сброс пароля, проигнорируйте это письмо.</p>
+            <p>С уважением,<br>Команда TechForma</p>
+            '''
+        },
+        timeout=5
+    )

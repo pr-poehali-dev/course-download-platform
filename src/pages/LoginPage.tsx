@@ -29,7 +29,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (data.token) {
-        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('auth_token', data.token);
         localStorage.setItem('userId', data.user.id);
         
         toast({
@@ -37,7 +37,7 @@ export default function LoginPage() {
           description: 'Вы успешно вошли в систему'
         });
         
-        navigate('/profile');
+        navigate('/');
       } else {
         toast({
           title: 'Ошибка входа',

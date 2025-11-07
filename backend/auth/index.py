@@ -1,7 +1,7 @@
 import json
 import os
 import psycopg2
-import hashlib
+import bcrypt
 import jwt
 from datetime import datetime, timedelta
 from typing import Dict, Any
@@ -52,7 +52,21 @@ def get_db_connection():
     return conn
 
 def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode(), salt).decode('utf-8')
+
+def verify_password(password: str, password_hash: str) -> bool:
+    """Verify password supporting both bcrypt and legacy SHA256"""
+    # Check if it's bcrypt format (starts with $2b$)
+    if password_hash.startswith('$2b$') or password_hash.startswith('$2a$'):
+        try:
+            return bcrypt.checkpw(password.encode(), password_hash.encode())
+        except:
+            return False
+    else:
+        # Legacy SHA256 format
+        import hashlib
+        return hashlib.sha256(password.encode()).hexdigest() == password_hash
 
 def generate_referral_code(username: str) -> str:
     return hashlib.md5(username.encode()).hexdigest()[:8].upper()
@@ -118,6 +132,12 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
     cur.close()
     conn.close()
     
+    # Send welcome email
+    try:
+        send_welcome_email(email, username)
+    except Exception as e:
+        print(f"Failed to send welcome email: {e}")
+    
     token = generate_jwt_token(user_id, username)
     
     return {
@@ -135,6 +155,41 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
         })
     }
 
+def send_welcome_email(email: str, username: str):
+    """Send welcome email via Resend API"""
+    resend_key = os.environ.get('RESEND_API_KEY')
+    if not resend_key:
+        return
+    
+    import requests
+    
+    response = requests.post(
+        'https://api.resend.com/emails',
+        headers={
+            'Authorization': f'Bearer {resend_key}',
+            'Content-Type': 'application/json'
+        },
+        json={
+            'from': 'TechForma <noreply@techforma.ru>',
+            'to': [email],
+            'subject': f'Добро пожаловать в TechForma, {username}!',
+            'html': f'''
+            <h1>Привет, {username}!</h1>
+            <p>Спасибо за регистрацию на TechForma — платформе для студентов.</p>
+            <p>Тебе начислено <strong>100 баллов</strong> в подарок!</p>
+            <h3>Что можно делать:</h3>
+            <ul>
+                <li>Покупать готовые курсовые и дипломы за баллы</li>
+                <li>Загружать свои работы и зарабатывать баллы</li>
+                <li>Использовать AI-помощника для учёбы</li>
+            </ul>
+            <p><a href="https://techforma.ru" style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; margin-top: 16px;">Перейти на платформу</a></p>
+            <p>С уважением,<br>Команда TechForma</p>
+            '''
+        },
+        timeout=5
+    )
+
 def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
     username = body_data.get('username', '').strip()
@@ -147,26 +202,41 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Заполните все поля'})
         }
     
-    password_hash = hash_password(password)
-    
     conn = get_db_connection()
     cur = conn.cursor()
     
     cur.execute(
-        "SELECT id, username, email, balance, referral_code FROM t_p63326274_course_download_plat.users WHERE username = %s AND password_hash = %s",
-        (username, password_hash)
+        "SELECT id, username, email, balance, referral_code, password_hash FROM t_p63326274_course_download_plat.users WHERE username = %s",
+        (username,)
     )
     user = cur.fetchone()
     
     cur.close()
     conn.close()
     
-    if not user:
+    if not user or not verify_password(password, user[5]):
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({'error': 'Неверное имя пользователя или пароль'})
         }
+    
+    # Upgrade legacy hash to bcrypt
+    old_hash = user[5]
+    if not old_hash.startswith('$2b$') and not old_hash.startswith('$2a$'):
+        new_hash = hash_password(password)
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s WHERE id = %s",
+                (new_hash, user[0])
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"Failed to upgrade password hash: {e}")
     
     token = generate_jwt_token(user[0], user[1])
     

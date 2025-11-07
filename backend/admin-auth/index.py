@@ -6,7 +6,7 @@ Returns: JWT token или user data
 
 import json
 import os
-import hashlib
+import bcrypt
 import hmac
 import secrets
 import time
@@ -49,13 +49,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     }
 
 def hash_password(password: str) -> str:
-    """Безопасное хеширование пароля с солью"""
-    salt = hashlib.sha256(SECRET_KEY.encode()).hexdigest()[:16]
-    return hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000).hex()
+    """Безопасное хеширование пароля с bcrypt"""
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password.encode(), salt).decode('utf-8')
 
 def verify_password(password: str, password_hash: str) -> bool:
-    """Проверка пароля"""
-    return hash_password(password) == password_hash
+    """Verify password supporting both bcrypt and legacy PBKDF2"""
+    # Check if it's bcrypt format (starts with $2b$)
+    if password_hash.startswith('$2b$') or password_hash.startswith('$2a$'):
+        try:
+            return bcrypt.checkpw(password.encode(), password_hash.encode())
+        except:
+            return False
+    else:
+        # Legacy PBKDF2 format
+        import hashlib
+        salt = hashlib.sha256(SECRET_KEY.encode()).hexdigest()[:16]
+        legacy_hash = hashlib.pbkdf2_hmac('sha256', password.encode(), salt.encode(), 100000).hex()
+        return legacy_hash == password_hash
 
 def create_jwt(admin_id: int, email: str) -> str:
     """Создание простого JWT токена"""
@@ -140,6 +151,17 @@ def handle_login(event: Dict[str, Any]) -> Dict[str, Any]:
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({'error': 'Invalid credentials'})
         }
+    
+    # Upgrade legacy hash to bcrypt
+    if not password_hash.startswith('$2b$') and not password_hash.startswith('$2a$'):
+        new_hash = hash_password(password)
+        try:
+            cur.execute(
+                "UPDATE t_p63326274_course_download_plat.admins SET password_hash = %s WHERE id = %s",
+                (new_hash, admin_id)
+            )
+        except Exception as e:
+            print(f"Failed to upgrade admin password hash: {e}")
     
     cur.execute('''
         UPDATE t_p63326274_course_download_plat.admins 

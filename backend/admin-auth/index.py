@@ -6,6 +6,7 @@ Returns: JWT token или user data
 
 import json
 import os
+import hashlib
 import bcrypt
 import hmac
 import secrets

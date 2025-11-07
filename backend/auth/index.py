@@ -1,5 +1,6 @@
 import json
 import os
+import hashlib
 import psycopg2
 import bcrypt
 import jwt

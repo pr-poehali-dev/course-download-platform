@@ -498,7 +498,7 @@ def confirm_reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
     
     cur.execute(
         """
-        SELECT user_id, expires_at, used_at 
+        SELECT user_id, expires_at, used 
         FROM t_p63326274_course_download_plat.password_reset_tokens 
         WHERE token = %s
         """,
@@ -516,9 +516,9 @@ def confirm_reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    user_id, expires_at, used_at = reset_record
+    user_id, expires_at, used = reset_record
     
-    if used_at is not None:
+    if used:
         cur.close()
         conn.close()
         return {
@@ -546,7 +546,7 @@ def confirm_reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
             (new_hash, user_id)
         )
         cur.execute(
-            "UPDATE t_p63326274_course_download_plat.password_reset_tokens SET used_at = CURRENT_TIMESTAMP WHERE token = %s",
+            "UPDATE t_p63326274_course_download_plat.password_reset_tokens SET used = true WHERE token = %s",
             (token_hash,)
         )
         conn.commit()

@@ -10,16 +10,16 @@
       }
     },
     {
-      "name": "Test chat request",
+      "name": "Test missing fileData",
       "method": "POST",
       "path": "/",
       "body": {
-        "sessionId": "test-session-123",
-        "userText": "Привет! Помоги с курсовой по маркетингу",
-        "mode": "tutor"
+        "fileName": "test.pdf"
       },
-      "expectedStatus": 200,
-      "bodyMatcher": "partial"
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "fileData is required"
+      }
     }
   ]
 }

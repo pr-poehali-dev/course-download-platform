@@ -92,7 +92,7 @@ export default function AIChatPage() {
     setChatLoading(true);
 
     try {
-      const response = await fetch('/api/mentor/stream', {
+      const response = await fetch(func2url['ai-chat'], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -108,32 +108,18 @@ export default function AIChatPage() {
         })
       });
 
-      if (!response.ok || !response.body) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
         throw new Error(response.status === 429 ? 'Лимит модели. Попробуйте позже.' :
                        response.status === 503 ? 'Сервер перегружен. Повторите позже.' :
                        response.status === 504 ? 'Таймаут ответа. Повторите запрос.' :
-                       'Ошибка сервера');
+                       errorData.error || 'Ошибка сервера');
       }
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let fullText = '';
+      const data = await response.json();
+      const reply = data.reply || 'Пустой ответ от сервера';
 
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        
-        const chunk = decoder.decode(value, { stream: true });
-        fullText += chunk;
-        
-        setMessages(prev => {
-          const newMessages = [...prev];
-          newMessages[newMessages.length - 1] = { role: 'assistant', content: fullText };
-          return newMessages;
-        });
-      }
+      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
     } catch (error: any) {
       toast({
         title: 'Ошибка',
@@ -153,14 +139,22 @@ export default function AIChatPage() {
     setCheckReport('Загружаю и анализирую файл...');
 
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('sessionId', sessionId);
-      formData.append('uniReq', checkRequirements.trim() || requirements.trim());
+      // Read file as base64
+      const reader = new FileReader();
+      const fileData = await new Promise<string>((resolve, reject) => {
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
-      const response = await fetch('/api/mentor/upload', {
+      const response = await fetch(func2url['ai-check'], {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileData,
+          fileName: file.name,
+          requirements: checkRequirements.trim() || requirements.trim()
+        })
       });
 
       const data = await response.json();

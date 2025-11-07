@@ -1,0 +1,31 @@
+{
+  "tests": [
+    {
+      "name": "Send message to AI mentor",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "message": "Как правильно оформить введение в курсовой работе?"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "response": "string",
+        "usage": "object"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Empty message validation",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "message": ""
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

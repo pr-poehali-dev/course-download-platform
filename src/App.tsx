@@ -34,6 +34,7 @@ import SupportAdmin from "./components/SupportAdmin";
 import MentorPage from "./pages/MentorPage";
 import AIChatPage from "./pages/AIChatPage";
 import PaymentPage from "./pages/PaymentPage";
+import AIMentorWidget from "./components/AIMentorWidget";
 
 
 const queryClient = new QueryClient();
@@ -80,6 +81,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <AIMentorWidget />
       </BrowserRouter>
     </TooltipProvider>
     </ThemeProvider>

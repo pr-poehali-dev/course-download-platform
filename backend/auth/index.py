@@ -161,10 +161,19 @@ def send_reset_password_email(email: str, username: str, reset_token: str):
     '''
     return _send_email_via_resend(to=email, subject='Сброс пароля — TechForma', html=html)
 
+def _norm(s: str) -> str:
+    return (s or "").strip()
+
+def _norm_email(s: str) -> str:
+    return _norm(s).lower()
+
+def _norm_username(s: str) -> str:
+    return _norm(s)
+
 def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
-    username = body_data.get('username', '').strip()
-    email = body_data.get('email', '').strip().lower()
+    username = _norm_username(body_data.get('username', ''))
+    email = _norm_email(body_data.get('email', ''))
     password = body_data.get('password', '')
     
     if not username or not email or not password:
@@ -188,8 +197,8 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
     
     try:
         cur.execute(
-            "SELECT id FROM t_p63326274_course_download_plat.users WHERE LOWER(username) = %s OR LOWER(email) = %s",
-            (username.lower(), email)
+            "SELECT id FROM t_p63326274_course_download_plat.users WHERE lower(username) = lower(%s) OR lower(email) = lower(%s)",
+            (username, email)
         )
         if cur.fetchone():
             cur.close()
@@ -264,12 +273,12 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
 
 def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
-    username = body_data.get('username', '').strip()
+    login = _norm(body_data.get('username', ''))
     password = body_data.get('password', '')
     
-    print(f"LOGIN: username={username}, password_len={len(password)}")
+    print(f"LOGIN: login={login}, password_len={len(password)}")
     
-    if not username or not password:
+    if not login or not password:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -284,16 +293,16 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
         """
         SELECT id, username, email, password_hash, balance, referral_code 
         FROM t_p63326274_course_download_plat.users 
-        WHERE LOWER(username) = %s OR LOWER(email) = %s
+        WHERE lower(username) = lower(%s) OR lower(email) = lower(%s)
         """,
-        (username.lower(), username.lower())
+        (login, login)
     )
     user = cur.fetchone()
     cur.close()
     conn.close()
     
     if not user:
-        print(f"LOGIN FAIL: user not found for {username}")
+        print(f"LOGIN FAIL: user not found for {login}")
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -406,7 +415,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
 
 def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
-    email = body_data.get('email', '').strip().lower()
+    email = _norm_email(body_data.get('email', ''))
     
     if not email:
         return {
@@ -420,7 +429,7 @@ def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
     cur = conn.cursor()
     
     cur.execute(
-        "SELECT id, username FROM t_p63326274_course_download_plat.users WHERE LOWER(email) = %s",
+        "SELECT id, username FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
         (email,)
     )
     user = cur.fetchone()

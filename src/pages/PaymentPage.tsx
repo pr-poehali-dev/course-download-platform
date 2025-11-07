@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { authService } from '@/lib/auth';
 
 export default function PaymentPage() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [status, setStatus] = useState<'loading' | 'ready' | 'processing' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
   const [orderInfo, setOrderInfo] = useState<any>(null);
 
   useEffect(() => {
+    const user = authService.getUser();
+    
     if (!orderId || !user) {
       setStatus('error');
       setMessage('Неверная ссылка на оплату');
@@ -42,9 +43,10 @@ export default function PaymentPage() {
         setStatus('error');
         setMessage('Ошибка загрузки информации о заказе');
       });
-  }, [orderId, user]);
+  }, [orderId]);
 
   const handlePay = async () => {
+    const user = authService.getUser();
     if (!user || !orderId) return;
 
     setStatus('processing');

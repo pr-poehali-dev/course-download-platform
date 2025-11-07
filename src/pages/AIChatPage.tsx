@@ -65,6 +65,12 @@ export default function AIChatPage() {
         return;
       }
       
+      if (user.role === 'admin') {
+        setHasAccess(true);
+        setLoading(false);
+        return;
+      }
+      
       try {
         const response = await fetch(`${func2url['ai-subscription']}?user_id=${user.id}`);
         const data = await response.json();

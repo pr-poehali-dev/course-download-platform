@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    const wasRemembered = localStorage.getItem('remember_me') === 'true';
+    setRememberMe(wasRemembered);
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,8 +35,15 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (data.token) {
-        localStorage.setItem('auth_token', data.token);
-        localStorage.setItem('userId', data.user.id);
+        if (rememberMe) {
+          localStorage.setItem('auth_token', data.token);
+          localStorage.setItem('userId', data.user.id);
+          localStorage.setItem('remember_me', 'true');
+        } else {
+          sessionStorage.setItem('auth_token', data.token);
+          sessionStorage.setItem('userId', data.user.id);
+          localStorage.removeItem('remember_me');
+        }
         
         toast({
           title: 'Добро пожаловать!',
@@ -119,7 +132,12 @@ export default function LoginPage() {
 
               <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" className="rounded" />
+                  <input 
+                    type="checkbox" 
+                    className="rounded" 
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
                   <span className="text-muted-foreground">Запомнить меня</span>
                 </label>
                 <Link to="/forgot-password" className="text-primary hover:underline">

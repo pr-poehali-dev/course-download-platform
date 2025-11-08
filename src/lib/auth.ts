@@ -76,7 +76,8 @@ export const authService = {
     }
 
     // Если не админ, проверяем обычный токен
-    const token = localStorage.getItem(TOKEN_KEY);
+    // Проверяем сначала localStorage (если "Запомнить меня"), затем sessionStorage
+    const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
 
     if (!token) {
       return null;
@@ -94,22 +95,28 @@ export const authService = {
 
       if (!response.ok) {
         localStorage.removeItem(TOKEN_KEY);
+        sessionStorage.removeItem(TOKEN_KEY);
         return null;
       }
 
       return data.user;
     } catch (error) {
       localStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(TOKEN_KEY);
       return null;
     }
   },
 
   logout() {
     localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem('userId');
+    sessionStorage.removeItem('userId');
     localStorage.removeItem('admin_authenticated');
+    localStorage.removeItem('remember_me');
   },
 
   getToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
   },
 };

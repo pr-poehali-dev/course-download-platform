@@ -253,8 +253,6 @@ export default function Index() {
         title: 'Покупка успешна!',
         description: `Куплено работ: ${cartItems.length}. Баллы списаны, работы доступны для скачивания.`,
       });
-
-      await fetchUserData();
       
     } catch (error) {
       console.error('Ошибка при покупке:', error);

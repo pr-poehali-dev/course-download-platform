@@ -351,14 +351,14 @@ export default function WorkDetailPage() {
       setLoadingSimilar(true);
       try {
         const response = await fetch(
-          `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?subject=${encodeURIComponent(work.subject)}&work_type=${encodeURIComponent(work.workType)}&limit=4&exclude_id=${actualWorkId}`
+          `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?limit=100`
         );
         
         if (response.ok) {
           const data = await response.json();
           const works = Array.isArray(data) ? data : (data.works || []);
           
-          const formattedWorks = works.slice(0, 4).map((w: any) => ({
+          const allWorks = works.map((w: any) => ({
             id: String(w.id),
             title: w.title,
             workType: w.work_type || 'Техническая работа',
@@ -373,7 +373,26 @@ export default function WorkDetailPage() {
             authorId: w.author_id
           }));
           
-          setSimilarWorks(formattedWorks);
+          // Фильтруем похожие работы
+          const filtered = allWorks.filter((w: Work) => {
+            // Исключаем текущую работу
+            if (w.id === actualWorkId) return false;
+            
+            // Приоритет 1: Тот же предмет И тот же тип
+            const sameSubject = w.subject === work.subject;
+            const sameType = w.workType === work.workType;
+            
+            return sameSubject || sameType;
+          });
+          
+          // Сортируем: сначала с совпадением и предмета, и типа
+          filtered.sort((a, b) => {
+            const aMatch = (a.subject === work.subject ? 2 : 0) + (a.workType === work.workType ? 1 : 0);
+            const bMatch = (b.subject === work.subject ? 2 : 0) + (b.workType === work.workType ? 1 : 0);
+            return bMatch - aMatch;
+          });
+          
+          setSimilarWorks(filtered.slice(0, 4));
         }
       } catch (error) {
         console.error('Error fetching similar works:', error);

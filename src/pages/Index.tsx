@@ -795,11 +795,11 @@ export default function Index() {
                   Технологичная экосистема для студентов
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Всё для учёбы в одном месте: готовые работы и умный AI-помощник 24/7 🚀
+                  Всё для учёбы в одном месте: готовые работы от студентов для студентов 🚀
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-3xl mx-auto">
                 <Card className="border-2 border-blue-200 hover:shadow-xl transition-all hover:border-blue-400 hover:scale-105">
                   <CardHeader className="text-center">
                     <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center">
@@ -810,20 +810,6 @@ export default function Index() {
                   <CardContent>
                     <p className="text-sm text-muted-foreground text-center">
                       Более 500 готовых курсовых, дипломов и рефератов по разным дисциплинам
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-2 border-purple-200 hover:shadow-xl transition-all hover:border-purple-400 hover:scale-105 cursor-pointer" onClick={() => window.location.href = '/ai-chat'}>
-                  <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center">
-                      <Icon name="Bot" size={32} className="text-white" />
-                    </div>
-                    <CardTitle className="text-xl">AI-помощник</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground text-center">
-                      Персональный AI-репетитор помогает разобраться в материале и составить план работы
                     </p>
                   </CardContent>
                 </Card>
@@ -843,25 +829,25 @@ export default function Index() {
                 </Card>
               </div>
 
-              <Card className="border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 mb-8 hover:shadow-xl transition-all">
+              <Card className="border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-cyan-50 mb-8 hover:shadow-xl transition-all">
                 <CardContent className="p-8 text-center">
                   <div className="mb-6">
-                    <div className="w-20 h-20 mx-auto bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center mb-4">
-                      <Icon name="Sparkles" size={40} className="text-white" />
+                    <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4">
+                      <Icon name="BookOpen" size={40} className="text-white" />
                     </div>
-                    <h3 className="font-bold text-2xl mb-3">Попробуй все возможности платформы</h3>
+                    <h3 className="font-bold text-2xl mb-3">Начни использовать платформу</h3>
                     <p className="text-muted-foreground text-base max-w-xl mx-auto mb-6">
-                      Доступ к каталогу работ и умному AI-помощнику — всё что нужно для успешной учёбы
+                      Доступ к каталогу из 500+ готовых работ — всё что нужно для успешной учёбы
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button size="lg" className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 h-14 px-8 text-lg shadow-xl" onClick={() => window.location.href = '/ai-chat'}>
-                      <Icon name="Bot" size={20} className="mr-2" />
-                      Открыть AI-помощник
-                    </Button>
-                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-purple-500 text-purple-600 hover:bg-purple-50" onClick={() => window.location.href = '/catalog'}>
+                    <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-xl" onClick={() => window.location.href = '/catalog'}>
                       <Icon name="BookOpen" size={20} className="mr-2" />
-                      Каталог работ
+                      Смотреть каталог
+                    </Button>
+                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-2 border-blue-500 text-blue-600 hover:bg-blue-50" onClick={() => !isLoggedIn ? setAuthDialogOpen(true) : setProfileDialogOpen(true)}>
+                      <Icon name="Upload" size={20} className="mr-2" />
+                      Загрузить работу
                     </Button>
                   </div>
                 </CardContent>

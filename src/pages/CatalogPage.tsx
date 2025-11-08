@@ -249,13 +249,14 @@ export default function CatalogPage() {
             }
             
             const isNew = Math.random() > 0.85;
-            const isHit = Math.random() > 0.80;
             const discount = Math.random() > 0.75 ? [10, 15, 20, 25][Math.floor(Math.random() * 4)] : 0;
             
             const workInfo = extractWorkInfo(work.title);
             const workType = work.work_type ? normalizeWorkType(work.work_type, work.title) : workInfo.workType;
             const rating = work.rating && work.rating > 0 ? parseFloat(String(work.rating)) : determineRating(workType);
             const finalRating = rating < 4.7 ? 4.7 : rating;
+            
+            const isHit = finalRating >= 4.8;
             
             return {
               id: String(work.id),
@@ -362,7 +363,13 @@ export default function CatalogPage() {
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-semibold mb-6">Каталог готовых работ</h1>
+          <div className="flex items-center justify-between mb-6">
+            <h1 className="text-2xl md:text-3xl font-semibold">Каталог готовых работ</h1>
+            <Badge variant="outline" className="text-sm">
+              <Icon name="FileText" size={14} className="mr-1" />
+              {filteredWorks.length} {filteredWorks.length === 1 ? 'работа' : filteredWorks.length < 5 ? 'работы' : 'работ'}
+            </Badge>
+          </div>
           
           <CatalogFilters
             searchQuery={searchQuery}

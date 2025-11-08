@@ -9,6 +9,7 @@ import func2url from '../../backend/func2url.json';
 import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { recentlyViewedStorage } from '@/utils/recentlyViewed';
 
 interface Work {
   id: string;
@@ -314,7 +315,7 @@ export default function WorkDetailPage() {
             setGallery([previewUrl]);
           }
           
-          setWork({
+          const workData = {
             id: String(data.id),
             title,
             workType,
@@ -328,7 +329,20 @@ export default function WorkDetailPage() {
             yandexDiskLink: folderPublicUrl,
             fileFormats: undefined,
             authorId: data.author_id
+          };
+          
+          setWork(workData);
+          
+          recentlyViewedStorage.add({
+            id: workData.id,
+            title: workData.title,
+            workType: workData.workType,
+            subject: workData.subject,
+            price: workData.price,
+            rating: workData.rating,
+            previewUrl: workData.previewUrl
           });
+          
           setLoading(false);
         } else {
           navigate('/catalog');

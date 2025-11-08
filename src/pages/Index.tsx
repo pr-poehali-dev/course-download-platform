@@ -25,6 +25,8 @@ import ReferralDialog from '@/components/ReferralDialog';
 
 import BlogSection from '@/components/BlogSection';
 import AboutSection from '@/components/AboutSection';
+import RecentlyViewed from '@/components/RecentlyViewed';
+import BestSellers from '@/components/BestSellers';
 
 import AgeBadge from '@/components/AgeBadge';
 import CookieBanner from '@/components/CookieBanner';
@@ -867,6 +869,10 @@ export default function Index() {
             </div>
           </div>
         </section>
+
+        <RecentlyViewed />
+
+        <BestSellers />
 
         <section className="py-20 bg-white">
           <div className="container mx-auto px-4">

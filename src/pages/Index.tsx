@@ -1783,7 +1783,6 @@ export default function Index() {
       />
 
       <CookieBanner />
-    </div>
     </>
   );
 }

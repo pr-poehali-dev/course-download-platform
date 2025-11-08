@@ -130,7 +130,7 @@ def send_welcome_email(email: str, username: str):
         <ul>
             <li>Покупать готовые курсовые и дипломы за баллы</li>
             <li>Загружать свои работы и зарабатывать баллы</li>
-            <li>Использовать AI-помощника для учёбы</li>
+            <li>Обмениваться работами с другими студентами</li>
         </ul>
         <p><a href="https://techforma.pro" style="display:inline-block;background:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin-top:16px">Перейти на платформу</a></p>
         <p>С уважением,<br>Команда TechForma</p>

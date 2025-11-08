@@ -380,8 +380,8 @@ export default function Index() {
     <>
       <SEO 
         title="Главная"
-        description="Маркетплейс студенческих работ + AI-помощник для студентов. Покупай работы за баллы, продавай свои и получай помощь от AI 24/7"
-        keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, ИИ ассистент для учебы, AI помощник, учебные материалы, искусственный интеллект"
+        description="Маркетплейс студенческих работ для студентов. Покупай готовые курсовые и дипломы за баллы, продавай свои работы"
+        keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, готовые курсовые, учебные материалы"
       />
       <div className="min-h-screen w-full overflow-x-hidden" style={{
       backgroundImage: `url('https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/1e62c804-3d33-4e1b-801f-92c5358091e1.jpg')`,
@@ -397,17 +397,14 @@ export default function Index() {
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
                 <div className="flex flex-col min-w-0">
                   <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Работы + AI-помощник</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Платформа для студентов</p>
                 </div>
               </div>
               
               <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
                 <a href="/" className="hover:text-primary transition-colors text-sm">Главная</a>
                 <a href="/catalog" className="hover:text-primary transition-colors text-sm">Каталог</a>
-                <a href="/ai-chat" className="hover:text-primary transition-colors text-sm flex items-center gap-1">
-                  <Icon name="Bot" size={14} />
-                  AI-помощник
-                </a>
+
                 <a href="#blog" className="hover:text-primary transition-colors text-sm">Блог</a>
                 <a href="#support" className="hover:text-primary transition-colors text-sm">Поддержка</a>
               </nav>
@@ -624,21 +621,19 @@ export default function Index() {
               </p>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Маркетплейс учебных работ + AI-помощник. Покупай работы за баллы, продавай свои и получай помощь от AI 24/7.
+                Маркетплейс учебных работ. Покупай готовые курсовые и дипломы за баллы, продавай свои работы.
               </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
                 <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
-                  <a href="/ai-chat">
-                    <Icon name="Bot" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                    AI-помощник
+                  <a href="/catalog">
+                    <Icon name="BookOpen" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+                    Смотреть каталог
                   </a>
                 </Button>
-                <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg shadow-xl border-2" asChild>
-                  <a href="/catalog">
-                    <Icon name="Database" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                    Каталог работ
-                  </a>
+                <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg shadow-xl border-2" onClick={() => !isLoggedIn ? setAuthDialogOpen(true) : setProfileDialogOpen(true)}>
+                  <Icon name="Upload" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+                  Загрузить работу
                 </Button>
               </div>
 
@@ -649,10 +644,10 @@ export default function Index() {
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-purple-200 hover:border-purple-400 transition-all hover:shadow-lg">
                   <div className="text-xl sm:text-3xl font-bold text-purple-600 mb-1 flex items-center justify-center gap-2">
-                    <Icon name="Bot" size={28} />
-                    AI
+                    <Icon name="TrendingUp" size={28} />
+                    ХИТЫ
                   </div>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Помощник 24/7</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Работы с рейтингом 4.8+</p>
                 </div>
                 <div className="bg-white/60 backdrop-blur-sm rounded-xl sm:rounded-2xl p-3 sm:p-6 text-center border border-green-200 hover:border-green-400 transition-all hover:shadow-lg">
                   <div className="text-xl sm:text-3xl font-bold text-green-600 mb-1">1000+</div>
@@ -677,7 +672,7 @@ export default function Index() {
                 Всё, что нужно студенту
               </h2>
               <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto">
-                Два мощных инструмента в единой экосистеме
+                Покупай готовые работы и зарабатывай на своих
               </p>
             </div>
 

@@ -91,7 +91,7 @@ export default function PremiumDialog({
               <div className="text-center space-y-3">
                 <Icon name="Sparkles" size={56} className="mx-auto" />
                 <h3 className="text-3xl font-bold">399₽/месяц</h3>
-                <p className="text-purple-100">Скидка 30% + безлимитный ИИ-помощник</p>
+                <p className="text-purple-100">Скидка 30% на все работы в каталоге</p>
               </div>
             </CardContent>
           </Card>
@@ -115,11 +115,11 @@ export default function PremiumDialog({
               <CardContent className="pt-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Bot" size={20} className="text-purple-600" />
+                    <Icon name="Star" size={20} className="text-purple-600" />
                   </div>
                   <div>
-                    <h4 className="font-bold mb-1">Безлимитный ИИ-помощник</h4>
-                    <p className="text-sm text-muted-foreground">Адаптирует работы под твой ВУЗ</p>
+                    <h4 className="font-bold mb-1">Приоритетная поддержка</h4>
+                    <p className="text-sm text-muted-foreground">Быстрая помощь в подборе работ</p>
                   </div>
                 </div>
               </CardContent>
@@ -180,7 +180,7 @@ export default function PremiumDialog({
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground italic mt-2">
-                  + Безлимитный ИИ-помощник (стоимость 499₽ отдельно)
+                  + Приоритетная поддержка и ранний доступ к новым работам
                 </p>
               </div>
             </CardContent>

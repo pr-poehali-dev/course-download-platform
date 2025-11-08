@@ -1180,9 +1180,9 @@ export default function Index() {
                         </div>
                       </CardFooter>
                     </Card>
-                  )}
-                  )}
-                  </div>
+                  );
+                })}
+                </div>
                 )}
               </TabsContent>
 

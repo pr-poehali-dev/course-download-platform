@@ -392,18 +392,37 @@ export default function WorkDetailPage() {
             // Исключаем текущую работу
             if (w.id === actualWorkId) return false;
             
-            // Приоритет 1: Тот же предмет И тот же тип
+            // Проверяем совпадения
             const sameSubject = w.subject === work.subject;
             const sameType = w.workType === work.workType;
             
-            return sameSubject || sameType;
+            // Проверяем похожесть по названию (общие ключевые слова)
+            const currentTitleWords = work.title.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+            const workTitleWords = w.title.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+            const commonWords = currentTitleWords.filter(word => workTitleWords.includes(word));
+            const hasSimilarTitle = commonWords.length >= 2; // Минимум 2 общих слова длиннее 3 символов
+            
+            // Показываем работы с тем же типом ИЛИ похожим названием
+            return sameType || hasSimilarTitle || sameSubject;
           });
           
-          // Сортируем: сначала с совпадением и предмета, и типа
+          // Сортируем: приоритет работам с тем же типом и похожим названием
           filtered.sort((a, b) => {
-            const aMatch = (a.subject === work.subject ? 2 : 0) + (a.workType === work.workType ? 1 : 0);
-            const bMatch = (b.subject === work.subject ? 2 : 0) + (b.workType === work.workType ? 1 : 0);
-            return bMatch - aMatch;
+            const currentTitleWords = work.title.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+            
+            const aWords = a.title.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+            const aCommon = currentTitleWords.filter(word => aWords.includes(word)).length;
+            const aType = a.workType === work.workType ? 1 : 0;
+            const aSubject = a.subject === work.subject ? 1 : 0;
+            const aScore = (aType * 10) + (aCommon * 3) + aSubject;
+            
+            const bWords = b.title.toLowerCase().split(/\s+/).filter(word => word.length > 3);
+            const bCommon = currentTitleWords.filter(word => bWords.includes(word)).length;
+            const bType = b.workType === work.workType ? 1 : 0;
+            const bSubject = b.subject === work.subject ? 1 : 0;
+            const bScore = (bType * 10) + (bCommon * 3) + bSubject;
+            
+            return bScore - aScore;
           });
           
           setSimilarWorks(filtered.slice(0, 4));
@@ -492,16 +511,16 @@ export default function WorkDetailPage() {
       }
       
       // Обновляем баланс пользователя в localStorage (если не админ)
-      if (user.role !== 'admin') {
-        user.balance = purchaseData.newBalance;
+      if (user.role !== 'admin' && orderData.newBalance !== undefined) {
+        user.balance = orderData.newBalance;
         localStorage.setItem('user', JSON.stringify(user));
       }
       
-      const message = purchaseData.isAdmin 
+      const message = orderData.isAdmin 
         ? '✅ Скачивание началось!\n\nФайл сохранится в папку "Загрузки"' 
-        : purchaseData.alreadyPurchased 
-          ? '✅ Работа уже куплена!\n\nСкачивание началось...' 
-          : `✅ Покупка успешна!\n\n💰 Списано ${work.price} баллов\n💵 Баланс: ${purchaseData.newBalance}\n\n📥 Скачивание началось...`;
+        : orderData.alreadyPaid 
+          ? '✅ Работа уже оплачена!\n\nСкачивание началось...' 
+          : `✅ Покупка успешна!\n\n💰 Списано ${work.price} баллов\n💵 Баланс: ${orderData.newBalance || user.balance}\n\n📥 Скачивание началось...`;
       
       alert(message);
       
@@ -906,31 +925,11 @@ export default function WorkDetailPage() {
               <Button 
                 variant="secondary"
                 size="default"
-                className="w-full font-semibold rounded-lg mb-3 h-10 md:h-11 text-sm md:text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
+                className="w-full font-semibold rounded-lg mb-4 md:mb-5 h-10 md:h-11 text-sm md:text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
                 onClick={() => navigate(`/defense-kit?workId=${actualWorkId}`)}
               >
                 <Icon name="GraduationCap" size={18} className="mr-2" />
                 Создать пакет для защиты
-              </Button>
-
-              <Button 
-                variant="outline"
-                size="default"
-                className="w-full font-semibold rounded-lg mb-4 md:mb-5 h-10 md:h-11 text-sm md:text-base"
-                onClick={handleShowPdfPreview}
-                disabled={loadingPdfPreview}
-              >
-                {loadingPdfPreview ? (
-                  <>
-                    <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                    Загрузка...
-                  </>
-                ) : (
-                  <>
-                    <Icon name="Eye" size={18} className="mr-2" />
-                    Посмотреть превью
-                  </>
-                )}
               </Button>
 
               <div className="space-y-2.5 md:space-y-3">

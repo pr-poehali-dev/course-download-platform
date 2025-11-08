@@ -42,6 +42,8 @@ export default function WorkDetailPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [showUploadButton, setShowUploadButton] = useState(false);
   const [extractingImages, setExtractingImages] = useState(false);
+  const [similarWorks, setSimilarWorks] = useState<Work[]>([]);
+  const [loadingSimilar, setLoadingSimilar] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -341,6 +343,47 @@ export default function WorkDetailPage() {
 
     fetchWork();
   }, [actualWorkId, navigate]);
+
+  useEffect(() => {
+    const fetchSimilarWorks = async () => {
+      if (!work) return;
+      
+      setLoadingSimilar(true);
+      try {
+        const response = await fetch(
+          `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?subject=${encodeURIComponent(work.subject)}&work_type=${encodeURIComponent(work.workType)}&limit=4&exclude_id=${actualWorkId}`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          const works = Array.isArray(data) ? data : (data.works || []);
+          
+          const formattedWorks = works.slice(0, 4).map((w: any) => ({
+            id: String(w.id),
+            title: w.title,
+            workType: w.work_type || 'Техническая работа',
+            subject: w.subject || determineSubject(w.title),
+            description: w.description || '',
+            composition: w.composition ? w.composition.split(',').map((c: string) => c.trim()) : [],
+            universities: w.universities || null,
+            price: w.price_points || w.price || 600,
+            rating: parseFloat(w.rating) || 4.5,
+            previewUrl: w.preview_image_url || null,
+            yandexDiskLink: w.yandex_disk_link || YANDEX_DISK_URL,
+            authorId: w.author_id
+          }));
+          
+          setSimilarWorks(formattedWorks);
+        }
+      } catch (error) {
+        console.error('Error fetching similar works:', error);
+      } finally {
+        setLoadingSimilar(false);
+      }
+    };
+    
+    fetchSimilarWorks();
+  }, [work, actualWorkId]);
 
   const handlePurchaseAndDownload = async () => {
     if (!actualWorkId || !work) return;
@@ -893,6 +936,53 @@ export default function WorkDetailPage() {
             </div>
           </div>
         </div>
+
+        {similarWorks.length > 0 && (
+          <div className="mt-12 pb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Похожие работы</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {similarWorks.map((similarWork) => (
+                <div
+                  key={similarWork.id}
+                  onClick={() => navigate(`/work/${similarWork.id}`)}
+                  className="bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all cursor-pointer group overflow-hidden"
+                >
+                  <div className="aspect-[4/3] relative overflow-hidden bg-gray-100">
+                    {similarWork.previewUrl ? (
+                      <img
+                        src={similarWork.previewUrl}
+                        alt={similarWork.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+                        <Icon name="FileText" size={48} className="text-gray-400" />
+                      </div>
+                    )}
+                    <div className="absolute top-2 right-2">
+                      <Badge className="bg-white/90 text-gray-700 text-xs px-2 py-1">
+                        {similarWork.workType}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-sm text-gray-900 line-clamp-2 mb-2 group-hover:text-blue-600 transition-colors">
+                      {similarWork.title}
+                    </h3>
+                    <div className="flex items-center justify-between">
+                      <Badge variant="outline" className="text-xs">
+                        {similarWork.subject}
+                      </Badge>
+                      <div className="text-sm font-bold text-primary">
+                        {similarWork.price} ₽
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       {showingPdfPreview && pdfPreviewUrl && (

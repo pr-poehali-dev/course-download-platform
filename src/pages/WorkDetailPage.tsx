@@ -948,17 +948,15 @@ export default function WorkDetailPage() {
                   className="bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all cursor-pointer group overflow-hidden"
                 >
                   <div className="aspect-[4/3] relative overflow-hidden bg-gray-100">
-                    {similarWork.previewUrl ? (
-                      <img
-                        src={similarWork.previewUrl}
-                        alt={similarWork.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-                        <Icon name="FileText" size={48} className="text-gray-400" />
-                      </div>
-                    )}
+                    <img
+                      src={similarWork.previewUrl || "https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"}
+                      alt={similarWork.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.src = "https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg";
+                      }}
+                    />
                     <div className="absolute top-2 right-2">
                       <Badge className="bg-white/90 text-gray-700 text-xs px-2 py-1">
                         {similarWork.workType}

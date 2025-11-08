@@ -47,17 +47,14 @@ export default function HomeHeader({
             <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
             <div className="flex flex-col min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-              <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Работы + AI-помощник</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Готовые студенческие работы</p>
             </div>
           </div>
           
           <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
             <a href="/" className="hover:text-primary transition-colors text-sm">Главная</a>
             <a href="/catalog" className="hover:text-primary transition-colors text-sm">Каталог</a>
-            <a href="/ai-chat" className="hover:text-primary transition-colors text-sm flex items-center gap-1">
-              <Icon name="Bot" size={14} />
-              AI-помощник
-            </a>
+
             <a href="#blog" className="hover:text-primary transition-colors text-sm">Блог</a>
             <a href="#support" className="hover:text-primary transition-colors text-sm">Поддержка</a>
           </nav>

@@ -32,7 +32,7 @@ import ResetPasswordPage from "./pages/ResetPasswordPage";
 import TestLoginPage from "./pages/TestLoginPage";
 import SupportAdmin from "./components/SupportAdmin";
 import MentorPage from "./pages/MentorPage";
-import AIChatPage from "./pages/AIChatPage";
+
 import PaymentPage from "./pages/PaymentPage";
 import DefenseKitBuilder from "./pages/DefenseKitBuilder";
 
@@ -76,7 +76,7 @@ const App = () => (
           <Route path="/test-login" element={<TestLoginPage />} />
           <Route path="/blog/:id" element={<BlogPost />} />
           <Route path="/mentor" element={<MentorPage />} />
-          <Route path="/ai-chat" element={<AIChatPage />} />
+
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
 

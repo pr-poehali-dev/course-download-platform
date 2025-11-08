@@ -358,14 +358,14 @@ export default function CatalogPage() {
         description="Каталог студенческих работ: курсовые, дипломы, рефераты, чертежи. Купить готовые работы за баллы по выгодным ценам"
         keywords="курсовые работы, дипломы, рефераты, чертежи, купить студенческие работы, каталог работ, готовые работы"
       />
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl md:text-3xl font-semibold">Каталог готовых работ</h1>
-            <Badge variant="outline" className="text-sm">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">Каталог готовых работ</h1>
+            <Badge className="glass-card border-blue-200 text-sm">
               <Icon name="FileText" size={14} className="mr-1" />
               {filteredWorks.length} {filteredWorks.length === 1 ? 'работа' : filteredWorks.length < 5 ? 'работы' : 'работ'}
             </Badge>
@@ -418,7 +418,7 @@ export default function CatalogPage() {
                 <Link
                   key={work.id}
                   to={`/work/${work.id}`}
-                  className="group bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-200 hover:border-blue-300 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 block"
+                  className="group glass-card tech-border rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] block"
                 >
                   <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
                     {work.previewUrl || (work.previewUrls && work.previewUrls.length > 0) ? (

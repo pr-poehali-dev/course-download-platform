@@ -6,51 +6,51 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 220 15% 10%;
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 15% 10%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 15% 10%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 217 91% 45%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 10% 92%;
-    --secondary-foreground: 220 15% 10%;
+    --secondary: 214 32% 91%;
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 220 10% 95%;
-    --muted-foreground: 220 10% 40%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 217 91% 45%;
+    --accent: 262 83% 58%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 10% 88%;
-    --input: 220 10% 88%;
-    --ring: 217 91% 45%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 221 83% 53%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 0 0% 100%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-foreground: 222 47% 11%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 221 83% 53%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 100%;
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent: 210 40% 96%;
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-accent-foreground: 222 47% 11%;
 
-    --sidebar-border: 220 13% 91%;
+    --sidebar-border: 214 32% 91%;
 
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-ring: 221 83% 53%;
   }
 
   .dark {
@@ -148,64 +148,56 @@
   }
 
   .gradient-purple-pink {
-    background: linear-gradient(135deg, #1e40af 0%, #0ea5e9 50%, #1e40af 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
   }
 
   .gradient-purple-blue {
-    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #1e3a8a 100%);
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
   }
 
   .gradient-premium {
-    background: linear-gradient(135deg, #0f172a 0%, #1e40af 50%, #0ea5e9 100%);
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #8b5cf6 100%);
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .tech-border {
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.05);
   }
 
   .hero-title {
     font-family: "Space Grotesk", sans-serif;
-    font-weight: 900;
-    letter-spacing: -0.03em;
-    background: linear-gradient(
-      135deg,
-      #0f172a 0%,
-      #1e40af 25%,
-      #3b82f6 50%,
-      #8b5cf6 75%,
-      #ec4899 100%
-    );
-    background-size: 300% 300%;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, #1e293b 0%, #3b82f6 50%, #8b5cf6 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation:
-      gradient-flow 8s ease infinite,
-      float 3s ease-in-out infinite;
-    text-shadow:
-      0 0 80px rgba(59, 130, 246, 0.5),
-      0 0 40px rgba(139, 92, 246, 0.3),
-      0 10px 30px rgba(0, 0, 0, 0.2);
-    filter: drop-shadow(0 0 20px rgba(59, 130, 246, 0.4))
-      drop-shadow(0 0 40px rgba(139, 92, 246, 0.3));
-    transform: translateZ(0);
-    will-change: background-position, transform;
   }
 
-  @keyframes gradient-flow {
-    0%,
-    100% {
-      background-position: 0% 50%;
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
     }
-    50% {
-      background-position: 100% 50%;
+    100% {
+      background-position: 200% 0;
     }
   }
 
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(59, 130, 246, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
   }
 
   .hero-glow {

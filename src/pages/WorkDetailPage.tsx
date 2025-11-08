@@ -678,7 +678,7 @@ export default function WorkDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <SEO 
         title={work ? `${work.title} — купить за ${work.price} баллов` : 'Просмотр работы'}
         description={work ? `${work.workType} по предмету "${work.subject}". ${work.description.substring(0, 150)}` : 'Детальная информация о студенческой работе'}
@@ -714,7 +714,7 @@ export default function WorkDetailPage() {
                 {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
               </h1>
 
-              <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-xl p-4 border border-slate-200">
+              <div className="glass-card tech-border rounded-xl p-4">
                 <TrustRating 
                   rating={work.rating}
                   purchaseCount={0}
@@ -889,7 +889,7 @@ export default function WorkDetailPage() {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="bg-card rounded-lg md:rounded-xl p-4 md:p-6 lg:sticky lg:top-20 border-2 border-border shadow-sm hover:shadow-md transition-shadow">
+            <div className="glass-card tech-border rounded-xl p-4 md:p-6 lg:sticky lg:top-20 hover:shadow-xl transition-all">
               <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
                 <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
                 <div className="flex flex-col items-center gap-0.5">

@@ -6,6 +6,7 @@ import YandexDiskImport from '@/components/YandexDiskImport';
 import PreviewGenerator from '@/components/PreviewGenerator';
 import ArchiveImagesChecker from '@/components/ArchiveImagesChecker';
 import MultiPreviewExtractor from '@/components/MultiPreviewExtractor';
+import DocPreviewGenerator from '@/components/admin/DocPreviewGenerator';
 import func2url from '../../../backend/func2url.json';
 
 export default function SyncTab() {
@@ -66,6 +67,7 @@ export default function SyncTab() {
         </CardContent>
       </Card>
       
+      <DocPreviewGenerator />
       <MultiPreviewExtractor />
       <ArchiveImagesChecker />
       <YandexDiskImport />

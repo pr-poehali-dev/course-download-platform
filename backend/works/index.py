@@ -174,7 +174,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute("""
                     SELECT id, title, work_type, subject, description, composition, 
                            price_points, rating, downloads, created_at, yandex_disk_link, 
-                           preview_image_url, file_url, author_id
+                           preview_image_url, file_url, author_id, preview_urls
                     FROM t_p63326274_course_download_plat.works WHERE id = %s
                 """, (work_id,))
                 row = cur.fetchone()
@@ -185,6 +185,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         'body': json.dumps({'error': 'Work not found'})
                     }
+                
+                preview_urls_str = row[14]
+                preview_urls = json.loads(preview_urls_str) if preview_urls_str else []
                 
                 work = {
                     'id': row[0],
@@ -200,7 +203,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'yandex_disk_link': row[10],
                     'preview_image_url': row[11],
                     'file_url': row[12],
-                    'author_id': row[13]
+                    'author_id': row[13],
+                    'preview_urls': preview_urls
                 }
                 
                 cur.execute("""
@@ -256,7 +260,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 # Получить работы с пагинацией
                 query = f"""
                     SELECT id, title, work_type, subject, description, 
-                           price_points, rating, downloads, category, preview_image_url, author_id
+                           price_points, rating, downloads, category, preview_image_url, author_id, preview_urls
                     FROM t_p63326274_course_download_plat.works 
                     WHERE {where_sql}
                     ORDER BY created_at DESC
@@ -267,6 +271,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 works = []
                 for row in cur.fetchall():
+                    preview_urls_str = row[11]
+                    preview_urls = json.loads(preview_urls_str) if preview_urls_str else []
+                    
                     work = {
                         'id': row[0],
                         'title': row[1],
@@ -278,7 +285,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'downloads': row[7] or 0,
                         'category': row[8],
                         'preview_image_url': row[9],
-                        'author_id': row[10]
+                        'author_id': row[10],
+                        'preview_urls': preview_urls
                     }
                     works.append(work)
                 

@@ -46,7 +46,6 @@ interface Category {
 export default function CatalogPage() {
   const [works, setWorks] = useState<Work[]>([]);
   const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSubject, setFilterSubject] = useState<string>('all');
@@ -170,20 +169,7 @@ export default function CatalogPage() {
     return 'Пояснительная записка';
   };
 
-  useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const response = await fetch(func2url.categories);
-        const data = await response.json();
-        if (data.categories) {
-          setCategories(data.categories);
-        }
-      } catch (error) {
-        console.error('Failed to load categories:', error);
-      }
-    };
-    loadCategories();
-  }, []);
+
 
   useEffect(() => {
     const CACHE_KEY = 'catalog_works_cache_v9';

@@ -106,23 +106,42 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if not is_admin:
                 cur.execute(
                     """
-                    SELECT id FROM t_p63326274_course_download_plat.purchases 
+                    SELECT id, created_at FROM t_p63326274_course_download_plat.purchases 
                     WHERE buyer_id = %s AND work_id = %s
                     UNION
-                    SELECT id FROM t_p63326274_course_download_plat.orders 
+                    SELECT id, created_at FROM t_p63326274_course_download_plat.orders 
                     WHERE user_id = %s AND work_id = %s AND status = 'paid'
+                    ORDER BY created_at DESC
                     LIMIT 1
                     """,
                     (user_id, work_id, user_id, work_id)
                 )
                 
-                if not cur.fetchone():
+                purchase_result = cur.fetchone()
+                
+                if not purchase_result:
                     return {
                         'statusCode': 402,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         'body': json.dumps({
                             'error': 'Payment required',
                             'message': 'Скачивание доступно только после оплаты. Оформите заказ и оплатите, потом вернитесь к скачиванию.'
+                        }),
+                        'isBase64Encoded': False
+                    }
+                
+                import datetime
+                purchase_date = purchase_result[1]
+                current_date = datetime.datetime.now()
+                days_passed = (current_date - purchase_date).days
+                
+                if days_passed > 7:
+                    return {
+                        'statusCode': 402,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({
+                            'error': 'Download period expired',
+                            'message': f'Срок скачивания истёк {days_passed - 7} дней назад. Доступ к работе действует только 7 дней после покупки. Пожалуйста, приобретите работу заново.'
                         }),
                         'isBase64Encoded': False
                     }

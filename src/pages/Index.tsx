@@ -247,12 +247,65 @@ export default function Index() {
         });
       }
       
-      setCartItems([]);
-      
       toast({
         title: 'Покупка успешна!',
-        description: `Куплено работ: ${cartItems.length}. Баллы списаны, работы доступны для скачивания.`,
+        description: `Куплено работ: ${cartItems.length}. Начинаем скачивание файлов...`,
       });
+
+      const downloadPromises = cartItems.map(async (item) => {
+        try {
+          const downloadResponse = await fetch(
+            `${func2url['download-work']}?workId=${encodeURIComponent(item.id)}`,
+            {
+              headers: {
+                'X-User-Id': String(currentUser.id)
+              }
+            }
+          );
+          
+          if (!downloadResponse.ok) {
+            throw new Error(`Ошибка скачивания ${item.title}`);
+          }
+          
+          const downloadData = await downloadResponse.json();
+          
+          const fileResponse = await fetch(downloadData.download_url);
+          const blob = await fileResponse.blob();
+          
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = downloadData.filename || `${item.title.substring(0, 50)}.rar`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+          
+          return { success: true, title: item.title };
+        } catch (error) {
+          console.error(`Ошибка скачивания ${item.title}:`, error);
+          return { success: false, title: item.title };
+        }
+      });
+
+      const downloadResults = await Promise.all(downloadPromises);
+      const successCount = downloadResults.filter(r => r.success).length;
+      const failedCount = downloadResults.filter(r => !r.success).length;
+
+      if (failedCount > 0) {
+        toast({
+          title: 'Скачивание завершено',
+          description: `Успешно: ${successCount}, Ошибок: ${failedCount}. Проверьте папку "Загрузки"`,
+          variant: failedCount === cartItems.length ? 'destructive' : 'default',
+        });
+      } else {
+        toast({
+          title: 'Все файлы скачаны!',
+          description: `${successCount} файлов сохранены в папку "Загрузки"`,
+        });
+      }
+      
+      setCartItems([]);
       
     } catch (error) {
       console.error('Ошибка при покупке:', error);

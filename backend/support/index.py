@@ -130,7 +130,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
         
-        if admin_email == 'tech.forma@yandex.ru':
+        if admin_email == 'rekrutiw@yandex.ru':
             cur.execute("""
                 SELECT id, user_email, subject, message, attachment_url, status, admin_response, 
                        created_at, updated_at 
@@ -181,7 +181,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         headers_dict = event.get('headers', {})
         admin_email = headers_dict.get('x-admin-email', '') or headers_dict.get('X-Admin-Email', '')
         
-        if admin_email != 'tech.forma@yandex.ru':
+        if admin_email != 'rekrutiw@yandex.ru':
             return {
                 'statusCode': 403,
                 'headers': headers,

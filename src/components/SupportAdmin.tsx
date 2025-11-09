@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import func2url from '../../backend/func2url.json';
 
 const SUPPORT_API = func2url.support;
-const ADMIN_EMAIL = 'tech.forma@yandex.ru';
+const ADMIN_EMAIL = 'rekrutiw@yandex.ru';
 
 interface Ticket {
   id: number;

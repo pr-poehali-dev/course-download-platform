@@ -7,7 +7,7 @@
       "body": {"userId": 1},
       "expectedStatus": 400,
       "expectedBody": {
-        "error": "workId, userId and price required"
+        "error": "workId and userId required"
       }
     },
     {

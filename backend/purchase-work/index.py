@@ -58,13 +58,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         body = json.loads(body_str) if body_str else {}
         work_id = body.get('workId')
         user_id = body.get('userId')
-        price = body.get('price')
+        client_price = body.get('price')
         
-        if not all([work_id, user_id, price]):
+        if not all([work_id, user_id]):
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'workId, userId and price required'}),
+                'body': json.dumps({'error': 'workId and userId required'}),
                 'isBase64Encoded': False
             }
         
@@ -77,9 +77,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
-            # Проверяем существование работы и получаем информацию о ней
+            # Проверяем существование работы и получаем РЕАЛЬНУЮ цену из БД
             cur.execute(
-                "SELECT id, author_id, title FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                "SELECT id, author_id, title, price_points FROM t_p63326274_course_download_plat.works WHERE id = %s",
                 (work_id,)
             )
             work_result = cur.fetchone()
@@ -96,6 +96,29 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             db_work_id = work_result[0]
             work_author_id = work_result[1]
             work_title = work_result[2]
+            price = work_result[3]
+            
+            # КРИТИЧНО: Игнорируем цену от клиента, используем только из БД
+            if client_price and client_price != price:
+                print(f"⚠️ SECURITY: Price manipulation attempt! User {user_id} tried to buy work {work_id} for {client_price}, real price is {price}")
+                # Логируем попытку мошенничества
+                cur.execute(
+                    """INSERT INTO t_p63326274_course_download_plat.security_logs 
+                    (user_id, event_type, details, ip_address) 
+                    VALUES (%s, %s, %s, %s)""",
+                    (user_id, 'price_manipulation', f'Attempted to pay {client_price} instead of {price} for work {work_id}', 
+                     event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown'))
+                )
+            
+            # КРИТИЧНО: Запрещаем авторам покупать свои работы
+            if work_author_id and int(user_id) == int(work_author_id):
+                conn.rollback()
+                return {
+                    'statusCode': 403,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Вы не можете купить свою собственную работу'}),
+                    'isBase64Encoded': False
+                }
             
             # Проверяем роль пользователя из базы данных
             cur.execute(
@@ -129,6 +152,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'balance': balance,
                         'required': price
                     }),
+                    'isBase64Encoded': False
+                }
+            
+            # Проверяем количество покупок за последний час (анти-фрод)
+            cur.execute(
+                """SELECT COUNT(*) FROM t_p63326274_course_download_plat.purchases 
+                WHERE buyer_id = %s AND created_at > NOW() - INTERVAL '1 hour'""",
+                (user_id,)
+            )
+            recent_purchases = cur.fetchone()[0]
+            if recent_purchases >= 10:
+                conn.rollback()
+                return {
+                    'statusCode': 429,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Слишком много покупок за последний час. Подождите немного.'}),
                     'isBase64Encoded': False
                 }
             

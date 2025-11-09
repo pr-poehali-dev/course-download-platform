@@ -35,6 +35,7 @@ import MentorPage from "./pages/MentorPage";
 
 import PaymentPage from "./pages/PaymentPage";
 import DefenseKitBuilder from "./pages/DefenseKitBuilder";
+import SecurityLogsPage from "./pages/SecurityLogsPage";
 
 
 
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/requisites" element={<Requisites />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/admin/support" element={<SupportAdmin />} />
+          <Route path="/admin/security-logs" element={<SecurityLogsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/buy-points" element={<BuyPointsPage />} />
           <Route path="/upload" element={<UploadWorkPage />} />

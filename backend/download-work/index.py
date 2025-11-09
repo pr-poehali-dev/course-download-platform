@@ -102,8 +102,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             print(f"[DEBUG] User {user_id}, role: {role}, is_admin: {is_admin}")
             
-            # Проверяем покупку только для НЕ-админов
-            if not is_admin:
+            # Получаем автора работы для проверки
+            cur.execute(
+                "SELECT author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                (work_id,)
+            )
+            work_author_result = cur.fetchone()
+            work_author_id = work_author_result[0] if work_author_result else None
+            
+            # КРИТИЧНО: Запрещаем авторам скачивать свои работы бесплатно (кроме админов)
+            is_author = work_author_id and int(user_id) == int(work_author_id)
+            
+            # Проверяем покупку только для НЕ-админов и НЕ-авторов
+            if not is_admin and not is_author:
                 cur.execute(
                     """
                     SELECT id, created_at FROM t_p63326274_course_download_plat.purchases 

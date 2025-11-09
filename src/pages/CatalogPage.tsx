@@ -143,7 +143,7 @@ export default function CatalogPage() {
     return null;
   };
 
-  const determineComposition = (workType: string, title: string): string => {
+  const determineComposition = (workType: string, title: string, hasRealCover: boolean): string => {
     const wt = workType.toLowerCase();
     const t = title.toLowerCase();
     
@@ -151,13 +151,13 @@ export default function CatalogPage() {
       return 'Диссертация, автореферат, презентация, раздаточный материал';
     }
     if (/дипломная/.test(wt)) {
-      if (/газопровод|электро|система|модернизация/.test(t)) {
+      if (hasRealCover || /газопровод|электро|система|модернизация/.test(t)) {
         return 'ПЗ, графика, чертежи';
       }
       return 'ПЗ, графика';
     }
     if (/курсовая/.test(wt)) {
-      if (/проектирование|расчет|схема/.test(t)) {
+      if (hasRealCover || /проектирование|расчет|схема/.test(t)) {
         return 'ПЗ, чертежи';
       }
       return 'ПЗ, расчеты';
@@ -166,7 +166,7 @@ export default function CatalogPage() {
       return 'Отчёт, дневник';
     }
     
-    return 'Пояснительная записка';
+    return hasRealCover ? 'Пояснительная записка, чертежи' : 'Пояснительная записка';
   };
 
 
@@ -244,6 +244,10 @@ export default function CatalogPage() {
             
             const isHit = finalRating >= 4.8;
             
+            const hasRealCover = work.preview_image_url && 
+              work.preview_image_url.includes('cdn.poehali.dev') && 
+              !work.preview_image_url.includes('e0139de0-3660-402a-8d29-d07f5dac95b3.jpg');
+            
             return {
               id: String(work.id),
               folderName: work.title,
@@ -251,7 +255,7 @@ export default function CatalogPage() {
               workType: workType,
               subject: determineSubject(work.title, work.subject),
               description: work.preview || `Готовая работа по теме "${work.title}". Включает теоретическую часть, практические расчеты и выводы.`,
-              composition: determineComposition(workType, work.title),
+              composition: determineComposition(workType, work.title, hasRealCover),
               universities: extractUniversity(work.title),
               price: work.price_points || work.price || 600,
               rating: finalRating,

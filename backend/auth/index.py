@@ -69,11 +69,17 @@ def verify_password(password: str, password_hash: str) -> bool:
     """Verify password supporting both bcrypt and legacy SHA256"""
     if password_hash.startswith('$2b$') or password_hash.startswith('$2a$'):
         try:
-            return bcrypt.checkpw(password.encode(), password_hash.encode())
-        except:
+            result = bcrypt.checkpw(password.encode(), password_hash.encode())
+            print(f"VERIFY: bcrypt check result={result}")
+            return result
+        except Exception as e:
+            print(f"VERIFY: bcrypt error={e}")
             return False
     else:
-        return hashlib.sha256(password.encode()).hexdigest() == password_hash
+        sha_hash = hashlib.sha256(password.encode()).hexdigest()
+        result = sha_hash == password_hash
+        print(f"VERIFY: sha256 check result={result}")
+        return result
 
 def generate_referral_code(username: str) -> str:
     return hashlib.md5(username.encode()).hexdigest()[:8].upper()

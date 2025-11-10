@@ -16,12 +16,43 @@ def get_db_connection():
     database_url = os.environ.get('DATABASE_URL')
     return psycopg2.connect(database_url)
 
+def send_internal_message(user_email: str, title: str, message: str, msg_type: str = 'support') -> bool:
+    """Send internal message to user's inbox"""
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        cur.execute("SELECT id FROM users WHERE email = %s", (user_email,))
+        user_row = cur.fetchone()
+        
+        if not user_row:
+            cur.close()
+            conn.close()
+            return False
+        
+        user_id = user_row[0]
+        
+        cur.execute("""
+            INSERT INTO user_messages (user_id, title, message, type, is_read, created_at)
+            VALUES (%s, %s, %s, %s, FALSE, NOW())
+        """, (user_id, title, message, msg_type))
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f'Internal message error: {e}')
+        return False
+
 def send_email(to_email: str, subject: str, message: str) -> bool:
     resend_api_key = os.environ.get('RESEND_API_KEY')
     
+    send_internal_message(to_email, subject, message, 'support')
+    
     if not resend_api_key:
-        print('Resend API key not configured')
-        return False
+        print('Resend API key not configured, message sent to inbox only')
+        return True
     
     html_content = f"""
     <html>

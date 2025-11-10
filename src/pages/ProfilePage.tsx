@@ -52,6 +52,15 @@ interface Transaction {
   date: string;
 }
 
+interface UserMessage {
+  id: number;
+  title: string;
+  message: string;
+  type: string;
+  is_read: boolean;
+  created_at: string;
+}
+
 export default function ProfilePage() {
   const [user, setUser] = useState<UserProfile>({
     name: '',
@@ -139,6 +148,30 @@ export default function ProfilePage() {
           rating: 0,
           registrationDate: new Date().toISOString().split('T')[0]
         });
+        setAvatarPreview(userData.avatar_url || null);
+        
+        try {
+          const messagesResponse = await fetch(`${func2url['user-messages']}?action=get&user_id=${userData.id}`);
+          const messagesData = await messagesResponse.json();
+          if (messagesData.messages) {
+            setMessages(messagesData.messages);
+            setUnreadCount(messagesData.messages.filter((m: UserMessage) => !m.is_read).length);
+          }
+          
+          const userDataResponse = await fetch(`${func2url['user-data']}?user_id=${userData.id}&action=purchases`);
+          const userDataJson = await userDataResponse.json();
+          if (userDataJson.purchases) {
+            setPurchases(userDataJson.purchases.map((p: any) => ({
+              id: p.work_id,
+              workTitle: p.work_title || 'Работа',
+              price: p.price_paid || 0,
+              date: p.created_at || new Date().toISOString(),
+              downloadUrl: ''
+            })));
+          }
+        } catch (error) {
+          console.error('Failed to load user data:', error);
+        }
       }
       setLoading(false);
     };
@@ -158,11 +191,54 @@ export default function ProfilePage() {
     }
   }, []);
 
-  const [purchases] = useState<Purchase[]>([]);
-  const [uploads] = useState<Upload[]>([]);
+  const [purchases, setPurchases] = useState<Purchase[]>([]);
+  const [uploads, setUploads] = useState<Upload[]>([]);
   const [transactions] = useState<Transaction[]>([]);
+  const [messages, setMessages] = useState<UserMessage[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState(user.name);
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: 'Ошибка',
+          description: 'Файл слишком большой (макс. 5 МБ)',
+          variant: 'destructive'
+        });
+        return;
+      }
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleMarkMessageRead = async (messageId: number) => {
+    try {
+      const userData = await authService.verify();
+      if (!userData) return;
+      
+      await fetch(`${func2url['user-messages']}?action=mark_read`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userData.id, message_id: messageId })
+      });
+      
+      setMessages(messages.map(m => m.id === messageId ? { ...m, is_read: true } : m));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
+      console.error('Failed to mark message as read:', error);
+    }
+  };
 
   const handleSaveProfile = () => {
     setEditMode(false);
@@ -216,8 +292,12 @@ export default function ProfilePage() {
             <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white shadow-2xl">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-4 border-white/30">
-                    <Icon name="User" size={40} className="text-white" />
+                  <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-4 border-white/30 overflow-hidden">
+                    {avatarPreview ? (
+                      <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                      <Icon name="User" size={40} className="text-white" />
+                    )}
                   </div>
                   <div>
                     <h1 className="text-3xl font-bold mb-1">Привет, {user.name}! 👋</h1>
@@ -301,6 +381,15 @@ export default function ProfilePage() {
               <TabsTrigger value="balance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white">
                 <Icon name="Wallet" size={16} className="mr-2" />
                 Баланс
+              </TabsTrigger>
+              <TabsTrigger value="messages" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white relative">
+                <Icon name="Mail" size={16} className="mr-2" />
+                Сообщения
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
               </TabsTrigger>
               <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gray-600 data-[state=active]:to-gray-800 data-[state=active]:text-white">
                 <Icon name="Settings" size={16} className="mr-2" />
@@ -577,6 +666,56 @@ export default function ProfilePage() {
               <BalanceTab userBalance={user.balance} />
             </TabsContent>
 
+            <TabsContent value="messages" className="space-y-4">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Mail" size={20} className="text-blue-500" />
+                    Входящие сообщения
+                  </CardTitle>
+                  <CardDescription>Уведомления от поддержки и системы</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {messages.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon name="Mail" size={40} className="text-blue-500" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">Нет новых сообщений</h3>
+                      <p className="text-muted-foreground">Здесь будут отображаться ответы от поддержки и важные уведомления</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {messages.map((msg) => (
+                        <div 
+                          key={msg.id} 
+                          className={`border rounded-lg p-4 transition-all ${
+                            msg.is_read 
+                              ? 'bg-white' 
+                              : 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200'
+                          }`}
+                          onClick={() => !msg.is_read && handleMarkMessageRead(msg.id)}
+                        >
+                          <div className="flex items-start justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <h3 className="font-semibold">{msg.title}</h3>
+                              {!msg.is_read && (
+                                <Badge className="bg-blue-500">Новое</Badge>
+                              )}
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(msg.created_at).toLocaleDateString('ru-RU')}
+                            </span>
+                          </div>
+                          <p className="text-sm text-muted-foreground whitespace-pre-line">{msg.message}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             <TabsContent value="settings" className="space-y-4">
               <Card className="shadow-lg">
                 <CardHeader>
@@ -604,6 +743,37 @@ export default function ProfilePage() {
                     <Label htmlFor="email">Email</Label>
                     <div className="p-2 border rounded bg-muted">{user.email}</div>
                     <p className="text-xs text-muted-foreground">Email нельзя изменить</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Фото профиля</Label>
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center overflow-hidden">
+                        {avatarPreview ? (
+                          <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <Icon name="User" size={40} className="text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="file"
+                          id="avatar-upload"
+                          accept="image/*"
+                          onChange={handleAvatarChange}
+                          className="hidden"
+                        />
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => document.getElementById('avatar-upload')?.click()}
+                        >
+                          <Icon name="Upload" size={14} className="mr-1" />
+                          Выбрать фото
+                        </Button>
+                        <p className="text-xs text-muted-foreground mt-1">JPG, PNG до 5 МБ</p>
+                      </div>
+                    </div>
                   </div>
 
                   {editMode ? (

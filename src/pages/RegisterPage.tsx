@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
+import SEO from '@/components/SEO';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -98,7 +99,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
+    <>
+      <SEO 
+        title="Регистрация"
+        description="Создайте аккаунт Tech Forma и получите 100 бонусных баллов в подарок. Покупайте и продавайте студенческие работы"
+        noindex={true}
+      />
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold mb-2">
@@ -289,5 +296,6 @@ export default function RegisterPage() {
         </Card>
       </div>
     </div>
+    </>
   );
 }

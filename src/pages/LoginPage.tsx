@@ -7,9 +7,24 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
+import SEO from '@/components/SEO';
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  
+  return (
+    <>
+      <SEO 
+        title="Вход в личный кабинет"
+        description="Войдите в свой аккаунт Tech Forma для доступа к каталогу студенческих работ"
+        noindex={true}
+      />
+      <LoginPageContent navigate={navigate} />
+    </>
+  );
+}
+
+function LoginPageContent({ navigate }: { navigate: any }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);

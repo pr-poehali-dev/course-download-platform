@@ -57,6 +57,24 @@ def get_db_connection():
     conn.autocommit = False
     return conn
 
+def cleanup_expired_tokens(conn):
+    """Clean up expired and used password reset tokens"""
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """
+            DELETE FROM t_p63326274_course_download_plat.password_reset_tokens 
+            WHERE expires_at < NOW() OR used = true
+            """
+        )
+        deleted_count = cur.rowcount
+        conn.commit()
+        cur.close()
+        print(f"Cleaned up {deleted_count} expired/used tokens")
+    except Exception as e:
+        print(f"Token cleanup error: {repr(e)}")
+        conn.rollback()
+
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode(), salt).decode('utf-8')
@@ -167,6 +185,9 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
         )
         
         conn.commit()
+        
+        cleanup_expired_tokens(conn)
+        
         cur.close()
         conn.close()
         

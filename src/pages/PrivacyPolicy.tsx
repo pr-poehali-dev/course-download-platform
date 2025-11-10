@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
+import Footer from '@/components/Footer';
 
 export default function PrivacyPolicy() {
   return (
@@ -31,6 +32,29 @@ export default function PrivacyPolicy() {
         </div>
 
         <div className="space-y-6">
+          <Card className="border-2 border-blue-500/30 bg-blue-50/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="Info" size={20} className="text-blue-600" />
+                Важно: О 152-ФЗ «О персональных данных»
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-muted-foreground">
+              <p>
+                Tech Forma обрабатывает минимальный объём данных пользователей: только <strong>адрес электронной почты</strong> и <strong>никнейм</strong>.
+              </p>
+              <p>
+                Согласно статье 3 Федерального закона №152-ФЗ «О персональных данных», действие данного закона <strong>НЕ распространяется</strong> на отношения, 
+                возникающие при обработке персональных данных физическими лицами исключительно для личных и семейных нужд, 
+                если при этом не нарушаются права субъектов персональных данных.
+              </p>
+              <p>
+                Платформа Tech Forma используется для личного информационного обмена учебными материалами между студентами 
+                и не осуществляет автоматизированную обработку персональных данных в масштабах, требующих регистрации в Роскомнадзоре.
+              </p>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -40,12 +64,14 @@ export default function PrivacyPolicy() {
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
-                Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных 
-                данных пользователей платформы Tech Forma (далее — «Платформа»).
+                Настоящая Политика конфиденциальности определяет порядок обработки и защиты данных 
+                пользователей платформы Tech Forma (далее — «Платформа»).
               </p>
               <p>
-                Оператором персональных данных является: самозанятый гражданин Рекрутив Максим Станиславович, ИНН 380416803984, email: tech.forma@yandex.ru. 
-                Мы обязуемся обрабатывать ваши персональные данные в соответствии с ФЗ-152 «О персональных данных».
+                Администратор Платформы: tech.forma@yandex.ru
+              </p>
+              <p>
+                Используя Платформу, вы соглашаетесь с условиями настоящей Политики конфиденциальности.
               </p>
             </CardContent>
           </Card>
@@ -59,22 +85,18 @@ export default function PrivacyPolicy() {
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
-                При использовании Платформы мы можем собирать следующие категории персональных данных:
+                При регистрации и использовании Платформы мы собираем только необходимый минимум данных:
               </p>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <Icon name="User" size={16} className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-foreground">Регистрационные данные</p>
-                    <p className="text-sm">Никнейм пользователя, адрес электронной почты, пароль (в зашифрованном виде)</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-3">
-                  <Icon name="CreditCard" size={16} className="text-primary mt-1 flex-shrink-0" />
-                  <div>
-                    <p className="font-semibold text-foreground">Платежная информация</p>
-                    <p className="text-sm">Данные о транзакциях, история покупок баллов. Данные банковских карт НЕ хранятся на наших серверах и обрабатываются только платежной системой CloudPayments</p>
+                    <p className="text-sm">
+                      <strong>Никнейм</strong> — для отображения в интерфейсе платформы<br/>
+                      <strong>Email</strong> — для восстановления доступа и важных уведомлений<br/>
+                      <strong>Пароль</strong> — хранится только в зашифрованном виде (хеш)
+                    </p>
                   </div>
                 </div>
                 
@@ -82,7 +104,9 @@ export default function PrivacyPolicy() {
                   <Icon name="Activity" size={16} className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-foreground">Данные об активности</p>
-                    <p className="text-sm">История скачиваний, загруженные работы, избранное, корзина</p>
+                    <p className="text-sm">
+                      История скачиваний, загруженные работы, избранное, баллы — привязываются к вашему аккаунту
+                    </p>
                   </div>
                 </div>
                 
@@ -90,9 +114,24 @@ export default function PrivacyPolicy() {
                   <Icon name="Laptop" size={16} className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-foreground">Технические данные</p>
-                    <p className="text-sm">IP-адрес, тип браузера, операционная система, данные cookies (для работы сайта)</p>
+                    <p className="text-sm">
+                      IP-адрес, тип браузера — только для обеспечения безопасности и работы сайта
+                    </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-green-50 border-l-4 border-green-400 p-4 mt-4">
+                <p className="font-bold text-green-800 mb-2">
+                  ✅ Мы НЕ собираем
+                </p>
+                <ul className="text-sm text-green-700 list-disc list-inside">
+                  <li>ФИО, дату рождения, паспортные данные</li>
+                  <li>Номера телефонов</li>
+                  <li>Адреса проживания</li>
+                  <li>Банковские реквизиты (обрабатываются только платёжной системой)</li>
+                  <li>Любые биометрические данные</li>
+                </ul>
               </div>
             </CardContent>
           </Card>
@@ -105,15 +144,14 @@ export default function PrivacyPolicy() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
-              <p>Мы используем ваши персональные данные для следующих целей:</p>
+              <p>Мы используем ваши данные исключительно для:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Регистрация и управление учетной записью пользователя</li>
-                <li>Обработка платежей и предоставление доступа к материалам</li>
-                <li>Коммуникация с пользователями (уведомления, поддержка)</li>
-                <li>Улучшение качества сервиса и персонализация опыта</li>
-                <li>Предотвращение мошенничества и обеспечение безопасности</li>
-                <li>Выполнение требований законодательства</li>
-                <li>Анализ использования Платформы и формирование статистики</li>
+                <li>Регистрации и управления учетной записью</li>
+                <li>Предоставления доступа к материалам платформы</li>
+                <li>Восстановления доступа к аккаунту (через email)</li>
+                <li>Отправки критически важных уведомлений</li>
+                <li>Обеспечения безопасности платформы</li>
+                <li>Улучшения работы сервиса (анализ анонимной статистики)</li>
               </ul>
             </CardContent>
           </Card>
@@ -127,16 +165,14 @@ export default function PrivacyPolicy() {
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
-                Мы применяем современные технические и организационные меры для защиты ваших 
-                персональных данных:
+                Мы применяем современные меры защиты:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Шифрование данных при передаче (SSL/TLS)</li>
-                <li>Безопасное хранение паролей (хеширование)</li>
-                <li>Регулярное резервное копирование</li>
-                <li>Ограниченный доступ к данным (только уполномоченный персонал)</li>
-                <li>Мониторинг и защита от несанкционированного доступа</li>
-                <li>Регулярные аудиты безопасности</li>
+                <li>Шифрование соединения (HTTPS/SSL)</li>
+                <li>Хеширование паролей (невозможно восстановить исходный пароль)</li>
+                <li>Защита от несанкционированного доступа к базе данных</li>
+                <li>Регулярные резервные копии</li>
+                <li>Ограниченный доступ к серверам (только администратор)</li>
               </ul>
             </CardContent>
           </Card>
@@ -150,18 +186,17 @@ export default function PrivacyPolicy() {
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
-                Мы не продаем и не сдаем в аренду ваши персональные данные третьим лицам. 
-                Передача данных возможна только в следующих случаях:
+                <strong>Мы НЕ продаём, НЕ передаём и НЕ сдаём в аренду ваши данные.</strong>
+              </p>
+              <p>
+                Передача возможна только в следующих случаях:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Платежным системам — для обработки транзакций (в зашифрованном виде)</li>
-                <li>Сервисам аналитики — в обезличенном виде для улучшения Платформы</li>
-                <li>По требованию правоохранительных органов — в соответствии с законодательством РФ</li>
-                <li>С вашего явного согласия</li>
+                <li><strong>Платёжные системы</strong> — для обработки транзакций (данные карты НЕ проходят через наши серверы)</li>
+                <li><strong>Правоохранительные органы</strong> — только по официальному запросу в соответствии с законодательством РФ</li>
               </ul>
               <p className="mt-4">
-                Все третьи лица, получающие доступ к вашим данным, обязуются соблюдать конфиденциальность 
-                и использовать данные только для указанных целей.
+                Мы не используем сторонние аналитические системы, которые собирают персональные данные.
               </p>
             </CardContent>
           </Card>
@@ -175,17 +210,14 @@ export default function PrivacyPolicy() {
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
-                Платформа использует cookies и аналогичные технологии для:
+                Платформа использует cookies только для:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Сохранения сеанса пользователя (авторизация)</li>
-                <li>Запоминания настроек и предпочтений</li>
-                <li>Анализа использования сайта</li>
-                <li>Персонализации контента</li>
+                <li>Сохранения сеанса авторизации (чтобы не вводить пароль каждый раз)</li>
+                <li>Запоминания настроек интерфейса</li>
               </ul>
               <p className="mt-4">
-                Вы можете управлять cookies через настройки браузера. Отключение cookies может 
-                ограничить функциональность Платформы.
+                Вы можете отключить cookies в настройках браузера, но это может ограничить функциональность сайта.
               </p>
             </CardContent>
           </Card>
@@ -193,22 +225,20 @@ export default function PrivacyPolicy() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Icon name="UserCheck" size={20} className="text-primary" />
+                <Icon name="UserX" size={20} className="text-primary" />
                 7. Ваши права
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
-              <p>В соответствии с законодательством РФ вы имеете право:</p>
+              <p>Вы имеете право:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Получать информацию об обработке ваших персональных данных</li>
-                <li>Требовать уточнения, изменения или удаления ваших данных</li>
-                <li>Отозвать согласие на обработку персональных данных</li>
-                <li>Ограничить обработку данных</li>
-                <li>Получить копию ваших данных в структурированном формате</li>
-                <li>Обжаловать действия администрации в надзорных органах</li>
+                <li><strong>Доступ к данным</strong> — запросить копию ваших данных</li>
+                <li><strong>Изменение данных</strong> — изменить никнейм или email в настройках профиля</li>
+                <li><strong>Удаление данных</strong> — удалить аккаунт и все связанные данные</li>
+                <li><strong>Отзыв согласия</strong> — прекратить использование платформы в любой момент</li>
               </ul>
               <p className="mt-4">
-                Для реализации своих прав свяжитесь с нами по email: tech.forma@yandex.ru или через форму техподдержки.
+                Для удаления аккаунта или запроса данных обратитесь на: <strong>tech.forma@yandex.ru</strong>
               </p>
             </CardContent>
           </Card>
@@ -222,17 +252,15 @@ export default function PrivacyPolicy() {
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
-                Мы храним ваши персональные данные только в течение периода, необходимого для 
-                достижения целей обработки:
+                Ваши данные хранятся до тех пор, пока:
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>Данные аккаунта — пока вы используете Платформу или до удаления аккаунта</li>
-                <li>Платежные данные — в соответствии с требованиями налогового законодательства (до 5 лет)</li>
-                <li>Техническая информация — от 1 до 12 месяцев</li>
+                <li>Вы используете платформу</li>
+                <li>Вы не удалите аккаунт</li>
+                <li>Аккаунт не будет неактивен более 3 лет</li>
               </ul>
               <p className="mt-4">
-                После удаления аккаунта ваши данные будут удалены в течение 30 дней, 
-                за исключением информации, которую мы обязаны хранить по закону.
+                После удаления аккаунта данные безвозвратно удаляются в течение 30 дней.
               </p>
             </CardContent>
           </Card>
@@ -240,39 +268,40 @@ export default function PrivacyPolicy() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Icon name="AlertCircle" size={20} className="text-primary" />
-                9. Изменения в Политике
+                <Icon name="Mail" size={20} className="text-primary" />
+                9. Контакты
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
-                Мы оставляем за собой право вносить изменения в настоящую Политику конфиденциальности. 
-                Новая редакция вступает в силу с момента её размещения на Платформе.
+                По вопросам конфиденциальности обращайтесь:
               </p>
-              <p>
-                О существенных изменениях мы уведомим вас по электронной почте или через 
-                уведомления на Платформе.
-              </p>
+              <div className="bg-muted p-4 rounded-lg">
+                <p><strong>Email:</strong> tech.forma@yandex.ru</p>
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="border-2 border-primary/20 bg-primary/5">
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <Icon name="Mail" size={24} className="text-primary flex-shrink-0 mt-1" />
-                <div>
-                  <p className="font-semibold mb-2">Контакты по вопросам конфиденциальности</p>
-                  <p className="text-sm text-muted-foreground">
-                    Если у вас возникли вопросы о том, как мы обрабатываем ваши данные, или вы 
-                    хотите реализовать свои права, свяжитесь с нами через раздел "Поддержка" 
-                    или отправьте запрос через форму обратной связи.
-                  </p>
-                </div>
-              </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="Edit" size={20} className="text-primary" />
+                10. Изменения в Политике
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-muted-foreground">
+              <p>
+                Мы можем обновлять эту Политику конфиденциальности. О существенных изменениях 
+                мы уведомим по email или через уведомление на сайте.
+              </p>
+              <p>
+                Дата последнего обновления указана в начале документа.
+              </p>
             </CardContent>
           </Card>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

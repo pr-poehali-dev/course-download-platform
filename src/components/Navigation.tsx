@@ -38,8 +38,6 @@ export default function Navigation({
             <a href="/" className="hover:text-primary transition-colors">Главная</a>
             <a href="/catalog" className="hover:text-primary transition-colors">Каталог</a>
             <a href="/marketplace" className="hover:text-primary transition-colors">Авторам</a>
-            <a href="/#blog" className="hover:text-primary transition-colors">Блог</a>
-            <a href="/#support" className="hover:text-primary transition-colors">Поддержка</a>
           </nav>
 
           <div className="flex items-center gap-1 md:gap-2">
@@ -160,22 +158,6 @@ export default function Navigation({
               >
                 <Icon name="Briefcase" size={20} className="text-primary" />
                 <span className="font-medium">Авторам</span>
-              </a>
-              <a 
-                href="/#blog" 
-                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Icon name="Newspaper" size={20} className="text-primary" />
-                <span className="font-medium">Блог</span>
-              </a>
-              <a 
-                href="/#support" 
-                className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Icon name="HelpCircle" size={20} className="text-primary" />
-                <span className="font-medium">Поддержка</span>
               </a>
             </nav>
           </div>

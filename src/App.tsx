@@ -30,8 +30,6 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import TestLoginPage from "./pages/TestLoginPage";
 import SupportAdmin from "./components/SupportAdmin";
-import MentorPage from "./pages/MentorPage";
-
 import PaymentPage from "./pages/PaymentPage";
 import DefenseKitBuilder from "./pages/DefenseKitBuilder";
 import SecurityLogsPage from "./pages/SecurityLogsPage";
@@ -75,8 +73,6 @@ const App = () => (
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/test-login" element={<TestLoginPage />} />
           <Route path="/blog/:id" element={<BlogPost />} />
-          <Route path="/mentor" element={<MentorPage />} />
-
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
 

@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Upload work with all required fields",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "title": "Тестовая курсовая работа",
+        "description": "Описание тестовой работы по программированию",
+        "category": "coursework",
+        "price": 600,
+        "authorId": 999999,
+        "fileName": "test_work.docx",
+        "file": "base64_encoded_file_data"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "workId": "number",
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

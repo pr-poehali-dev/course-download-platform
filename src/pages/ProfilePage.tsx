@@ -396,11 +396,11 @@ export default function ProfilePage() {
                 <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
                   <div>
                     <p className="text-sm text-muted-foreground">Приглашено друзей</p>
-                    <p className="text-2xl font-bold">3</p>
+                    <p className="text-2xl font-bold">0</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Бонусов получено</p>
-                    <p className="text-2xl font-bold">150 баллов</p>
+                    <p className="text-2xl font-bold">0 баллов</p>
                   </div>
                 </div>
               </CardContent>

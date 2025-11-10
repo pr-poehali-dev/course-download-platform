@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import PlagiarismChecker from '@/components/PlagiarismChecker';
+import { authService } from '@/lib/auth';
+import func2url from '../../backend/func2url.json';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -92,14 +94,58 @@ export default function UploadWorkPage() {
 
     setUploading(true);
 
-    setTimeout(() => {
+    try {
+      const user = await authService.verify();
+      if (!user) {
+        toast({
+          title: 'Ошибка',
+          description: 'Необходимо войти в систему',
+          variant: 'destructive'
+        });
+        navigate('/login');
+        return;
+      }
+
+      const uploadUrl = func2url['upload-work'];
+      
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': String(user.id)
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          category: formData.category,
+          price: parseInt(formData.price),
+          authorId: user.id,
+          fileName: formData.file?.name || 'work.docx',
+          file: 'base64_placeholder'
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ошибка загрузки');
+      }
+
+      const data = await response.json();
+      
       setUploading(false);
       toast({
         title: 'Работа загружена!',
         description: `Уникальность: ${plagiarismResult.uniqueness_percent.toFixed(1)}%. Работа отправлена на модерацию.`
       });
       navigate('/profile');
-    }, 2000);
+    } catch (error) {
+      setUploading(false);
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось загрузить работу',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (

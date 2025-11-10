@@ -201,12 +201,18 @@ def create_docx_preview_images(docx_path: str, work_id: str, temp_dir: str) -> O
         img = Image.new('RGB', (img_width, img_height), color='white')
         draw = ImageDraw.Draw(img)
         
+        # Используем Liberation Sans - хорошая поддержка кириллицы
         try:
-            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14)
-            font_bold = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 16)
+            font = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf', 14)
+            font_bold = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf', 16)
         except:
-            font = ImageFont.load_default()
-            font_bold = ImageFont.load_default()
+            try:
+                # Fallback на DejaVu
+                font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14)
+                font_bold = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 16)
+            except:
+                font = ImageFont.load_default()
+                font_bold = ImageFont.load_default()
         
         y_position = 30
         x_margin = 40

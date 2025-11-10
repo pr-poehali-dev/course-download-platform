@@ -4,12 +4,8 @@ import hashlib
 import psycopg2
 import bcrypt
 import jwt
-import secrets
-import requests
 from datetime import datetime, timedelta
 from typing import Dict, Any
-
-RESEND_API = 'https://api.resend.com/emails'
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -42,8 +38,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return login_user(event)
         elif path == 'reset-password':
             return reset_password(event)
-        elif path == 'confirm-reset':
-            return confirm_reset_password(event)
+        elif path == 'verify-security-answer':
+            return verify_security_answer(event)
     
     if method == 'GET' and path == 'verify':
         return verify_token(event)
@@ -93,79 +89,7 @@ def generate_jwt_token(user_id: int, username: str) -> str:
     }
     return jwt.encode(payload, secret, algorithm='HS256')
 
-def _send_email_via_resend(*, to: str, subject: str, html: str) -> str:
-    """Send email via Resend API with proper error handling"""
-    key = os.environ.get('RESEND_API_KEY')
-    if not key:
-        raise RuntimeError('RESEND_API_KEY is not set')
-    
-    mail_from = os.environ.get('MAIL_FROM', 'TechForma <noreply@techforma.pro>')
-    
-    resp = requests.post(
-        RESEND_API,
-        headers={
-            'Authorization': f'Bearer {key}',
-            'Content-Type': 'application/json',
-        },
-        json={
-            'from': mail_from,
-            'to': [to],
-            'subject': subject,
-            'html': html,
-        },
-        timeout=15,
-    )
-    
-    if resp.status_code >= 300:
-        raise RuntimeError(f"Resend error {resp.status_code}: {resp.text}")
-    
-    data = resp.json()
-    if not data.get('id'):
-        raise RuntimeError(f"Resend no id in response: {resp.text}")
-    
-    return data['id']
 
-def send_welcome_email(email: str, username: str):
-    """Send welcome email via Resend API"""
-    html = f'''
-    <div style="font-family:Arial,sans-serif;font-size:14px;color:#222">
-        <h1>Привет, {username}!</h1>
-        <p>Спасибо за регистрацию на <b>TechForma</b> — платформе для студентов.</p>
-        <p>Тебе начислено <strong>100 баллов</strong> в подарок! 🎉</p>
-        <h3>Что можно делать:</h3>
-        <ul>
-            <li>Покупать готовые курсовые и дипломы за баллы</li>
-            <li>Загружать свои работы и зарабатывать баллы</li>
-            <li>Обмениваться работами с другими студентами</li>
-        </ul>
-        <p><a href="https://techforma.pro" style="display:inline-block;background:#3b82f6;color:white;padding:12px 24px;text-decoration:none;border-radius:6px;margin-top:16px">Перейти на платформу</a></p>
-        <p>С уважением,<br>Команда TechForma</p>
-    </div>
-    '''
-    return _send_email_via_resend(to=email, subject=f'Добро пожаловать, {username}!', html=html)
-
-def send_reset_password_email(email: str, username: str, reset_token: str):
-    """Send password reset email via Resend API"""
-    base = os.environ.get('FRONTEND_RESET_URL', 'https://techforma.pro/reset-password')
-    reset_url = f"{base}?token={reset_token}"
-    
-    html = f'''
-    <div style="font-family:Arial,sans-serif;font-size:14px;color:#222">
-        <h1>Здравствуйте, {username}!</h1>
-        <p>Вы запросили сброс пароля на платформе TechForma.</p>
-        <p>Для сброса пароля нажмите кнопку ниже:</p>
-        <p style="text-align:center;margin:24px 0">
-            <a href="{reset_url}" style="display:inline-block;padding:12px 18px;background:#3b82f6;color:white;text-decoration:none;border-radius:8px;font-weight:bold">
-                Сбросить пароль
-            </a>
-        </p>
-        <p>Если кнопка не работает, перейдите по ссылке:<br><a href="{reset_url}">{reset_url}</a></p>
-        <p>Ссылка действительна в течение 1 часа.</p>
-        <p style="color:#555">Если вы не запрашивали сброс пароля, проигнорируйте это письмо.</p>
-        <p>С уважением,<br>Команда TechForma</p>
-    </div>
-    '''
-    return _send_email_via_resend(to=email, subject='Сброс пароля — TechForma', html=html)
 
 def _norm(s: str) -> str:
     return (s or "").strip()
@@ -181,12 +105,14 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
     username = _norm_username(body_data.get('username', ''))
     email = _norm_email(body_data.get('email', ''))
     password = body_data.get('password', '')
+    security_question = body_data.get('security_question', '')
+    security_answer = body_data.get('security_answer', '')
     
-    if not username or not email or not password:
+    if not username or not email or not password or not security_question or not security_answer:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Заполните все поля'}),
+            'body': json.dumps({'error': 'Заполните все поля, включая секретный вопрос'}),
             'isBase64Encoded': False
         }
     
@@ -217,16 +143,17 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             }
         
         password_hash = hash_password(password)
+        security_answer_hash = hashlib.sha256(security_answer.lower().strip().encode()).hexdigest()
         referral_code = generate_referral_code(username)
         
         cur.execute(
             """
             INSERT INTO t_p63326274_course_download_plat.users 
-            (username, email, password_hash, referral_code, balance) 
-            VALUES (%s, %s, %s, %s, %s) 
+            (username, email, password_hash, referral_code, balance, security_question, security_answer_hash) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s) 
             RETURNING id
             """,
-            (username, email, password_hash, referral_code, 100)
+            (username, email, password_hash, referral_code, 100, security_question, security_answer_hash)
         )
         user_id = cur.fetchone()[0]
         
@@ -242,11 +169,6 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
         conn.commit()
         cur.close()
         conn.close()
-        
-        try:
-            send_welcome_email(email, username)
-        except Exception as e:
-            print(f"WELCOME EMAIL FAIL: {repr(e)}")
         
         token = generate_jwt_token(user_id, username)
         
@@ -420,6 +342,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
         }
 
 def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
+    """Get security question for user by email"""
     body_data = json.loads(event.get('body', '{}'))
     email = _norm_email(body_data.get('email', ''))
     
@@ -435,73 +358,42 @@ def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
     cur = conn.cursor()
     
     cur.execute(
-        "SELECT id, username FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
+        "SELECT id, security_question FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
         (email,)
     )
     user = cur.fetchone()
+    cur.close()
+    conn.close()
     
     if not user:
-        cur.close()
-        conn.close()
         return {
-            'statusCode': 200,
+            'statusCode': 404,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'message': 'Если пользователь существует, письмо отправлено'}),
+            'body': json.dumps({'error': 'Пользователь не найден'}),
             'isBase64Encoded': False
         }
     
-    user_id, username = user
+    user_id, security_question = user
     
-    token_raw = secrets.token_urlsafe(32)
-    token_hash = hashlib.sha256(token_raw.encode()).hexdigest()
-    expires_at = datetime.utcnow() + timedelta(hours=1)
-    
-    try:
-        cur.execute(
-            """
-            INSERT INTO t_p63326274_course_download_plat.password_reset_tokens 
-            (user_id, token, expires_at) 
-            VALUES (%s, %s, %s)
-            """,
-            (user_id, token_hash, expires_at)
-        )
-        conn.commit()
-        cur.close()
-        conn.close()
-        
-        try:
-            send_reset_password_email(email, username, token_raw)
-        except Exception as e:
-            print(f"RESET EMAIL FAIL: {repr(e)}")
-        
-        return {
-            'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'message': 'Письмо для сброса пароля отправлено'}),
-            'isBase64Encoded': False
-        }
-    except Exception as e:
-        conn.rollback()
-        cur.close()
-        conn.close()
-        print(f"Reset password error: {repr(e)}")
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Ошибка при сбросе пароля'}),
-            'isBase64Encoded': False
-        }
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+        'body': json.dumps({'security_question': security_question}),
+        'isBase64Encoded': False
+    }
 
-def confirm_reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
+def verify_security_answer(event: Dict[str, Any]) -> Dict[str, Any]:
+    """Verify security answer and allow password reset"""
     body_data = json.loads(event.get('body', '{}'))
-    token_raw = body_data.get('token', '').strip()
-    new_password = body_data.get('password', '')
+    email = _norm_email(body_data.get('email', ''))
+    security_answer = body_data.get('security_answer', '').strip()
+    new_password = body_data.get('new_password', '')
     
-    if not token_raw or not new_password:
+    if not email or not security_answer or not new_password:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Токен и новый пароль обязательны'}),
+            'body': json.dumps({'error': 'Все поля обязательны'}),
             'isBase64Encoded': False
         }
     
@@ -516,79 +408,63 @@ def confirm_reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
     conn = get_db_connection()
     cur = conn.cursor()
     
-    token_hash = hashlib.sha256(token_raw.encode()).hexdigest()
-    
-    cur.execute(
-        """
-        SELECT user_id, expires_at, used 
-        FROM t_p63326274_course_download_plat.password_reset_tokens 
-        WHERE token = %s
-        """,
-        (token_hash,)
-    )
-    reset_record = cur.fetchone()
-    
-    if not reset_record:
-        cur.close()
-        conn.close()
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Недействительный токен'}),
-            'isBase64Encoded': False
-        }
-    
-    user_id, expires_at, used = reset_record
-    
-    if used:
-        cur.close()
-        conn.close()
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Токен уже использован'}),
-            'isBase64Encoded': False
-        }
-    
-    if datetime.utcnow() > expires_at:
-        cur.close()
-        conn.close()
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Токен истёк'}),
-            'isBase64Encoded': False
-        }
-    
-    new_hash = hash_password(new_password)
-    
     try:
         cur.execute(
-            "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s WHERE id = %s",
-            (new_hash, user_id)
+            "SELECT id, security_answer_hash, username FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
+            (email,)
         )
+        user = cur.fetchone()
+        
+        if not user:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Пользователь не найден'}),
+                'isBase64Encoded': False
+            }
+        
+        user_id, security_answer_hash, username = user
+        
+        answer_hash = hashlib.sha256(security_answer.lower().strip().encode()).hexdigest()
+        
+        if answer_hash != security_answer_hash:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 403,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Неверный ответ на секретный вопрос'}),
+                'isBase64Encoded': False
+            }
+        
+        new_password_hash = hash_password(new_password)
+        
         cur.execute(
-            "UPDATE t_p63326274_course_download_plat.password_reset_tokens SET used = true WHERE token = %s",
-            (token_hash,)
+            "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s WHERE id = %s",
+            (new_password_hash, user_id)
         )
         conn.commit()
         cur.close()
         conn.close()
         
+        token = generate_jwt_token(user_id, username)
+        
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'message': 'Пароль успешно изменён'}),
+            'body': json.dumps({'message': 'Пароль успешно изменен', 'token': token}),
             'isBase64Encoded': False
         }
     except Exception as e:
         conn.rollback()
         cur.close()
         conn.close()
-        print(f"Password reset error: {repr(e)}")
+        print(f"Verify security answer error: {repr(e)}")
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Ошибка при сбросе пароля'}),
+            'body': json.dumps({'error': 'Ошибка при смене пароля'}),
             'isBase64Encoded': False
         }

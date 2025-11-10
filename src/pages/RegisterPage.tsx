@@ -14,7 +14,9 @@ export default function RegisterPage() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    security_question: '',
+    security_answer: ''
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -59,7 +61,9 @@ export default function RegisterPage() {
         body: JSON.stringify({
           username: formData.name,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          security_question: formData.security_question,
+          security_answer: formData.security_answer
         })
       });
 
@@ -71,7 +75,7 @@ export default function RegisterPage() {
         
         toast({
           title: 'Регистрация успешна!',
-          description: 'Добро пожаловать! Вам начислено 100 бонусных баллов. Проверьте email!'
+          description: 'Добро пожаловать! Вам начислено 100 бонусных баллов.'
         });
         
         navigate('/profile');
@@ -189,6 +193,37 @@ export default function RegisterPage() {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="security_question">Секретный вопрос</Label>
+                <select
+                  id="security_question"
+                  value={formData.security_question}
+                  onChange={(e) => setFormData({ ...formData, security_question: e.target.value })}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  required
+                >
+                  <option value="">Выберите вопрос</option>
+                  <option value="Девичья фамилия матери?">Девичья фамилия матери?</option>
+                  <option value="Город вашего рождения?">Город вашего рождения?</option>
+                  <option value="Кличка первого питомца?">Кличка первого питомца?</option>
+                  <option value="Название первой школы?">Название первой школы?</option>
+                  <option value="Любимый цвет?">Любимый цвет?</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="security_answer">Ответ на секретный вопрос</Label>
+                <Input
+                  id="security_answer"
+                  type="text"
+                  placeholder="Ваш ответ"
+                  value={formData.security_answer}
+                  onChange={(e) => setFormData({ ...formData, security_answer: e.target.value })}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">Используется для восстановления пароля</p>
               </div>
 
               <div className="flex items-start gap-2">

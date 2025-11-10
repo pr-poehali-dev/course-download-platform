@@ -5,16 +5,18 @@
       "method": "POST",
       "path": "/?action=register",
       "body": {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "password123"
+        "username": "testuser_sec_99123",
+        "email": "test_sec_99123@example.com",
+        "password": "password123",
+        "security_question": "Любимый цвет?",
+        "security_answer": "синий"
       },
       "expectedStatus": 200,
       "expectedBody": {
         "token": "string",
         "user": {
-          "username": "testuser",
-          "email": "test@example.com",
+          "username": "testuser_sec_99123",
+          "email": "test_sec_99123@example.com",
           "balance": 100
         }
       },

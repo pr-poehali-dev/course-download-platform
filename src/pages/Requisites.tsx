@@ -35,32 +35,16 @@ export default function Requisites() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Icon name="User" size={20} className="text-primary" />
-                Реквизиты исполнителя
+                <Icon name="Mail" size={20} className="text-primary" />
+                Контакты
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="grid gap-2">
                 <div className="flex items-start gap-2">
-                  <Icon name="User" size={16} className="mt-1 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">ФИО:</p>
-                    <p className="text-sm text-muted-foreground">Рекрутив Максим Станиславович</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-2">
-                  <Icon name="FileText" size={16} className="mt-1 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">ИНН:</p>
-                    <p className="text-sm text-muted-foreground">380416803984</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-2">
                   <Icon name="Mail" size={16} className="mt-1 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">Email:</p>
+                    <p className="text-sm font-medium">Email для связи:</p>
                     <p className="text-sm text-muted-foreground">tech.forma@yandex.ru</p>
                   </div>
                 </div>
@@ -72,7 +56,7 @@ export default function Requisites() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Icon name="Info" size={20} className="text-primary" />
-                Правовая информация
+                О платформе
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -80,7 +64,7 @@ export default function Requisites() {
                 Платформа Tech Forma предоставляет информационные услуги по обмену учебными материалами между студентами.
               </p>
               <p className="text-sm text-muted-foreground">
-                Исполнитель — самозанятый гражданин, зарегистрированный в соответствии с ФЗ-422 «О проведении эксперимента по установлению специального налогового режима "Налог на профессиональный доход"».
+                Все материалы размещаются пользователями платформы и предоставляются в ознакомительных целях.
               </p>
             </CardContent>
           </Card>

@@ -225,6 +225,35 @@ export default function WorksManagement() {
                       </div>
                     </div>
                     <div className="flex gap-2 ml-4 flex-wrap">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`${func2url['download-work']}?workId=${work.id}&userId=admin`);
+                            const data = await response.json();
+                            if (data.url) {
+                              window.open(data.url, '_blank');
+                              toast({
+                                title: 'Скачивание...',
+                                description: 'Файл открывается в новой вкладке'
+                              });
+                            } else {
+                              throw new Error('URL не найден');
+                            }
+                          } catch (error) {
+                            toast({
+                              title: 'Ошибка',
+                              description: 'Не удалось скачать работу',
+                              variant: 'destructive'
+                            });
+                          }
+                        }}
+                        className="gap-2"
+                      >
+                        <Icon name="Download" size={16} />
+                        Скачать
+                      </Button>
                       <PreviewUploader
                         workId={work.id}
                         workTitle={work.title}

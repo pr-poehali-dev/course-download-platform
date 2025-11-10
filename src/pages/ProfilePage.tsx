@@ -166,6 +166,10 @@ export default function ProfilePage() {
 
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState(user.name);
+  const [resetEmail, setResetEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   const handleSaveProfile = () => {
     setEditMode(false);
@@ -284,7 +288,7 @@ export default function ProfilePage() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview">
               <Icon name="User" size={18} className="mr-2" />
               Профиль
@@ -300,6 +304,10 @@ export default function ProfilePage() {
             <TabsTrigger value="purchases">
               <Icon name="ShoppingBag" size={18} className="mr-2" />
               Покупки
+            </TabsTrigger>
+            <TabsTrigger value="security">
+              <Icon name="Shield" size={18} className="mr-2" />
+              Безопасность
             </TabsTrigger>
           </TabsList>
 
@@ -484,6 +492,169 @@ export default function ProfilePage() {
 
           <TabsContent value="balance">
             <BalanceTab />
+          </TabsContent>
+
+          <TabsContent value="security" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Key" size={20} className="text-primary" />
+                  Восстановление пароля
+                </CardTitle>
+                <CardDescription>Сбросить пароль, если вы его забыли</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="bg-amber-50 border-l-4 border-amber-400 p-4">
+                  <div className="flex items-start gap-2">
+                    <Icon name="AlertTriangle" size={18} className="text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-semibold text-amber-800 mb-1">Забыли пароль?</h3>
+                      <p className="text-sm text-amber-700">
+                        Укажите ваш email, и мы сгенерируем новый временный пароль. 
+                        Новый пароль будет показан прямо на этой странице — обязательно сохраните его!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {newPassword ? (
+                  <div className="bg-green-50 border-2 border-green-400 p-6 rounded-lg">
+                    <div className="flex items-start gap-3 mb-4">
+                      <Icon name="CheckCircle" size={24} className="text-green-600 flex-shrink-0" />
+                      <div>
+                        <h3 className="font-semibold text-green-800 text-lg mb-1">Пароль успешно сброшен!</h3>
+                        <p className="text-sm text-green-700">
+                          Вот ваш новый временный пароль. Сохраните его в надежном месте!
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-white p-4 rounded border-2 border-green-300">
+                      <Label className="text-sm font-semibold text-green-800 mb-2 block">Новый пароль:</Label>
+                      <div className="flex items-center gap-2">
+                        <code className="text-2xl font-mono font-bold text-green-900 select-all">
+                          {showNewPassword ? newPassword : '••••••••••••'}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                        >
+                          <Icon name={showNewPassword ? "EyeOff" : "Eye"} size={18} />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            navigator.clipboard.writeText(newPassword);
+                            toast({
+                              title: 'Скопировано',
+                              description: 'Пароль скопирован в буфер обмена'
+                            });
+                          }}
+                        >
+                          <Icon name="Copy" size={18} />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 flex gap-2">
+                      <Button
+                        className="flex-1"
+                        onClick={() => {
+                          navigator.clipboard.writeText(newPassword);
+                          toast({
+                            title: 'Пароль скопирован',
+                            description: 'Теперь вы можете войти с новым паролем'
+                          });
+                        }}
+                      >
+                        <Icon name="Copy" size={16} className="mr-2" />
+                        Скопировать пароль
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={() => setNewPassword('')}
+                      >
+                        Закрыть
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email">Email для сброса пароля</Label>
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      className="w-full gap-2"
+                      variant="destructive"
+                      disabled={!resetEmail || resettingPassword}
+                      onClick={async () => {
+                        setResettingPassword(true);
+                        try {
+                          await new Promise(resolve => setTimeout(resolve, 1500));
+                          const tempPassword = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12).toUpperCase();
+                          setNewPassword(tempPassword);
+                          toast({
+                            title: 'Пароль сброшен',
+                            description: 'Новый временный пароль сгенерирован'
+                          });
+                        } catch (error) {
+                          toast({
+                            title: 'Ошибка',
+                            description: 'Не удалось сбросить пароль',
+                            variant: 'destructive'
+                          });
+                        } finally {
+                          setResettingPassword(false);
+                        }
+                      }}
+                    >
+                      {resettingPassword ? (
+                        <>
+                          <Icon name="Loader2" size={16} className="animate-spin" />
+                          Сброс пароля...
+                        </>
+                      ) : (
+                        <>
+                          <Icon name="RefreshCw" size={16} />
+                          Сбросить пароль
+                        </>
+                      )}
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      После сброса вам будет показан новый временный пароль. Обязательно сохраните его!
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="LogOut" size={20} className="text-primary" />
+                  Выход из аккаунта
+                </CardTitle>
+                <CardDescription>Завершить сеанс на этом устройстве</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  При выходе из аккаунта вы потеряете доступ к профилю и сохраненным данным на этом устройстве.
+                </p>
+                <Button variant="outline" className="w-full">
+                  <Icon name="LogOut" size={18} className="mr-2" />
+                  Выйти из аккаунта
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
 
         </Tabs>

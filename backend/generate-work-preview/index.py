@@ -2,11 +2,12 @@ import json
 import os
 import zipfile
 import tempfile
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import requests
-from docx import Document
 import boto3
+from docx import Document
 from PIL import Image, ImageDraw, ImageFont
+import io
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
@@ -125,8 +126,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             docx_path = docx_files[0]
             print(f"Processing Word file: {docx_path}")
             
-            # Создаем превью напрямую из DOCX
-            preview_url = create_docx_preview_images(docx_path, work_id, temp_dir)
+            # Создаем превью изображение из DOCX
+            preview_url = create_formatted_preview(docx_path, work_id, temp_dir)
             if preview_url:
                 preview_urls.append(preview_url)
         
@@ -170,91 +171,118 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
 
 
-def create_docx_preview_images(docx_path: str, work_id: str, temp_dir: str) -> Optional[str]:
-    """Создает превью изображения из DOCX с содержанием и введением"""
+def create_formatted_preview(docx_path: str, work_id: str, temp_dir: str) -> Optional[str]:
+    """Создает красиво отформатированное превью из DOCX"""
     try:
         doc = Document(docx_path)
         
-        # Ищем разделы "Содержание" и "Введение"
-        content_sections = []
-        capture_next = 0
+        # Ищем содержание
+        content_lines = []
+        found_content = False
         
         for i, para in enumerate(doc.paragraphs):
-            text = para.text.lower().strip()
+            text = para.text.strip()
+            text_lower = text.lower()
             
-            # Проверяем ключевые слова
-            if any(keyword in text for keyword in ['содержание', 'оглавление', 'введение']):
-                # Захватываем этот параграф и следующие 15
-                for j in range(i, min(i + 15, len(doc.paragraphs))):
-                    content_sections.append(doc.paragraphs[j].text)
+            # Нашли начало содержания
+            if not found_content and any(kw in text_lower for kw in ['содержание', 'оглавление']):
+                found_content = True
+                content_lines.append(('title', text))
+                continue
+            
+            # Собираем строки содержания
+            if found_content:
+                if text and len(text) > 2:
+                    # Проверяем, не начался ли новый раздел (введение и т.д.)
+                    if any(kw in text_lower for kw in ['введение', 'глава', 'раздел', 'список']):
+                        if 'введение' in text_lower:
+                            content_lines.append(('title', text))
+                        break
+                    
+                    # Это строка содержания
+                    content_lines.append(('item', text))
                 
-                if len(content_sections) > 50:  # Достаточно текста
+                # Ограничиваем количество строк
+                if len(content_lines) > 30:
                     break
         
-        if not content_sections:
-            # Если не нашли, берем первые 20 параграфов
-            content_sections = [p.text for p in doc.paragraphs[:20]]
+        if not content_lines:
+            # Если не нашли содержание, берем первые 20 строк
+            for para in doc.paragraphs[:20]:
+                if para.text.strip():
+                    content_lines.append(('item', para.text.strip()))
         
         # Создаем изображение
-        img_width = 800
+        img_width = 850
         img_height = 1200
         img = Image.new('RGB', (img_width, img_height), color='white')
         draw = ImageDraw.Draw(img)
         
-        # Используем Liberation Sans - хорошая поддержка кириллицы
+        # Загружаем шрифты
         try:
-            font = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf', 14)
-            font_bold = ImageFont.truetype('/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf', 16)
+            font_regular = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 13)
+            font_title = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 14)
         except:
-            try:
-                # Fallback на DejaVu
-                font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 14)
-                font_bold = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 16)
-            except:
-                font = ImageFont.load_default()
-                font_bold = ImageFont.load_default()
+            font_regular = ImageFont.load_default()
+            font_title = ImageFont.load_default()
         
-        y_position = 30
-        x_margin = 40
-        line_height = 25
+        y = 50
+        x_margin = 60
         
-        for line in content_sections:
-            if y_position > img_height - 50:
+        for line_type, text in content_lines:
+            if y > img_height - 100:
                 break
             
-            # Разбиваем длинные строки
-            if len(line) > 80:
-                words = line.split()
-                current_line = ""
-                for word in words:
-                    if len(current_line + word) < 80:
-                        current_line += word + " "
-                    else:
-                        draw.text((x_margin, y_position), current_line.strip(), fill='black', font=font)
-                        y_position += line_height
-                        current_line = word + " "
-                if current_line:
-                    draw.text((x_margin, y_position), current_line.strip(), fill='black', font=font)
-                    y_position += line_height
+            if line_type == 'title':
+                # Заголовок (Содержание, Введение)
+                draw.text((img_width // 2 - 60, y), text, fill='black', font=font_title)
+                y += 35
             else:
-                draw.text((x_margin, y_position), line, fill='black', font=font)
-                y_position += line_height
+                # Строка содержания
+                # Разбиваем на номер/название и номер страницы
+                parts = text.rsplit('.', 1)
+                
+                if len(parts) == 2 and parts[1].strip().isdigit():
+                    # Есть номер страницы
+                    title_part = parts[0]
+                    page_num = parts[1].strip()
+                    
+                    # Рисуем название
+                    draw.text((x_margin, y), title_part, fill='black', font=font_regular)
+                    
+                    # Рисуем точки
+                    title_width = draw.textlength(title_part, font=font_regular)
+                    dots_start = x_margin + title_width + 10
+                    dots_end = img_width - x_margin - 40
+                    dot_spacing = 5
+                    
+                    for x_dot in range(int(dots_start), int(dots_end), dot_spacing):
+                        draw.text((x_dot, y + 8), '.', fill='black', font=font_regular)
+                    
+                    # Рисуем номер страницы
+                    draw.text((dots_end + 5, y), page_num, fill='black', font=font_regular)
+                else:
+                    # Нет номера страницы, просто текст
+                    draw.text((x_margin, y), text[:90], fill='black', font=font_regular)
+                
+                y += 22
         
-        # Добавляем водяной знак
-        watermark_font = font_bold
-        watermark_text = "ПРЕВЬЮ"
-        draw.text((img_width - 120, img_height - 40), watermark_text, fill=(200, 200, 200), font=watermark_font)
+        # Водяной знак
+        watermark = "ПРЕВЬЮ"
+        watermark_width = draw.textlength(watermark, font=font_title)
+        draw.text((img_width - watermark_width - 50, img_height - 50), watermark, fill=(220, 220, 220), font=font_title)
         
         img_path = os.path.join(temp_dir, 'preview_content.png')
-        img.save(img_path)
+        img.save(img_path, 'PNG')
         
+        # Загружаем в S3
         return upload_to_s3(img_path, work_id, 0)
+        
     except Exception as e:
-        print(f"Error creating docx preview: {e}")
+        print(f"Error creating formatted preview: {e}")
         import traceback
         traceback.print_exc()
         return None
-
 
 
 def upload_to_s3(image_path: str, work_id: str, page_num: int) -> Optional[str]:
@@ -278,7 +306,11 @@ def upload_to_s3(image_path: str, work_id: str, page_num: int) -> Optional[str]:
             ExtraArgs={'ACL': 'public-read', 'ContentType': 'image/png'}
         )
         
-        return f'https://storage.yandexcloud.net/{bucket_name}/{object_name}'
+        url = f'https://storage.yandexcloud.net/{bucket_name}/{object_name}'
+        print(f"Uploaded to S3: {url}")
+        return url
     except Exception as e:
         print(f"Error uploading to S3: {e}")
+        import traceback
+        traceback.print_exc()
         return None

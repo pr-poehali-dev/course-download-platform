@@ -27,3 +27,6 @@ builds
 # S3 Debug outputs (may contain sensitive data)
 debug_output.txt
 full_debug.txt
+
+# Local scripts environment files
+local_scripts/.env

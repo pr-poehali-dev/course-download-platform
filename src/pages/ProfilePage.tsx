@@ -159,17 +159,10 @@ export default function ProfilePage() {
   }, []);
 
   const [purchases] = useState<Purchase[]>([]);
-
   const [uploads] = useState<Upload[]>([]);
-
   const [transactions] = useState<Transaction[]>([]);
-
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState(user.name);
-  const [resetEmail, setResetEmail] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [resettingPassword, setResettingPassword] = useState(false);
 
   const handleSaveProfile = () => {
     setEditMode(false);
@@ -194,7 +187,7 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center">
         <div className="text-center">
           <Icon name="Loader2" className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
           <p className="text-muted-foreground">Загрузка профиля...</p>
@@ -210,457 +203,448 @@ export default function ProfilePage() {
         description="Управление профилем, балансом, загруженными и купленными работами"
         noindex={true}
       />
-      <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16 max-w-6xl">
-        <div className="mb-8">
-          <Button variant="ghost" className="mb-4" asChild>
-            <Link to="/">
-              <Icon name="Home" size={18} className="mr-2" />
-              На главную
-            </Link>
-          </Button>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold mb-2">Личный кабинет</h1>
-              <p className="text-muted-foreground">Управление профилем и работами</p>
-            </div>
-            <Button asChild>
-              <Link to="/upload">
-                <Icon name="Upload" size={18} className="mr-2" />
-                Загрузить работу
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <div className="mb-6">
+            <Button variant="ghost" className="mb-4 hover:bg-white/50" asChild>
+              <Link to="/">
+                <Icon name="ArrowLeft" size={18} className="mr-2" />
+                На главную
               </Link>
             </Button>
+
+            <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white shadow-2xl">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-4 border-white/30">
+                    <Icon name="User" size={40} className="text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-bold mb-1">Привет, {user.name}! 👋</h1>
+                    <p className="text-white/80 text-sm">{user.email}</p>
+                  </div>
+                </div>
+                <Button 
+                  size="lg"
+                  className="bg-white text-purple-600 hover:bg-white/90 shadow-lg"
+                  asChild
+                >
+                  <Link to="/upload">
+                    <Icon name="Upload" size={20} className="mr-2" />
+                    Загрузить работу
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="gradient-blue-cyan">
-            <CardHeader className="pb-2">
-              <div className="text-white/80 flex items-center gap-2 text-sm">
-                <Icon name="Wallet" size={18} />
-                Баланс
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-white mb-1">{user.balance}</div>
-              <p className="text-sm text-white/80">баллов для покупок</p>
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                className="mt-3 w-full"
-                onClick={() => {
-                  const balanceTab = document.querySelector('[value="balance"]') as HTMLElement;
-                  balanceTab?.click();
-                }}
-              >
-                <Icon name="Plus" size={14} className="mr-1" />
-                Пополнить
-              </Button>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <Card className="bg-gradient-to-br from-blue-500 to-cyan-500 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <Icon name="Wallet" size={24} className="opacity-80" />
+                  <Icon name="TrendingUp" size={20} className="opacity-60" />
+                </div>
+                <div className="text-3xl font-bold mb-1">{user.balance}</div>
+                <p className="text-sm text-white/80">Баллов на счету</p>
+              </CardContent>
+            </Card>
 
-          <Card className="gradient-purple-pink">
-            <CardHeader className="pb-2">
-              <div className="text-white/80 flex items-center gap-2 text-sm">
-                <Icon name="FileText" size={18} />
+            <Card className="bg-gradient-to-br from-purple-500 to-pink-500 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <Icon name="FileUp" size={24} className="opacity-80" />
+                  <Icon name="CheckCircle" size={20} className="opacity-60" />
+                </div>
+                <div className="text-3xl font-bold mb-1">{uploads.length}</div>
+                <p className="text-sm text-white/80">Загружено работ</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-orange-500 to-red-500 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <Icon name="ShoppingBag" size={24} className="opacity-80" />
+                  <Icon name="Download" size={20} className="opacity-60" />
+                </div>
+                <div className="text-3xl font-bold mb-1">{purchases.length}</div>
+                <p className="text-sm text-white/80">Куплено работ</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-green-500 to-emerald-500 text-white border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="pt-6">
+                <div className="flex items-center justify-between mb-2">
+                  <Icon name="Star" size={24} className="opacity-80" />
+                  <Icon name="Award" size={20} className="opacity-60" />
+                </div>
+                <div className="text-3xl font-bold mb-1">{user.rating.toFixed(1)}</div>
+                <p className="text-sm text-white/80">Рейтинг автора</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="bg-white shadow-md p-1 h-auto flex-wrap justify-start">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
+                <Icon name="LayoutDashboard" size={16} className="mr-2" />
+                Обзор
+              </TabsTrigger>
+              <TabsTrigger value="purchases" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white">
+                <Icon name="ShoppingBag" size={16} className="mr-2" />
+                Покупки
+              </TabsTrigger>
+              <TabsTrigger value="uploads" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white">
+                <Icon name="FileUp" size={16} className="mr-2" />
                 Мои работы
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-white mb-1">{user.worksUploaded}</div>
-              <p className="text-sm text-white/80">работ в библиотеке</p>
-            </CardContent>
-          </Card>
+              </TabsTrigger>
+              <TabsTrigger value="balance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white">
+                <Icon name="Wallet" size={16} className="mr-2" />
+                Баланс
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gray-600 data-[state=active]:to-gray-800 data-[state=active]:text-white">
+                <Icon name="Settings" size={16} className="mr-2" />
+                Настройки
+              </TabsTrigger>
+            </TabsList>
 
-          <Card className="gradient-green-yellow">
-            <CardHeader className="pb-2">
-              <div className="text-white/80 flex items-center gap-2 text-sm">
-                <Icon name="ShoppingBag" size={18} />
-                Куплено
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-4xl font-bold text-white mb-1">{user.worksPurchased}</div>
-              <p className="text-sm text-white/80">работ других авторов</p>
-            </CardContent>
-          </Card>
-        </div>
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="shadow-lg border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Icon name="Activity" size={20} className="text-blue-500" />
+                      Активность
+                    </CardTitle>
+                    <CardDescription>Ваша статистика за всё время</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+                          <Icon name="TrendingUp" size={20} className="text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Заработано</p>
+                          <p className="text-xl font-bold text-blue-600">{user.totalEarned} б.</p>
+                        </div>
+                      </div>
+                    </div>
 
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">
-              <Icon name="User" size={18} className="mr-2" />
-              Профиль
-            </TabsTrigger>
-            <TabsTrigger value="balance">
-              <Icon name="Wallet" size={18} className="mr-2" />
-              Баланс
-            </TabsTrigger>
-            <TabsTrigger value="uploads">
-              <Icon name="Upload" size={18} className="mr-2" />
-              Мои работы
-            </TabsTrigger>
-            <TabsTrigger value="purchases">
-              <Icon name="ShoppingBag" size={18} className="mr-2" />
-              Покупки
-            </TabsTrigger>
-            <TabsTrigger value="security">
-              <Icon name="Shield" size={18} className="mr-2" />
-              Безопасность
-            </TabsTrigger>
-          </TabsList>
+                    <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center">
+                          <Icon name="TrendingDown" size={20} className="text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Потрачено</p>
+                          <p className="text-xl font-bold text-purple-600">{user.totalSpent} б.</p>
+                        </div>
+                      </div>
+                    </div>
 
+                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                          <Icon name="Calendar" size={20} className="text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">С нами с</p>
+                          <p className="text-lg font-semibold">{new Date(user.registrationDate).toLocaleDateString('ru-RU')}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-
-          <TabsContent value="overview" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Личная информация</CardTitle>
-                  {!editMode ? (
-                    <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
-                      <Icon name="Edit" size={16} className="mr-2" />
-                      Редактировать
+                <Card className="shadow-lg border-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Icon name="Zap" size={20} className="text-orange-500" />
+                      Быстрые действия
+                    </CardTitle>
+                    <CardDescription>Часто используемые функции</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <Button className="w-full justify-start bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white" size="lg" asChild>
+                      <Link to="/upload">
+                        <Icon name="Upload" size={20} className="mr-2" />
+                        Загрузить новую работу
+                      </Link>
                     </Button>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm" onClick={() => setEditMode(false)}>
-                        Отмена
+
+                    <Button className="w-full justify-start bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white" size="lg" asChild>
+                      <Link to="/catalog">
+                        <Icon name="Search" size={20} className="mr-2" />
+                        Найти работу
+                      </Link>
+                    </Button>
+
+                    <Button 
+                      className="w-full justify-start bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white" 
+                      size="lg"
+                      onClick={() => {
+                        const balanceTab = document.querySelector('[value="balance"]') as HTMLElement;
+                        balanceTab?.click();
+                      }}
+                    >
+                      <Icon name="Wallet" size={20} className="mr-2" />
+                      Пополнить баланс
+                    </Button>
+
+                    <Button className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white" size="lg" asChild>
+                      <Link to="/support">
+                        <Icon name="MessageCircle" size={20} className="mr-2" />
+                        Связаться с поддержкой
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <Card className="shadow-lg border-2 bg-gradient-to-r from-yellow-50 to-orange-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Lightbulb" size={20} className="text-yellow-600" />
+                    Советы для увеличения дохода
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg">
+                    <Icon name="CheckCircle" size={20} className="text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold mb-1">Подробные описания</p>
+                      <p className="text-sm text-muted-foreground">Добавляйте детальное описание к работам — это увеличивает продажи на 40%</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg">
+                    <Icon name="CheckCircle" size={20} className="text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold mb-1">Качественное оформление</p>
+                      <p className="text-sm text-muted-foreground">Работы с хорошим форматированием покупают в 2 раза чаще</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-3 bg-white rounded-lg">
+                    <Icon name="CheckCircle" size={20} className="text-green-500 mt-0.5" />
+                    <div>
+                      <p className="font-semibold mb-1">Актуальные темы</p>
+                      <p className="text-sm text-muted-foreground">Загружайте работы по востребованным направлениям</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="purchases" className="space-y-4">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="ShoppingBag" size={20} className="text-orange-500" />
+                    Мои покупки
+                  </CardTitle>
+                  <CardDescription>История приобретенных работ</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {purchases.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon name="ShoppingBag" size={40} className="text-orange-500" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">Пока нет покупок</h3>
+                      <p className="text-muted-foreground mb-6">Начните с поиска подходящей работы в каталоге</p>
+                      <Button asChild>
+                        <Link to="/catalog">
+                          <Icon name="Search" size={18} className="mr-2" />
+                          Перейти в каталог
+                        </Link>
                       </Button>
-                      <Button size="sm" onClick={handleSaveProfile}>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {purchases.map((purchase) => (
+                        <div key={purchase.id} className="border rounded-lg p-4 hover:border-primary transition-colors bg-gradient-to-r from-white to-orange-50">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h3 className="font-semibold mb-2">{purchase.workTitle}</h3>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Icon name="Calendar" size={14} />
+                                  {new Date(purchase.date).toLocaleDateString('ru-RU')}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Icon name="Coins" size={14} />
+                                  {purchase.price} баллов
+                                </span>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              onClick={() => handleDownloadPurchase(purchase.id, purchase.workTitle)}
+                              disabled={downloadingId === purchase.id}
+                            >
+                              {downloadingId === purchase.id ? (
+                                <>
+                                  <Icon name="Loader2" size={14} className="mr-1 animate-spin" />
+                                  Загрузка...
+                                </>
+                              ) : (
+                                <>
+                                  <Icon name="Download" size={14} className="mr-1" />
+                                  Скачать
+                                </>
+                              )}
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="uploads" className="space-y-4">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="FileUp" size={20} className="text-purple-500" />
+                    Загруженные работы
+                  </CardTitle>
+                  <CardDescription>Ваши работы в каталоге</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {uploads.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon name="FileUp" size={40} className="text-purple-500" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">Начните зарабатывать</h3>
+                      <p className="text-muted-foreground mb-6">Загрузите свою первую работу и получайте баллы с каждой продажи</p>
+                      <Button asChild>
+                        <Link to="/upload">
+                          <Icon name="Upload" size={18} className="mr-2" />
+                          Загрузить работу
+                        </Link>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {uploads.map((upload) => (
+                        <div key={upload.id} className="border rounded-lg p-4 bg-gradient-to-r from-white to-purple-50">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <h3 className="font-semibold">{upload.title}</h3>
+                                {getStatusBadge(upload.status)}
+                              </div>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <span className="flex items-center gap-1">
+                                  <Icon name="Calendar" size={14} />
+                                  {new Date(upload.uploadDate).toLocaleDateString('ru-RU')}
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Icon name="Download" size={14} />
+                                  {upload.downloads} скачиваний
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Icon name="Coins" size={14} />
+                                  {upload.price} баллов
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm">
+                              <Icon name="Edit" size={14} className="mr-1" />
+                              Редактировать
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <Icon name="Eye" size={14} className="mr-1" />
+                              Просмотр
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="balance">
+              <BalanceTab userBalance={user.balance} />
+            </TabsContent>
+
+            <TabsContent value="settings" className="space-y-4">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="User" size={20} className="text-gray-600" />
+                    Личные данные
+                  </CardTitle>
+                  <CardDescription>Управление профилем</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Имя пользователя</Label>
+                    {editMode ? (
+                      <Input
+                        id="name"
+                        value={editedName}
+                        onChange={(e) => setEditedName(e.target.value)}
+                      />
+                    ) : (
+                      <div className="p-2 border rounded">{user.name}</div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="p-2 border rounded bg-muted">{user.email}</div>
+                    <p className="text-xs text-muted-foreground">Email нельзя изменить</p>
+                  </div>
+
+                  {editMode ? (
+                    <div className="flex gap-2">
+                      <Button onClick={handleSaveProfile}>
                         <Icon name="Save" size={16} className="mr-2" />
                         Сохранить
                       </Button>
-                    </div>
-                  )}
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {editMode ? (
-                  <>
-                    <div className="space-y-2">
-                      <Label>Имя</Label>
-                      <Input value={editedName} onChange={(e) => setEditedName(e.target.value)} />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Email</Label>
-                      <Input value={user.email} disabled />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-3">
-                      <Icon name="User" size={20} className="text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Имя</p>
-                        <p className="font-semibold">{user.name}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Icon name="Mail" size={20} className="text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Email</p>
-                        <p className="font-semibold">{user.email}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <Icon name="Calendar" size={20} className="text-muted-foreground" />
-                      <div>
-                        <p className="text-sm text-muted-foreground">Дата регистрации</p>
-                        <p className="font-semibold">
-                          {new Date(user.registrationDate).toLocaleDateString('ru-RU')}
-                        </p>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Реферальная программа</CardTitle>
-                <CardDescription>Приглашай друзей и получай бонусы</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex gap-2">
-                  <Input value="https://techforma.ru/ref/alex123" readOnly />
-                  <Button onClick={() => {
-                    navigator.clipboard.writeText('https://techforma.ru/ref/alex123');
-                    toast({ title: 'Скопировано', description: 'Реферальная ссылка скопирована' });
-                  }}>
-                    <Icon name="Copy" size={16} />
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Приглашено друзей</p>
-                    <p className="text-2xl font-bold">0</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Бонусов получено</p>
-                    <p className="text-2xl font-bold">0 баллов</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="purchases" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>История покупок ({purchases.length})</CardTitle>
-                <CardDescription>Все скачанные работы</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {purchases.map((purchase) => (
-                    <div key={purchase.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-semibold mb-1">{purchase.workTitle}</h4>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Icon name="Calendar" size={14} />
-                            {new Date(purchase.date).toLocaleDateString('ru-RU')}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Icon name="Coins" size={14} />
-                            {purchase.price} баллов
-                          </span>
-                        </div>
-                      </div>
-                      <Button 
-                        size="sm" 
-                        onClick={() => handleDownloadPurchase(purchase.id, purchase.workTitle)}
-                        disabled={downloadingId === purchase.id}
-                      >
-                        <Icon name="Download" size={16} className="mr-2" />
-                        {downloadingId === purchase.id ? 'Скачивание...' : 'Скачать работу'}
+                      <Button variant="outline" onClick={() => setEditMode(false)}>
+                        Отмена
                       </Button>
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="uploads" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Мои работы ({uploads.length})</CardTitle>
-                <CardDescription>Загруженные работы и статистика скачиваний</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {uploads.map((upload) => (
-                    <div key={upload.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h4 className="font-semibold">{upload.title}</h4>
-                          {getStatusBadge(upload.status)}
-                        </div>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Icon name="Coins" size={14} />
-                            {upload.price} баллов
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Icon name="Download" size={14} />
-                            {upload.downloads} скачиваний
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Icon name="Calendar" size={14} />
-                            {new Date(upload.uploadDate).toLocaleDateString('ru-RU')}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm">
-                          <Icon name="Edit" size={16} />
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Icon name="Trash2" size={16} className="text-destructive" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="balance">
-            <BalanceTab />
-          </TabsContent>
-
-          <TabsContent value="security" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icon name="Key" size={20} className="text-primary" />
-                  Восстановление пароля
-                </CardTitle>
-                <CardDescription>Сбросить пароль, если вы его забыли</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="bg-amber-50 border-l-4 border-amber-400 p-4">
-                  <div className="flex items-start gap-2">
-                    <Icon name="AlertTriangle" size={18} className="text-amber-600 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <h3 className="font-semibold text-amber-800 mb-1">Забыли пароль?</h3>
-                      <p className="text-sm text-amber-700">
-                        Укажите ваш email, и мы сгенерируем новый временный пароль. 
-                        Новый пароль будет показан прямо на этой странице — обязательно сохраните его!
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {newPassword ? (
-                  <div className="bg-green-50 border-2 border-green-400 p-6 rounded-lg">
-                    <div className="flex items-start gap-3 mb-4">
-                      <Icon name="CheckCircle" size={24} className="text-green-600 flex-shrink-0" />
-                      <div>
-                        <h3 className="font-semibold text-green-800 text-lg mb-1">Пароль успешно сброшен!</h3>
-                        <p className="text-sm text-green-700">
-                          Вот ваш новый временный пароль. Сохраните его в надежном месте!
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="bg-white p-4 rounded border-2 border-green-300">
-                      <Label className="text-sm font-semibold text-green-800 mb-2 block">Новый пароль:</Label>
-                      <div className="flex items-center gap-2">
-                        <code className="text-2xl font-mono font-bold text-green-900 select-all">
-                          {showNewPassword ? newPassword : '••••••••••••'}
-                        </code>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => setShowNewPassword(!showNewPassword)}
-                        >
-                          <Icon name={showNewPassword ? "EyeOff" : "Eye"} size={18} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            navigator.clipboard.writeText(newPassword);
-                            toast({
-                              title: 'Скопировано',
-                              description: 'Пароль скопирован в буфер обмена'
-                            });
-                          }}
-                        >
-                          <Icon name="Copy" size={18} />
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="mt-4 flex gap-2">
-                      <Button
-                        className="flex-1"
-                        onClick={() => {
-                          navigator.clipboard.writeText(newPassword);
-                          toast({
-                            title: 'Пароль скопирован',
-                            description: 'Теперь вы можете войти с новым паролем'
-                          });
-                        }}
-                      >
-                        <Icon name="Copy" size={16} className="mr-2" />
-                        Скопировать пароль
-                      </Button>
-                      <Button
-                        variant="outline"
-                        onClick={() => setNewPassword('')}
-                      >
-                        Закрыть
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="reset-email">Email для сброса пароля</Label>
-                      <Input
-                        id="reset-email"
-                        type="email"
-                        placeholder="your@email.com"
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                      />
-                    </div>
-                    <Button
-                      className="w-full gap-2"
-                      variant="destructive"
-                      disabled={!resetEmail || resettingPassword}
-                      onClick={async () => {
-                        setResettingPassword(true);
-                        try {
-                          await new Promise(resolve => setTimeout(resolve, 1500));
-                          const tempPassword = Math.random().toString(36).slice(-12) + Math.random().toString(36).slice(-12).toUpperCase();
-                          setNewPassword(tempPassword);
-                          toast({
-                            title: 'Пароль сброшен',
-                            description: 'Новый временный пароль сгенерирован'
-                          });
-                        } catch (error) {
-                          toast({
-                            title: 'Ошибка',
-                            description: 'Не удалось сбросить пароль',
-                            variant: 'destructive'
-                          });
-                        } finally {
-                          setResettingPassword(false);
-                        }
-                      }}
-                    >
-                      {resettingPassword ? (
-                        <>
-                          <Icon name="Loader2" size={16} className="animate-spin" />
-                          Сброс пароля...
-                        </>
-                      ) : (
-                        <>
-                          <Icon name="RefreshCw" size={16} />
-                          Сбросить пароль
-                        </>
-                      )}
+                  ) : (
+                    <Button onClick={() => setEditMode(true)}>
+                      <Icon name="Edit" size={16} className="mr-2" />
+                      Редактировать профиль
                     </Button>
-                    <p className="text-xs text-muted-foreground text-center">
-                      После сброса вам будет показан новый временный пароль. Обязательно сохраните его!
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  )}
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icon name="LogOut" size={20} className="text-primary" />
-                  Выход из аккаунта
-                </CardTitle>
-                <CardDescription>Завершить сеанс на этом устройстве</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">
-                  При выходе из аккаунта вы потеряете доступ к профилю и сохраненным данным на этом устройстве.
-                </p>
-                <Button variant="outline" className="w-full">
-                  <Icon name="LogOut" size={18} className="mr-2" />
-                  Выйти из аккаунта
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-        </Tabs>
+              <Card className="shadow-lg border-red-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-600">
+                    <Icon name="AlertTriangle" size={20} />
+                    Опасная зона
+                  </CardTitle>
+                  <CardDescription>Необратимые действия с аккаунтом</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button variant="destructive" className="w-full">
+                    <Icon name="Trash2" size={16} className="mr-2" />
+                    Удалить аккаунт
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
       <Footer />
-    </div>
     </>
   );
 }

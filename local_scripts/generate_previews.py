@@ -24,7 +24,7 @@ from PIL import Image
 import io
 
 # Конфигурация (будет заполнена из .env или вручную)
-DATABASE_URL = "postgresql://t_p63326274_course_download_plat_user:ASOdp99adp0920jASPdj09jAS@rc1b-vb0od8cokgh3c4lk.mdb.yandexcloud.net:6432/t_p63326274_course_download_plat?sslmode=require"
+DATABASE_URL = None
 YANDEX_S3_KEY_ID = "your_s3_key_id_here"
 YANDEX_S3_SECRET_KEY = "your_s3_secret_key_here"
 
@@ -53,15 +53,22 @@ def load_config():
                     elif key == 'YANDEX_S3_SECRET_KEY':
                         YANDEX_S3_SECRET_KEY = value
     
-    # Проверка заполнения S3 ключей
+    # Проверка заполнения
+    if not DATABASE_URL:
+        print("❌ ОШИБКА: Не указан DATABASE_URL")
+        print("Добавьте в файл .env строку:")
+        print("")
+        print("DATABASE_URL=postgresql://user:password@host:port/database")
+        print("")
+        sys.exit(1)
+    
     if YANDEX_S3_KEY_ID == "your_s3_key_id_here" or YANDEX_S3_SECRET_KEY == "your_s3_secret_key_here":
         print("❌ ОШИБКА: Не указаны S3 ключи")
-        print("Создайте файл .env в папке local_scripts/ с содержимым:")
+        print("Добавьте в файл .env строки:")
         print("")
         print("YANDEX_S3_KEY_ID=YCAJERGpk5SnSCkDZEMHjBRI1")
         print("YANDEX_S3_SECRET_KEY=YCPNtwr-uwOYzm2eCk2WkajMi38bjP2RsU4Qz_Me")
         print("")
-        print("(используй свои ключи из Yandex Cloud)")
         sys.exit(1)
 
 

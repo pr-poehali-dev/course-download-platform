@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Generate preview for work",
+      "method": "POST",
+      "path": "/?work_id=4383",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "preview_urls": "array",
+        "pages_found": "number",
+        "work_id": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

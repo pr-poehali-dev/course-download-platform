@@ -24,7 +24,7 @@ from PIL import Image
 import io
 
 # Конфигурация (будет заполнена из .env или вручную)
-DATABASE_URL = "your_database_url_here"
+DATABASE_URL = "postgresql://t_p63326274_course_download_plat_user:ASOdp99adp0920jASPdj09jAS@rc1b-vb0od8cokgh3c4lk.mdb.yandexcloud.net:6432/t_p63326274_course_download_plat?sslmode=require"
 YANDEX_S3_KEY_ID = "your_s3_key_id_here"
 YANDEX_S3_SECRET_KEY = "your_s3_secret_key_here"
 
@@ -40,22 +40,28 @@ def load_config():
             for line in f:
                 line = line.strip()
                 if line and not line.startswith('#'):
+                    if '=' not in line:
+                        continue
                     key, value = line.split('=', 1)
+                    key = key.strip()
+                    value = value.strip().strip('"').strip("'")
+                    
                     if key == 'DATABASE_URL':
-                        DATABASE_URL = value.strip('"').strip("'")
+                        DATABASE_URL = value
                     elif key == 'YANDEX_S3_KEY_ID':
-                        YANDEX_S3_KEY_ID = value.strip('"').strip("'")
+                        YANDEX_S3_KEY_ID = value
                     elif key == 'YANDEX_S3_SECRET_KEY':
-                        YANDEX_S3_SECRET_KEY = value.strip('"').strip("'")
+                        YANDEX_S3_SECRET_KEY = value
     
-    # Проверка заполнения
-    if DATABASE_URL == "your_database_url_here":
-        print("❌ ОШИБКА: Не указан DATABASE_URL")
+    # Проверка заполнения S3 ключей
+    if YANDEX_S3_KEY_ID == "your_s3_key_id_here" or YANDEX_S3_SECRET_KEY == "your_s3_secret_key_here":
+        print("❌ ОШИБКА: Не указаны S3 ключи")
         print("Создайте файл .env в папке local_scripts/ с содержимым:")
         print("")
-        print("DATABASE_URL=postgresql://...")
-        print("YANDEX_S3_KEY_ID=your_key")
-        print("YANDEX_S3_SECRET_KEY=your_secret")
+        print("YANDEX_S3_KEY_ID=YCAJERGpk5SnSCkDZEMHjBRI1")
+        print("YANDEX_S3_SECRET_KEY=YCPNtwr-uwOYzm2eCk2WkajMi38bjP2RsU4Qz_Me")
+        print("")
+        print("(используй свои ключи из Yandex Cloud)")
         sys.exit(1)
 
 

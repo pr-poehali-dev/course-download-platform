@@ -32,15 +32,13 @@ pip3 install psycopg2-binary requests python-docx Pillow boto3 PyMuPDF
 Создайте файл `.env` в папке `local_scripts/` со следующим содержимым:
 
 ```
-DATABASE_URL=postgresql://user:password@host:port/database
-YANDEX_S3_KEY_ID=ваш_ключ_s3
-YANDEX_S3_SECRET_KEY=ваш_секретный_ключ_s3
+YANDEX_S3_KEY_ID=YCAJERGpk5SnSCkDZEMHjBRI1
+YANDEX_S3_SECRET_KEY=YCPNtwr-uwOYzm2eCk2WkajMi38bjP2RsU4Qz_Me
 ```
 
-**Где взять эти данные:**
-- `DATABASE_URL` - строка подключения к PostgreSQL (попроси у Юры)
-- `YANDEX_S3_KEY_ID` - ключ доступа к Yandex Object Storage (попроси у Юры)
-- `YANDEX_S3_SECRET_KEY` - секретный ключ доступа (попроси у Юры)
+**Примечание:**
+- `DATABASE_URL` уже встроен в скрипт, указывать не нужно
+- Используй свои ключи S3 из Yandex Cloud (указаны твои реальные ключи выше)
 
 ## Запуск
 

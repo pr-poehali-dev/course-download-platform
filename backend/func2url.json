@@ -1,4 +1,6 @@
 {
+  "bulk-approve-works": "https://functions.poehali.dev/e0319554-86af-43b3-a2ad-d0662cf9593a",
+  "activate-works": "https://functions.poehali.dev/a0d356df-1a1c-42e3-8611-b6c2d45c1778",
   "upload-work": "https://functions.poehali.dev/fb387705-926b-436e-9d4f-4f064c4a4b3d",
   "upload-preview": "https://functions.poehali.dev/6bbd2ffd-478a-4e92-a0c5-8471afb6ee70",
   "generate-work-preview": "https://functions.poehali.dev/ce75cac5-db95-41b2-b846-fc429791dd1a",

@@ -137,12 +137,54 @@ export default function WorksManagement() {
     }
   };
 
+  const handleBulkApprove = async () => {
+    if (!confirm('Одобрить следующие 100 работ со статусом "pending"?')) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`${func2url['bulk-approve-works']}?limit=100`, {
+        method: 'POST'
+      });
+      
+      if (!response.ok) throw new Error('Failed to bulk approve');
+      
+      const data = await response.json();
+      
+      toast({
+        title: 'Успешно!',
+        description: `Одобрено работ: ${data.approved}`
+      });
+      
+      await loadWorks();
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось одобрить работы',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
-          <CardTitle>Фильтры и поиск</CardTitle>
-          <CardDescription>Найдите нужную работу для редактирования</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Фильтры и поиск</CardTitle>
+              <CardDescription>Найдите нужную работу для редактирования</CardDescription>
+            </div>
+            <Button 
+              onClick={handleBulkApprove}
+              disabled={loading}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Icon name="CheckCheck" size={18} className="mr-2" />
+              Одобрить 100 работ
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

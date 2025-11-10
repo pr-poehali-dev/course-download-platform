@@ -268,8 +268,31 @@ export default function PrivacyPolicy() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                <Icon name="UserCog" size={20} className="text-primary" />
+                9. Обработка персональных данных несовершеннолетних
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 text-muted-foreground">
+              <p>
+                <strong>9.1.</strong> Платформа предназначена для лиц старше 18 лет.
+              </p>
+              <p>
+                <strong>9.2.</strong> Лица в возрасте от 14 до 18 лет могут использовать Платформу только при наличии 
+                письменного согласия родителей или законных представителей. Такое согласие должно быть направлено 
+                на email: tech.forma@yandex.ru с приложением копий документов.
+              </p>
+              <p>
+                <strong>9.3.</strong> Платформа не собирает намеренно данные лиц младше 14 лет. При обнаружении 
+                такого аккаунта он будет немедленно заблокирован и все данные удалены.
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <Icon name="Mail" size={20} className="text-primary" />
-                9. Контакты
+                10. Контакты
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
@@ -286,7 +309,7 @@ export default function PrivacyPolicy() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Icon name="Edit" size={20} className="text-primary" />
-                10. Изменения в Политике
+                11. Изменения в Политике
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">

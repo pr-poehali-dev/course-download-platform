@@ -1,0 +1,25 @@
+{
+  "tests": [
+    {
+      "name": "Upload preview image",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "work_id": "4383",
+        "images": [
+          {
+            "file": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+            "filename": "test_preview.png"
+          }
+        ]
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": "boolean",
+        "preview_url": "string",
+        "work_id": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

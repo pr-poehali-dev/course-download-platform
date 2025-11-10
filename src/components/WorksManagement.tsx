@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
+import PreviewUploader from '@/components/PreviewUploader';
 import {
   Dialog,
   DialogContent,
@@ -28,6 +29,7 @@ interface Work {
   id: number;
   title: string;
   description: string;
+  preview_image_url?: string;
   category: string;
   price_points: number;
   author?: string;
@@ -222,7 +224,18 @@ export default function WorksManagement() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex gap-2 ml-4">
+                    <div className="flex gap-2 ml-4 flex-wrap">
+                      <PreviewUploader
+                        workId={work.id}
+                        workTitle={work.title}
+                        currentPreviewUrl={work.preview_image_url}
+                        onUploadSuccess={(newUrl) => {
+                          const updatedWorks = works.map(w => 
+                            w.id === work.id ? { ...w, preview_image_url: newUrl } : w
+                          );
+                          setWorks(updatedWorks);
+                        }}
+                      />
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button variant="outline" size="sm" onClick={() => handleEdit(work)}>

@@ -81,6 +81,7 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
                   src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
                   alt={work.workType}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent flex items-end justify-center pb-8">
                   <p className="text-lg text-white font-bold drop-shadow-lg">{work.workType}</p>

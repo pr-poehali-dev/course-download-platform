@@ -134,6 +134,7 @@ export default function TestimonialsSection() {
                     src={testimonial.avatar} 
                     alt={testimonial.name}
                     className="w-12 h-12 rounded-full object-cover"
+                    loading="lazy"
                   />
                   <div>
                     <p className="font-semibold">{testimonial.name}</p>

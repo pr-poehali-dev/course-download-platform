@@ -106,6 +106,20 @@ export default function UploadWorkPage() {
         return;
       }
 
+      let fileBase64 = '';
+      if (formData.file) {
+        fileBase64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            const result = reader.result as string;
+            const base64 = result.split(',')[1];
+            resolve(base64);
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(formData.file!);
+        });
+      }
+
       const uploadUrl = func2url['upload-work'];
       
       const response = await fetch(uploadUrl, {
@@ -121,7 +135,7 @@ export default function UploadWorkPage() {
           price: parseInt(formData.price),
           authorId: user.id,
           fileName: formData.file?.name || 'work.docx',
-          file: 'base64_placeholder'
+          file: fileBase64
         })
       });
 

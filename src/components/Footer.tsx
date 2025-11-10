@@ -36,15 +36,13 @@ export default function Footer() {
           </div>
 
           <div>
-            <h4 className="font-semibold mb-4">Поддержка</h4>
+            <h4 className="font-semibold mb-4">Юридическая информация</h4>
             <ul className="space-y-2 text-sm text-muted-foreground">
               <li><a href="/#support" className="hover:text-primary transition-colors">Связаться с нами</a></li>
               <li><Link to="/privacy-policy" className="hover:text-primary transition-colors">Политика конфиденциальности</Link></li>
               <li><Link to="/terms-of-service" className="hover:text-primary transition-colors">Пользовательское соглашение</Link></li>
               <li><Link to="/offer" className="hover:text-primary transition-colors">Договор-оферта</Link></li>
-              <li><Link to="/requisites" className="hover:text-primary transition-colors">Реквизиты</Link></li>
-              <li><Link to="/roskomnadzor-guide" className="hover:text-primary transition-colors">Регистрация в Роскомнадзоре</Link></li>
-              <li><Link to="/admin" className="hover:text-primary transition-colors">Админ-панель</Link></li>
+              <li><Link to="/requisites" className="hover:text-primary transition-colors">Контакты</Link></li>
             </ul>
           </div>
         </div>

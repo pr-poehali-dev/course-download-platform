@@ -22,12 +22,12 @@ export default function Requisites() {
           </Button>
           
           <Badge variant="outline" className="mb-4">
-            <Icon name="FileText" size={14} className="mr-2" />
-            Юридическая информация
+            <Icon name="Mail" size={14} className="mr-2" />
+            Контактная информация
           </Badge>
-          <h1 className="text-4xl font-bold mb-4">Реквизиты</h1>
+          <h1 className="text-4xl font-bold mb-4">Контакты</h1>
           <p className="text-muted-foreground">
-            Информация об исполнителе и реквизиты для связи
+            Свяжитесь с нами по любым вопросам
           </p>
         </div>
 

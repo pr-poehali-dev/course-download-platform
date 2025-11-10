@@ -38,12 +38,12 @@ export default function AboutSection() {
               <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
                 <Icon name="ShieldCheck" size={32} className="text-primary" />
               </div>
-              <CardTitle className="text-2xl">Гарантии качества</CardTitle>
+              <CardTitle className="text-2xl">Безопасность и качество</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
-                Все работы проходят модерацию и проверку уникальности с помощью ИИ. 
-                Мы проверяем соответствие описанию, качество оформления и оригинальность.
+                Платформа обеспечивает безопасное хранение материалов. Авторы сами 
+                несут ответственность за качество и оригинальность своих работ.
               </p>
             </CardContent>
           </Card>

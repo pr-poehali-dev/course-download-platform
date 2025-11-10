@@ -10,6 +10,7 @@ import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { recentlyViewedStorage } from '@/utils/recentlyViewed';
+import WorkPreviewModal from '@/components/WorkPreviewModal';
 
 interface Work {
   id: string;
@@ -45,6 +46,7 @@ export default function WorkDetailPage() {
   const [extractingImages, setExtractingImages] = useState(false);
   const [similarWorks, setSimilarWorks] = useState<Work[]>([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
+  const [showWorkPreview, setShowWorkPreview] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -904,6 +906,16 @@ export default function WorkDetailPage() {
               </div>
 
               <Button 
+                variant="outline"
+                size="default"
+                className="w-full font-semibold rounded-lg mb-3 border-primary text-primary hover:bg-primary/10 h-10 md:h-11 text-sm md:text-base"
+                onClick={() => setShowWorkPreview(true)}
+              >
+                <Icon name="Eye" size={18} className="mr-2" />
+                Посмотреть превью
+              </Button>
+
+              <Button 
                 size="default"
                 className="w-full font-semibold rounded-lg mb-3 shadow-md hover:shadow-lg transition-all duration-200 h-10 md:h-11 text-sm md:text-base"
                 onClick={handlePurchaseAndDownload}
@@ -1056,6 +1068,15 @@ export default function WorkDetailPage() {
           </div>
         </div>
       )}
+      
+      <WorkPreviewModal
+        workId={actualWorkId || null}
+        workTitle={work?.title}
+        open={showWorkPreview}
+        onClose={() => setShowWorkPreview(false)}
+        onBuyClick={handlePurchaseAndDownload}
+      />
+      
       <Footer />
     </div>
   );

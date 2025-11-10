@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Get work preview with valid ID",
+      "method": "GET",
+      "path": "/?work_id=4383",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "work_id": "string",
+        "title": "string",
+        "preview_type": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

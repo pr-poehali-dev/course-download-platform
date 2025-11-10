@@ -30,9 +30,10 @@ interface WorkCardProps {
   onQuickView: (work: Work) => void;
   onAddToFavorite: (workId: string) => void;
   isFavorite: boolean;
+  onPreview?: (workId: string) => void;
 }
 
-export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite }: WorkCardProps) {
+export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite, onPreview }: WorkCardProps) {
   const [imageError, setImageError] = useState(false);
   const hasPreview = work.previewUrls && work.previewUrls.length > 0 && !imageError;
   
@@ -192,12 +193,28 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
               </div>
             )}
           </div>
-          <Button 
-            onClick={handleBuyClick}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
-          >
-            Купить
-          </Button>
+          <div className="flex gap-2">
+            {onPreview && (
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onPreview(work.id);
+                }}
+                variant="outline"
+                size="sm"
+                className="border-primary text-primary hover:bg-primary/10"
+              >
+                <Icon name="Eye" className="h-4 w-4 mr-1" />
+                Превью
+              </Button>
+            )}
+            <Button 
+              onClick={handleBuyClick}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+            >
+              Купить
+            </Button>
+          </div>
         </div>
 
         <div className="mt-3 pt-3 border-t border-gray-100">

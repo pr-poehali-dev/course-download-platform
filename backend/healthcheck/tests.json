@@ -1,0 +1,19 @@
+{
+  "tests": [
+    {
+      "name": "Health check returns healthy status",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "status": "string",
+        "components": {
+          "database": {
+            "status": "string"
+          }
+        }
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

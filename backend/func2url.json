@@ -1,4 +1,5 @@
 {
+  "healthcheck": "https://functions.poehali.dev/fafd6cc9-8170-405d-b2b9-d282d190b762",
   "extract-doc-preview": "https://functions.poehali.dev/0842d7ac-c5da-4887-94c3-c066374bafad",
   "defense-kit": "https://functions.poehali.dev/4b4b9ad2-3c92-4c35-8116-be574e423531",
   "platform-finances": "https://functions.poehali.dev/e202433e-0e20-4349-b587-c9ed30120965",

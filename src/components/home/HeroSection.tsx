@@ -52,16 +52,16 @@ export default function HeroSection({ onCatalogClick, onAuthClick, isLoggedIn }:
           
           <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <div className="text-4xl font-bold mb-2">5000+</div>
+              <div className="text-4xl font-bold mb-2">488</div>
               <div className="text-white/80">Готовых работ</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <div className="text-4xl font-bold mb-2">2000+</div>
-              <div className="text-white/80">Довольных студентов</div>
+              <div className="text-4xl font-bold mb-2">10+</div>
+              <div className="text-white/80">Активных пользователей</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-              <div className="text-4xl font-bold mb-2">4.8★</div>
-              <div className="text-white/80">Средний рейтинг</div>
+              <div className="text-4xl font-bold mb-2">13</div>
+              <div className="text-white/80">Успешных покупок</div>
             </div>
           </div>
         </div>

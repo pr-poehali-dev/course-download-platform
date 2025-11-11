@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import BalanceTab from '@/components/profile/BalanceTab';
+import SupportTab from '@/components/profile/SupportTab';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 
@@ -391,6 +392,10 @@ export default function ProfilePage() {
                   </span>
                 )}
               </TabsTrigger>
+              <TabsTrigger value="support" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white">
+                <Icon name="Headphones" size={16} className="mr-2" />
+                Техподдержка
+              </TabsTrigger>
               <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gray-600 data-[state=active]:to-gray-800 data-[state=active]:text-white">
                 <Icon name="Settings" size={16} className="mr-2" />
                 Настройки
@@ -714,6 +719,10 @@ export default function ProfilePage() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="support" className="space-y-4">
+              <SupportTab userEmail={user.email} />
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-4">

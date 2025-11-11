@@ -97,10 +97,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             conn = psycopg2.connect(database_url)
             cur = conn.cursor()
             
-            cur.execute(
-                "UPDATE t_p63326274_course_download_plat.works SET preview_image_url = %s WHERE id = %s",
-                (uploaded_urls[0], int(work_id))
-            )
+            escaped_url = uploaded_urls[0].replace("'", "''")
+            update_query = f"UPDATE works SET preview_image_url = '{escaped_url}' WHERE id = {int(work_id)}"
+            cur.execute(update_query)
             
             conn.commit()
             cur.close()

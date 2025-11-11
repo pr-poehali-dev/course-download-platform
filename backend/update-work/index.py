@@ -57,23 +57,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     conn = psycopg2.connect(dsn)
     cursor = conn.cursor()
     
-    # Build update query dynamically
+    # Build update query dynamically using Simple Query Protocol
     updates = []
-    params = []
     
     if title is not None:
-        updates.append('title = %s')
-        params.append(title)
+        escaped_title = title.replace("'", "''")
+        updates.append(f"title = '{escaped_title}'")
     
     if description is not None:
-        updates.append('preview = %s')
-        params.append(description)
+        escaped_desc = description.replace("'", "''")
+        updates.append(f"preview = '{escaped_desc}'")
     
     if composition is not None:
-        # Convert list to string with comma separator
         composition_str = ', '.join(composition) if isinstance(composition, list) else composition
-        updates.append('composition = %s')
-        params.append(composition_str)
+        escaped_comp = composition_str.replace("'", "''")
+        updates.append(f"composition = '{escaped_comp}'")
     
     if not updates:
         cursor.close()
@@ -84,12 +82,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'No fields to update'})
         }
     
-    # Add workId to params
-    params.append(int(work_id))
-    
-    # Execute update
-    update_query = f"UPDATE works SET {', '.join(updates)} WHERE id = %s"
-    cursor.execute(update_query, params)
+    # Execute update using Simple Query Protocol
+    update_query = f"UPDATE works SET {', '.join(updates)} WHERE id = {int(work_id)}"
+    cursor.execute(update_query)
     conn.commit()
     
     cursor.close()

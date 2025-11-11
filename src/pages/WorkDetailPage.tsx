@@ -632,30 +632,32 @@ export default function WorkDetailPage() {
       reader.onloadend = async () => {
         const base64Image = (reader.result as string).split(',')[1];
 
-        const UPDATE_PREVIEW_URL = func2url['update-work-preview'];
-        const response = await fetch(UPDATE_PREVIEW_URL, {
+        const UPLOAD_PREVIEW_URL = func2url['upload-preview'];
+        const response = await fetch(UPLOAD_PREVIEW_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             work_id: workId,
-            image_base64: base64Image,
-            image_filename: file.name
+            images: [{
+              file: base64Image,
+              filename: file.name
+            }]
           })
         });
 
         const data = await response.json();
 
-        if (data.success) {
-          setGallery([data.image_url]);
+        if (data.success && data.preview_url) {
+          setGallery([data.preview_url]);
           setSelectedImage(0);
           
           if (work) {
-            setWork({ ...work, previewUrl: data.image_url });
+            setWork({ ...work, previewUrl: data.preview_url });
           }
           
           alert('✅ Фото успешно загружено!');
         } else {
-          alert('❌ Ошибка: ' + data.error);
+          alert('❌ Ошибка: ' + (data.error || 'Не удалось загрузить изображение'));
         }
       };
 
@@ -1054,12 +1056,6 @@ export default function WorkDetailPage() {
                     <Icon name="Shield" size={16} className="text-primary" />
                   </div>
                   <span className="font-medium">Гарантия возврата</span>
-                </div>
-                <div className="flex items-center gap-2.5 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Star" size={16} className="text-primary" />
-                  </div>
-                  <span className="font-medium">Премиум поддержка</span>
                 </div>
               </div>
 

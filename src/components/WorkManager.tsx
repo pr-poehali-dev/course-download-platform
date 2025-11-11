@@ -38,6 +38,9 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
   const [currentFileUrl, setCurrentFileUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [confirmAuthorship, setConfirmAuthorship] = useState(false);
+  const [coverImages, setCoverImages] = useState<File[]>([]);
+  const [previewImages, setPreviewImages] = useState<File[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const handleAddFile = () => {
     if (currentFileUrl.trim()) {
@@ -48,6 +51,135 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
         description: 'Изображение добавлено в список'
       });
     }
+  };
+
+  const handleCoverImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    const validFiles = selectedFiles.filter(file => {
+      const isValid = file.type === 'image/jpeg' || file.type === 'image/png';
+      const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB
+      if (!isValid) {
+        toast({
+          title: 'Неверный формат',
+          description: `${file.name} - разрешены только JPG/PNG`,
+          variant: 'destructive'
+        });
+      }
+      if (!isValidSize) {
+        toast({
+          title: 'Файл слишком большой',
+          description: `${file.name} превышает 5MB`,
+          variant: 'destructive'
+        });
+      }
+      return isValid && isValidSize;
+    });
+    
+    if (coverImages.length + validFiles.length > 3) {
+      toast({
+        title: 'Слишком много файлов',
+        description: 'Максимум 3 обложки',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    setCoverImages([...coverImages, ...validFiles]);
+  };
+
+  const handlePreviewImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = Array.from(e.target.files || []);
+    const validFiles = selectedFiles.filter(file => {
+      const isValid = file.type === 'image/jpeg' || file.type === 'image/png';
+      const isValidSize = file.size <= 5 * 1024 * 1024;
+      if (!isValid) {
+        toast({
+          title: 'Неверный формат',
+          description: `${file.name} - разрешены только JPG/PNG`,
+          variant: 'destructive'
+        });
+      }
+      if (!isValidSize) {
+        toast({
+          title: 'Файл слишком большой',
+          description: `${file.name} превышает 5MB`,
+          variant: 'destructive'
+        });
+      }
+      return isValid && isValidSize;
+    });
+    
+    if (previewImages.length + validFiles.length > 5) {
+      toast({
+        title: 'Слишком много файлов',
+        description: 'Максимум 5 страниц содержания',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    setPreviewImages([...previewImages, ...validFiles]);
+  };
+
+  const removeCoverImage = (index: number) => {
+    setCoverImages(coverImages.filter((_, i) => i !== index));
+  };
+
+  const removePreviewImage = (index: number) => {
+    setPreviewImages(previewImages.filter((_, i) => i !== index));
+  };
+
+  const uploadImages = async (): Promise<{coverUrls: string[], previewUrls: string[]}> => {
+    const coverUrls: string[] = [];
+    const previewUrls: string[] = [];
+
+    // Upload cover images
+    for (const file of coverImages) {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+
+      const response = await fetch(func2url['upload-work-cover'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: base64,
+          filename: file.name
+        })
+      });
+
+      const data = await response.json();
+      if (data.url) {
+        coverUrls.push(data.url);
+      }
+    }
+
+    // Upload preview images
+    for (const file of previewImages) {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve) => {
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+
+      const response = await fetch(func2url['upload-preview'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: base64,
+          filename: file.name
+        })
+      });
+
+      const data = await response.json();
+      if (data.url) {
+        previewUrls.push(data.url);
+      }
+    }
+
+    return { coverUrls, previewUrls };
   };
 
   const handleRemoveFile = (index: number) => {
@@ -77,8 +209,16 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
     }
 
     setLoading(true);
+    setUploading(true);
 
     try {
+      // Upload images first
+      const { coverUrls, previewUrls } = await uploadImages();
+      
+      // Combine uploaded URLs with manual URLs
+      const allFiles = [...files, ...coverUrls];
+      const allPreviews = previewUrls;
+
       const response = await fetch(func2url.works, {
         method: 'POST',
         headers: {
@@ -88,7 +228,8 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
         body: JSON.stringify({
           ...formData,
           price_points: parseInt(formData.price_points),
-          files: files
+          files: allFiles,
+          preview_urls: allPreviews
         })
       });
 
@@ -109,7 +250,10 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
           price_points: ''
         });
         setFiles([]);
+        setCoverImages([]);
+        setPreviewImages([]);
         setConfirmAuthorship(false);
+        setUploading(false);
         
         if (onWorkAdded) {
           onWorkAdded();
@@ -125,6 +269,7 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
       });
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -212,39 +357,139 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
             />
           </div>
 
-          <div className="space-y-4">
-            <Label>Изображения работы (JPG/PNG)</Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="https://example.com/image.jpg или путь к файлу"
-                value={currentFileUrl}
-                onChange={(e) => setCurrentFileUrl(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddFile())}
-              />
-              <Button type="button" onClick={handleAddFile} variant="outline">
-                <Icon name="Plus" size={18} className="mr-2" />
-                Добавить
-              </Button>
+          <div className="space-y-6">
+            {/* Обложки чертежей */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Обложки чертежей (JPG/PNG)</Label>
+              <p className="text-sm text-muted-foreground">Загрузите скриншоты чертежей работы (до 3 файлов, макс. 5MB каждый)</p>
+              <div className="flex items-center gap-3">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => document.getElementById('cover-upload')?.click()}
+                  className="w-full"
+                >
+                  <Icon name="Upload" size={18} className="mr-2" />
+                  Выбрать обложки
+                </Button>
+                <input
+                  id="cover-upload"
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  multiple
+                  onChange={handleCoverImageSelect}
+                  className="hidden"
+                />
+              </div>
+              {coverImages.length > 0 && (
+                <div className="grid grid-cols-3 gap-3">
+                  {coverImages.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <img 
+                        src={URL.createObjectURL(file)} 
+                        alt={`Cover ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg border-2 border-primary/20"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => removeCoverImage(index)}
+                      >
+                        <Icon name="X" size={14} />
+                      </Button>
+                      <p className="text-xs text-center mt-1 truncate">{file.name}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {files.length > 0 && (
-              <div className="grid grid-cols-1 gap-2 mt-4">
-                {files.map((file, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg">
-                    <Icon name="Image" size={20} className="text-primary" />
-                    <span className="flex-1 text-sm truncate">{file}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleRemoveFile(index)}
-                    >
-                      <Icon name="Trash2" size={16} className="text-red-600" />
-                    </Button>
-                  </div>
-                ))}
+            {/* Превью содержания */}
+            <div className="space-y-3">
+              <Label className="text-base font-semibold">Превью содержания ПЗ (JPG/PNG)</Label>
+              <p className="text-sm text-muted-foreground">Загрузите скриншоты страниц пояснительной записки (до 5 файлов, макс. 5MB каждый)</p>
+              <div className="flex items-center gap-3">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => document.getElementById('preview-upload')?.click()}
+                  className="w-full"
+                >
+                  <Icon name="FileText" size={18} className="mr-2" />
+                  Выбрать страницы содержания
+                </Button>
+                <input
+                  id="preview-upload"
+                  type="file"
+                  accept="image/jpeg,image/png"
+                  multiple
+                  onChange={handlePreviewImageSelect}
+                  className="hidden"
+                />
               </div>
-            )}
+              {previewImages.length > 0 && (
+                <div className="grid grid-cols-3 gap-3">
+                  {previewImages.map((file, index) => (
+                    <div key={index} className="relative group">
+                      <img 
+                        src={URL.createObjectURL(file)} 
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg border-2 border-blue-500/20"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => removePreviewImage(index)}
+                      >
+                        <Icon name="X" size={14} />
+                      </Button>
+                      <p className="text-xs text-center mt-1 truncate">{file.name}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Дополнительные URL (опционально) */}
+            <div className="space-y-3">
+              <Label>Дополнительные изображения (URL)</Label>
+              <p className="text-sm text-muted-foreground">Опционально: добавьте ссылки на изображения</p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://example.com/image.jpg"
+                  value={currentFileUrl}
+                  onChange={(e) => setCurrentFileUrl(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddFile())}
+                />
+                <Button type="button" onClick={handleAddFile} variant="outline">
+                  <Icon name="Plus" size={18} className="mr-2" />
+                  Добавить
+                </Button>
+              </div>
+
+              {files.length > 0 && (
+                <div className="grid grid-cols-1 gap-2 mt-4">
+                  {files.map((file, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-secondary/30 rounded-lg">
+                      <Icon name="Link" size={20} className="text-primary" />
+                      <span className="flex-1 text-sm truncate">{file}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveFile(index)}
+                      >
+                        <Icon name="Trash2" size={16} className="text-red-600" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-start gap-2 py-2 px-4 bg-primary/5 rounded-lg border border-primary/20">
@@ -263,11 +508,11 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
             </label>
           </div>
 
-          <Button type="submit" className="w-full h-12 text-lg gradient-purple-blue" disabled={loading}>
-            {loading ? (
+          <Button type="submit" className="w-full h-12 text-lg gradient-purple-blue" disabled={loading || uploading}>
+            {loading || uploading ? (
               <>
                 <Icon name="Loader2" size={20} className="mr-2 animate-spin" />
-                Добавление...
+                {uploading ? 'Загрузка изображений...' : 'Публикация...'}
               </>
             ) : (
               <>

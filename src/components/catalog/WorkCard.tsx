@@ -18,6 +18,7 @@ interface Work {
   previewUrl: string | null;
   previewUrls?: string[];
   cover_images?: string[];
+  yandexDiskLink?: string;
   purchaseCount?: number;
   isHit?: boolean;
   isNew?: boolean;
@@ -32,9 +33,10 @@ interface WorkCardProps {
   onAddToFavorite: (workId: string) => void;
   isFavorite: boolean;
   onPreview?: (workId: string) => void;
+  isAdmin?: boolean;
 }
 
-export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite, onPreview }: WorkCardProps) {
+export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite, onPreview, isAdmin = false }: WorkCardProps) {
   const [imageError, setImageError] = useState(false);
   const coverImages = work.cover_images && work.cover_images.length > 0 ? work.cover_images : work.previewUrls;
   const hasPreview = coverImages && coverImages.length > 0 && !imageError;
@@ -196,6 +198,21 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
             )}
           </div>
           <div className="flex gap-2">
+            {isAdmin && work.yandexDiskLink && (
+              <Button 
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  window.open(work.yandexDiskLink, '_blank');
+                }}
+                variant="outline"
+                size="sm"
+                className="border-green-600 text-green-600 hover:bg-green-50"
+              >
+                <Icon name="Download" className="h-4 w-4 mr-1" />
+                Скачать
+              </Button>
+            )}
             {onPreview && (
               <Button 
                 onClick={(e) => {
@@ -210,12 +227,14 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
                 Превью
               </Button>
             )}
-            <Button 
-              onClick={handleBuyClick}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
-            >
-              Купить
-            </Button>
+            {!isAdmin && (
+              <Button 
+                onClick={handleBuyClick}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+              >
+                Купить
+              </Button>
+            )}
           </div>
         </div>
 

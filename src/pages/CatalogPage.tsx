@@ -55,6 +55,7 @@ export default function CatalogPage() {
   const [sortBy, setSortBy] = useState<string>('default');
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [quickViewWork, setQuickViewWork] = useState<Work | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [previewWorkId, setPreviewWorkId] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export default function CatalogPage() {
     const checkAuth = async () => {
       const user = await authService.verify();
       setIsLoggedIn(!!user);
+      setIsAdmin(user?.role === 'admin');
     };
     checkAuth();
   }, []);
@@ -523,6 +525,21 @@ export default function CatalogPage() {
                         )}
                       </div>
                       <div className="flex gap-2 items-center">
+                        {isAdmin && work.yandexDiskLink && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.open(work.yandexDiskLink, '_blank');
+                            }}
+                            className="border-green-600 text-green-600 hover:bg-green-50"
+                          >
+                            <Icon name="Download" size={14} className="mr-1" />
+                            Скачать
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           variant="outline"
@@ -537,10 +554,12 @@ export default function CatalogPage() {
                           <Icon name="Eye" size={14} className="mr-1" />
                           Превью
                         </Button>
-                        <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5">
-                          <Icon name="ArrowRight" size={16} />
-                          Купить
-                        </div>
+                        {!isAdmin && (
+                          <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5">
+                            <Icon name="ArrowRight" size={16} />
+                            Купить
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

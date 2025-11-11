@@ -5,8 +5,8 @@ import psycopg2
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: Update work details (title, description, composition) by admin
-    Args: event with httpMethod POST, body with workId, title, description, composition
+    Business: Update work details (title, description, composition, language, software, keywords, authorName) by admin
+    Args: event with httpMethod POST, body with workId and optional fields to update
     Returns: HTTP response with success status
     '''
     method: str = event.get('httpMethod', 'POST')
@@ -37,6 +37,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     title = body_data.get('title')
     description = body_data.get('description')
     composition = body_data.get('composition')
+    language = body_data.get('language')
+    software = body_data.get('software')
+    keywords = body_data.get('keywords')
+    author_name = body_data.get('authorName')
     
     if not work_id:
         return {
@@ -72,6 +76,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         composition_str = ', '.join(composition) if isinstance(composition, list) else composition
         escaped_comp = composition_str.replace("'", "''")
         updates.append(f"composition = '{escaped_comp}'")
+    
+    if language is not None:
+        escaped_lang = language.replace("'", "''")
+        updates.append(f"language = '{escaped_lang}'")
+    
+    if software is not None:
+        software_json = json.dumps(software, ensure_ascii=False).replace("'", "''")
+        updates.append(f"software = '{software_json}'")
+    
+    if keywords is not None:
+        keywords_json = json.dumps(keywords, ensure_ascii=False).replace("'", "''")
+        updates.append(f"keywords = '{keywords_json}'")
+    
+    if author_name is not None:
+        if author_name == '':
+            updates.append("author_name = NULL")
+        else:
+            escaped_author = author_name.replace("'", "''")
+            updates.append(f"author_name = '{escaped_author}'")
     
     if not updates:
         cursor.close()

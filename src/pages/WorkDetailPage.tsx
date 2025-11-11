@@ -562,7 +562,11 @@ export default function WorkDetailPage() {
         workId: actualWorkId,
         title: editedWork.title !== undefined ? editedWork.title : work.title,
         description: editedWork.description !== undefined ? editedWork.description : work.description,
-        composition: editedWork.composition !== undefined ? editedWork.composition : work.composition
+        composition: editedWork.composition !== undefined ? editedWork.composition : work.composition,
+        language: editedWork.language !== undefined ? editedWork.language : work.language,
+        software: editedWork.software !== undefined ? editedWork.software : work.software,
+        keywords: editedWork.keywords !== undefined ? editedWork.keywords : work.keywords,
+        authorName: editedWork.authorName !== undefined ? editedWork.authorName : work.authorName
       };
       
       const response = await fetch(`${func2url['update-work']}`, {
@@ -581,9 +585,7 @@ export default function WorkDetailPage() {
       
       const newWork = {
         ...work,
-        title: updatedData.title,
-        description: updatedData.description,
-        composition: updatedData.composition
+        ...updatedData
       };
       
       setWork(newWork);
@@ -959,41 +961,71 @@ export default function WorkDetailPage() {
             <div className="space-y-6">
               {/* Информация о работе: Автор, Язык, Софт */}
               <div className="glass-card tech-border rounded-xl p-4 space-y-3">
-                {work.authorName && (
-                  <div className="flex items-start gap-3">
-                    <Icon name="User" size={20} className="flex-shrink-0 text-blue-600 mt-0.5" />
-                    <div>
-                      <div className="text-sm text-gray-500 mb-0.5">Автор работы</div>
-                      <div className="font-medium text-gray-900">{work.authorName}</div>
-                    </div>
-                  </div>
-                )}
-                
-                {work.language && (
-                  <div className="flex items-start gap-3">
-                    <Icon name="Globe" size={20} className="flex-shrink-0 text-green-600 mt-0.5" />
-                    <div>
-                      <div className="text-sm text-gray-500 mb-0.5">Язык работы</div>
-                      <div className="font-medium text-gray-900">{work.language}</div>
-                    </div>
-                  </div>
-                )}
-                
-                {work.software && work.software.length > 0 && (
-                  <div className="flex items-start gap-3">
-                    <Icon name="Code2" size={20} className="flex-shrink-0 text-purple-600 mt-0.5" />
-                    <div>
-                      <div className="text-sm text-gray-500 mb-0.5">Использованное ПО</div>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {work.software.map((soft, index) => (
-                          <Badge key={index} variant="outline" className="text-xs">
-                            {soft}
-                          </Badge>
-                        ))}
+                <div className="flex items-start gap-3">
+                  <Icon name="User" size={20} className="flex-shrink-0 text-blue-600 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500 mb-0.5">Автор работы</div>
+                    {isEditMode ? (
+                      <Input
+                        value={editedWork.authorName !== undefined ? editedWork.authorName || '' : work.authorName || ''}
+                        onChange={(e) => setEditedWork({...editedWork, authorName: e.target.value || null})}
+                        placeholder="Оставьте пустым для работ от платформы"
+                        className="text-sm"
+                      />
+                    ) : (
+                      <div className="font-medium text-gray-900">
+                        {work.authorName || 'Tech Forma (платформа)'}
                       </div>
-                    </div>
+                    )}
                   </div>
-                )}
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <Icon name="Globe" size={20} className="flex-shrink-0 text-green-600 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500 mb-0.5">Язык работы</div>
+                    {isEditMode ? (
+                      <Input
+                        value={editedWork.language || work.language || 'Русский'}
+                        onChange={(e) => setEditedWork({...editedWork, language: e.target.value})}
+                        placeholder="Русский"
+                        className="text-sm"
+                      />
+                    ) : (
+                      <div className="font-medium text-gray-900">{work.language}</div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <Icon name="Code2" size={20} className="flex-shrink-0 text-purple-600 mt-0.5" />
+                  <div className="flex-1">
+                    <div className="text-sm text-gray-500 mb-0.5">Использованное ПО</div>
+                    {isEditMode ? (
+                      <Textarea
+                        value={(editedWork.software || work.software || []).join(', ')}
+                        onChange={(e) => setEditedWork({
+                          ...editedWork, 
+                          software: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                        })}
+                        placeholder="AutoCAD, КОМПАС-3D, Microsoft Word (через запятую)"
+                        className="min-h-[60px] text-sm"
+                      />
+                    ) : (
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {(work.software && work.software.length > 0) ? (
+                          work.software.map((soft, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {soft}
+                            </Badge>
+                          ))
+                        ) : (
+                          <span className="text-sm text-gray-500">Не указано</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
 
               <div>
@@ -1058,26 +1090,40 @@ export default function WorkDetailPage() {
                 </div>
               </div>
 
-              {work.keywords && work.keywords.length > 0 && (
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Ключевые слова</h2>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-3">Ключевые слова</h2>
+                {isEditMode ? (
+                  <Textarea
+                    value={(editedWork.keywords || work.keywords || []).join(', ')}
+                    onChange={(e) => setEditedWork({
+                      ...editedWork, 
+                      keywords: e.target.value.split(',').map(s => s.trim()).filter(s => s)
+                    })}
+                    placeholder="курсовая работа, механика, расчет (через запятую)"
+                    className="min-h-[80px] text-sm"
+                  />
+                ) : (
                   <div className="flex flex-wrap gap-2">
-                    {work.keywords.map((keyword, index) => (
-                      <Badge 
-                        key={index} 
-                        variant="secondary" 
-                        className="cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors"
-                        onClick={() => {
-                          navigate(`/catalog?keyword=${encodeURIComponent(keyword)}`);
-                        }}
-                      >
-                        <Icon name="Hash" size={12} className="mr-1" />
-                        {keyword}
-                      </Badge>
-                    ))}
+                    {(work.keywords && work.keywords.length > 0) ? (
+                      work.keywords.map((keyword, index) => (
+                        <Badge 
+                          key={index} 
+                          variant="secondary" 
+                          className="cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                          onClick={() => {
+                            navigate(`/catalog?keyword=${encodeURIComponent(keyword)}`);
+                          }}
+                        >
+                          <Icon name="Hash" size={12} className="mr-1" />
+                          {keyword}
+                        </Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-gray-500">Теги не добавлены</span>
+                    )}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
               {work.universities && (
                 <div>

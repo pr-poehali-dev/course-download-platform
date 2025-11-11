@@ -28,6 +28,13 @@ interface Work {
   yandexDiskLink: string;
   fileFormats?: string[];
   authorId?: number | null;
+  authorName?: string | null;
+  language?: string;
+  software?: string[];
+  viewsCount?: number;
+  downloadsCount?: number;
+  reviewsCount?: number;
+  keywords?: string[];
 }
 
 export default function WorkDetailPage() {
@@ -335,6 +342,13 @@ export default function WorkDetailPage() {
             rating,
             previewUrl,
             yandexDiskLink: folderPublicUrl,
+            authorName: data.author_name || null,
+            language: data.language || 'Русский',
+            software: data.software || [],
+            viewsCount: data.views_count || 0,
+            downloadsCount: data.downloads || 0,
+            reviewsCount: data.reviews_count || 0,
+            keywords: data.keywords || [],
             fileFormats: undefined,
             authorId: data.author_id
           };
@@ -813,6 +827,24 @@ export default function WorkDetailPage() {
               </div>
             </div>
 
+            {/* Статистика работы */}
+            <div className="glass-card tech-border rounded-xl p-4 mb-6">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Icon name="Eye" size={18} className="text-blue-600" />
+                  <span className="text-sm font-medium">{work.viewsCount || 0} просмотров</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Icon name="Download" size={18} className="text-green-600" />
+                  <span className="text-sm font-medium">{work.downloadsCount || 0} скачиваний</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Icon name="MessageSquare" size={18} className="text-purple-600" />
+                  <span className="text-sm font-medium">{work.reviewsCount || 0} отзывов</span>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
               {gallery.length > 0 ? (
                 <>
@@ -925,6 +957,45 @@ export default function WorkDetailPage() {
             </div>
 
             <div className="space-y-6">
+              {/* Информация о работе: Автор, Язык, Софт */}
+              <div className="glass-card tech-border rounded-xl p-4 space-y-3">
+                {work.authorName && (
+                  <div className="flex items-start gap-3">
+                    <Icon name="User" size={20} className="flex-shrink-0 text-blue-600 mt-0.5" />
+                    <div>
+                      <div className="text-sm text-gray-500 mb-0.5">Автор работы</div>
+                      <div className="font-medium text-gray-900">{work.authorName}</div>
+                    </div>
+                  </div>
+                )}
+                
+                {work.language && (
+                  <div className="flex items-start gap-3">
+                    <Icon name="Globe" size={20} className="flex-shrink-0 text-green-600 mt-0.5" />
+                    <div>
+                      <div className="text-sm text-gray-500 mb-0.5">Язык работы</div>
+                      <div className="font-medium text-gray-900">{work.language}</div>
+                    </div>
+                  </div>
+                )}
+                
+                {work.software && work.software.length > 0 && (
+                  <div className="flex items-start gap-3">
+                    <Icon name="Code2" size={20} className="flex-shrink-0 text-purple-600 mt-0.5" />
+                    <div>
+                      <div className="text-sm text-gray-500 mb-0.5">Использованное ПО</div>
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {work.software.map((soft, index) => (
+                          <Badge key={index} variant="outline" className="text-xs">
+                            {soft}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">Описание работы</h2>
                 {isEditMode ? (
@@ -986,6 +1057,27 @@ export default function WorkDetailPage() {
                   </Badge>
                 </div>
               </div>
+
+              {work.keywords && work.keywords.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Ключевые слова</h2>
+                  <div className="flex flex-wrap gap-2">
+                    {work.keywords.map((keyword, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="secondary" 
+                        className="cursor-pointer hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                        onClick={() => {
+                          navigate(`/catalog?keyword=${encodeURIComponent(keyword)}`);
+                        }}
+                      >
+                        <Icon name="Hash" size={12} className="mr-1" />
+                        {keyword}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {work.universities && (
                 <div>
@@ -1228,6 +1320,27 @@ export default function WorkDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Секция отзывов - в самом конце */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="glass-card tech-border rounded-xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">Отзывы о работе</h2>
+            <Badge variant="outline" className="text-sm">
+              {work?.reviewsCount || 0} отзывов
+            </Badge>
+          </div>
+          
+          <div className="text-center py-8 text-gray-500">
+            <Icon name="MessageSquare" size={48} className="mx-auto mb-3 text-gray-300" />
+            <p className="text-sm">Пока нет отзывов об этой работе</p>
+            <Button variant="outline" size="sm" className="mt-4">
+              <Icon name="Plus" size={16} className="mr-2" />
+              Оставить первый отзыв
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <Footer />
     </div>

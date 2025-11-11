@@ -174,7 +174,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute("""
                     SELECT id, title, work_type, subject, description, composition, 
                            price_points, rating, downloads, created_at, yandex_disk_link, 
-                           preview_image_url, file_url, author_id, preview_urls
+                           preview_image_url, file_url, author_id, preview_urls,
+                           author_name, language, software, views_count, reviews_count, keywords
                     FROM t_p63326274_course_download_plat.works WHERE id = %s
                 """, (work_id,))
                 row = cur.fetchone()
@@ -187,7 +188,28 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     }
                 
                 preview_urls_str = row[14]
-                preview_urls = json.loads(preview_urls_str) if preview_urls_str else []
+                if isinstance(preview_urls_str, str):
+                    preview_urls = json.loads(preview_urls_str) if preview_urls_str else []
+                elif isinstance(preview_urls_str, list):
+                    preview_urls = preview_urls_str
+                else:
+                    preview_urls = []
+                
+                software_str = row[17]
+                if isinstance(software_str, str):
+                    software = json.loads(software_str) if software_str and software_str != '[]' else []
+                elif isinstance(software_str, list):
+                    software = software_str
+                else:
+                    software = []
+                
+                keywords_str = row[20]
+                if isinstance(keywords_str, str):
+                    keywords = json.loads(keywords_str) if keywords_str and keywords_str != '[]' else []
+                elif isinstance(keywords_str, list):
+                    keywords = keywords_str
+                else:
+                    keywords = []
                 
                 work = {
                     'id': row[0],
@@ -204,7 +226,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'preview_image_url': row[11],
                     'file_url': row[12],
                     'author_id': row[13],
-                    'preview_urls': preview_urls
+                    'preview_urls': preview_urls,
+                    'author_name': row[15],
+                    'language': row[16] or 'Русский',
+                    'software': software,
+                    'views_count': row[18] or 0,
+                    'reviews_count': row[19] or 0,
+                    'keywords': keywords
                 }
                 
                 cur.execute("""
@@ -260,7 +288,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 # Получить работы с пагинацией
                 query = f"""
                     SELECT id, title, work_type, subject, description, 
-                           price_points, rating, downloads, category, preview_image_url, author_id, preview_urls
+                           price_points, rating, downloads, category, preview_image_url, author_id, preview_urls,
+                           author_name, language, software, views_count, reviews_count, keywords
                     FROM t_p63326274_course_download_plat.works 
                     WHERE {where_sql}
                     ORDER BY created_at DESC
@@ -272,7 +301,28 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 works = []
                 for row in cur.fetchall():
                     preview_urls_str = row[11]
-                    preview_urls = json.loads(preview_urls_str) if preview_urls_str else []
+                    if isinstance(preview_urls_str, str):
+                        preview_urls = json.loads(preview_urls_str) if preview_urls_str else []
+                    elif isinstance(preview_urls_str, list):
+                        preview_urls = preview_urls_str
+                    else:
+                        preview_urls = []
+                    
+                    software_str = row[14]
+                    if isinstance(software_str, str):
+                        software = json.loads(software_str) if software_str and software_str != '[]' else []
+                    elif isinstance(software_str, list):
+                        software = software_str
+                    else:
+                        software = []
+                    
+                    keywords_str = row[17]
+                    if isinstance(keywords_str, str):
+                        keywords = json.loads(keywords_str) if keywords_str and keywords_str != '[]' else []
+                    elif isinstance(keywords_str, list):
+                        keywords = keywords_str
+                    else:
+                        keywords = []
                     
                     work = {
                         'id': row[0],
@@ -286,7 +336,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'category': row[8],
                         'preview_image_url': row[9],
                         'author_id': row[10],
-                        'preview_urls': preview_urls
+                        'preview_urls': preview_urls,
+                        'author_name': row[12],
+                        'language': row[13] or 'Русский',
+                        'software': software,
+                        'views_count': row[15] or 0,
+                        'reviews_count': row[16] or 0,
+                        'keywords': keywords
                     }
                     works.append(work)
                 

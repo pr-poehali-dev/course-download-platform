@@ -17,6 +17,7 @@ interface Work {
   rating: number;
   previewUrl: string | null;
   previewUrls?: string[];
+  cover_images?: string[];
   purchaseCount?: number;
   isHit?: boolean;
   isNew?: boolean;
@@ -35,7 +36,8 @@ interface WorkCardProps {
 
 export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite, onPreview }: WorkCardProps) {
   const [imageError, setImageError] = useState(false);
-  const hasPreview = work.previewUrls && work.previewUrls.length > 0 && !imageError;
+  const coverImages = work.cover_images && work.cover_images.length > 0 ? work.cover_images : work.previewUrls;
+  const hasPreview = coverImages && coverImages.length > 0 && !imageError;
   
   const finalPrice = work.discount 
     ? work.price * (1 - work.discount / 100) 
@@ -83,7 +85,7 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
       <div className="relative h-56 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
         {hasPreview ? (
           <PreviewCarousel 
-            previews={work.previewUrls!} 
+            previews={coverImages!} 
             onError={() => setImageError(true)}
             className="h-full w-full"
           />

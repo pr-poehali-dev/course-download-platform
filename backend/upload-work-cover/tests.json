@@ -1,0 +1,34 @@
+{
+  "tests": [
+    {
+      "name": "Upload cover images - no auth",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "work_id": 1,
+        "images": ["data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="]
+      },
+      "expectedStatus": 403,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Upload cover images - missing work_id",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-Admin-Secret": "techforma2025admin"
+      },
+      "body": {
+        "images": ["data:image/png;base64,test"]
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

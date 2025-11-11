@@ -9,6 +9,7 @@ import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
 import PreviewUploader from '@/components/PreviewUploader';
+import CoverImagesUploader from '@/components/CoverImagesUploader';
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,7 @@ interface Work {
   title: string;
   description: string;
   preview_image_url?: string;
+  cover_images?: string[];
   category: string;
   price_points: number;
   author?: string;
@@ -303,6 +305,17 @@ export default function WorksManagement() {
                         onUploadSuccess={(newUrl) => {
                           const updatedWorks = works.map(w => 
                             w.id === work.id ? { ...w, preview_image_url: newUrl } : w
+                          );
+                          setWorks(updatedWorks);
+                        }}
+                      />
+                      <CoverImagesUploader
+                        workId={work.id}
+                        workTitle={work.title}
+                        currentImages={work.cover_images}
+                        onUploadSuccess={(imageUrls) => {
+                          const updatedWorks = works.map(w => 
+                            w.id === work.id ? { ...w, cover_images: imageUrls } : w
                           );
                           setWorks(updatedWorks);
                         }}

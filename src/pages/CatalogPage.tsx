@@ -5,7 +5,7 @@ import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import QuickViewModal from '@/components/catalog/QuickViewModal';
-import WorkPreviewModal from '@/components/WorkPreviewModal';
+
 import CatalogFilters from '@/components/catalog/CatalogFilters';
 import PreviewCarousel from '@/components/PreviewCarousel';
 import { Badge } from '@/components/ui/badge';
@@ -58,8 +58,7 @@ export default function CatalogPage() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [quickViewWork, setQuickViewWork] = useState<Work | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
-  const [previewWorkId, setPreviewWorkId] = useState<string | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -267,6 +266,7 @@ export default function CatalogPage() {
               previewUrl: previewUrls[0] || work.preview_image_url || null,
               previewUrls: previewUrls,
               yandexDiskLink: work.file_url || '',
+              authorId: work.author_id,
               isNew,
               isHit,
               discount,
@@ -525,14 +525,20 @@ export default function CatalogPage() {
                         )}
                       </div>
                       <div className="flex gap-2 items-center">
-                        {isAdmin && work.yandexDiskLink && (
+                        {isAdmin && work.yandexDiskLink && work.yandexDiskLink.trim() !== '' && (
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              window.open(work.yandexDiskLink, '_blank');
+                              const url = work.yandexDiskLink.trim();
+                              if (url.startsWith('http://') || url.startsWith('https://')) {
+                                window.open(url, '_blank', 'noopener,noreferrer');
+                              } else {
+                                console.error('Invalid URL:', url);
+                                alert('Некорректная ссылка на файл');
+                              }
                             }}
                             className="border-green-600 text-green-600 hover:bg-green-50"
                           >
@@ -540,20 +546,6 @@ export default function CatalogPage() {
                             Скачать
                           </Button>
                         )}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setPreviewWorkId(work.id);
-                            setShowPreview(true);
-                          }}
-                          className="border-primary text-primary hover:bg-primary/10"
-                        >
-                          <Icon name="Eye" size={14} className="mr-1" />
-                          Превью
-                        </Button>
                         {!isAdmin && (
                           <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5">
                             <Icon name="ArrowRight" size={16} />
@@ -572,21 +564,6 @@ export default function CatalogPage() {
               work={quickViewWork}
               open={!!quickViewWork}
               onClose={() => setQuickViewWork(null)}
-            />
-            
-            <WorkPreviewModal
-              workId={previewWorkId}
-              workTitle={works.find(w => w.id === previewWorkId)?.title}
-              open={showPreview}
-              onClose={() => {
-                setShowPreview(false);
-                setPreviewWorkId(null);
-              }}
-              onBuyClick={() => {
-                if (previewWorkId) {
-                  navigate(`/work/${previewWorkId}`);
-                }
-              }}
             />
           </>
         )}

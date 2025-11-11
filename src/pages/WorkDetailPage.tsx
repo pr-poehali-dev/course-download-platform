@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
@@ -10,7 +12,7 @@ import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { recentlyViewedStorage } from '@/utils/recentlyViewed';
-import WorkPreviewModal from '@/components/WorkPreviewModal';
+
 
 interface Work {
   id: string;
@@ -46,7 +48,11 @@ export default function WorkDetailPage() {
   const [extractingImages, setExtractingImages] = useState(false);
   const [similarWorks, setSimilarWorks] = useState<Work[]>([]);
   const [loadingSimilar, setLoadingSimilar] = useState(false);
-  const [showWorkPreview, setShowWorkPreview] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageIndex, setModalImageIndex] = useState(0);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editedWork, setEditedWork] = useState<Partial<Work>>({});
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -534,6 +540,49 @@ export default function WorkDetailPage() {
     }
   };
 
+  const handleSaveWorkEdits = async () => {
+    if (!actualWorkId || !editedWork) return;
+    
+    try {
+      const response = await fetch(`${func2url['update-work']}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          workId: actualWorkId,
+          title: editedWork.title,
+          description: editedWork.description,
+          composition: editedWork.composition
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Ошибка обновления работы');
+      }
+      
+      // Обновляем локальное состояние
+      if (work) {
+        setWork({
+          ...work,
+          title: editedWork.title || work.title,
+          description: editedWork.description || work.description,
+          composition: editedWork.composition || work.composition
+        });
+      }
+      
+      setIsEditMode(false);
+      alert('✅ Работа успешно обновлена!');
+      
+      // Очищаем кэш каталога для обновления
+      localStorage.removeItem('catalog_works_cache_v9');
+      
+    } catch (error) {
+      console.error('Error updating work:', error);
+      alert('Ошибка при обновлении работы');
+    }
+  };
+
   const handleShowPdfPreview = async () => {
     if (!work) return;
     
@@ -712,9 +761,33 @@ export default function WorkDetailPage() {
                 )}
               </div>
               
-              <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-4 leading-tight">
-                {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
-              </h1>
+              <div className="flex items-start justify-between gap-4 mb-4">
+                <h1 className="text-xl md:text-3xl font-bold text-gray-900 leading-tight flex-1">
+                  {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
+                </h1>
+                {showUploadButton && (
+                  <Button
+                    variant={isEditMode ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      if (isEditMode) {
+                        handleSaveWorkEdits();
+                      } else {
+                        setIsEditMode(true);
+                        setEditedWork({
+                          title: work.title,
+                          description: work.description,
+                          composition: work.composition
+                        });
+                      }
+                    }}
+                    className={isEditMode ? "bg-green-600 hover:bg-green-700" : ""}
+                  >
+                    <Icon name={isEditMode ? "Save" : "Edit"} size={16} className="mr-1" />
+                    {isEditMode ? "Сохранить" : "Редактировать"}
+                  </Button>
+                )}
+              </div>
 
               <div className="glass-card tech-border rounded-xl p-4">
                 <TrustRating 
@@ -729,7 +802,13 @@ export default function WorkDetailPage() {
             <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">
               {gallery.length > 0 ? (
                 <>
-                  <div className="bg-white rounded-lg overflow-hidden border-2 border-gray-200 shadow-sm max-h-[600px] flex items-center justify-center">
+                  <div 
+                    className="bg-white rounded-lg overflow-hidden border-2 border-gray-200 shadow-sm max-h-[600px] flex items-center justify-center cursor-pointer hover:border-blue-400 transition-colors"
+                    onClick={() => {
+                      setModalImageIndex(selectedImage);
+                      setShowImageModal(true);
+                    }}
+                  >
                     <img 
                       src={gallery[selectedImage]} 
                       alt={`${work.title} - страница ${selectedImage + 1}`}
@@ -833,23 +912,44 @@ export default function WorkDetailPage() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">Описание работы</h2>
-                <div className="text-gray-700 leading-relaxed whitespace-pre-line">
-                  {work.description}
-                </div>
+                {isEditMode ? (
+                  <Textarea
+                    value={editedWork.description || work.description}
+                    onChange={(e) => setEditedWork({...editedWork, description: e.target.value})}
+                    className="min-h-[150px] text-gray-700"
+                    placeholder="Введите описание работы"
+                  />
+                ) : (
+                  <div className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {work.description}
+                  </div>
+                )}
               </div>
 
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3">Содержание архива</h2>
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <ul className="space-y-2.5">
-                    {work.composition.map((item, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <Icon name="FileText" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
-                        <span className="text-gray-700">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                {isEditMode ? (
+                  <Textarea
+                    value={(editedWork.composition || work.composition).join('\n')}
+                    onChange={(e) => setEditedWork({
+                      ...editedWork, 
+                      composition: e.target.value.split('\n').filter(line => line.trim())
+                    })}
+                    className="min-h-[120px] text-gray-700"
+                    placeholder="Каждый пункт с новой строки"
+                  />
+                ) : (
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <ul className="space-y-2.5">
+                      {work.composition.map((item, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <Icon name="FileText" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
+                          <span className="text-gray-700">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {work.fileFormats && work.fileFormats.length > 0 && (
@@ -905,15 +1005,7 @@ export default function WorkDetailPage() {
                 </div>
               </div>
 
-              <Button 
-                variant="outline"
-                size="default"
-                className="w-full font-semibold rounded-lg mb-3 border-primary text-primary hover:bg-primary/10 h-10 md:h-11 text-sm md:text-base"
-                onClick={() => setShowWorkPreview(true)}
-              >
-                <Icon name="Eye" size={18} className="mr-2" />
-                Посмотреть превью
-              </Button>
+
 
               <Button 
                 size="default"
@@ -1069,14 +1161,65 @@ export default function WorkDetailPage() {
         </div>
       )}
       
-      <WorkPreviewModal
-        workId={actualWorkId || null}
-        workTitle={work?.title}
-        open={showWorkPreview}
-        onClose={() => setShowWorkPreview(false)}
-        onBuyClick={handlePurchaseAndDownload}
-      />
-      
+      {/* Image Gallery Modal */}
+      {showImageModal && gallery.length > 0 && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+          onClick={() => setShowImageModal(false)}
+        >
+          <div 
+            className="relative max-w-7xl w-full h-full flex items-center justify-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 text-white hover:bg-white/20 z-10"
+              onClick={() => setShowImageModal(false)}
+            >
+              <Icon name="X" size={24} />
+            </Button>
+
+            {/* Previous button */}
+            {gallery.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-4 text-white hover:bg-white/20 z-10 h-12 w-12"
+                onClick={() => setModalImageIndex((prev) => (prev - 1 + gallery.length) % gallery.length)}
+              >
+                <Icon name="ChevronLeft" size={32} />
+              </Button>
+            )}
+
+            {/* Image */}
+            <img 
+              src={gallery[modalImageIndex]} 
+              alt={`${work?.title} - страница ${modalImageIndex + 1}`}
+              className="max-h-full max-w-full object-contain"
+            />
+
+            {/* Next button */}
+            {gallery.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-4 text-white hover:bg-white/20 z-10 h-12 w-12"
+                onClick={() => setModalImageIndex((prev) => (prev + 1) % gallery.length)}
+              >
+                <Icon name="ChevronRight" size={32} />
+              </Button>
+            )}
+
+            {/* Image counter */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/60 text-white px-4 py-2 rounded-full text-sm">
+              {modalImageIndex + 1} / {gallery.length}
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

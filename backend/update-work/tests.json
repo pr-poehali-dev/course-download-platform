@@ -1,0 +1,28 @@
+{
+  "tests": [
+    {
+      "name": "Empty update fields",
+      "method": "POST",
+      "body": {
+        "workId": "1"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "No fields to update"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Missing workId",
+      "method": "POST",
+      "body": {
+        "title": "Test"
+      },
+      "expectedStatus": 400,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

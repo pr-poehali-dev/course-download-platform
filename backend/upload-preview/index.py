@@ -98,7 +98,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur = conn.cursor()
             
             escaped_url = uploaded_urls[0].replace("'", "''")
-            update_query = f"UPDATE works SET preview_image_url = '{escaped_url}' WHERE id = {int(work_id)}"
+            update_query = f"UPDATE t_p63326274_course_download_plat.works SET preview_image_url = '{escaped_url}' WHERE id = {int(work_id)}"
             cur.execute(update_query)
             
             conn.commit()

@@ -623,7 +623,7 @@ export default function WorkDetailPage() {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !workId) return;
+    if (!file || !actualWorkId) return;
 
     setUploadingImage(true);
 
@@ -637,7 +637,7 @@ export default function WorkDetailPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            work_id: workId,
+            work_id: actualWorkId,
             images: [{
               file: base64Image,
               filename: file.name
@@ -671,38 +671,35 @@ export default function WorkDetailPage() {
   };
 
   const handleExtractImagesFromArchive = async () => {
-    if (!workId) return;
+    if (!actualWorkId || !work) return;
 
     setExtractingImages(true);
 
     try {
-      const UPDATE_PREVIEW_URL = func2url['update-work-preview'];
-      const response = await fetch(UPDATE_PREVIEW_URL, {
+      const EXTRACT_PREVIEWS_URL = func2url['extract-all-previews'];
+      const response = await fetch(EXTRACT_PREVIEWS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          work_id: workId,
-          extract_from_archive: true
+          work_id: actualWorkId,
+          folder_name: work.title,
+          public_key: YANDEX_DISK_URL
         })
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        if (data.all_images && data.all_images.length > 0) {
-          setGallery(data.all_images);
-          setSelectedImage(0);
-          
-          if (work) {
-            setWork({ ...work, previewUrl: data.image_url });
-          }
-          
-          alert(`✅ Извлечено ${data.count} изображений из архива!`);
-        } else {
-          alert('⚠️ PNG изображения не найдены в архиве');
+      if (data.success && data.preview_urls && data.preview_urls.length > 0) {
+        setGallery(data.preview_urls);
+        setSelectedImage(0);
+        
+        if (work) {
+          setWork({ ...work, previewUrl: data.preview_urls[0] });
         }
+        
+        alert(`✅ Извлечено ${data.preview_urls.length} изображений из архива!`);
       } else {
-        alert('❌ Ошибка: ' + (data.error || data.message));
+        alert('⚠️ PNG изображения не найдены в архиве');
       }
     } catch (error) {
       console.error('Extract error:', error);

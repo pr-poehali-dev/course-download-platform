@@ -83,7 +83,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     # Execute update using Simple Query Protocol
-    update_query = f"UPDATE works SET {', '.join(updates)} WHERE id = {int(work_id)}"
+    update_query = f"UPDATE t_p63326274_course_download_plat.works SET {', '.join(updates)} WHERE id = {int(work_id)}"
     cursor.execute(update_query)
     conn.commit()
     

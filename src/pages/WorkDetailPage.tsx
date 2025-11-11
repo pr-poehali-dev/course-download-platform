@@ -541,45 +541,48 @@ export default function WorkDetailPage() {
   };
 
   const handleSaveWorkEdits = async () => {
-    if (!actualWorkId || !editedWork) return;
+    if (!actualWorkId || !work) return;
     
     try {
+      const updatedData = {
+        workId: actualWorkId,
+        title: editedWork.title !== undefined ? editedWork.title : work.title,
+        description: editedWork.description !== undefined ? editedWork.description : work.description,
+        composition: editedWork.composition !== undefined ? editedWork.composition : work.composition
+      };
+      
       const response = await fetch(`${func2url['update-work']}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          workId: actualWorkId,
-          title: editedWork.title,
-          description: editedWork.description,
-          composition: editedWork.composition
-        })
+        body: JSON.stringify(updatedData)
       });
       
-      if (!response.ok) {
-        throw new Error('Ошибка обновления работы');
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Ошибка обновления работы');
       }
       
-      // Обновляем локальное состояние
-      if (work) {
-        setWork({
-          ...work,
-          title: editedWork.title || work.title,
-          description: editedWork.description || work.description,
-          composition: editedWork.composition || work.composition
-        });
-      }
+      const newWork = {
+        ...work,
+        title: updatedData.title,
+        description: updatedData.description,
+        composition: updatedData.composition
+      };
       
+      setWork(newWork);
+      setEditedWork({});
       setIsEditMode(false);
-      alert('✅ Работа успешно обновлена!');
       
-      // Очищаем кэш каталога для обновления
       localStorage.removeItem('catalog_works_cache_v9');
+      
+      alert('✅ Работа успешно обновлена!');
       
     } catch (error) {
       console.error('Error updating work:', error);
-      alert('Ошибка при обновлении работы');
+      alert('❌ Ошибка при обновлении работы: ' + (error instanceof Error ? error.message : 'Неизвестная ошибка'));
     }
   };
 
@@ -622,51 +625,63 @@ export default function WorkDetailPage() {
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !actualWorkId) return;
+    const files = e.target.files;
+    if (!files || files.length === 0 || !actualWorkId) return;
+
+    const maxFiles = 5;
+    const selectedFiles = Array.from(files).slice(0, maxFiles);
+    
+    if (files.length > maxFiles) {
+      alert(`⚠️ Можно загрузить максимум ${maxFiles} изображений. Будут загружены первые ${maxFiles}.`);
+    }
 
     setUploadingImage(true);
 
     try {
-      const reader = new FileReader();
-      reader.onloadend = async () => {
-        const base64Image = (reader.result as string).split(',')[1];
-
-        const UPLOAD_PREVIEW_URL = func2url['upload-preview'];
-        const response = await fetch(UPLOAD_PREVIEW_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            work_id: actualWorkId,
-            images: [{
-              file: base64Image,
-              filename: file.name
-            }]
-          })
+      const imagePromises = selectedFiles.map(file => {
+        return new Promise<{file: string, filename: string}>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64Image = (reader.result as string).split(',')[1];
+            resolve({ file: base64Image, filename: file.name });
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
         });
+      });
 
-        const data = await response.json();
+      const images = await Promise.all(imagePromises);
 
-        if (data.success && data.preview_url) {
-          setGallery([data.preview_url]);
-          setSelectedImage(0);
-          
-          if (work) {
-            setWork({ ...work, previewUrl: data.preview_url });
-          }
-          
-          alert('✅ Фото успешно загружено!');
-        } else {
-          alert('❌ Ошибка: ' + (data.error || 'Не удалось загрузить изображение'));
+      const UPLOAD_PREVIEW_URL = func2url['upload-preview'];
+      const response = await fetch(UPLOAD_PREVIEW_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          work_id: actualWorkId,
+          images: images
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.all_urls && data.all_urls.length > 0) {
+        setGallery(data.all_urls);
+        setSelectedImage(0);
+        
+        if (work) {
+          setWork({ ...work, previewUrl: data.all_urls[0] });
         }
-      };
-
-      reader.readAsDataURL(file);
+        
+        alert(`✅ Успешно загружено ${data.all_urls.length} изображений!`);
+      } else {
+        alert('❌ Ошибка: ' + (data.error || 'Не удалось загрузить изображения'));
+      }
     } catch (error) {
       console.error('Upload error:', error);
       alert('❌ Ошибка загрузки');
     } finally {
       setUploadingImage(false);
+      e.target.value = '';
     }
   };
 
@@ -898,7 +913,8 @@ export default function WorkDetailPage() {
                     </Button>
                     <input
                       type="file"
-                      accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.txt"
+                      accept="image/jpeg,image/jpg,image/png"
+                      multiple
                       onChange={handleImageUpload}
                       className="hidden"
                       disabled={uploadingImage}

@@ -66,7 +66,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     if description is not None:
         escaped_desc = description.replace("'", "''")
-        updates.append(f"preview = '{escaped_desc}'")
+        updates.append(f"description = '{escaped_desc}'")
     
     if composition is not None:
         composition_str = ', '.join(composition) if isinstance(composition, list) else composition

@@ -1,7 +1,7 @@
 '''
-Business: Upload multiple cover images for work cards (admin only)
-Args: event with httpMethod POST, body with base64 images and work_id
-Returns: HTTP response with uploaded image URLs
+Business: Upload cover images and update composition for works (admin only)
+Args: event with httpMethod POST, body with images/composition and work_id
+Returns: HTTP response with uploaded image URLs or success message
 '''
 
 import json
@@ -47,24 +47,55 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
     work_id = body_data.get('work_id')
     images = body_data.get('images', [])
+    composition = body_data.get('composition')
     
-    if not work_id or not images:
+    if not work_id:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'work_id and images are required'})
-        }
-    
-    if len(images) > 3:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Maximum 3 images allowed'})
+            'body': json.dumps({'error': 'work_id is required'})
         }
     
     dsn = os.environ.get('DATABASE_URL')
     conn = psycopg2.connect(dsn)
     cur = conn.cursor()
+    
+    if composition is not None:
+        cur.execute(
+            "UPDATE works SET composition = %s WHERE id = %s",
+            (composition, work_id)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({
+                'success': True,
+                'work_id': work_id,
+                'message': 'Composition updated successfully'
+            })
+        }
+    
+    if not images:
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Either images or composition is required'})
+        }
+    
+    if len(images) > 3:
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Maximum 3 images allowed'})
+        }
     
     image_urls: List[str] = []
     

@@ -10,6 +10,7 @@ import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
 import PreviewUploader from '@/components/PreviewUploader';
 import CoverImagesUploader from '@/components/CoverImagesUploader';
+import CompositionEditor from '@/components/CompositionEditor';
 import {
   Dialog,
   DialogContent,
@@ -32,6 +33,7 @@ interface Work {
   description: string;
   preview_image_url?: string;
   cover_images?: string[];
+  composition?: string;
   category: string;
   price_points: number;
   author?: string;
@@ -316,6 +318,17 @@ export default function WorksManagement() {
                         onUploadSuccess={(imageUrls) => {
                           const updatedWorks = works.map(w => 
                             w.id === work.id ? { ...w, cover_images: imageUrls } : w
+                          );
+                          setWorks(updatedWorks);
+                        }}
+                      />
+                      <CompositionEditor
+                        workId={work.id}
+                        workTitle={work.title}
+                        currentComposition={work.composition}
+                        onUpdateSuccess={(newComposition) => {
+                          const updatedWorks = works.map(w => 
+                            w.id === work.id ? { ...w, composition: newComposition } : w
                           );
                           setWorks(updatedWorks);
                         }}

@@ -289,7 +289,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 query = f"""
                     SELECT id, title, work_type, subject, description, 
                            price_points, rating, downloads, category, preview_image_url, author_id, preview_urls,
-                           author_name, language, software, views_count, reviews_count, keywords
+                           author_name, language, software, views_count, reviews_count, keywords, file_url
                     FROM t_p63326274_course_download_plat.works 
                     WHERE {where_sql}
                     ORDER BY created_at DESC
@@ -342,7 +342,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'software': software,
                         'views_count': row[15] or 0,
                         'reviews_count': row[16] or 0,
-                        'keywords': keywords
+                        'keywords': keywords,
+                        'file_url': row[18]
                     }
                     works.append(work)
                 

@@ -28,7 +28,7 @@ interface Work {
   rating: number;
   previewUrl: string | null;
   previewUrls?: string[];
-  yandexDiskLink: string;
+  yandexDiskLink: string | null;
   purchaseCount?: number;
   isHit?: boolean;
   isNew?: boolean;
@@ -265,7 +265,7 @@ export default function CatalogPage() {
               rating: finalRating,
               previewUrl: previewUrls[0] || work.preview_image_url || null,
               previewUrls: previewUrls,
-              yandexDiskLink: work.file_url || '',
+              yandexDiskLink: work.file_url || null,
               authorId: work.author_id,
               isNew,
               isHit,
@@ -525,20 +525,14 @@ export default function CatalogPage() {
                         )}
                       </div>
                       <div className="flex gap-2 items-center">
-                        {isAdmin && work.yandexDiskLink && work.yandexDiskLink.trim() !== '' && (
+                        {isAdmin && work.yandexDiskLink && (
                           <Button
                             size="sm"
                             variant="outline"
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              const url = work.yandexDiskLink.trim();
-                              if (url.startsWith('http://') || url.startsWith('https://')) {
-                                window.open(url, '_blank', 'noopener,noreferrer');
-                              } else {
-                                console.error('Invalid URL:', url);
-                                alert('Некорректная ссылка на файл');
-                              }
+                              window.open(work.yandexDiskLink, '_blank', 'noopener,noreferrer');
                             }}
                             className="border-green-600 text-green-600 hover:bg-green-50"
                           >

@@ -45,10 +45,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     headers = event.get('headers', {})
     work_id = params.get('workId')
     user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+    token = params.get('token')
     public_key = params.get('publicKey', 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ')
     
     print(f"[DEBUG] Headers: {headers}")
-    print(f"[DEBUG] work_id={work_id}, user_id={user_id}")
+    print(f"[DEBUG] work_id={work_id}, user_id={user_id}, token={token[:20] if token else None}...")
     
     if not work_id:
         return {
@@ -66,6 +67,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
+    if not token:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Download token required'}),
+            'isBase64Encoded': False
+        }
+    
     try:
         # Загружаем данные работы из БД
         dsn = os.environ.get('DATABASE_URL')
@@ -79,84 +88,66 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
-            # Проверяем роль пользователя из базы данных
-            print(f"[DEBUG] Querying user with id={user_id}, type={type(user_id)}")
+            # КРИТИЧНО: Проверяем токен
             cur.execute(
-                "SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s",
-                (user_id,)
+                """SELECT user_id, work_id, expires_at, used 
+                FROM t_p63326274_course_download_plat.download_tokens 
+                WHERE token = %s""",
+                (token,)
             )
-            user_result = cur.fetchone()
-            print(f"[DEBUG] Query result: {user_result}")
+            token_result = cur.fetchone()
             
-            if not user_result:
-                print(f"[ERROR] User not found in database for id={user_id}")
+            if not token_result:
                 return {
-                    'statusCode': 404,
+                    'statusCode': 403,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': f'User not found for id={user_id}'}),
+                    'body': json.dumps({'error': 'Invalid download token'}),
                     'isBase64Encoded': False
                 }
             
-            role = user_result[0] if user_result[0] else 'user'
-            is_admin = (role == 'admin')
+            token_user_id = token_result[0]
+            token_work_id = token_result[1]
+            token_expires_at = token_result[2]
+            token_used = token_result[3]
             
-            print(f"[DEBUG] User {user_id}, role: {role}, is_admin: {is_admin}")
+            # Проверяем совпадение user_id и work_id
+            if int(token_user_id) != int(user_id) or int(token_work_id) != int(work_id):
+                return {
+                    'statusCode': 403,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Token mismatch'}),
+                    'isBase64Encoded': False
+                }
             
-            # Получаем автора работы для проверки
+            # Проверяем срок действия
+            from datetime import datetime
+            if datetime.now() > token_expires_at:
+                return {
+                    'statusCode': 403,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Token expired', 'message': 'Токен истёк. Вернитесь на страницу работы и попробуйте снова.'}),
+                    'isBase64Encoded': False
+                }
+            
+            # Проверяем, не использован ли уже токен
+            if token_used:
+                return {
+                    'statusCode': 403,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Token already used'}),
+                    'isBase64Encoded': False
+                }
+            
+            # Помечаем токен как использованный
             cur.execute(
-                "SELECT author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
-                (work_id,)
+                """UPDATE t_p63326274_course_download_plat.download_tokens 
+                SET used = TRUE, used_at = NOW() 
+                WHERE token = %s""",
+                (token,)
             )
-            work_author_result = cur.fetchone()
-            work_author_id = work_author_result[0] if work_author_result else None
+            conn.commit()
             
-            # КРИТИЧНО: Запрещаем авторам скачивать свои работы бесплатно (кроме админов)
-            is_author = work_author_id and int(user_id) == int(work_author_id)
-            
-            # Проверяем покупку только для НЕ-админов и НЕ-авторов
-            if not is_admin and not is_author:
-                cur.execute(
-                    """
-                    SELECT id, created_at FROM t_p63326274_course_download_plat.purchases 
-                    WHERE buyer_id = %s AND work_id = %s
-                    UNION
-                    SELECT id, created_at FROM t_p63326274_course_download_plat.orders 
-                    WHERE user_id = %s AND work_id = %s AND status = 'paid'
-                    ORDER BY created_at DESC
-                    LIMIT 1
-                    """,
-                    (user_id, work_id, user_id, work_id)
-                )
-                
-                purchase_result = cur.fetchone()
-                
-                if not purchase_result:
-                    return {
-                        'statusCode': 402,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({
-                            'error': 'Payment required',
-                            'message': 'Скачивание доступно только после оплаты. Оформите заказ и оплатите, потом вернитесь к скачиванию.'
-                        }),
-                        'isBase64Encoded': False
-                    }
-                
-                import datetime
-                purchase_date = purchase_result[1]
-                current_date = datetime.datetime.now()
-                days_passed = (current_date - purchase_date).days
-                
-                if days_passed > 7:
-                    return {
-                        'statusCode': 402,
-                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({
-                            'error': 'Download period expired',
-                            'message': f'Срок скачивания истёк {days_passed - 7} дней назад. Доступ к работе действует только 7 дней после покупки. Пожалуйста, приобретите работу заново.'
-                        }),
-                        'isBase64Encoded': False
-                    }
-            
+            # Токен уже проверен выше, просто получаем данные работы
             cur.execute(
                 "SELECT title, download_url, file_url FROM t_p63326274_course_download_plat.works WHERE id = %s",
                 (work_id,)

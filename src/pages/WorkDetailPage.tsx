@@ -492,15 +492,24 @@ export default function WorkDetailPage() {
       }
       
       if (orderData.alreadyPaid) {
+        // Работа уже оплачена, но токен нужен заново
+        alert('Работа уже оплачена. Для скачивания нужен новый токен. Обратитесь в поддержку.');
         setDownloading(false);
+        return;
       } else if (orderData.payUrl) {
         window.location.href = orderData.payUrl;
         return;
       }
       
-      // Шаг 2: Получение ссылки на скачивание
+      // Получаем токен из ответа покупки
+      const downloadToken = orderData.downloadToken;
+      if (!downloadToken) {
+        throw new Error('Не получен токен для скачивания');
+      }
+      
+      // Шаг 2: Скачивание с использованием токена
       const downloadResponse = await fetch(
-        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(actualWorkId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`,
+        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(actualWorkId)}&token=${encodeURIComponent(downloadToken)}`,
         {
           headers: {
             'X-User-Id': String(userId)

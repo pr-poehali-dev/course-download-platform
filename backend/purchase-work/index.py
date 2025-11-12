@@ -45,6 +45,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if method == 'POST' and action == 'mock-pay':
         return mock_payment(event)
     
+    if method == 'POST' and action == 'generate-token':
+        return generate_download_token(event)
+    
     if method != 'POST':
         return {
             'statusCode': 405,
@@ -288,6 +291,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 (db_work_id,)
             )
             
+            # Генерируем временный токен для скачивания (30 минут)
+            import secrets
+            from datetime import datetime, timedelta
+            
+            download_token = secrets.token_urlsafe(48)
+            token_expires_at = datetime.now() + timedelta(minutes=30)
+            ip_address = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
+            
+            cur.execute(
+                """INSERT INTO t_p63326274_course_download_plat.download_tokens 
+                (token, user_id, work_id, expires_at, ip_address) 
+                VALUES (%s, %s, %s, %s, %s)""",
+                (download_token, user_id, db_work_id, token_expires_at, ip_address)
+            )
+            
             conn.commit()
             
             return {
@@ -297,7 +315,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'success': True,
                     'newBalance': balance if is_admin else balance - price,
                     'message': 'Purchase successful',
-                    'isAdmin': is_admin
+                    'isAdmin': is_admin,
+                    'downloadToken': download_token,
+                    'tokenExpiresIn': 1800
                 }),
                 'isBase64Encoded': False
             }
@@ -534,6 +554,125 @@ def get_order_status(event: Dict[str, Any]) -> Dict[str, Any]:
         }),
         'isBase64Encoded': False
     }
+
+def generate_download_token(event: Dict[str, Any]) -> Dict[str, Any]:
+    """Генерация токена для скачивания уже купленной работы"""
+    headers = event.get('headers', {})
+    user_id = headers.get('X-User-Id') or headers.get('x-user-id')
+    
+    if not user_id:
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Требуется авторизация'}),
+            'isBase64Encoded': False
+        }
+    
+    body_data = json.loads(event.get('body', '{}'))
+    work_id = body_data.get('workId')
+    
+    if not work_id:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'workId обязателен'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        # Проверяем роль пользователя
+        cur.execute(
+            "SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s",
+            (user_id,)
+        )
+        user_result = cur.fetchone()
+        
+        if not user_result:
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Пользователь не найден'}),
+                'isBase64Encoded': False
+            }
+        
+        role = user_result[0] if user_result[0] else 'user'
+        is_admin = (role == 'admin')
+        
+        # Получаем автора работы
+        cur.execute(
+            "SELECT author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
+            (work_id,)
+        )
+        work_result = cur.fetchone()
+        
+        if not work_result:
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Работа не найдена'}),
+                'isBase64Encoded': False
+            }
+        
+        work_author_id = work_result[0]
+        is_author = work_author_id and int(user_id) == int(work_author_id)
+        
+        # Проверяем покупку (кроме админов и авторов)
+        if not is_admin and not is_author:
+            if not user_has_paid(cur, int(user_id), int(work_id)):
+                return {
+                    'statusCode': 402,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'error': 'Payment required',
+                        'message': 'Скачивание доступно только после оплаты'
+                    }),
+                    'isBase64Encoded': False
+                }
+        
+        # Генерируем токен
+        import secrets
+        from datetime import datetime, timedelta
+        
+        download_token = secrets.token_urlsafe(48)
+        token_expires_at = datetime.now() + timedelta(minutes=30)
+        ip_address = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
+        
+        cur.execute(
+            """INSERT INTO t_p63326274_course_download_plat.download_tokens 
+            (token, user_id, work_id, expires_at, ip_address) 
+            VALUES (%s, %s, %s, %s, %s)""",
+            (download_token, user_id, work_id, token_expires_at, ip_address)
+        )
+        
+        conn.commit()
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({
+                'success': True,
+                'token': download_token,
+                'expiresAt': token_expires_at.isoformat(),
+                'expiresIn': 1800
+            }),
+            'isBase64Encoded': False
+        }
+        
+    except Exception as e:
+        print(f"[ERROR] Token generation failed: {str(e)}")
+        conn.rollback()
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': f'Ошибка генерации токена: {str(e)}'}),
+            'isBase64Encoded': False
+        }
+    finally:
+        cur.close()
+        conn.close()
 
 def mock_payment(event: Dict[str, Any]) -> Dict[str, Any]:
     headers = event.get('headers', {})

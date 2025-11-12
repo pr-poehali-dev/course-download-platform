@@ -90,8 +90,33 @@ export default function ProfilePage() {
         return;
       }
 
+      // Шаг 1: Генерируем токен для скачивания
+      const tokenResponse = await fetch(
+        `${func2url['purchase-work']}?action=generate-token`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': String(userData.id)
+          },
+          body: JSON.stringify({ workId })
+        }
+      );
+
+      if (!tokenResponse.ok) {
+        throw new Error('Не удалось сгенерировать токен для скачивания');
+      }
+
+      const tokenData = await tokenResponse.json();
+      const downloadToken = tokenData.token;
+
+      if (!downloadToken) {
+        throw new Error('Не получен токен для скачивания');
+      }
+
+      // Шаг 2: Скачиваем с использованием токена
       const downloadResponse = await fetch(
-        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&publicKey=${encodeURIComponent(YANDEX_DISK_URL)}`,
+        `${DOWNLOAD_WORK_URL}?workId=${encodeURIComponent(workId)}&token=${encodeURIComponent(downloadToken)}`,
         {
           headers: {
             'X-User-Id': String(userData.id)

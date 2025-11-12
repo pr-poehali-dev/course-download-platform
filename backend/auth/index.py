@@ -142,10 +142,14 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
+    # Получаем IP адрес пользователя
+    ip_address = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
+    
     conn = get_db_connection()
     cur = conn.cursor()
     
     try:
+        # КРИТИЧНО: Проверка на дубликат username/email
         cur.execute(
             "SELECT id FROM t_p63326274_course_download_plat.users WHERE lower(username) = lower(%s) OR lower(email) = lower(%s)",
             (username, email)
@@ -160,6 +164,32 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
+        # КРИТИЧНО: Анти-фрод - лимит 3 регистрации с одного IP за 24 часа
+        cur.execute(
+            """SELECT COUNT(*) FROM t_p63326274_course_download_plat.users 
+            WHERE registration_ip = %s AND created_at > NOW() - INTERVAL '24 hours'""",
+            (ip_address,)
+        )
+        recent_registrations = cur.fetchone()[0]
+        
+        if recent_registrations >= 3:
+            # Логируем подозрительную активность
+            cur.execute(
+                """INSERT INTO t_p63326274_course_download_plat.security_logs 
+                (user_id, event_type, details, ip_address) 
+                VALUES (%s, %s, %s, %s)""",
+                (None, 'registration_limit_exceeded', f'Попытка создать {recent_registrations + 1} аккаунт за 24 часа', ip_address)
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 429,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Превышен лимит регистраций с этого устройства. Попробуйте позже или обратитесь в поддержку.'}),
+                'isBase64Encoded': False
+            }
+        
         password_hash = hash_password(password)
         security_answer_hash = hashlib.sha256(security_answer.lower().strip().encode()).hexdigest()
         referral_code = generate_referral_code(username)
@@ -167,11 +197,11 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
         cur.execute(
             """
             INSERT INTO t_p63326274_course_download_plat.users 
-            (username, email, password_hash, referral_code, balance, security_question, security_answer_hash) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s) 
+            (username, email, password_hash, referral_code, balance, security_question, security_answer_hash, registration_ip) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) 
             RETURNING id
             """,
-            (username, email, password_hash, referral_code, 100, security_question, security_answer_hash)
+            (username, email, password_hash, referral_code, 100, security_question, security_answer_hash, ip_address)
         )
         user_id = cur.fetchone()[0]
         

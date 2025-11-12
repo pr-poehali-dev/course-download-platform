@@ -201,7 +201,7 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s) 
             RETURNING id
             """,
-            (username, email, password_hash, referral_code, 100, security_question, security_answer_hash, ip_address)
+            (username, email, password_hash, referral_code, 450, security_question, security_answer_hash, ip_address)
         )
         user_id = cur.fetchone()[0]
         
@@ -211,7 +211,7 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             (user_id, type, amount, description) 
             VALUES (%s, %s, %s, %s)
             """,
-            (user_id, 'refill', 100, 'Бонус при регистрации')
+            (user_id, 'refill', 450, 'Бонус при регистрации')
         )
         
         conn.commit()

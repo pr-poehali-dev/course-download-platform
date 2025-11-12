@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
@@ -410,10 +410,15 @@ export default function CatalogPage() {
             <TooltipProvider>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {filteredWorks.map((work) => (
-                <Link
+                <div
                   key={work.id}
-                  to={`/work/${work.id}`}
-                  className="group glass-card tech-border rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] block"
+                  onClick={(e) => {
+                    if ((e.target as HTMLElement).closest('button')) {
+                      return;
+                    }
+                    window.location.href = `/work/${work.id}`;
+                  }}
+                  className="group glass-card tech-border rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
                 >
                   <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
                     {work.previewUrl || (work.previewUrls && work.previewUrls.length > 0) ? (
@@ -550,7 +555,7 @@ export default function CatalogPage() {
                       </div>
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
               </div>
             </TooltipProvider>

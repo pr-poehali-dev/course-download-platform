@@ -30,6 +30,12 @@ function LoginPageContent({ navigate }: { navigate: any }) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  
+  const [captchaNum1, setCaptchaNum1] = useState(() => Math.floor(Math.random() * 10) + 1);
+  const [captchaNum2, setCaptchaNum2] = useState(() => Math.floor(Math.random() * 10) + 1);
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [showCaptcha, setShowCaptcha] = useState(false);
 
   useEffect(() => {
     const wasRemembered = localStorage.getItem('remember_me') === 'true';
@@ -38,6 +44,16 @@ function LoginPageContent({ navigate }: { navigate: any }) {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (showCaptcha && parseInt(captchaAnswer) !== captchaNum1 + captchaNum2) {
+      toast({
+        title: 'Ошибка',
+        description: 'Неверный ответ на математический вопрос',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -67,6 +83,16 @@ function LoginPageContent({ navigate }: { navigate: any }) {
         
         navigate('/test-login');
       } else {
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        
+        if (newAttempts >= 3) {
+          setShowCaptcha(true);
+          setCaptchaNum1(Math.floor(Math.random() * 10) + 1);
+          setCaptchaNum2(Math.floor(Math.random() * 10) + 1);
+          setCaptchaAnswer('');
+        }
+        
         toast({
           title: 'Ошибка входа',
           description: data.error || 'Неверный email или пароль',
@@ -144,6 +170,21 @@ function LoginPageContent({ navigate }: { navigate: any }) {
                   </button>
                 </div>
               </div>
+
+              {showCaptcha && (
+                <div className="space-y-2">
+                  <Label htmlFor="captcha">Проверка: Сколько будет {captchaNum1} + {captchaNum2}?</Label>
+                  <Input
+                    id="captcha"
+                    type="number"
+                    placeholder="Введите ответ"
+                    value={captchaAnswer}
+                    onChange={(e) => setCaptchaAnswer(e.target.value)}
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">После 3 неудачных попыток входа</p>
+                </div>
+              )}
 
               <div className="flex items-center text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">

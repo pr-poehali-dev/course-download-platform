@@ -22,6 +22,10 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  
+  const [captchaNum1] = useState(() => Math.floor(Math.random() * 10) + 1);
+  const [captchaNum2] = useState(() => Math.floor(Math.random() * 10) + 1);
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +43,15 @@ export default function RegisterPage() {
       toast({
         title: 'Ошибка',
         description: 'Необходимо принять условия использования',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    if (parseInt(captchaAnswer) !== captchaNum1 + captchaNum2) {
+      toast({
+        title: 'Ошибка',
+        description: 'Неверный ответ на математический вопрос',
         variant: 'destructive'
       });
       return;
@@ -231,6 +244,19 @@ export default function RegisterPage() {
                   required
                 />
                 <p className="text-xs text-muted-foreground">Используется для восстановления пароля</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="captcha">Проверка: Сколько будет {captchaNum1} + {captchaNum2}?</Label>
+                <Input
+                  id="captcha"
+                  type="number"
+                  placeholder="Введите ответ"
+                  value={captchaAnswer}
+                  onChange={(e) => setCaptchaAnswer(e.target.value)}
+                  required
+                />
+                <p className="text-xs text-muted-foreground">Введите сумму чисел выше</p>
               </div>
 
               <div className="flex items-start gap-2">

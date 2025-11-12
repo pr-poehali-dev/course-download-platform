@@ -532,7 +532,8 @@ export default function CatalogPage() {
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
-                              window.open(work.yandexDiskLink, '_blank', 'noopener,noreferrer');
+                              const encodedUrl = encodeURI(work.yandexDiskLink!);
+                              window.open(encodedUrl, '_blank', 'noopener,noreferrer');
                             }}
                             className="border-green-600 text-green-600 hover:bg-green-50"
                           >

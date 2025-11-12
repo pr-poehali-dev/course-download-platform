@@ -203,7 +203,8 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  window.open(work.yandexDiskLink, '_blank');
+                  const encodedUrl = encodeURI(work.yandexDiskLink!);
+                  window.open(encodedUrl, '_blank');
                 }}
                 variant="outline"
                 size="sm"

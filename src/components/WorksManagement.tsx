@@ -279,7 +279,8 @@ export default function WorksManagement() {
                             const response = await fetch(`${func2url['download-work']}?workId=${work.id}&userId=admin`);
                             const data = await response.json();
                             if (data.url) {
-                              window.open(data.url, '_blank');
+                              const encodedUrl = encodeURI(data.url);
+                              window.open(encodedUrl, '_blank');
                               toast({
                                 title: 'Скачивание...',
                                 description: 'Файл открывается в новой вкладке'

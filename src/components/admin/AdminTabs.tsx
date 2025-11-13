@@ -3,7 +3,7 @@ import Icon from '@/components/ui/icon';
 
 export default function AdminTabs() {
   return (
-    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-7">
+    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8">
       <TabsTrigger value="finances">
         <Icon name="DollarSign" size={18} className="mr-2" />
         Финансы
@@ -23,6 +23,10 @@ export default function AdminTabs() {
       <TabsTrigger value="users">
         <Icon name="Users" size={18} className="mr-2" />
         Пользователи
+      </TabsTrigger>
+      <TabsTrigger value="blog">
+        <Icon name="BookOpen" size={18} className="mr-2" />
+        Блог
       </TabsTrigger>
       <TabsTrigger value="sync">
         <Icon name="CloudDownload" size={18} className="mr-2" />

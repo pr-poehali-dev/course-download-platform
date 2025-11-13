@@ -451,8 +451,7 @@ export default function Index() {
               <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
                 <a href="/" className="hover:text-primary transition-colors text-sm">Главная</a>
                 <a href="/catalog" className="hover:text-primary transition-colors text-sm">Каталог</a>
-
-                <a href="#blog" className="hover:text-primary transition-colors text-sm">Блог</a>
+                <a href="/blog" className="hover:text-primary transition-colors text-sm">Блог</a>
                 <a href="#support" className="hover:text-primary transition-colors text-sm">Поддержка</a>
               </nav>
               

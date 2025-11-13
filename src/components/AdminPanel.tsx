@@ -16,6 +16,7 @@ import AdminLoginForm from '@/components/admin/AdminLoginForm';
 import AdminHeader from '@/components/admin/AdminHeader';
 import AdminTabs from '@/components/admin/AdminTabs';
 import SyncTab from '@/components/admin/SyncTab';
+import BlogManagement from '@/components/admin/BlogManagement';
 import func2url from '../../backend/func2url.json';
 
 const ADMIN_EMAIL = 'admin@techforma.pro';
@@ -165,6 +166,10 @@ export default function AdminPanel() {
 
         <TabsContent value="users" className="space-y-6">
           <UsersManagement />
+        </TabsContent>
+
+        <TabsContent value="blog" className="space-y-6">
+          <BlogManagement />
         </TabsContent>
 
         <TabsContent value="support" className="space-y-6">

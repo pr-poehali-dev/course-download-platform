@@ -11,6 +11,7 @@ import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import TermsOfServicePage from "./pages/TermsOfServicePage";
 import UsageRulesPage from "./pages/UsageRulesPage";
 import BlogPost from "./pages/BlogPost";
+import BlogPage from "./pages/BlogPage";
 import OfferPage from "./pages/OfferPage";
 import Requisites from "./pages/Requisites";
 import AdminPage from "./pages/AdminPage";
@@ -72,7 +73,8 @@ const App = () => (
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/test-login" element={<TestLoginPage />} />
-          <Route path="/blog/:id" element={<BlogPost />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
 

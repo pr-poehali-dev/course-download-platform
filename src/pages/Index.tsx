@@ -657,13 +657,6 @@ export default function Index() {
                 </span>
               </div>
               
-              <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-orange-50 border-2 border-orange-300 rounded-full mb-4 sm:mb-8 animate-fade-in">
-                <Icon name="AlertCircle" size={18} className="text-orange-600 sm:w-5 sm:h-5" />
-                <span className="text-xs sm:text-sm font-semibold text-orange-700">
-                  🚀 Платформа новая! Нашли баг? Напишите в поддержку — начислим бонусы!
-                </span>
-              </div>
-              
               <div className="hero-glow mb-4 sm:mb-8">
                 <h2 className="hero-title text-5xl sm:text-7xl md:text-8xl lg:text-9xl leading-tight px-2">
                   Tech Forma

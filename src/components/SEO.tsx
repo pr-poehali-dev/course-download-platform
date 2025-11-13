@@ -15,7 +15,7 @@ const DEFAULT_SEO = {
   title: 'Tech Forma — Маркетплейс студенческих работ',
   description: 'Каталог курсовых, дипломов, чертежей. Маркетплейс для студентов. Покупай за баллы, продавай свои работы.',
   keywords: 'курсовые работы, дипломы, рефераты, студенческие работы купить, чертежи, маркетплейс работ',
-  ogImage: 'https://cdn.poehali.dev/intertnal/img/og.png',
+  ogImage: 'https://cdn.poehali.dev/internal/img/og.png',
   siteName: 'Tech Forma'
 };
 

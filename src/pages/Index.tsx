@@ -132,7 +132,7 @@ export default function Index() {
       setAuthDialogOpen(false);
       toast({
         title: 'Регистрация успешна!',
-        description: `Добро пожаловать, ${data.user.username}! Вам начислено 100 баллов.`,
+        description: `Добро пожаловать, ${data.user.username}! Вам начислено 1000 баллов.`,
       });
     } catch (error: any) {
       toast({
@@ -657,6 +657,13 @@ export default function Index() {
                 </span>
               </div>
               
+              <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-orange-50 border-2 border-orange-300 rounded-full mb-4 sm:mb-8 animate-fade-in">
+                <Icon name="AlertCircle" size={18} className="text-orange-600 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-semibold text-orange-700">
+                  🚀 Платформа новая! Нашли баг? Напишите в поддержку — начислим бонусы!
+                </span>
+              </div>
+              
               <div className="hero-glow mb-4 sm:mb-8">
                 <h2 className="hero-title text-5xl sm:text-7xl md:text-8xl lg:text-9xl leading-tight px-2">
                   Tech Forma
@@ -697,8 +704,11 @@ export default function Index() {
                   <p className="text-xs sm:text-sm font-medium text-slate-600">Рейтинг 4.8+</p>
                 </div>
                 <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
-                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-green-600 to-green-400 bg-clip-text text-transparent mb-2">1000+</div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-600">Студентов</p>
+                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-green-600 to-green-400 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2">
+                    <Icon name="Users" size={28} />
+                    Много
+                  </div>
+                  <p className="text-xs sm:text-sm font-medium text-slate-600">Активных авторов</p>
                 </div>
               </div>
             </div>
@@ -1547,7 +1557,7 @@ export default function Index() {
                   </div>
                   <h3 className="text-xl font-bold mb-3 text-slate-900">Сообщество студентов</h3>
                   <p className="text-slate-600 leading-relaxed">
-                    Более 5000 активных пользователей. Обменивайся знаниями с коллегами по всей стране.
+                    Растущее сообщество студентов и авторов. Обменивайся знаниями с коллегами по всей стране.
                   </p>
                 </div>
               </div>
@@ -1584,7 +1594,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Загрузи свою работу — получи баллы бесплатно. Или купи баллы, чтобы получить доступ к материалам других студентов для обучения.
+                    При регистрации ты получаешь стартовый бонус 450 баллов. Загружай работы и получай баллы за каждую продажу, или купи баллы для доступа к материалам других студентов.
                   </p>
                 </CardContent>
               </Card>

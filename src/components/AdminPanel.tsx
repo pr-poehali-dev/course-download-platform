@@ -18,8 +18,8 @@ import AdminTabs from '@/components/admin/AdminTabs';
 import SyncTab from '@/components/admin/SyncTab';
 import func2url from '../../backend/func2url.json';
 
-const ADMIN_EMAIL = 'admin@system.local';
-const ADMIN_PASSWORD = 'admin123';
+const ADMIN_EMAIL = 'admin@techforma.pro';
+const ADMIN_PASSWORD = 'TF2025!SecureAdmin#Pass$9876';
 
 interface StatData {
   totalWorks: number;

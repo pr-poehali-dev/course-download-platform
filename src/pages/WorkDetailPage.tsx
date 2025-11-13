@@ -12,6 +12,7 @@ import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { recentlyViewedStorage } from '@/utils/recentlyViewed';
+import { getFakeAuthor, incrementViewCount, getViewCount } from '@/utils/fakeAuthors';
 
 
 interface Work {
@@ -354,6 +355,9 @@ export default function WorkDetailPage() {
           };
           
           setWork(workData);
+          
+          // Увеличиваем счетчик просмотров
+          incrementViewCount(workData.id);
           
           recentlyViewedStorage.add({
             id: workData.id,
@@ -843,7 +847,7 @@ export default function WorkDetailPage() {
               <div className="flex items-center justify-between gap-4 flex-wrap">
                 <div className="flex items-center gap-2 text-gray-600">
                   <Icon name="Eye" size={18} className="text-blue-600" />
-                  <span className="text-sm font-medium">{work.viewsCount || 0} просмотров</span>
+                  <span className="text-sm font-medium">{getViewCount(work.id)} просмотров</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <Icon name="Download" size={18} className="text-green-600" />
@@ -983,7 +987,7 @@ export default function WorkDetailPage() {
                       />
                     ) : (
                       <div className="font-medium text-gray-900">
-                        {work.authorName || 'Tech Forma (платформа)'}
+                        {work.authorName || getFakeAuthor(work.id)}
                       </div>
                     )}
                   </div>
@@ -1211,12 +1215,7 @@ export default function WorkDetailPage() {
                   </div>
                   <span className="font-medium">Мгновенный доступ</span>
                 </div>
-                <div className="flex items-center gap-2.5 text-sm">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Icon name="Shield" size={16} className="text-primary" />
-                  </div>
-                  <span className="font-medium">Гарантия возврата</span>
-                </div>
+
               </div>
 
               <div className="mt-5 pt-5 border-t border-border">

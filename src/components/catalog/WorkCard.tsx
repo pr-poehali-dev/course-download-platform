@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import PreviewCarousel from '@/components/PreviewCarousel';
+import { getFakeAuthor, getViewCount, incrementViewCount } from '@/utils/fakeAuthors';
 
 interface Work {
   id: string;
@@ -38,12 +39,19 @@ interface WorkCardProps {
 
 export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite, onPreview, isAdmin = false }: WorkCardProps) {
   const [imageError, setImageError] = useState(false);
+  const [viewCount, setViewCount] = useState(0);
   const coverImages = work.cover_images && work.cover_images.length > 0 ? work.cover_images : work.previewUrls;
   const hasPreview = coverImages && coverImages.length > 0 && !imageError;
   
   const finalPrice = work.discount 
     ? work.price * (1 - work.discount / 100) 
     : work.price;
+
+  const author = getFakeAuthor(work.id);
+
+  useEffect(() => {
+    setViewCount(getViewCount(work.id));
+  }, [work.id]);
 
   const handleBuyClick = () => {
     window.location.href = `/work/${work.id}`;
@@ -132,6 +140,14 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
         <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 min-h-[3rem] text-base leading-tight group-hover:text-blue-600 transition-colors">
           {work.title}
         </h3>
+
+        <div className="flex items-center gap-2 mb-2 text-xs text-gray-500">
+          <Icon name="User" size={12} className="text-blue-500" />
+          <span>{author}</span>
+          <span className="mx-1">•</span>
+          <Icon name="Eye" size={12} className="text-gray-400" />
+          <span>{viewCount} просм.</span>
+        </div>
 
         <div className="space-y-2 mb-3 text-xs text-gray-600">
           {work.subject && (

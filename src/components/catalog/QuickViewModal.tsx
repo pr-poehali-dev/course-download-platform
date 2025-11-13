@@ -204,10 +204,6 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
 
                 <div className="space-y-2 text-xs text-gray-600">
                   <div className="flex items-center gap-2">
-                    <Icon name="ShieldCheck" size={14} className="text-green-600" />
-                    <span>Гарантия возврата в течение 7 дней</span>
-                  </div>
-                  <div className="flex items-center gap-2">
                     <Icon name="Download" size={14} className="text-blue-600" />
                     <span>Мгновенное скачивание после оплаты</span>
                   </div>

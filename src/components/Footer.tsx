@@ -49,7 +49,7 @@ export default function Footer() {
 
         <div className="border-t mt-8 pt-8">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-sm text-muted-foreground">
-            <p>© 2024 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
+            <p>© 2025 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
             <div className="flex items-center justify-center">
               <AgeBadge />
             </div>

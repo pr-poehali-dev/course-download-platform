@@ -33,6 +33,7 @@ import CookieBanner from '@/components/CookieBanner';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 import SEO from '@/components/SEO';
 import HomeHeader from '@/components/home/HomeHeader';
+import RotatingText from '@/components/home/RotatingText';
 
 
 
@@ -661,12 +662,12 @@ export default function Index() {
                 </h2>
               </div>
               
-              <p className="text-lg sm:text-2xl md:text-3xl font-medium text-slate-600 mb-6 sm:mb-12 animate-fade-in px-2">
-                Современный маркетплейс учебных работ
-              </p>
+              <div className="mb-6 sm:mb-8">
+                <RotatingText />
+              </div>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Маркетплейс учебных работ. Покупай готовые курсовые и дипломы за баллы, продавай свои работы.
+                Покупай готовые курсовые и дипломы за баллы. Продавай свои работы и зарабатывай.
               </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
@@ -1613,25 +1614,7 @@ export default function Index() {
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="Bot" size={20} className="text-purple-600" />
-                    Что такое AI-помощник?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground mb-3">
-                    Это персональный AI-репетитор, который отвечает на вопросы, помогает с учёбой, проверяет работы и составляет планы 24/7.
-                  </p>
-                  <Button variant="outline" className="mt-2" asChild>
-                    <a href="/ai-chat">
-                      <Icon name="Sparkles" size={16} className="mr-2" />
-                      Попробовать AI-помощник
-                    </a>
-                  </Button>
-                </CardContent>
-              </Card>
+
 
               <Card className="border-2 border-blue-500/30 bg-blue-50/50">
                 <CardHeader>
@@ -1696,18 +1679,18 @@ export default function Index() {
                     <ul className="space-y-2 text-sm text-muted-foreground ml-4">
                       <li className="flex items-start gap-2">
                         <Icon name="User" size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Автор получает 85%</strong> от цены работы</span>
+                        <span><strong>Автор получает 90%</strong> от цены работы</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Icon name="Server" size={14} className="text-purple-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Платформа 15%</strong> — поддержка, хостинг, ИИ</span>
+                        <span><strong>Платформа 10%</strong> — поддержка, хостинг, серверы</span>
                       </li>
                     </ul>
                   </div>
 
                   <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-3 border border-purple-200">
                     <p className="text-xs text-muted-foreground">
-                      <strong>Пример:</strong> Работа за 100 баллов → Автор получает 85 баллов (425₽) → 15 баллов на развитие платформы
+                      <strong>Пример:</strong> Работа за 100 баллов → Автор получает 90 баллов (450₽) → 10 баллов на развитие платформы
                     </p>
                   </div>
                 </CardContent>

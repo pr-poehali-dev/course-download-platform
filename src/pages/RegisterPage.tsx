@@ -136,14 +136,14 @@ export default function RegisterPage() {
           <CardContent>
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Имя</Label>
+                <Label htmlFor="name">Никнейм</Label>
                 <div className="relative">
                   <Icon name="User" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     id="name"
                     name="username"
                     type="text"
-                    placeholder="Иван Иванов"
+                    placeholder="techmaster2024"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="pl-10"

@@ -13,6 +13,7 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { recentlyViewedStorage } from '@/utils/recentlyViewed';
 import { getFakeAuthor, incrementViewCount, getViewCount } from '@/utils/fakeAuthors';
+import ReviewsSection from '@/components/ReviewsSection';
 
 
 interface Work {
@@ -1240,8 +1241,26 @@ export default function WorkDetailPage() {
 
               </div>
 
-              <div className="mt-5 pt-5 border-t border-border">
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <div className="mt-5 pt-5 border-t border-border space-y-3">
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="flex flex-col items-center">
+                    <Icon name="Eye" size={16} className="text-blue-600 mb-1" />
+                    <span className="text-lg font-bold text-gray-900">{work.viewsCount || 0}</span>
+                    <span className="text-xs text-gray-500">Просмотров</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Icon name="Download" size={16} className="text-green-600 mb-1" />
+                    <span className="text-lg font-bold text-gray-900">{work.downloadsCount || 0}</span>
+                    <span className="text-xs text-gray-500">Скачиваний</span>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <Icon name="MessageSquare" size={16} className="text-purple-600 mb-1" />
+                    <span className="text-lg font-bold text-gray-900">{work.reviewsCount || 0}</span>
+                    <span className="text-xs text-gray-500">Отзывов</span>
+                  </div>
+                </div>
+                
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-3 border-t">
                   <Icon name="Lock" size={14} />
                   <span>Безопасная покупка</span>
                 </div>
@@ -1249,6 +1268,8 @@ export default function WorkDetailPage() {
             </div>
           </div>
         </div>
+
+        <ReviewsSection workId={actualWorkId} isPurchased={isPurchased} />
 
         {similarWorks.length > 0 && (
           <div className="mt-12 pb-8">

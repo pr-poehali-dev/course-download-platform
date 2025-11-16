@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import ReviewsModeration from '@/components/ReviewsModeration';
 
 interface UploadedWork {
   id: number;
@@ -323,6 +324,10 @@ export default function ModerationPanel() {
           </Card>
         ))
       )}
+      
+      <div className="mt-8">
+        <ReviewsModeration />
+      </div>
     </div>
   );
 }

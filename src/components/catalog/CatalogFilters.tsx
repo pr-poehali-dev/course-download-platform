@@ -102,10 +102,10 @@ export default function CatalogFilters({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Любые баллы</SelectItem>
-                <SelectItem value="0-300">До 300 б. (Практика, Реферат)</SelectItem>
-                <SelectItem value="300-800">300 - 800 б. (Курсовая)</SelectItem>
-                <SelectItem value="800-2000">800 - 2000 б. (Дипломная)</SelectItem>
-                <SelectItem value="2000+">От 2000 б. (Диссертация)</SelectItem>
+                <SelectItem value="0-300">До 300 б. (Реферат)</SelectItem>
+                <SelectItem value="300-1500">300 - 1500 б. (Курсовая)</SelectItem>
+                <SelectItem value="1500-3000">1500 - 3000 б. (Дипломная)</SelectItem>
+                <SelectItem value="3000+">От 3000 б. (Диссертация)</SelectItem>
               </SelectContent>
             </Select>
           </div>

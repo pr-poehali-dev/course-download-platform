@@ -165,6 +165,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             title = work_result[0]
             download_url = work_result[1] or work_result[2]
             
+            # Инкрементируем счётчик скачиваний
+            cur.execute("""
+                UPDATE t_p63326274_course_download_plat.works 
+                SET downloads_count = COALESCE(downloads_count, 0) + 1 
+                WHERE id = %s
+            """, (work_id,))
+            conn.commit()
+            
             print(f"[DEBUG] Work found: title={title}, download_url={download_url}")
             
             if not download_url:

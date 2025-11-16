@@ -322,9 +322,9 @@ export default function CatalogPage() {
     if (priceRange !== 'all') {
       filtered = filtered.filter(work => {
         if (priceRange === '0-300') return work.price <= 300;
-        if (priceRange === '300-800') return work.price > 300 && work.price <= 800;
-        if (priceRange === '800-2000') return work.price > 800 && work.price <= 2000;
-        if (priceRange === '2000+') return work.price > 2000;
+        if (priceRange === '300-1500') return work.price > 300 && work.price <= 1500;
+        if (priceRange === '1500-3000') return work.price > 1500 && work.price <= 3000;
+        if (priceRange === '3000+') return work.price > 3000;
         return true;
       });
     }
@@ -465,13 +465,10 @@ export default function CatalogPage() {
 
                   <div className="p-4 md:p-5">
                     <div className="flex items-center justify-between mb-3">
-                      <TrustRating 
-                        rating={work.rating}
-                        purchaseCount={work.purchaseCount}
-                        isHit={work.isHit}
-                        isNew={work.isNew}
-                        compact
-                      />
+                      <div className="flex items-center gap-1">
+                        <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
+                        <span className="text-sm font-semibold">{work.rating.toFixed(1)}</span>
+                      </div>
                       <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
                         {work.workType}
                       </Badge>

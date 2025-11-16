@@ -6,17 +6,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../backend/func2url.json';
 
 interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onLogin: (username: string, password: string) => void;
-  onRegister: (username: string, email: string, password: string) => void;
+  onRegister: (username: string, email: string, password: string, securityQuestion: string, securityAnswer: string) => void;
 }
 
 export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: AuthDialogProps) {
   const [isResetMode, setIsResetMode] = useState(false);
+  const [resetStep, setResetStep] = useState<'email' | 'security' | 'newPassword'>('email');
   const [resetEmail, setResetEmail] = useState('');
+  const [userSecurityQuestion, setUserSecurityQuestion] = useState('');
+  const [securityAnswer, setSecurityAnswer] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   
   const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [registerData, setRegisterData] = useState({ 
@@ -24,6 +30,8 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
     email: '', 
     password: '', 
     confirmPassword: '',
+    securityQuestion: '',
+    securityAnswer: '',
     agreeToPrivacy: false
   });
 
@@ -45,10 +53,10 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!registerData.username || !registerData.email || !registerData.password || !registerData.confirmPassword) {
+    if (!registerData.username || !registerData.email || !registerData.password || !registerData.confirmPassword || !registerData.securityQuestion || !registerData.securityAnswer) {
       toast({
         title: 'Ошибка',
-        description: 'Заполните все поля',
+        description: 'Заполните все поля, включая секретный вопрос и ответ',
         variant: 'destructive',
       });
       return;
@@ -81,10 +89,10 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
       return;
     }
 
-    onRegister(registerData.username, registerData.email, registerData.password);
+    onRegister(registerData.username, registerData.email, registerData.password, registerData.securityQuestion, registerData.securityAnswer);
   };
 
-  const handleResetPassword = (e: React.FormEvent) => {
+  const handleCheckEmail = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!resetEmail) {
@@ -96,12 +104,126 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
       return;
     }
 
-    toast({
-      title: 'Письмо отправлено!',
-      description: `Инструкция по восстановлению пароля отправлена на ${resetEmail}`,
-    });
-    setIsResetMode(false);
-    setResetEmail('');
+    try {
+      const response = await fetch(`${func2url.auth}?action=get-security-question`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Пользователь не найден');
+      }
+
+      setUserSecurityQuestion(data.security_question);
+      setResetStep('security');
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleVerifySecurityAnswer = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!securityAnswer) {
+      toast({
+        title: 'Ошибка',
+        description: 'Введите ответ на секретный вопрос',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${func2url.auth}?action=verify-security-answer`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail, security_answer: securityAnswer })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Неверный ответ');
+      }
+
+      setResetStep('newPassword');
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleSetNewPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newPassword || !confirmNewPassword) {
+      toast({
+        title: 'Ошибка',
+        description: 'Заполните все поля',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (newPassword !== confirmNewPassword) {
+      toast({
+        title: 'Ошибка',
+        description: 'Пароли не совпадают',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      toast({
+        title: 'Ошибка',
+        description: 'Пароль должен быть не менее 6 символов',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${func2url.auth}?action=reset-password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmail, new_password: newPassword })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка смены пароля');
+      }
+
+      toast({
+        title: 'Пароль изменён!',
+        description: 'Теперь вы можете войти с новым паролем',
+      });
+
+      setIsResetMode(false);
+      setResetStep('email');
+      setResetEmail('');
+      setSecurityAnswer('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
   };
 
   if (isResetMode) {
@@ -114,36 +236,111 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
               Восстановление пароля
             </DialogTitle>
             <DialogDescription>
-              Введите email, указанный при регистрации
+              {resetStep === 'email' && 'Введите email, указанный при регистрации'}
+              {resetStep === 'security' && 'Ответьте на секретный вопрос'}
+              {resetStep === 'newPassword' && 'Установите новый пароль'}
             </DialogDescription>
           </DialogHeader>
           
-          <form onSubmit={handleResetPassword} className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="reset-email">Email</Label>
-              <Input
-                id="reset-email"
-                type="email"
-                placeholder="example@mail.ru"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-              />
-            </div>
+          {resetStep === 'email' && (
+            <form onSubmit={handleCheckEmail} className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="reset-email">Email</Label>
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="example@mail.ru"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                />
+              </div>
 
-            <div className="flex gap-2">
-              <Button type="submit" className="flex-1">
-                <Icon name="Mail" size={18} className="mr-2" />
-                Отправить письмо
+              <div className="flex gap-2">
+                <Button type="submit" className="flex-1">
+                  <Icon name="ArrowRight" size={18} className="mr-2" />
+                  Продолжить
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsResetMode(false);
+                    setResetStep('email');
+                  }}
+                >
+                  Назад
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {resetStep === 'security' && (
+            <form onSubmit={handleVerifySecurityAnswer} className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label>Ваш секретный вопрос:</Label>
+                <p className="text-sm text-muted-foreground italic">{userSecurityQuestion}</p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="security-answer">Ответ</Label>
+                <Input
+                  id="security-answer"
+                  type="text"
+                  placeholder="Введите ответ"
+                  value={securityAnswer}
+                  onChange={(e) => setSecurityAnswer(e.target.value)}
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <Button type="submit" className="flex-1">
+                  <Icon name="CheckCircle" size={18} className="mr-2" />
+                  Проверить
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setResetStep('email');
+                    setSecurityAnswer('');
+                  }}
+                >
+                  Назад
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {resetStep === 'newPassword' && (
+            <form onSubmit={handleSetNewPassword} className="space-y-4 pt-4">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Новый пароль</Label>
+                <Input
+                  id="new-password"
+                  type="password"
+                  placeholder="Минимум 6 символов"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirm-new-password">Подтвердите пароль</Label>
+                <Input
+                  id="confirm-new-password"
+                  type="password"
+                  placeholder="Повторите пароль"
+                  value={confirmNewPassword}
+                  onChange={(e) => setConfirmNewPassword(e.target.value)}
+                />
+              </div>
+
+              <Button type="submit" className="w-full">
+                <Icon name="Save" size={18} className="mr-2" />
+                Сохранить новый пароль
               </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setIsResetMode(false)}
-              >
-                Назад
-              </Button>
-            </div>
-          </form>
+            </form>
+          )}
         </DialogContent>
       </Dialog>
     );
@@ -260,6 +457,28 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
                   value={registerData.confirmPassword}
                   onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                   autoComplete="new-password"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="register-security-question">Секретный вопрос</Label>
+                <Input
+                  id="register-security-question"
+                  type="text"
+                  placeholder="Например: Девичья фамилия матери"
+                  value={registerData.securityQuestion}
+                  onChange={(e) => setRegisterData({ ...registerData, securityQuestion: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="register-security-answer">Ответ на секретный вопрос</Label>
+                <Input
+                  id="register-security-answer"
+                  type="text"
+                  placeholder="Ваш ответ"
+                  value={registerData.securityAnswer}
+                  onChange={(e) => setRegisterData({ ...registerData, securityAnswer: e.target.value })}
                 />
               </div>
 

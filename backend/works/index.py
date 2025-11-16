@@ -245,6 +245,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     for f in cur.fetchall()
                 ]
                 
+                # Инкрементируем счётчик просмотров
+                cur.execute("""
+                    UPDATE t_p63326274_course_download_plat.works 
+                    SET views_count = COALESCE(views_count, 0) + 1 
+                    WHERE id = %s
+                """, (work_id,))
+                conn.commit()
+                
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

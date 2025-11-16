@@ -67,13 +67,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    if not token:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Download token required'}),
-            'isBase64Encoded': False
-        }
+    # Токен теперь опциональный - проверяем покупку напрямую
     
     try:
         # Загружаем данные работы из БД
@@ -88,62 +82,49 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
-            # КРИТИЧНО: Проверяем токен
+            from datetime import datetime, timedelta
+            
+            # Проверяем покупку работы (7-дневный доступ)
             cur.execute(
-                """SELECT user_id, work_id, expires_at, used 
-                FROM t_p63326274_course_download_plat.download_tokens 
-                WHERE token = %s""",
-                (token,)
+                """SELECT id, created_at 
+                FROM t_p63326274_course_download_plat.purchases 
+                WHERE buyer_id = %s AND work_id = %s
+                ORDER BY created_at DESC
+                LIMIT 1""",
+                (user_id, work_id)
             )
-            token_result = cur.fetchone()
+            purchase_result = cur.fetchone()
             
-            if not token_result:
+            if not purchase_result:
                 return {
                     'statusCode': 403,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Invalid download token'}),
+                    'body': json.dumps({'error': 'Вы не купили эту работу'}),
                     'isBase64Encoded': False
                 }
             
-            token_user_id = token_result[0]
-            token_work_id = token_result[1]
-            token_expires_at = token_result[2]
-            token_used = token_result[3]
+            purchase_date = purchase_result[1]
+            download_deadline = purchase_date + timedelta(days=7)
             
-            # Проверяем совпадение user_id и work_id
-            if int(token_user_id) != int(user_id) or int(token_work_id) != int(work_id):
+            # Проверяем, не истёк ли 7-дневный период
+            if datetime.now() > download_deadline:
+                days_passed = (datetime.now() - purchase_date).days
                 return {
                     'statusCode': 403,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Token mismatch'}),
+                    'body': json.dumps({
+                        'error': 'Download period expired', 
+                        'message': f'Период скачивания истёк {days_passed - 7} дней назад. Для повторного доступа купите работу заново.'
+                    }),
                     'isBase64Encoded': False
                 }
             
-            # Проверяем срок действия
-            from datetime import datetime
-            if datetime.now() > token_expires_at:
-                return {
-                    'statusCode': 403,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Token expired', 'message': 'Токен истёк. Вернитесь на страницу работы и попробуйте снова.'}),
-                    'isBase64Encoded': False
-                }
-            
-            # Проверяем, не использован ли уже токен
-            if token_used:
-                return {
-                    'statusCode': 403,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Token already used'}),
-                    'isBase64Encoded': False
-                }
-            
-            # Помечаем токен как использованный
+            # Записываем факт скачивания
             cur.execute(
-                """UPDATE t_p63326274_course_download_plat.download_tokens 
-                SET used = TRUE, used_at = NOW() 
-                WHERE token = %s""",
-                (token,)
+                """INSERT INTO t_p63326274_course_download_plat.user_downloads 
+                (user_id, work_id, downloaded_at) 
+                VALUES (%s, %s, NOW())""",
+                (user_id, work_id)
             )
             conn.commit()
             

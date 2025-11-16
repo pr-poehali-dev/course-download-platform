@@ -1,0 +1,4 @@
+ALTER TABLE t_p63326274_course_download_plat.reviews 
+ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'pending',
+ADD COLUMN IF NOT EXISTS moderated_at TIMESTAMP,
+ADD COLUMN IF NOT EXISTS moderated_by INTEGER;

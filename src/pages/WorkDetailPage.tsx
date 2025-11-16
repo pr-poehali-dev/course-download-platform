@@ -60,12 +60,27 @@ export default function WorkDetailPage() {
   const [modalImageIndex, setModalImageIndex] = useState(0);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedWork, setEditedWork] = useState<Partial<Work>>({});
+  const [isPurchased, setIsPurchased] = useState(false);
 
 
   useEffect(() => {
     const checkAuth = async () => {
       const user = await authService.verify();
       setIsLoggedIn(!!user);
+      
+      // Проверяем, куплена ли работа
+      if (user && actualWorkId) {
+        try {
+          const response = await fetch(`${func2url['user-data']}?user_id=${user.id}&action=purchases`);
+          const data = await response.json();
+          if (data.purchases) {
+            const purchased = data.purchases.some((p: any) => String(p.work_id) === String(actualWorkId));
+            setIsPurchased(purchased);
+          }
+        } catch (error) {
+          console.error('Error checking purchase:', error);
+        }
+      }
       
       // Проверяем, является ли пользователь админом
       if (user && user.role === 'admin') {
@@ -1195,11 +1210,18 @@ export default function WorkDetailPage() {
               <Button 
                 variant="secondary"
                 size="default"
-                className="w-full font-semibold rounded-lg mb-4 md:mb-5 h-10 md:h-11 text-sm md:text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600"
-                onClick={() => navigate(`/defense-kit?workId=${actualWorkId}`)}
+                className="w-full font-semibold rounded-lg mb-4 md:mb-5 h-10 md:h-11 text-sm md:text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => {
+                  if (!isPurchased) {
+                    alert('⚠️ Сначала нужно купить работу, чтобы создать пакет для защиты');
+                    return;
+                  }
+                  navigate(`/defense-kit?workId=${actualWorkId}`);
+                }}
+                disabled={!isPurchased}
               >
                 <Icon name="GraduationCap" size={18} className="mr-2" />
-                Создать пакет для защиты
+                {isPurchased ? 'Создать пакет для защиты' : '🔒 Купите работу для пакета защиты'}
               </Button>
 
               <div className="space-y-2.5 md:space-y-3">

@@ -467,20 +467,7 @@ export default function Index() {
               <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                 {isLoggedIn ? (
                   <>
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="relative h-8 w-8 sm:h-10 sm:w-10 hidden sm:flex"
-                      onClick={() => setFavoritesDialogOpen(true)}
-                    >
-                      <Icon name="Heart" size={18} className={favoriteItems.length > 0 ? 'text-red-500' : ''} />
-                      {favoriteItems.length > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center text-[10px] sm:text-xs">
-                          {favoriteItems.length}
-                        </span>
-                      )}
-                    </Button>
-                    
+
                     <Button 
                       variant="ghost" 
                       size="icon"
@@ -496,7 +483,7 @@ export default function Index() {
                     </Button>
                     
                     <div className="flex flex-col gap-1">
-                      <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-primary/10 rounded-full cursor-pointer" onClick={() => setPromoDialogOpen(true)}>
+                      <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-primary/10 rounded-full">
                         <Icon name="Coins" size={16} className="text-primary sm:w-5 sm:h-5" />
                         <span className="font-semibold text-sm sm:text-base">{userBalance}</span>
                       </div>
@@ -541,14 +528,7 @@ export default function Index() {
                           <Icon name="Wallet" size={16} className="mr-2" />
                           Пополнить баланс
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setFavoritesDialogOpen(true)}>
-                          <Icon name="Heart" size={16} className="mr-2" />
-                          Избранное
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setPromoDialogOpen(true)}>
-                          <Icon name="Gift" size={16} className="mr-2" />
-                          Промокоды
-                        </DropdownMenuItem>
+
                         <DropdownMenuItem onClick={() => setReferralDialogOpen(true)}>
                           <Icon name="Users" size={16} className="mr-2" />
                           Реферальная программа
@@ -603,16 +583,7 @@ export default function Index() {
                   {isLoggedIn && (
                     <>
                       <div className="border-t my-2"></div>
-                      <button 
-                        className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium text-left flex items-center gap-2"
-                        onClick={() => {
-                          setFavoritesDialogOpen(true);
-                          setMobileMenuOpen(false);
-                        }}
-                      >
-                        <Icon name="Heart" size={18} />
-                        Избранное {favoriteItems.length > 0 && `(${favoriteItems.length})`}
-                      </button>
+
                       <button 
                         className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium text-left flex items-center gap-2"
                         onClick={() => {
@@ -689,16 +660,20 @@ export default function Index() {
                   <p className="text-xs sm:text-sm font-medium text-slate-600">Готовых работ</p>
                 </div>
                 <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
-                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-purple-600 to-purple-400 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2">
-                    <Icon name="TrendingUp" size={28} />
-                    ХИТ
+                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-purple-600 to-purple-400 bg-clip-text text-transparent mb-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <Icon name="TrendingUp" size={28} />
+                    </div>
+                    <div>ХИТ</div>
                   </div>
                   <p className="text-xs sm:text-sm font-medium text-slate-600">Рейтинг 4.8+</p>
                 </div>
                 <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
-                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-green-600 to-green-400 bg-clip-text text-transparent mb-2 flex items-center justify-center gap-2">
-                    <Icon name="Users" size={28} />
-                    Много
+                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-green-600 to-green-400 bg-clip-text text-transparent mb-2">
+                    <div className="flex items-center justify-center gap-2">
+                      <Icon name="Users" size={28} />
+                    </div>
+                    <div>Много авторов</div>
                   </div>
                   <p className="text-xs sm:text-sm font-medium text-slate-600">Активных авторов</p>
                 </div>
@@ -780,10 +755,7 @@ export default function Index() {
                     <Icon name="Check" size={16} className="text-green-600" />
                     <span>Публикуй свои работы</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Авто-модерация</span>
-                  </div>
+
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
                     <span>Статистика скачиваний</span>
@@ -854,7 +826,7 @@ export default function Index() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-sm text-slate-600 text-center">
-                      Более 500 готовых курсовых, дипломов и рефератов по разным дисциплинам
+                      Более 500 готовых курсовых, дипломов, диссертаций и рефератов по разным дисциплинам
                     </p>
                   </CardContent>
                 </Card>
@@ -916,7 +888,7 @@ export default function Index() {
                 Лучшие работы по рейтингу
               </h2>
               <p className="text-lg text-slate-600 max-w-2xl mx-auto mb-6">
-                Работы с высшими оценками от студентов и преподавателей
+                Лучшие работы по скачиваниям и отзывам пользователей
               </p>
             </div>
 
@@ -1563,10 +1535,6 @@ export default function Index() {
 
         <BlogSection />
 
-        <section id="support" className="py-16 bg-slate-50">
-          <SupportPage />
-        </section>
-
         <section id="faq" className="py-16 bg-white">
           <div className="container mx-auto px-4 max-w-3xl">
             <div className="text-center mb-12">
@@ -1586,7 +1554,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    При регистрации ты получаешь стартовый бонус 450 баллов. Загружай работы и получай баллы за каждую продажу, или купи баллы для доступа к материалам других студентов.
+                    При регистрации ты получаешь стартовый бонус 1000 баллов. Загружай работы и получай баллы за каждую продажу, или купи баллы для доступа к материалам других студентов.
                   </p>
                 </CardContent>
               </Card>
@@ -1674,7 +1642,7 @@ export default function Index() {
                       </li>
                       <li className="flex justify-between items-center">
                         <span>Отчёт, практика, реферат</span>
-                        <span className="font-bold text-primary">200 баллов</span>
+                        <span className="font-bold text-primary">300 баллов</span>
                       </li>
                     </ul>
                   </div>
@@ -1718,15 +1686,6 @@ export default function Index() {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-4">Платформа</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#catalog" className="hover:text-primary transition-colors">Каталог работ</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Загрузить работу</a></li>
-                  <li><a href="#" className="hover:text-primary transition-colors">Покупка баллов</a></li>
-                </ul>
-              </div>
-
-              <div>
                 <h4 className="font-semibold mb-4">Информация</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
                   <li><a href="#about" className="hover:text-primary transition-colors">О платформе</a></li>
@@ -1736,14 +1695,12 @@ export default function Index() {
               </div>
 
               <div>
-                <h4 className="font-semibold mb-4">Поддержка</h4>
+                <h4 className="font-semibold mb-4">Документы</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#support" className="hover:text-primary transition-colors">Связаться с нами</a></li>
                   <li><a href="/privacy-policy" className="hover:text-primary transition-colors">Политика конфиденциальности</a></li>
                   <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Пользовательское соглашение</a></li>
                   <li><a href="/offer" className="hover:text-primary transition-colors">Договор-оферта</a></li>
                   <li><a href="/requisites" className="hover:text-primary transition-colors">Реквизиты</a></li>
-                  <li><a href="/roskomnadzor-guide" className="hover:text-primary transition-colors">Регистрация в Роскомнадзоре</a></li>
                   <li><a href="/admin" className="hover:text-primary transition-colors">Админ-панель</a></li>
                 </ul>
               </div>

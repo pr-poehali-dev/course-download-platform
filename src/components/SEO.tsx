@@ -16,7 +16,8 @@ const DEFAULT_SEO = {
   description: 'Каталог курсовых, дипломов, чертежей. Маркетплейс для студентов. Покупай за баллы, продавай свои работы.',
   keywords: 'курсовые работы, дипломы, рефераты, студенческие работы купить, чертежи, маркетплейс работ',
   ogImage: 'https://cdn.poehali.dev/internal/img/og.png',
-  siteName: 'Tech Forma'
+  siteName: 'Tech Forma',
+  baseUrl: 'https://techforma.pro'
 };
 
 export default function SEO({ 
@@ -35,8 +36,7 @@ export default function SEO({
     const metaDescription = description || DEFAULT_SEO.description;
     const metaKeywords = keywords || DEFAULT_SEO.keywords;
     const metaImage = ogImage || DEFAULT_SEO.ogImage;
-    const currentUrl = `${window.location.origin}${location.pathname}`;
-    const canonicalUrl = canonical || currentUrl;
+    const canonicalUrl = canonical || `${DEFAULT_SEO.baseUrl}${location.pathname}`;
 
     document.title = fullTitle;
 
@@ -68,7 +68,7 @@ export default function SEO({
     setMetaTag('og:title', fullTitle, true);
     setMetaTag('og:description', metaDescription, true);
     setMetaTag('og:type', ogType, true);
-    setMetaTag('og:url', currentUrl, true);
+    setMetaTag('og:url', canonicalUrl, true);
     setMetaTag('og:image', metaImage, true);
     setMetaTag('og:site_name', DEFAULT_SEO.siteName, true);
     setMetaTag('og:locale', 'ru_RU', true);
@@ -90,11 +90,11 @@ export default function SEO({
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       'name': DEFAULT_SEO.siteName,
-      'url': window.location.origin,
+      'url': DEFAULT_SEO.baseUrl,
       'description': DEFAULT_SEO.description,
       'potentialAction': {
         '@type': 'SearchAction',
-        'target': `${window.location.origin}/catalog?search={search_term_string}`,
+        'target': `${DEFAULT_SEO.baseUrl}/catalog?search={search_term_string}`,
         'query-input': 'required name=search_term_string'
       }
     };

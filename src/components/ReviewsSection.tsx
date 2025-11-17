@@ -22,9 +22,10 @@ interface Review {
 interface ReviewsSectionProps {
   workId: string | undefined;
   isPurchased: boolean;
+  isAdmin?: boolean;
 }
 
-export default function ReviewsSection({ workId, isPurchased }: ReviewsSectionProps) {
+export default function ReviewsSection({ workId, isPurchased, isAdmin = false }: ReviewsSectionProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(5);
@@ -114,14 +115,14 @@ export default function ReviewsSection({ workId, isPurchased }: ReviewsSectionPr
       }
 
       toast({
-        title: 'Отзыв отправлен!',
-        description: 'Ваш отзыв будет опубликован после модерации',
+        title: 'Отзыв опубликован!',
+        description: 'Ваш отзыв успешно добавлен',
       });
 
       setComment('');
       setRating(5);
       setShowForm(false);
-      loadReviews();
+      await loadReviews();
     } catch (error: any) {
       toast({
         title: 'Ошибка',
@@ -130,6 +131,40 @@ export default function ReviewsSection({ workId, isPurchased }: ReviewsSectionPr
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async (reviewId: number) => {
+    if (!confirm('Удалить этот отзыв?')) return;
+
+    try {
+      const response = await fetch(`${func2url.reviews}?action=delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': String(currentUserId),
+        },
+        body: JSON.stringify({ review_id: reviewId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка удаления отзыва');
+      }
+
+      toast({
+        title: 'Отзыв удален',
+        description: 'Отзыв успешно удален',
+      });
+
+      await loadReviews();
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive',
+      });
     }
   };
 
@@ -241,19 +276,32 @@ export default function ReviewsSection({ workId, isPurchased }: ReviewsSectionPr
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-1">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Icon
-                        key={star}
-                        name="Star"
-                        size={16}
-                        className={`${
-                          star <= review.rating
-                            ? 'text-yellow-500 fill-yellow-500'
-                            : 'text-gray-300'
-                        }`}
-                      />
-                    ))}
+                  <div className="flex items-center gap-3">
+                    <div className="flex gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Icon
+                          key={star}
+                          name="Star"
+                          size={16}
+                          className={`${
+                            star <= review.rating
+                              ? 'text-yellow-500 fill-yellow-500'
+                              : 'text-gray-300'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDeleteReview(review.id)}
+                        title="Удалить отзыв"
+                      >
+                        <Icon name="Trash2" size={16} />
+                      </Button>
+                    )}
                   </div>
                 </div>
                 <p className="text-gray-700 whitespace-pre-wrap">{review.comment}</p>

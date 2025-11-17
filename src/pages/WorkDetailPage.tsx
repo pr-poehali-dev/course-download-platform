@@ -62,6 +62,7 @@ export default function WorkDetailPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedWork, setEditedWork] = useState<Partial<Work>>({});
   const [isPurchased, setIsPurchased] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
 
   useEffect(() => {
@@ -86,6 +87,7 @@ export default function WorkDetailPage() {
       // Проверяем, является ли пользователь админом
       if (user && user.role === 'admin') {
         setShowUploadButton(true);
+        setIsAdmin(true);
       }
     };
     checkAuth();
@@ -1420,23 +1422,11 @@ export default function WorkDetailPage() {
 
       {/* Секция отзывов - в самом конце */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="glass-card tech-border rounded-xl p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Отзывы о работе</h2>
-            <Badge variant="outline" className="text-sm">
-              {work?.reviewsCount || 0} отзывов
-            </Badge>
-          </div>
-          
-          <div className="text-center py-8 text-gray-500">
-            <Icon name="MessageSquare" size={48} className="mx-auto mb-3 text-gray-300" />
-            <p className="text-sm">Пока нет отзывов об этой работе</p>
-            <Button variant="outline" size="sm" className="mt-4">
-              <Icon name="Plus" size={16} className="mr-2" />
-              Оставить первый отзыв
-            </Button>
-          </div>
-        </div>
+        <ReviewsSection 
+          workId={actualWorkId} 
+          isPurchased={isPurchased}
+          isAdmin={isAdmin}
+        />
       </div>
 
       <Footer />

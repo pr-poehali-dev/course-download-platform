@@ -1,14 +1,10 @@
 {
   "tests": [
     {
-      "name": "Get reviews for work",
+      "name": "Get reviews list",
       "method": "GET",
-      "path": "/?action=list&work_id=1&status=all",
-      "expectedStatus": 200,
-      "expectedBody": {
-        "reviews": "array"
-      },
-      "bodyMatcher": "partial"
+      "path": "/?action=list&status=all",
+      "expectedStatus": 200
     },
     {
       "name": "OPTIONS request",

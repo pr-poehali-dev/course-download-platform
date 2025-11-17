@@ -20,10 +20,11 @@ interface Review {
 }
 
 export default function ReviewsModeration() {
-  const [pendingReviews, setPendingReviews] = useState<Review[]>([]);
+  const [allReviews, setAllReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -36,15 +37,16 @@ export default function ReviewsModeration() {
   }, []);
 
   useEffect(() => {
-    loadPendingReviews();
-  }, []);
+    loadReviews();
+  }, [filterStatus]);
 
-  const loadPendingReviews = async () => {
+  const loadReviews = async () => {
+    setLoading(true);
     try {
-      const response = await fetch(`${func2url.reviews}?action=list&status=pending`);
+      const response = await fetch(`${func2url.reviews}?action=list&status=${filterStatus}`);
       const data = await response.json();
       if (data.reviews) {
-        setPendingReviews(data.reviews);
+        setAllReviews(data.reviews);
       }
     } catch (error) {
       console.error('Failed to load reviews:', error);
@@ -94,7 +96,7 @@ export default function ReviewsModeration() {
         description: `Отзыв ${newStatus === 'approved' ? 'одобрен' : 'отклонён'}`,
       });
 
-      loadPendingReviews();
+      await loadReviews();
     } catch (error: any) {
       toast({
         title: 'Ошибка',
@@ -123,11 +125,13 @@ export default function ReviewsModeration() {
     setProcessing(true);
 
     try {
-      const response = await fetch(`${func2url.reviews}?action=delete&review_id=${reviewId}`, {
+      const response = await fetch(`${func2url.reviews}?action=delete`, {
         method: 'DELETE',
         headers: {
+          'Content-Type': 'application/json',
           'X-User-Id': String(currentUserId),
         },
+        body: JSON.stringify({ review_id: reviewId }),
       });
 
       const data = await response.json();
@@ -141,7 +145,7 @@ export default function ReviewsModeration() {
         description: 'Отзыв удалён',
       });
 
-      loadPendingReviews();
+      await loadReviews();
     } catch (error: any) {
       toast({
         title: 'Ошибка',
@@ -163,28 +167,53 @@ export default function ReviewsModeration() {
     );
   }
 
+  const pendingReviews = allReviews.filter(r => r.status === 'pending');
+  const approvedReviews = allReviews.filter(r => r.status === 'approved');
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold">Отзывы на модерации</h3>
+          <h3 className="text-lg font-semibold">Управление отзывами</h3>
           <p className="text-sm text-muted-foreground">
-            Проверьте и одобрите или отклоните отзывы пользователей
+            Просмотр и модерация отзывов пользователей
           </p>
         </div>
-        <Badge variant="secondary">{pendingReviews.length} отзывов</Badge>
+        <div className="flex gap-2">
+          <Button
+            variant={filterStatus === 'all' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilterStatus('all')}
+          >
+            Все ({allReviews.length})
+          </Button>
+          <Button
+            variant={filterStatus === 'pending' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilterStatus('pending')}
+          >
+            На модерации ({pendingReviews.length})
+          </Button>
+          <Button
+            variant={filterStatus === 'approved' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setFilterStatus('approved')}
+          >
+            Одобрены ({approvedReviews.length})
+          </Button>
+        </div>
       </div>
 
-      {pendingReviews.length === 0 ? (
+      {allReviews.length === 0 ? (
         <Card>
           <CardContent className="py-8 text-center">
-            <Icon name="CheckCircle2" size={48} className="mx-auto text-green-500 mb-4" />
-            <p className="text-gray-600">Нет отзывов на модерации</p>
+            <Icon name="MessageSquare" size={48} className="mx-auto text-gray-300 mb-4" />
+            <p className="text-gray-600">Нет отзывов</p>
           </CardContent>
         </Card>
       ) : (
         <div className="space-y-4">
-          {pendingReviews.map((review) => (
+          {allReviews.map((review) => (
             <Card key={review.id}>
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -205,10 +234,27 @@ export default function ReviewsModeration() {
                       </div>
                     </CardDescription>
                   </div>
-                  <Badge variant="secondary" className="flex items-center gap-1">
-                    <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
-                    {review.rating}/5
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    {review.status === 'pending' && (
+                      <Badge variant="outline" className="text-orange-600 border-orange-600">
+                        На модерации
+                      </Badge>
+                    )}
+                    {review.status === 'approved' && (
+                      <Badge variant="outline" className="text-green-600 border-green-600">
+                        Одобрен
+                      </Badge>
+                    )}
+                    {review.status === 'rejected' && (
+                      <Badge variant="outline" className="text-red-600 border-red-600">
+                        Отклонён
+                      </Badge>
+                    )}
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
+                      {review.rating}/5
+                    </Badge>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -217,27 +263,32 @@ export default function ReviewsModeration() {
                 </div>
                 
                 <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    variant="default"
-                    disabled={processing}
-                    onClick={() => handleModerate(review.id, 'approved')}
-                  >
-                    <Icon name="CheckCircle" size={16} className="mr-2" />
-                    Одобрить
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="destructive"
-                    disabled={processing}
-                    onClick={() => handleModerate(review.id, 'rejected')}
-                  >
-                    <Icon name="XCircle" size={16} className="mr-2" />
-                    Отклонить
-                  </Button>
+                  {review.status === 'pending' && (
+                    <>
+                      <Button 
+                        size="sm" 
+                        variant="default"
+                        disabled={processing}
+                        onClick={() => handleModerate(review.id, 'approved')}
+                      >
+                        <Icon name="CheckCircle" size={16} className="mr-2" />
+                        Одобрить
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="destructive"
+                        disabled={processing}
+                        onClick={() => handleModerate(review.id, 'rejected')}
+                      >
+                        <Icon name="XCircle" size={16} className="mr-2" />
+                        Отклонить
+                      </Button>
+                    </>
+                  )}
                   <Button 
                     size="sm" 
                     variant="ghost"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
                     disabled={processing}
                     onClick={() => handleDelete(review.id)}
                   >

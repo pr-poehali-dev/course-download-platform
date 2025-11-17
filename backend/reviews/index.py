@@ -176,7 +176,7 @@ def create_review(event: Dict[str, Any]) -> Dict[str, Any]:
             cur.execute(
                 """INSERT INTO t_p63326274_course_download_plat.reviews 
                 (work_id, user_id, rating, comment, status, created_at) 
-                VALUES (%s, %s, %s, %s, 'pending', NOW()) 
+                VALUES (%s, %s, %s, %s, 'approved', NOW()) 
                 RETURNING id""",
                 (work_id, user_id, rating, comment)
             )
@@ -194,7 +194,7 @@ def create_review(event: Dict[str, Any]) -> Dict[str, Any]:
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': True, 'review_id': review_id, 'message': 'Отзыв отправлен на модерацию'}),
+                'body': json.dumps({'success': True, 'review_id': review_id, 'message': 'Отзыв успешно опубликован'}),
                 'isBase64Encoded': False
             }
         except Exception as e:
@@ -306,8 +306,8 @@ def delete_review(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        params = event.get('queryStringParameters') or {}
-        review_id = params.get('review_id')
+        body = json.loads(event.get('body', '{}'))
+        review_id = body.get('review_id')
         
         if not review_id:
             return {

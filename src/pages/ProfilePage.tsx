@@ -400,6 +400,10 @@ export default function ProfilePage() {
                 <Icon name="ShoppingBag" size={16} className="mr-2" />
                 Покупки
               </TabsTrigger>
+              <TabsTrigger value="favorites" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-rose-500 data-[state=active]:text-white">
+                <Icon name="Heart" size={16} className="mr-2" />
+                Избранное
+              </TabsTrigger>
               <TabsTrigger value="uploads" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-500 data-[state=active]:text-white">
                 <Icon name="FileUp" size={16} className="mr-2" />
                 Мои работы
@@ -620,6 +624,33 @@ export default function ProfilePage() {
                       ))}
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="favorites" className="space-y-4">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Heart" size={20} className="text-pink-500" />
+                    Избранное
+                  </CardTitle>
+                  <CardDescription>Работы, которые вы добавили в избранное</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-12">
+                    <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Icon name="Heart" size={40} className="text-pink-500" />
+                    </div>
+                    <h3 className="text-xl font-semibold mb-2">Избранное пусто</h3>
+                    <p className="text-muted-foreground mb-6">Добавляйте понравившиеся работы в избранное для быстрого доступа</p>
+                    <Button asChild>
+                      <Link to="/catalog">
+                        <Icon name="Search" size={18} className="mr-2" />
+                        Перейти в каталог
+                      </Link>
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

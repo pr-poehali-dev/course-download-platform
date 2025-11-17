@@ -172,7 +172,7 @@ export default function ProfilePage() {
           worksUploaded: 0,
           worksPurchased: 0,
           rating: 0,
-          registrationDate: new Date().toISOString().split('T')[0]
+          registrationDate: userData.created_at || new Date().toISOString().split('T')[0]
         });
         setAvatarPreview(userData.avatar_url || null);
         
@@ -215,6 +215,38 @@ export default function ProfilePage() {
       url.searchParams.delete('payment');
       window.history.replaceState({}, '', url.toString());
     }
+  }, []);
+
+  useEffect(() => {
+    const refreshUserData = async () => {
+      const userData = await authService.verify();
+      if (userData) {
+        setUser(prev => ({
+          ...prev,
+          balance: userData.balance
+        }));
+        
+        try {
+          const userDataResponse = await fetch(`${func2url['user-data']}?user_id=${userData.id}&action=all`);
+          const userDataJson = await userDataResponse.json();
+          
+          if (userDataJson.purchases) {
+            setPurchases(userDataJson.purchases.map((p: any) => ({
+              id: p.id,
+              workTitle: p.title || 'Работа',
+              price: p.price_paid || 0,
+              date: p.purchased_at || new Date().toISOString(),
+              downloadUrl: ''
+            })));
+          }
+        } catch (error) {
+          console.error('Failed to refresh user data:', error);
+        }
+      }
+    };
+
+    const interval = setInterval(refreshUserData, 10000);
+    return () => clearInterval(interval);
   }, []);
 
   const [purchases, setPurchases] = useState<Purchase[]>([]);
@@ -810,37 +842,6 @@ export default function ProfilePage() {
                     <p className="text-xs text-muted-foreground">Email нельзя изменить</p>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label>Фото профиля</Label>
-                    <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center overflow-hidden">
-                        {avatarPreview ? (
-                          <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
-                        ) : (
-                          <Icon name="User" size={40} className="text-white" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <input
-                          type="file"
-                          id="avatar-upload"
-                          accept="image/*"
-                          onChange={handleAvatarChange}
-                          className="hidden"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => document.getElementById('avatar-upload')?.click()}
-                        >
-                          <Icon name="Upload" size={14} className="mr-1" />
-                          Выбрать фото
-                        </Button>
-                        <p className="text-xs text-muted-foreground mt-1">JPG, PNG до 5 МБ</p>
-                      </div>
-                    </div>
-                  </div>
-
                   {editMode ? (
                     <div className="flex gap-2">
                       <Button onClick={handleSaveProfile}>
@@ -857,22 +858,6 @@ export default function ProfilePage() {
                       Редактировать профиль
                     </Button>
                   )}
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg border-red-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-red-600">
-                    <Icon name="AlertTriangle" size={20} />
-                    Опасная зона
-                  </CardTitle>
-                  <CardDescription>Необратимые действия с аккаунтом</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button variant="destructive" className="w-full">
-                    <Icon name="Trash2" size={16} className="mr-2" />
-                    Удалить аккаунт
-                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>

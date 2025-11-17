@@ -14,6 +14,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { Helmet } from 'react-helmet-async';
 
 interface Work {
   id: string;
@@ -346,6 +347,39 @@ export default function CatalogPage() {
 
   const subjects = Array.from(new Set(works.map(w => w.subject)));
 
+  const jsonLdSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    'name': 'Каталог студенческих работ',
+    'description': 'Готовые курсовые, дипломы, рефераты, чертежи от 200₽',
+    'numberOfItems': filteredWorks.length,
+    'itemListElement': filteredWorks.slice(0, 20).map((work, index) => ({
+      '@type': 'ListItem',
+      'position': index + 1,
+      'item': {
+        '@type': 'Product',
+        'name': work.title,
+        'description': work.description,
+        'category': work.workType,
+        'offers': {
+          '@type': 'Offer',
+          'price': work.price,
+          'priceCurrency': 'RUB',
+          'availability': 'https://schema.org/InStock',
+          'seller': {
+            '@type': 'Organization',
+            'name': 'Tech Forma'
+          }
+        },
+        'aggregateRating': work.rating > 0 ? {
+          '@type': 'AggregateRating',
+          'ratingValue': work.rating,
+          'ratingCount': work.purchaseCount || 1
+        } : undefined
+      }
+    }))
+  };
+
   return (
     <>
       <SEO 
@@ -353,6 +387,11 @@ export default function CatalogPage() {
         description="Каталог студенческих работ: курсовые, дипломы, рефераты, чертежи. Купить готовые работы за баллы по выгодным ценам"
         keywords="курсовые работы, дипломы, рефераты, чертежи, купить студенческие работы, каталог работ, готовые работы"
       />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(jsonLdSchema)}
+        </script>
+      </Helmet>
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <Navigation isLoggedIn={isLoggedIn} />
       

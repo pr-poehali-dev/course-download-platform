@@ -27,6 +27,7 @@ import BlogSection from '@/components/BlogSection';
 import AboutSection from '@/components/AboutSection';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import BestSellers from '@/components/BestSellers';
+import FAQSection from '@/components/FAQSection';
 
 import AgeBadge from '@/components/AgeBadge';
 import CookieBanner from '@/components/CookieBanner';
@@ -1671,6 +1672,8 @@ export default function Index() {
             </div>
           </div>
         </section>
+
+        <FAQSection />
 
         <footer className="bg-muted/50 py-8 border-t">
           <div className="container mx-auto px-4">

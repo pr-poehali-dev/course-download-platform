@@ -1,15 +1,62 @@
+# robots.txt для TechForma
+# Оптимизировано для поисковых систем
+
 User-agent: *
 Allow: /
+Allow: /catalog
+Allow: /blog
+Allow: /marketplace
+Allow: /bot-subscription
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.png$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.webp$
+
+# Блокируем приватные страницы
 Disallow: /admin
 Disallow: /profile
 Disallow: /login
 Disallow: /register
 Disallow: /forgot-password
 Disallow: /reset-password
+
+# Блокируем служебные страницы
 Disallow: /upload
 Disallow: /sync-previews
 Disallow: /full-sync
 Disallow: /batch-upload
 Disallow: /extract-previews
 
+# Специальные правила для Яндекса
+User-agent: Yandex
+Allow: /
+Crawl-delay: 0.5
+Clean-param: utm_source&utm_medium&utm_campaign
+
+# Специальные правила для Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0.3
+
+# Блокируем плохих ботов
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+# Карта сайта
 Sitemap: https://techforma.pro/sitemap.xml
+
+# Хост для Яндекса
+Host: techforma.pro

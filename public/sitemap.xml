@@ -1,69 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  
+  <!-- Главная страница -->
   <url>
     <loc>https://techforma.pro/</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+  
+  <!-- Каталог работ -->
   <url>
     <loc>https://techforma.pro/catalog</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
   </url>
+  
+  <!-- Блог -->
+  <url>
+    <loc>https://techforma.pro/blog</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  
+  <!-- Подписка на бота -->
   <url>
     <loc>https://techforma.pro/bot-subscription</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  
+  <!-- Маркетплейс -->
   <url>
     <loc>https://techforma.pro/marketplace</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  
+  <!-- Покупка баллов -->
   <url>
     <loc>https://techforma.pro/buy-points</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+  
+  <!-- Регистрация -->
+  <url>
+    <loc>https://techforma.pro/register</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Вход -->
+  <url>
+    <loc>https://techforma.pro/login</loc>
+    <lastmod>2025-01-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Оферта -->
   <url>
     <loc>https://techforma.pro/offer</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  
+  <!-- Политика конфиденциальности -->
   <url>
     <loc>https://techforma.pro/privacy-policy</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  
+  <!-- Условия использования -->
   <url>
     <loc>https://techforma.pro/terms-of-service</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
+  
+  <!-- Правила использования -->
   <url>
     <loc>https://techforma.pro/usage-rules</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
+  
+  <!-- Реквизиты -->
   <url>
     <loc>https://techforma.pro/requisites</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  
+  <!-- Гайд по Роскомнадзору -->
   <url>
     <loc>https://techforma.pro/roskomnadzor-guide</loc>
-    <lastmod>2025-11-05</lastmod>
+    <lastmod>2025-01-18</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  
 </urlset>

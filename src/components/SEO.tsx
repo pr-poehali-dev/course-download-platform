@@ -86,7 +86,40 @@ export default function SEO({
     }
     linkCanonical.href = canonicalUrl;
 
-    const jsonLd = {
+    const isHomePage = location.pathname === '/';
+    
+    const jsonLd = isHomePage ? {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      'name': DEFAULT_SEO.siteName,
+      'alternateName': 'TechForma',
+      'url': DEFAULT_SEO.baseUrl,
+      'description': DEFAULT_SEO.description,
+      'publisher': {
+        '@type': 'Organization',
+        'name': DEFAULT_SEO.siteName,
+        'url': DEFAULT_SEO.baseUrl,
+        'logo': {
+          '@type': 'ImageObject',
+          'url': 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg'
+        }
+      },
+      'potentialAction': {
+        '@type': 'SearchAction',
+        'target': {
+          '@type': 'EntryPoint',
+          'urlTemplate': `${DEFAULT_SEO.baseUrl}/catalog?search={search_term_string}`
+        },
+        'query-input': 'required name=search_term_string'
+      },
+      'offers': {
+        '@type': 'AggregateOffer',
+        'priceCurrency': 'RUB',
+        'lowPrice': '200',
+        'highPrice': '3000',
+        'offerCount': '500+'
+      }
+    } : {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
       'name': DEFAULT_SEO.siteName,

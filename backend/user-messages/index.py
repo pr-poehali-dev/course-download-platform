@@ -92,8 +92,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         cur.execute("""
-            UPDATE t_p63326274_course_download_plat.user_messages
-            SET is_read = TRUE
+            DELETE FROM t_p63326274_course_download_plat.user_messages
             WHERE id = %s AND user_id = %s
         """, (message_id, user_id))
         

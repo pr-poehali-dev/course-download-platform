@@ -14,6 +14,8 @@ interface ProfileTabProps {
   onEditModeChange: (mode: boolean) => void;
   onSaveProfile: () => void;
   onLogout: () => void;
+  onTopUpBalance?: () => void;
+  onContactSupport?: () => void;
 }
 
 export default function ProfileTab({
@@ -25,7 +27,9 @@ export default function ProfileTab({
   onEditDataChange,
   onEditModeChange,
   onSaveProfile,
-  onLogout
+  onLogout,
+  onTopUpBalance,
+  onContactSupport
 }: ProfileTabProps) {
   return (
     <div className="space-y-6 pt-4">
@@ -45,7 +49,7 @@ export default function ProfileTab({
                 <p className="text-sm text-muted-foreground">баллов</p>
               </div>
             </div>
-            <Button>
+            <Button onClick={onTopUpBalance}>
               <Icon name="Plus" size={16} className="mr-2" />
               Пополнить
             </Button>
@@ -104,6 +108,22 @@ export default function ProfileTab({
               </div>
             </>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Быстрые действия</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button onClick={onTopUpBalance} variant="outline" className="w-full justify-start">
+            <Icon name="Wallet" size={16} className="mr-2" />
+            Пополнить баланс
+          </Button>
+          <Button onClick={onContactSupport} variant="outline" className="w-full justify-start">
+            <Icon name="MessageSquare" size={16} className="mr-2" />
+            Связаться с поддержкой
+          </Button>
         </CardContent>
       </Card>
 

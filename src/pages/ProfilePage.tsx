@@ -299,7 +299,7 @@ export default function ProfilePage() {
         body: JSON.stringify({ user_id: userData.id, message_id: messageId })
       });
       
-      setMessages(messages.map(m => m.id === messageId ? { ...m, is_read: true } : m));
+      setMessages(messages.filter(m => m.id !== messageId));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Failed to mark message as read:', error);

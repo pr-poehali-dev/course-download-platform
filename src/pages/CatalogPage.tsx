@@ -61,6 +61,7 @@ export default function CatalogPage() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userId, setUserId] = useState<number | null>(null);
   const [quickViewWork, setQuickViewWork] = useState<Work | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
@@ -70,9 +71,57 @@ export default function CatalogPage() {
       const user = await authService.verify();
       setIsLoggedIn(!!user);
       setIsAdmin(user?.role === 'admin');
+      if (user) {
+        setUserId(user.id);
+        loadFavorites(user.id);
+      }
     };
     checkAuth();
   }, []);
+
+  const loadFavorites = async (userId: number) => {
+    try {
+      const response = await fetch(`${func2url['user-data']}?user_id=${userId}&action=favorites`);
+      const data = await response.json();
+      if (data.favorites) {
+        const favoriteIds = new Set(data.favorites.map((f: any) => String(f.work_id || f.id)));
+        setFavorites(favoriteIds);
+      }
+    } catch (error) {
+      console.error('Failed to load favorites:', error);
+    }
+  };
+
+  const toggleFavorite = async (workId: string) => {
+    if (!userId) {
+      alert('Войдите в систему для добавления в избранное');
+      return;
+    }
+
+    try {
+      const response = await fetch(func2url['toggle-favorite'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: userId, work_id: parseInt(workId) })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setFavorites(prev => {
+          const newFavorites = new Set(prev);
+          if (data.action === 'added') {
+            newFavorites.add(workId);
+          } else {
+            newFavorites.delete(workId);
+          }
+          return newFavorites;
+        });
+      }
+    } catch (error) {
+      console.error('Failed to toggle favorite:', error);
+    }
+  };
 
   const normalizeWorkType = (workType: string, title: string = ''): string => {
     const wt = workType.toLowerCase().trim();
@@ -480,6 +529,23 @@ export default function CatalogPage() {
                         </div>
                       </div>
                     )}
+                    
+                    <div className="absolute top-3 left-3 z-10 pointer-events-auto">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleFavorite(work.id);
+                        }}
+                        className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white transition-all hover:scale-110"
+                      >
+                        <Icon
+                          name="Heart"
+                          size={18}
+                          className={favorites.has(work.id) ? 'text-red-500 fill-red-500' : 'text-gray-600'}
+                        />
+                      </button>
+                    </div>
                     
                     <div className="absolute top-3 right-3 flex flex-col items-end gap-2 pointer-events-none">
                       {work.discount && (

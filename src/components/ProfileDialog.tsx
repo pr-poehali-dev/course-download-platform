@@ -38,6 +38,7 @@ export default function ProfileDialog({
 }: ProfileDialogProps) {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState({ username, email });
+  const [activeTab, setActiveTab] = useState('profile');
   const [uploadForm, setUploadForm] = useState({
     title: '',
     workType: '',
@@ -206,7 +207,7 @@ export default function ProfileDialog({
           </DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="profile" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="profile">
               <Icon name="UserCircle" size={16} className="mr-2" />
@@ -245,6 +246,11 @@ export default function ProfileDialog({
               onEditModeChange={setEditMode}
               onSaveProfile={handleSaveProfile}
               onLogout={handleLogout}
+              onTopUpBalance={() => {
+                onOpenChange(false);
+                window.location.href = '/profile?tab=balance';
+              }}
+              onContactSupport={() => setActiveTab('support')}
             />
           </TabsContent>
 

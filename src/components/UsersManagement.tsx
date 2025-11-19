@@ -323,29 +323,56 @@ export default function UsersManagement() {
                             </div>
                             
                             <div className="space-y-2">
-                              <Label>Корректировка баланса</Label>
+                              <Label>Начислить баллы</Label>
+                              <Input
+                                type="number"
+                                placeholder="Введите сумму..."
+                                id={`balance-input-${user.id}`}
+                              />
                               <div className="flex gap-2">
                                 <Button 
-                                  variant="outline" 
+                                  variant="default" 
                                   className="flex-1"
                                   onClick={() => {
-                                    handleBalanceAdjustment(user.id, 100);
-                                    setSelectedUser(null);
+                                    const input = document.getElementById(`balance-input-${user.id}`) as HTMLInputElement;
+                                    const amount = parseInt(input?.value || '0');
+                                    if (amount > 0) {
+                                      handleBalanceAdjustment(user.id, amount);
+                                      input.value = '';
+                                      setSelectedUser(null);
+                                    } else {
+                                      toast({
+                                        title: 'Ошибка',
+                                        description: 'Введите положительное число',
+                                        variant: 'destructive'
+                                      });
+                                    }
                                   }}
                                 >
                                   <Icon name="Plus" size={16} className="mr-2" />
-                                  +100
+                                  Начислить
                                 </Button>
                                 <Button 
                                   variant="outline" 
                                   className="flex-1"
                                   onClick={() => {
-                                    handleBalanceAdjustment(user.id, -100);
-                                    setSelectedUser(null);
+                                    const input = document.getElementById(`balance-input-${user.id}`) as HTMLInputElement;
+                                    const amount = parseInt(input?.value || '0');
+                                    if (amount > 0) {
+                                      handleBalanceAdjustment(user.id, -amount);
+                                      input.value = '';
+                                      setSelectedUser(null);
+                                    } else {
+                                      toast({
+                                        title: 'Ошибка',
+                                        description: 'Введите положительное число',
+                                        variant: 'destructive'
+                                      });
+                                    }
                                   }}
                                 >
                                   <Icon name="Minus" size={16} className="mr-2" />
-                                  -100
+                                  Списать
                                 </Button>
                               </div>
                             </div>

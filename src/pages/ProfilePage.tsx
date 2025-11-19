@@ -204,6 +204,25 @@ export default function ProfilePage() {
             downloadUrl: ''
           })));
         }
+        
+        const favoritesResponse = await fetch(`${func2url['user-data']}?user_id=${userData.id}&action=favorites`);
+        const favoritesData = await favoritesResponse.json();
+        if (favoritesData.favorites) {
+          setFavoriteWorks(favoritesData.favorites);
+        }
+        
+        const worksResponse = await fetch(`${func2url.works}?author_id=${userData.id}`);
+        const worksData = await worksResponse.json();
+        if (worksData.works) {
+          setUploads(worksData.works.map((w: any) => ({
+            id: w.id,
+            title: w.title,
+            price: w.price_points || w.price || 0,
+            downloads: w.downloads || 0,
+            status: w.status === 'approved' ? 'active' : w.status === 'pending' ? 'moderation' : 'rejected',
+            uploadDate: w.created_at || new Date().toISOString()
+          })));
+        }
       } catch (error) {
         console.error('Failed to load user data:', error);
       }
@@ -262,6 +281,7 @@ export default function ProfilePage() {
   const [transactions] = useState<Transaction[]>([]);
   const [messages, setMessages] = useState<UserMessage[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [favoriteWorks, setFavoriteWorks] = useState<any[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState(user.name);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -601,6 +621,18 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="purchases" className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div className="flex items-start gap-3">
+                  <Icon name="Info" size={20} className="text-blue-600 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-blue-900">Доступ к файлам 7 дней</p>
+                    <p className="text-sm text-blue-700 mt-1">
+                      После покупки работы вы можете скачивать файл в течение 7 дней. Не забудьте сохранить работу на своё устройство.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -626,42 +658,69 @@ export default function ProfilePage() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {purchases.map((purchase) => (
-                        <div key={purchase.id} className="border rounded-lg p-4 hover:border-primary transition-colors bg-gradient-to-r from-white to-orange-50">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <h3 className="font-semibold mb-2">{purchase.workTitle}</h3>
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                  <Icon name="Calendar" size={14} />
-                                  {new Date(purchase.date).toLocaleDateString('ru-RU')}
-                                </span>
-                                <span className="flex items-center gap-1">
-                                  <Icon name="Coins" size={14} />
-                                  {purchase.price} баллов
-                                </span>
+                      {purchases.map((purchase) => {
+                        const purchaseDate = new Date(purchase.date);
+                        const expiryDate = new Date(purchaseDate);
+                        expiryDate.setDate(expiryDate.getDate() + 7);
+                        const daysLeft = Math.max(0, Math.ceil((expiryDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+                        const isExpired = daysLeft === 0;
+                        
+                        return (
+                          <div key={purchase.id} className="border rounded-lg p-4 hover:border-primary transition-colors bg-gradient-to-r from-white to-orange-50">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <h3 className="font-semibold mb-2">{purchase.workTitle}</h3>
+                                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                                  <span className="flex items-center gap-1">
+                                    <Icon name="Calendar" size={14} />
+                                    {new Date(purchase.date).toLocaleDateString('ru-RU')}
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <Icon name="Coins" size={14} />
+                                    {purchase.price} баллов
+                                  </span>
+                                </div>
+                                {!isExpired ? (
+                                  <div className="flex items-center gap-1 text-xs">
+                                    <Icon name="Clock" size={12} className={daysLeft <= 2 ? "text-red-500" : "text-green-600"} />
+                                    <span className={daysLeft <= 2 ? "text-red-600 font-medium" : "text-green-700"}>
+                                      Доступ: {daysLeft} {daysLeft === 1 ? 'день' : daysLeft < 5 ? 'дня' : 'дней'}
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1 text-xs text-red-600">
+                                    <Icon name="AlertCircle" size={12} />
+                                    <span className="font-medium">Доступ истёк</span>
+                                  </div>
+                                )}
                               </div>
+                              <Button
+                                size="sm"
+                                onClick={() => handleDownloadPurchase(purchase.id, purchase.workTitle)}
+                                disabled={downloadingId === purchase.id || isExpired}
+                                variant={isExpired ? "outline" : "default"}
+                              >
+                                {downloadingId === purchase.id ? (
+                                  <>
+                                    <Icon name="Loader2" size={14} className="mr-1 animate-spin" />
+                                    Загрузка...
+                                  </>
+                                ) : isExpired ? (
+                                  <>
+                                    <Icon name="Lock" size={14} className="mr-1" />
+                                    Недоступно
+                                  </>
+                                ) : (
+                                  <>
+                                    <Icon name="Download" size={14} className="mr-1" />
+                                    Скачать
+                                  </>
+                                )}
+                              </Button>
                             </div>
-                            <Button
-                              size="sm"
-                              onClick={() => handleDownloadPurchase(purchase.id, purchase.workTitle)}
-                              disabled={downloadingId === purchase.id}
-                            >
-                              {downloadingId === purchase.id ? (
-                                <>
-                                  <Icon name="Loader2" size={14} className="mr-1 animate-spin" />
-                                  Загрузка...
-                                </>
-                              ) : (
-                                <>
-                                  <Icon name="Download" size={14} className="mr-1" />
-                                  Скачать
-                                </>
-                              )}
-                            </Button>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </CardContent>
@@ -678,19 +737,43 @@ export default function ProfilePage() {
                   <CardDescription>Работы, которые вы добавили в избранное</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12">
-                    <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Icon name="Heart" size={40} className="text-pink-500" />
+                  {favoriteWorks.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="w-20 h-20 bg-pink-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon name="Heart" size={40} className="text-pink-500" />
+                      </div>
+                      <h3 className="text-xl font-semibold mb-2">Избранное пусто</h3>
+                      <p className="text-muted-foreground mb-6">Добавляйте понравившиеся работы в избранное для быстрого доступа</p>
+                      <Button asChild>
+                        <Link to="/catalog">
+                          <Icon name="Search" size={18} className="mr-2" />
+                          Перейти в каталог
+                        </Link>
+                      </Button>
                     </div>
-                    <h3 className="text-xl font-semibold mb-2">Избранное пусто</h3>
-                    <p className="text-muted-foreground mb-6">Добавляйте понравившиеся работы в избранное для быстрого доступа</p>
-                    <Button asChild>
-                      <Link to="/catalog">
-                        <Icon name="Search" size={18} className="mr-2" />
-                        Перейти в каталог
-                      </Link>
-                    </Button>
-                  </div>
+                  ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {favoriteWorks.map((work) => (
+                        <Link
+                          key={work.work_id || work.id}
+                          to={`/work/${work.work_id || work.id}`}
+                          className="border rounded-lg p-4 hover:border-pink-500 transition-colors bg-gradient-to-r from-white to-pink-50"
+                        >
+                          <h3 className="font-semibold mb-2">{work.work_title || work.title}</h3>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Icon name="Coins" size={14} />
+                              {work.price_points || work.price || 0} баллов
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Icon name="Heart" size={14} className="text-pink-500 fill-pink-500" />
+                              В избранном
+                            </span>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -822,6 +905,36 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="settings" className="space-y-4">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="User" size={20} className="text-gray-600" />
+                    Фото профиля
+                  </CardTitle>
+                  <CardDescription>Загрузите аватар</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden">
+                      {avatarPreview ? (
+                        <img src={avatarPreview} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <Icon name="User" size={40} className="text-white" />
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleAvatarChange}
+                        className="max-w-xs"
+                      />
+                      <p className="text-xs text-muted-foreground">JPG, PNG или GIF (макс. 5 МБ)</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">

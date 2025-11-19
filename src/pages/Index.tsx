@@ -876,8 +876,6 @@ export default function Index() {
 
         <RecentlyViewed />
 
-        <BestSellers />
-
         <section className="py-20 bg-slate-50">
           <div className="container mx-auto px-4">
             <Tabs defaultValue="catalog" className="w-full">

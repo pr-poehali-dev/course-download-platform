@@ -119,6 +119,13 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
         description: 'Ваш отзыв успешно добавлен',
       });
 
+      // Отслеживаем добавление отзыва
+      fetch(func2url.works, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workId: workId, activityType: 'review' })
+      }).catch(err => console.error('Failed to track review:', err));
+
       setComment('');
       setRating(5);
       setShowForm(false);

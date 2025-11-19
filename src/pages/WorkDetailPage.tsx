@@ -14,6 +14,7 @@ import SEO from '@/components/SEO';
 import { recentlyViewedStorage } from '@/utils/recentlyViewed';
 import { getFakeAuthor, incrementViewCount, getViewCount } from '@/utils/fakeAuthors';
 import ReviewsSection from '@/components/ReviewsSection';
+import WorkActivityTracker from '@/components/WorkActivityTracker';
 
 
 interface Work {
@@ -558,9 +559,23 @@ export default function WorkDetailPage() {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        
+        // Отслеживаем скачивание
+        fetch(func2url.works, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ workId: actualWorkId, activityType: 'download' })
+        }).catch(err => console.error('Failed to track download:', err));
       } catch (fetchError) {
         // Если fetch не сработал, открываем в новой вкладке
         window.location.href = downloadData.download_url;
+        
+        // Отслеживаем скачивание
+        fetch(func2url.works, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ workId: actualWorkId, activityType: 'download' })
+        }).catch(err => console.error('Failed to track download:', err));
       }
       
       // Обновляем баланс пользователя в localStorage (если не админ)
@@ -862,20 +877,14 @@ export default function WorkDetailPage() {
 
             {/* Статистика работы */}
             <div className="glass-card tech-border rounded-xl p-4 mb-6">
-              <div className="flex items-center justify-between gap-4 flex-wrap">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Icon name="Eye" size={18} className="text-blue-600" />
-                  <span className="text-sm font-medium">{getViewCount(work.id)} просмотров</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Icon name="Download" size={18} className="text-green-600" />
-                  <span className="text-sm font-medium">{work.downloadsCount || 0} скачиваний</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Icon name="MessageSquare" size={18} className="text-purple-600" />
-                  <span className="text-sm font-medium">{work.reviewsCount || 0} отзывов</span>
-                </div>
-              </div>
+              <WorkActivityTracker 
+                workId={parseInt(work.id)} 
+                initialViews={work.viewsCount || 0}
+                initialDownloads={work.downloadsCount || 0}
+                initialReviews={work.reviewsCount || 0}
+                onView={true}
+                showLabels={true}
+              />
             </div>
 
             <div className="space-y-3 md:space-y-4 mb-6 md:mb-8">

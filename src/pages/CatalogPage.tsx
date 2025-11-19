@@ -15,6 +15,7 @@ import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
+import WorkActivityTracker from '@/components/WorkActivityTracker';
 
 interface Work {
   id: string;
@@ -37,6 +38,9 @@ interface Work {
   pageCount?: number;
   fileCount?: number;
   authorId?: number | null;
+  views?: number;
+  downloads?: number;
+  reviewsCount?: number;
 }
 
 interface Category {
@@ -538,6 +542,14 @@ export default function CatalogPage() {
                         <Icon name="Tag" size={14} className="text-purple-600" />
                         <span className="font-medium">{work.subject}</span>
                       </div>
+
+                      <WorkActivityTracker 
+                        workId={parseInt(work.id)} 
+                        initialViews={0}
+                        initialDownloads={0}
+                        initialReviews={0}
+                        showLabels={false}
+                      />
                     </div>
 
                     <div className="flex items-center justify-between pt-3 border-t">

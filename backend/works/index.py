@@ -578,6 +578,68 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.close()
             conn.close()
     
+    if method == 'PUT':
+        body_data = json.loads(event.get('body', '{}'))
+        work_id = body_data.get('workId')
+        activity_type = body_data.get('activityType')
+        
+        if not work_id or not activity_type:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'workId and activityType required'})
+            }
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            if activity_type == 'view':
+                cur.execute(
+                    "UPDATE t_p63326274_course_download_plat.works SET views = COALESCE(views, 0) + 1 WHERE id = %s",
+                    (work_id,)
+                )
+            elif activity_type == 'download':
+                cur.execute(
+                    "UPDATE t_p63326274_course_download_plat.works SET downloads = COALESCE(downloads, 0) + 1 WHERE id = %s",
+                    (work_id,)
+                )
+            elif activity_type == 'review':
+                cur.execute(
+                    "UPDATE t_p63326274_course_download_plat.works SET reviews_count = COALESCE(reviews_count, 0) + 1 WHERE id = %s",
+                    (work_id,)
+                )
+            
+            cur.execute(
+                "SELECT views, downloads, reviews_count FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                (work_id,)
+            )
+            stats = cur.fetchone()
+            
+            conn.commit()
+            
+            if not stats:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Work not found'})
+                }
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'success': True,
+                    'workId': work_id,
+                    'views': stats[0] if stats[0] else 0,
+                    'downloads': stats[1] if stats[1] else 0,
+                    'reviewsCount': stats[2] if stats[2] else 0
+                })
+            }
+        finally:
+            cur.close()
+            conn.close()
+    
     return {
         'statusCode': 405,
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

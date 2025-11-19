@@ -74,15 +74,6 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
       return;
     }
 
-    if (!isPurchased) {
-      toast({
-        title: 'Ошибка',
-        description: 'Купите работу чтобы оставить отзыв',
-        variant: 'destructive',
-      });
-      return;
-    }
-
     if (comment.trim().length < 10) {
       toast({
         title: 'Ошибка',
@@ -183,7 +174,7 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
         <h2 className="text-2xl font-bold text-gray-900">
           Отзывы ({reviews.length})
         </h2>
-        {isPurchased && currentUserId && !userHasReviewed && !showForm && (
+        {currentUserId && !userHasReviewed && !showForm && (
           <Button onClick={() => setShowForm(true)}>
             <Icon name="MessageSquare" size={18} className="mr-2" />
             Оставить отзыв
@@ -261,7 +252,7 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
           <CardContent className="py-8 text-center">
             <Icon name="MessageSquare" size={48} className="mx-auto text-gray-300 mb-4" />
             <p className="text-gray-600">Пока нет отзывов на эту работу</p>
-            {isPurchased && currentUserId && (
+            {currentUserId && (
               <p className="text-sm text-gray-500 mt-2">Будьте первым!</p>
             )}
           </CardContent>

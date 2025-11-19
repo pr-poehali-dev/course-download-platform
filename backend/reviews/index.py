@@ -191,6 +191,29 @@ def create_review(event: Dict[str, Any]) -> Dict[str, Any]:
             )
             conn.commit()
             
+            # Получаем информацию о работе и пользователе для уведомления
+            cur.execute(
+                """SELECT w.title, u.username 
+                FROM t_p63326274_course_download_plat.works w, t_p63326274_course_download_plat.users u
+                WHERE w.id = %s AND u.id = %s""",
+                (work_id, user_id)
+            )
+            work_info = cur.fetchone()
+            work_title = work_info[0] if work_info else 'Работа'
+            username = work_info[1] if work_info else 'Пользователь'
+            
+            # Отправляем уведомление админу (user_id = 1)
+            cur.execute(
+                """INSERT INTO t_p63326274_course_download_plat.user_messages 
+                (user_id, title, message, type, is_read, created_at)
+                VALUES (1, %s, %s, 'info', FALSE, NOW())""",
+                (
+                    f'Новый отзыв на работу "{work_title}"',
+                    f'Пользователь {username} оставил отзыв ({rating} звезд) на работу "{work_title}": {comment[:100]}...'
+                )
+            )
+            conn.commit()
+            
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

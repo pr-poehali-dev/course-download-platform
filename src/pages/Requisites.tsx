@@ -55,6 +55,40 @@ export default function Requisites() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                <Icon name="Building2" size={20} className="text-primary" />
+                Реквизиты
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="grid gap-3">
+                <div className="flex items-start gap-2">
+                  <Icon name="User" size={16} className="mt-1 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Владелец:</p>
+                    <p className="text-sm text-muted-foreground">ИП Гагарская Е.А.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Icon name="Hash" size={16} className="mt-1 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">ИНН:</p>
+                    <p className="text-sm text-muted-foreground">290540407146</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Icon name="MapPin" size={16} className="mt-1 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Адрес:</p>
+                    <p className="text-sm text-muted-foreground">г. Санкт-Петербург</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
                 <Icon name="Info" size={20} className="text-primary" />
                 О платформе
               </CardTitle>

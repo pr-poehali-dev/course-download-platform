@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
@@ -63,6 +63,7 @@ interface UserMessage {
 }
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<UserProfile>({
     name: '',
     email: '',
@@ -75,6 +76,7 @@ export default function ProfilePage() {
     registrationDate: ''
   });
   const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
   const DOWNLOAD_WORK_URL = func2url['download-work'];
@@ -162,42 +164,48 @@ export default function ProfilePage() {
   useEffect(() => {
     const loadUserData = async () => {
       const userData = await authService.verify();
-      if (userData) {
-        setUser({
-          name: userData.username,
-          email: userData.email,
-          balance: userData.balance,
-          totalEarned: 0,
-          totalSpent: 0,
-          worksUploaded: 0,
-          worksPurchased: 0,
-          rating: 0,
-          registrationDate: userData.created_at || new Date().toISOString().split('T')[0]
-        });
-        setAvatarPreview(userData.avatar_url || null);
-        
-        try {
-          const messagesResponse = await fetch(`${func2url['user-messages']}?action=get&user_id=${userData.id}`);
-          const messagesData = await messagesResponse.json();
-          if (messagesData.messages) {
-            setMessages(messagesData.messages);
-            setUnreadCount(messagesData.messages.filter((m: UserMessage) => !m.is_read).length);
-          }
-          
-          const userDataResponse = await fetch(`${func2url['user-data']}?user_id=${userData.id}&action=purchases`);
-          const userDataJson = await userDataResponse.json();
-          if (userDataJson.purchases) {
-            setPurchases(userDataJson.purchases.map((p: any) => ({
-              id: p.work_id,
-              workTitle: p.work_title || 'Работа',
-              price: p.price_paid || 0,
-              date: p.created_at || new Date().toISOString(),
-              downloadUrl: ''
-            })));
-          }
-        } catch (error) {
-          console.error('Failed to load user data:', error);
+      if (!userData) {
+        setLoading(false);
+        setIsAuthenticated(false);
+        navigate('/');
+        return;
+      }
+      
+      setIsAuthenticated(true);
+      setUser({
+        name: userData.username,
+        email: userData.email,
+        balance: userData.balance,
+        totalEarned: 0,
+        totalSpent: 0,
+        worksUploaded: 0,
+        worksPurchased: 0,
+        rating: 0,
+        registrationDate: userData.created_at || new Date().toISOString().split('T')[0]
+      });
+      setAvatarPreview(userData.avatar_url || null);
+      
+      try {
+        const messagesResponse = await fetch(`${func2url['user-messages']}?action=get&user_id=${userData.id}`);
+        const messagesData = await messagesResponse.json();
+        if (messagesData.messages) {
+          setMessages(messagesData.messages);
+          setUnreadCount(messagesData.messages.filter((m: UserMessage) => !m.is_read).length);
         }
+        
+        const userDataResponse = await fetch(`${func2url['user-data']}?user_id=${userData.id}&action=purchases`);
+        const userDataJson = await userDataResponse.json();
+        if (userDataJson.purchases) {
+          setPurchases(userDataJson.purchases.map((p: any) => ({
+            id: p.work_id,
+            workTitle: p.work_title || 'Работа',
+            price: p.price_paid || 0,
+            date: p.created_at || new Date().toISOString(),
+            downloadUrl: ''
+          })));
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
       }
       setLoading(false);
     };

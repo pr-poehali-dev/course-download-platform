@@ -326,10 +326,11 @@ export default function CatalogPage() {
 
     if (priceRange !== 'all') {
       filtered = filtered.filter(work => {
-        if (priceRange === '0-300') return work.price <= 300;
-        if (priceRange === '300-1500') return work.price > 300 && work.price <= 1500;
-        if (priceRange === '1500-3000') return work.price > 1500 && work.price <= 3000;
-        if (priceRange === '3000+') return work.price > 3000;
+        if (priceRange === '0-100') return work.price <= 100;
+        if (priceRange === '100-400') return work.price > 100 && work.price <= 400;
+        if (priceRange === '400-1200') return work.price > 400 && work.price <= 1200;
+        if (priceRange === '1200-2000') return work.price > 1200 && work.price <= 2000;
+        if (priceRange === '2000+') return work.price > 2000;
         return true;
       });
     }

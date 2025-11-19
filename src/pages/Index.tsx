@@ -453,7 +453,6 @@ export default function Index() {
                 <a href="/" className="hover:text-primary transition-colors text-sm">Главная</a>
                 <a href="/catalog" className="hover:text-primary transition-colors text-sm">Каталог</a>
                 <a href="/blog" className="hover:text-primary transition-colors text-sm">Блог</a>
-                <a href="#support" className="hover:text-primary transition-colors text-sm">Поддержка</a>
               </nav>
               
               <Button 
@@ -573,13 +572,6 @@ export default function Index() {
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Блог
-                  </a>
-                  <a 
-                    href="#support" 
-                    className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Поддержка
                   </a>
                   {isLoggedIn && (
                     <>

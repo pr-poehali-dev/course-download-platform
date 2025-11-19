@@ -124,11 +124,11 @@ export default function UploadsTab({
           </div>
 
           <div>
-            <Label htmlFor="file">Файл работы (RAR архив) *</Label>
+            <Label htmlFor="file">Файл работы (архив) *</Label>
             <Input
               id="file"
               type="file"
-              accept=".rar,.zip"
+              accept=".rar,.zip,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.dxf,.cdw,.frw,.step"
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
@@ -137,7 +137,7 @@ export default function UploadsTab({
               }}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Максимальный размер: 50 МБ. Поддерживаются форматы: RAR, ZIP
+              Максимальный размер: 50 МБ. Поддерживаются: RAR, ZIP, PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, DXF, CDW, FRW, STEP
             </p>
           </div>
         </CardContent>

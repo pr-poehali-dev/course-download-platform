@@ -23,7 +23,7 @@ import FavoritesDialog from '@/components/FavoritesDialog';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
 import ReferralDialog from '@/components/ReferralDialog';
 
-import BlogSection from '@/components/BlogSection';
+
 import AboutSection from '@/components/AboutSection';
 import RecentlyViewed from '@/components/RecentlyViewed';
 
@@ -1375,8 +1375,6 @@ export default function Index() {
         <AboutSection />
 
         <NewsSection isAdmin={currentUser?.role === 'admin'} />
-
-        <BlogSection />
 
         <section id="faq" className="py-16 bg-white">
           <div className="container mx-auto px-4 max-w-3xl">

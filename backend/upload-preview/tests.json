@@ -17,6 +17,7 @@
       "expectedBody": {
         "success": "boolean",
         "preview_url": "string",
+        "all_urls": "array",
         "work_id": "string"
       },
       "bodyMatcher": "partial"

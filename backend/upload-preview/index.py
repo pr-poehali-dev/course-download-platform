@@ -91,14 +91,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             url = f'https://storage.yandexcloud.net/{bucket_name}/{object_key}'
             uploaded_urls.append(url)
         
-        # Обновляем БД (первое изображение как основное превью)
+        # Обновляем БД (сохраняем все изображения)
         if uploaded_urls:
             database_url = os.environ.get('DATABASE_URL')
             conn = psycopg2.connect(database_url)
             cur = conn.cursor()
             
+            # Первое изображение как основное превью
             escaped_url = uploaded_urls[0].replace("'", "''")
-            update_query = f"UPDATE t_p63326274_course_download_plat.works SET preview_image_url = '{escaped_url}' WHERE id = {int(work_id)}"
+            
+            # Массив всех URL для галереи
+            urls_json = json.dumps(uploaded_urls).replace("'", "''")
+            
+            update_query = f"""
+                UPDATE t_p63326274_course_download_plat.works 
+                SET preview_image_url = '{escaped_url}',
+                    preview_urls = '{urls_json}'
+                WHERE id = {int(work_id)}
+            """
             cur.execute(update_query)
             
             conn.commit()

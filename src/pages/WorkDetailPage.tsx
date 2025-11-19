@@ -734,7 +734,10 @@ export default function WorkDetailPage() {
           setWork({ ...work, previewUrl: data.all_urls[0] });
         }
         
-        alert(`✅ Успешно загружено ${data.all_urls.length} изображений!`);
+        // Очищаем кеш каталога, чтобы новые изображения появились сразу
+        localStorage.removeItem('catalog_works_cache_v9');
+        
+        alert(`✅ Успешно загружено ${data.all_urls.length} изображений! Обновите каталог, чтобы увидеть изменения.`);
       } else {
         alert('❌ Ошибка: ' + (data.error || 'Не удалось загрузить изображения'));
       }
@@ -753,20 +756,16 @@ export default function WorkDetailPage() {
     setExtractingImages(true);
 
     try {
-      const EXTRACT_PREVIEWS_URL = func2url['extract-all-previews'];
-      const response = await fetch(EXTRACT_PREVIEWS_URL, {
+      // Используем генератор превью из Word файлов
+      const GENERATE_PREVIEW_URL = func2url['generate-work-preview'];
+      const response = await fetch(`${GENERATE_PREVIEW_URL}?work_id=${actualWorkId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          work_id: actualWorkId,
-          folder_name: work.title,
-          public_key: YANDEX_DISK_URL
-        })
+        headers: { 'Content-Type': 'application/json' }
       });
 
       const data = await response.json();
 
-      if (data.success && data.preview_urls && data.preview_urls.length > 0) {
+      if (data.preview_urls && data.preview_urls.length > 0) {
         setGallery(data.preview_urls);
         setSelectedImage(0);
         
@@ -774,13 +773,16 @@ export default function WorkDetailPage() {
           setWork({ ...work, previewUrl: data.preview_urls[0] });
         }
         
+        // Очищаем кеш каталога
+        localStorage.removeItem('catalog_works_cache_v9');
+        
         alert(`✅ Извлечено ${data.preview_urls.length} изображений из архива!`);
       } else {
-        alert('⚠️ PNG изображения не найдены в архиве');
+        alert('⚠️ Изображения не найдены в архиве. Попробуйте загрузить вручную.');
       }
     } catch (error) {
       console.error('Extract error:', error);
-      alert('❌ Ошибка извлечения изображений');
+      alert('❌ Ошибка извлечения изображений. Попробуйте загрузить вручную.');
     } finally {
       setExtractingImages(false);
     }

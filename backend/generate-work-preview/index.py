@@ -131,11 +131,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if preview_url:
                 preview_urls.append(preview_url)
         
-        # Обновляем БД с первым скриншотом
+        # Обновляем БД с первым скриншотом и массивом всех URL
         if preview_urls:
+            import json as json_lib
+            urls_json = json_lib.dumps(preview_urls)
             cur.execute(
-                "UPDATE t_p63326274_course_download_plat.works SET preview_image_url = %s WHERE id = %s",
-                (preview_urls[0], work_id)
+                "UPDATE t_p63326274_course_download_plat.works SET preview_image_url = %s, preview_urls = %s WHERE id = %s",
+                (preview_urls[0], urls_json, work_id)
             )
             conn.commit()
         

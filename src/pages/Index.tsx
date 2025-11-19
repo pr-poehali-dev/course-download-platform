@@ -1390,12 +1390,12 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="HelpCircle" size={20} className="text-primary" />
-                    Как работает балльная система?
+                    Как купить работу на платформе?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    При регистрации ты получаешь стартовый бонус 1000 баллов. Загружай работы и получай баллы за каждую продажу, или купи баллы для доступа к материалам других студентов.
+                    Зарегистрируйтесь на платформе и получите 1000 приветственных баллов. Выберите работу в каталоге, оплатите баллами или картой, и мгновенно скачайте файл.
                   </p>
                 </CardContent>
               </Card>
@@ -1404,12 +1404,82 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="Shield" size={20} className="text-primary" />
-                    Это легально?
+                    Какая уникальность готовых работ?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Платформа работает как база референсных материалов для обучения. Все работы используются исключительно в ознакомительных целях.
+                    Уникальность готовых работ составляет от 95%.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="DollarSign" size={20} className="text-primary" />
+                    Сколько стоят работы?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Цены начинаются от 500₽ за реферат, 2250-3000₽ за курсовую работу и от 7000₽ за дипломную работу. Это в 10 раз дешевле, чем заказывать работу с нуля на других платформах и не факт, что будет правильная.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Coins" size={20} className="text-primary" />
+                    Что такое баллы и как их получить?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    При регистрации вы получаете 1000 баллов бесплатно. 1 балл = 5 рублей. Баллы можно пополнить картой, заработать за загрузку своих работ или получить по реферальной программе.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="RotateCcw" size={20} className="text-primary" />
+                    Можно ли вернуть деньги?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Да, если работа не соответствует описанию, обратитесь в поддержку в течение 24 часов. Мы начислим баллы или подберем альтернативную работу.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Database" size={20} className="text-primary" />
+                    Сколько работ в каталоге?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    В каталоге 500+ работ по техническим дисциплинам. База пополняется ежедневно.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Zap" size={20} className="text-primary" />
+                    Как быстро я получу работу после оплаты?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Мгновенно! После оплаты вы сразу получаете ссылку на скачивание архива. Никаких ожиданий и задержек.
                   </p>
                 </CardContent>
               </Card>
@@ -1418,95 +1488,41 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="Upload" size={20} className="text-primary" />
-                    Как загрузить свою работу?
+                    Могу ли я продавать свои работы?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Нажми "Загрузить работу", заполни описание, выбери цену в баллах и загрузи файл. После проверки работа станет доступна другим студентам.
+                    Да! Загружайте свои курсовые, дипломы и рефераты. За каждую загруженную работу вы получаете баллы, а за каждую покупку — 90% от стоимости. Это отличный способ заработать на старых работах.
                   </p>
                 </CardContent>
               </Card>
 
-
-
-              <Card className="border-2 border-blue-500/30 bg-blue-50/50">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Icon name="Coins" size={20} className="text-blue-600" />
-                    Как работает экономика платформы?
+                    <Icon name="CheckCircle" size={20} className="text-primary" />
+                    Это легально?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground mb-3">
-                    Tech Forma — <span className="font-semibold text-foreground">студенческое сообщество</span> с прозрачной системой баллов:
+                  <p className="text-muted-foreground">
+                    Да, покупка готовых работ как образцов для изучения абсолютно легальна. Это аналогично покупке учебника или методического пособия. Важно использовать материал этично: дорабатывать, перефразировать и добавлять авторские идеи.
                   </p>
-                  
-                  <div className="bg-white rounded-lg p-4 mb-3 border">
-                    <p className="font-bold text-lg mb-2 flex items-center gap-2">
-                      <Icon name="TrendingUp" size={18} className="text-primary" />
-                      1 балл = 5 рублей
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Работа за 100 баллов = 500₽ покупательской способности
-                    </p>
-                  </div>
+                </CardContent>
+              </Card>
 
-                  <div className="space-y-2 mb-3">
-                    <p className="font-semibold text-foreground">💰 Как зарабатывать баллы:</p>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                      <li className="flex items-start gap-2">
-                        <Icon name="Upload" size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
-                        <span>Загружаешь работу → получаешь баллы при каждой продаже</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Icon name="ShoppingCart" size={14} className="text-blue-600 mt-0.5 flex-shrink-0" />
-                        <span>Покупаешь пакет баллов → тратишь на нужные работы</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-white rounded-lg p-4 mb-3 border">
-                    <p className="font-semibold text-foreground mb-2">📊 Стандартные цены:</p>
-                    <ul className="space-y-1.5 text-sm text-muted-foreground">
-                      <li className="flex justify-between items-center">
-                        <span>Диссертация</span>
-                        <span className="font-bold text-primary">3000 баллов</span>
-                      </li>
-                      <li className="flex justify-between items-center">
-                        <span>Дипломная работа</span>
-                        <span className="font-bold text-primary">1500 баллов</span>
-                      </li>
-                      <li className="flex justify-between items-center">
-                        <span>Курсовая работа</span>
-                        <span className="font-bold text-primary">600 баллов</span>
-                      </li>
-                      <li className="flex justify-between items-center">
-                        <span>Отчёт, практика, реферат</span>
-                        <span className="font-bold text-primary">300 баллов</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-2 mb-3">
-                    <p className="font-semibold text-foreground">🔄 Как работает покупка:</p>
-                    <ul className="space-y-2 text-sm text-muted-foreground ml-4">
-                      <li className="flex items-start gap-2">
-                        <Icon name="User" size={14} className="text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Автор получает 90%</strong> от цены работы</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Icon name="Server" size={14} className="text-purple-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Платформа 10%</strong> — поддержка, хостинг, серверы</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg p-3 border border-purple-200">
-                    <p className="text-xs text-muted-foreground">
-                      <strong>Пример:</strong> Работа за 100 баллов → Автор получает 90 баллов (450₽) → 10 баллов на развитие платформы
-                    </p>
-                  </div>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Mail" size={20} className="text-primary" />
+                    Как связаться с поддержкой?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Напишите нам на tech.forma@yandex.ru — мы отвечаем в течение 24 часов.
+                  </p>
                 </CardContent>
               </Card>
             </div>

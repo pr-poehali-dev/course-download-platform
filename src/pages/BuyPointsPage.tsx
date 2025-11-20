@@ -95,6 +95,8 @@ export default function BuyPointsPage() {
         5: '1000'
       };
 
+      const baseUrl = window.location.origin;
+      
       const response = await fetch(func2url['payment'], {
         method: 'POST',
         headers: {
@@ -104,7 +106,9 @@ export default function BuyPointsPage() {
           action: 'init_tinkoff',
           user_id: user.id,
           user_email: user.email,
-          package_id: packageIdMap[selectedPackage.id]
+          package_id: packageIdMap[selectedPackage.id],
+          success_url: `${baseUrl}/payment/success`,
+          fail_url: `${baseUrl}/payment/failed`
         })
       });
 

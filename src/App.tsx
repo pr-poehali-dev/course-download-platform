@@ -35,6 +35,8 @@ import SupportAdmin from "./components/SupportAdmin";
 import PaymentPage from "./pages/PaymentPage";
 import DefenseKitBuilder from "./pages/DefenseKitBuilder";
 import SecurityLogsPage from "./pages/SecurityLogsPage";
+import PaymentSuccessPage from "./pages/PaymentSuccessPage";
+import PaymentFailedPage from "./pages/PaymentFailedPage";
 
 
 
@@ -78,6 +80,8 @@ const App = () => (
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPage />} />
           <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/failed" element={<PaymentFailedPage />} />
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

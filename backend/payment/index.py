@@ -116,11 +116,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             order_id = f"order_{user_id}_{package_id}_{context.request_id[:8]}"
             
+            success_url = body_data.get('success_url', 'https://techforma.pro/payment/success')
+            fail_url = body_data.get('fail_url', 'https://techforma.pro/payment/failed')
+            
             init_params = {
                 'TerminalKey': TINKOFF_TERMINAL_KEY,
                 'Amount': amount_kopecks,
                 'OrderId': order_id,
-                'Description': f'Покупка {total_points} баллов'
+                'Description': f'Покупка {total_points} баллов',
+                'SuccessURL': success_url,
+                'FailURL': fail_url
             }
             
             init_params['Token'] = generate_tinkoff_token(init_params)

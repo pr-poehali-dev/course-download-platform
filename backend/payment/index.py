@@ -9,9 +9,9 @@ import os
 import uuid
 import hashlib
 import psycopg2
+import requests
 from typing import Dict, Any
 from yookassa import Configuration, Payment
-import urllib.request
 
 SHOP_ID = os.environ.get('YOOKASSA_SHOP_ID', '')
 SECRET_KEY = os.environ.get('YOOKASSA_SECRET_KEY', '')
@@ -63,16 +63,15 @@ def tinkoff_request(endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
     """Отправка запроса к API Тинькофф"""
     url = TINKOFF_API_URL + endpoint
     
-    json_data = json.dumps(data).encode('utf-8')
+    print(f"[TINKOFF_REQUEST] URL: {url}")
+    print(f"[TINKOFF_REQUEST] Data: {json.dumps(data, ensure_ascii=False)}")
     
-    req = urllib.request.Request(
-        url,
-        data=json_data,
-        headers={'Content-Type': 'application/json'}
-    )
+    response = requests.post(url, json=data, headers={'Content-Type': 'application/json'})
     
-    with urllib.request.urlopen(req) as response:
-        return json.loads(response.read().decode('utf-8'))
+    print(f"[TINKOFF_REQUEST] Response status: {response.status_code}")
+    print(f"[TINKOFF_REQUEST] Response body: {response.text}")
+    
+    return response.json()
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')

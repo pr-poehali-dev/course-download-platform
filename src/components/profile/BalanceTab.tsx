@@ -16,11 +16,11 @@ interface BalancePackage {
 }
 
 const BALANCE_PACKAGES: BalancePackage[] = [
-  { id: '100', points: 100, price: 500 },
-  { id: '300', points: 300, price: 1500, popular: true },
-  { id: '500', points: 500, price: 2500, bonus: 50 },
-  { id: '1000', points: 1000, price: 5000, bonus: 150 },
-  { id: '2000', points: 2000, price: 10000, bonus: 400 },
+  { id: '50', points: 50, price: 250 },
+  { id: '100', points: 100, price: 500, bonus: 20, popular: true },
+  { id: '200', points: 200, price: 1000, bonus: 50 },
+  { id: '500', points: 500, price: 2500, bonus: 150 },
+  { id: '1000', points: 1000, price: 5000, bonus: 350 },
 ];
 
 export default function BalanceTab() {
@@ -40,18 +40,20 @@ export default function BalanceTab() {
         return;
       }
 
+      const baseUrl = window.location.origin;
+      
       const response = await fetch(func2url.payment, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          action: 'create_payment',
-          user_email: userData.email,
+          action: 'init_tinkoff',
           user_id: userData.id,
+          user_email: userData.email,
           package_id: packageId,
-          payment_type: 'points',
-          return_url: `${window.location.origin}/profile?tab=balance&payment=success`
+          success_url: `${baseUrl}/payment/success`,
+          fail_url: `${baseUrl}/payment/failed`
         })
       });
 
@@ -61,10 +63,10 @@ export default function BalanceTab() {
 
       const data = await response.json();
       
-      if (data.confirmation_url) {
-        window.location.href = data.confirmation_url;
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
       } else {
-        throw new Error('Не получена ссылка на оплату');
+        throw new Error(data.error || 'Не получена ссылка на оплату');
       }
       
     } catch (error) {

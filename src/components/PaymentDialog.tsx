@@ -56,7 +56,25 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
   const handlePayment = async (pkg: PaymentPackage) => {
     try {
       const funcUrls = await import('../../backend/func2url.json');
-      const totalPoints = pkg.points + pkg.bonus;
+      const { authService } = await import('@/lib/auth');
+      const user = await authService.verify();
+      
+      if (!user) {
+        toast({
+          title: 'Ошибка',
+          description: 'Необходимо войти в систему',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const packageIdMap: Record<number, string> = {
+        50: '50',
+        100: '100',
+        200: '200'
+      };
+      
+      const baseUrl = window.location.origin;
       
       const response = await fetch(funcUrls.payment, {
         method: 'POST',
@@ -64,22 +82,23 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          action: 'create_payment',
-          user_email: userEmail,
-          points: totalPoints,
-          price: pkg.price,
-          return_url: window.location.origin + '/profile?payment=success'
+          action: 'init_tinkoff',
+          user_id: user.id,
+          user_email: user.email,
+          package_id: packageIdMap[pkg.points],
+          success_url: `${baseUrl}/payment/success`,
+          fail_url: `${baseUrl}/payment/failed`
         }),
       });
 
       const data = await response.json();
       
-      if (data.confirmation_url) {
-        window.location.href = data.confirmation_url;
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
       } else {
         toast({
           title: 'Ошибка',
-          description: 'Не удалось создать платёж',
+          description: data.error || 'Не удалось создать платёж',
           variant: 'destructive',
         });
       }
@@ -116,7 +135,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
               Настройка платежей
             </DialogTitle>
             <DialogDescription>
-              Платёжная система ещё не настроена. Пожалуйста, добавьте ключи ЮКассы в настройках проекта.
+              Платёжная система ещё не настроена. Пожалуйста, добавьте ключи Тинькофф Кассы в настройках проекта.
             </DialogDescription>
           </DialogHeader>
         </DialogContent>
@@ -204,7 +223,7 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
             <Icon name="Shield" size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-semibold text-foreground mb-1">Безопасная оплата</p>
-              <p>Платежи обрабатываются через ЮКассу. Мы не храним данные ваших карт. Поддерживаем все российские карты и СБП.</p>
+              <p>Платежи обрабатываются через Тинькофф Кассу. Мы не храним данные ваших карт. Поддерживаем все российские карты и СБП.</p>
             </div>
           </div>
         </div>

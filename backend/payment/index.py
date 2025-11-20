@@ -38,7 +38,13 @@ def generate_token(params: Dict[str, Any]) -> str:
     sorted_keys = sorted(token_params.keys())
     concatenated = ''.join([str(token_params[k]) for k in sorted_keys])
     
-    return hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
+    token_hash = hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
+    
+    print(f"[TOKEN_DEBUG] Keys: {sorted_keys}")
+    print(f"[TOKEN_DEBUG] Concatenated length: {len(concatenated)}")
+    print(f"[TOKEN_DEBUG] Token hash: {token_hash}")
+    
+    return token_hash
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')

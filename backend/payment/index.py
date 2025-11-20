@@ -101,6 +101,78 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         print(f"[PAYMENT] POST request, action={action}, body_keys={list(body_data.keys())}")
         
+        # Определяем webhook от Тинькофф по наличию TerminalKey и Status
+        if 'TerminalKey' in body_data and 'Status' in body_data and not action:
+            print(f"[TINKOFF_WEBHOOK] Detected webhook: Status={body_data.get('Status')}, PaymentId={body_data.get('PaymentId')}")
+            status = body_data.get('Status')
+            payment_id = body_data.get('PaymentId')
+            order_id = body_data.get('OrderId')
+            
+            if status == 'CONFIRMED':
+                print(f"[TINKOFF_WEBHOOK] Payment confirmed: {order_id}")
+                
+                # Извлекаем user_id и points из OrderId (формат: order_{user_id}_{package_id}_{random})
+                order_parts = order_id.split('_')
+                if len(order_parts) >= 3:
+                    user_id = order_parts[1]
+                    package_id = order_parts[2]
+                    
+                    print(f"[TINKOFF_WEBHOOK] Parsed: user_id={user_id}, package_id={package_id}")
+                    
+                    if package_id in BALANCE_PACKAGES:
+                        package = BALANCE_PACKAGES[package_id]
+                        points = package['points'] + package['bonus']
+                        
+                        print(f"[TINKOFF_WEBHOOK] Crediting {points} points to user {user_id}")
+                        
+                        conn = get_db_connection()
+                        cur = conn.cursor()
+                        
+                        try:
+                            cur.execute("""
+                                UPDATE t_p63326274_course_download_plat.users 
+                                SET balance = balance + %s 
+                                WHERE id = %s
+                            """, (points, int(user_id)))
+                            
+                            cur.execute("""
+                                INSERT INTO t_p63326274_course_download_plat.transactions
+                                (user_id, amount, transaction_type, description)
+                                VALUES (%s, %s, 'balance_topup', %s)
+                            """, (int(user_id), points, f'Пополнение через Тинькофф: {points} баллов'))
+                            
+                            amount_rubles = float(body_data.get('Amount', 0)) / 100
+                            
+                            cur.execute("""
+                                SELECT email FROM t_p63326274_course_download_plat.users WHERE id = %s
+                            """, (int(user_id),))
+                            user_email_row = cur.fetchone()
+                            user_email = user_email_row[0] if user_email_row else ''
+                            
+                            cur.execute("""
+                                INSERT INTO t_p63326274_course_download_plat.payments 
+                                (user_email, points, amount, payment_id, status, created_at)
+                                VALUES (%s, %s, %s, %s, 'succeeded', NOW())
+                            """, (user_email, points, amount_rubles, str(payment_id)))
+                            
+                            conn.commit()
+                            print(f"[TINKOFF_WEBHOOK] Successfully credited {points} points to user {user_id}")
+                        except Exception as e:
+                            print(f"[TINKOFF_WEBHOOK] Error: {e}")
+                            conn.rollback()
+                        finally:
+                            cur.close()
+                            conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'OK': 'OK'})
+            }
+        
         if action == 'init_tinkoff':
             user_id = body_data.get('user_id')
             user_email = body_data.get('user_email')

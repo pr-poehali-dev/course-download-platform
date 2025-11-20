@@ -171,16 +171,16 @@ export default function TestPaymentPage() {
               </Card>
             )}
 
-            <Card className="border-yellow-200 bg-yellow-50">
+            <Card className="border-green-200 bg-green-50">
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
-                  <Icon name="AlertCircle" size={20} className="text-yellow-600 mt-1 flex-shrink-0" />
+                  <Icon name="CheckCircle2" size={20} className="text-green-600 mt-1 flex-shrink-0" />
                   <div className="text-sm">
-                    <p className="font-semibold text-yellow-900 mb-2">Если видишь ошибку 204 "Неверный токен":</p>
-                    <ul className="list-disc list-inside space-y-1 text-yellow-800">
-                      <li>В Тинькофф админке есть ДВА поля: "Пароль" и "Секретный ключ"</li>
-                      <li>Для API нужен именно "Секретный ключ", а не "Пароль"</li>
-                      <li>Для DEMO терминалов обычно: <code className="bg-yellow-100 px-1">wvchd3k3ju9vms5e</code></li>
+                    <p className="font-semibold text-green-900 mb-2">Текущие настройки:</p>
+                    <ul className="list-disc list-inside space-y-1 text-green-800">
+                      <li>Терминал: <code className="bg-green-100 px-1">1763583059270DEMO</code></li>
+                      <li>Пароль: <code className="bg-green-100 px-1">Isvm4_ae1lIiD9RM</code></li>
+                      <li>Тестовая карта: 4300 0000 0000 0777</li>
                     </ul>
                   </div>
                 </div>

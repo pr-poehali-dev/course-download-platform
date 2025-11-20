@@ -19,8 +19,8 @@ TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_TERMINAL_KEY', '')
 TINKOFF_PASSWORD = os.environ.get('TINKOFF_PASSWORD', '')
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
-print(f"[INIT] TINKOFF_TERMINAL_KEY present: {bool(TINKOFF_TERMINAL_KEY)}, length: {len(TINKOFF_TERMINAL_KEY) if TINKOFF_TERMINAL_KEY else 0}")
-print(f"[INIT] TINKOFF_PASSWORD present: {bool(TINKOFF_PASSWORD)}, length: {len(TINKOFF_PASSWORD) if TINKOFF_PASSWORD else 0}")
+print(f"[INIT] TINKOFF_TERMINAL_KEY present: {bool(TINKOFF_TERMINAL_KEY)}, length: {len(TINKOFF_TERMINAL_KEY) if TINKOFF_TERMINAL_KEY else 0}, first_chars: {TINKOFF_TERMINAL_KEY[:5] if TINKOFF_TERMINAL_KEY else ''}")
+print(f"[INIT] TINKOFF_PASSWORD present: {bool(TINKOFF_PASSWORD)}, length: {len(TINKOFF_PASSWORD) if TINKOFF_PASSWORD else 0}, first_chars: {TINKOFF_PASSWORD[:3] if TINKOFF_PASSWORD else ''}")
 
 TINKOFF_API_URL = 'https://securepay.tinkoff.ru/v2/'
 

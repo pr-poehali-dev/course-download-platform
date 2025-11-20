@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import { authService } from '@/lib/auth';
+import func2url from '../../backend/func2url.json';
 
 interface PointsPackage {
   id: number;
@@ -18,6 +20,20 @@ interface PointsPackage {
 export default function BuyPointsPage() {
   const [selectedPackage, setSelectedPackage] = useState<PointsPackage | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'sbp' | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const currentUser = await authService.verify();
+      if (!currentUser) {
+        window.location.href = '/login';
+        return;
+      }
+      setUser(currentUser);
+    };
+    checkAuth();
+  }, []);
 
   const packages: PointsPackage[] = [
     {
@@ -58,8 +74,8 @@ export default function BuyPointsPage() {
     }
   ];
 
-  const handlePurchase = () => {
-    if (!selectedPackage || !paymentMethod) {
+  const handlePurchase = async () => {
+    if (!selectedPackage || !paymentMethod || !user) {
       toast({
         title: 'Ошибка',
         description: 'Выберите пакет и способ оплаты',
@@ -68,10 +84,51 @@ export default function BuyPointsPage() {
       return;
     }
 
-    toast({
-      title: 'Переход к оплате',
-      description: `Пакет ${selectedPackage.points + selectedPackage.bonus} баллов за ${selectedPackage.price}₽`
-    });
+    setLoading(true);
+
+    try {
+      const packageIdMap: Record<number, string> = {
+        1: '50',
+        2: '100',
+        3: '200',
+        4: '500',
+        5: '1000'
+      };
+
+      const response = await fetch(func2url['payment'], {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          action: 'init_tinkoff',
+          user_id: user.id,
+          user_email: user.email,
+          package_id: packageIdMap[selectedPackage.id]
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.payment_url) {
+        window.location.href = data.payment_url;
+      } else {
+        toast({
+          title: 'Ошибка',
+          description: data.error || 'Не удалось создать платёж',
+          variant: 'destructive'
+        });
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: 'Ошибка',
+        description: 'Произошла ошибка при создании платежа',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -204,10 +261,19 @@ export default function BuyPointsPage() {
                   className="w-full"
                   size="lg"
                   onClick={handlePurchase}
-                  disabled={!paymentMethod}
+                  disabled={!paymentMethod || loading}
                 >
-                  <Icon name="ShoppingCart" size={18} className="mr-2" />
-                  Оплатить {selectedPackage.price} ₽
+                  {loading ? (
+                    <>
+                      <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                      Создание платежа...
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="ShoppingCart" size={18} className="mr-2" />
+                      Оплатить {selectedPackage.price} ₽
+                    </>
+                  )}
                 </Button>
 
                 <p className="text-xs text-muted-foreground text-center mt-4">

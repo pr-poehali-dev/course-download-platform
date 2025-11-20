@@ -13,11 +13,6 @@ from typing import Dict, Any
 TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_TERMINAL_KEY', '')
 TINKOFF_PASSWORD = os.environ.get('TINKOFF_PASSWORD', '')
 TINKOFF_API_URL = 'https://securepay.tinkoff.ru/v2/'
-
-# Для DEMO терминала используем стандартный пароль
-if 'DEMO' in TINKOFF_TERMINAL_KEY:
-    TINKOFF_PASSWORD = 'wvchd3k3ju9vms5e'
-    print(f"[DEMO_MODE] Using standard demo password for terminal {TINKOFF_TERMINAL_KEY}")
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 BALANCE_PACKAGES = {

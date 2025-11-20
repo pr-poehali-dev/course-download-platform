@@ -204,34 +204,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Amount': amount_kopecks,
                 'OrderId': order_id,
                 'Description': f'Покупка {total_points} баллов',
-                'SuccessURL': success_url,
-                'FailURL': fail_url
+                'DATA': {
+                    'user_id': str(user_id),
+                    'user_email': user_email or '',
+                    'points': str(total_points),
+                    'package_id': package_id
+                }
             }
             
             init_params['Token'] = generate_tinkoff_token(init_params)
             
-            init_params['DATA'] = {
-                'user_id': str(user_id),
-                'user_email': user_email or '',
-                'points': str(total_points),
-                'package_id': package_id
-            }
-            
-            init_params['Receipt'] = {
-                'Email': user_email or 'noreply@techforma.pro',
-                'Taxation': 'usn_income',
-                'Items': [
-                    {
-                        'Name': f'Баллы TechForma',
-                        'Price': amount_kopecks,
-                        'Quantity': 1.00,
-                        'Amount': amount_kopecks,
-                        'Tax': 'none',
-                        'PaymentMethod': 'full_payment',
-                        'PaymentObject': 'service'
-                    }
-                ]
-            }
+            init_params['SuccessURL'] = success_url
+            init_params['FailURL'] = fail_url
             
             print(f"[TINKOFF] Sending Init request: OrderId={order_id}, Amount={amount_kopecks}")
             result = tinkoff_request('Init', init_params)

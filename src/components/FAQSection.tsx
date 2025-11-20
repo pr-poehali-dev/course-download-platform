@@ -141,11 +141,11 @@ export default function FAQSection() {
               Напишите нам в поддержку — ответим в течение 5 минут!
             </p>
             <a 
-              href="mailto:support@techforma.ru" 
+              href="mailto:tech.forma@yandex.ru" 
               className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
             >
               <Icon name="Mail" size={18} />
-              support@techforma.ru
+              tech.forma@yandex.ru
             </a>
           </div>
         </div>

@@ -29,7 +29,7 @@ export default function PlatformSettings() {
     maintenanceMode: false,
     maxFileSize: 10,
     allowedFormats: 'pdf, docx, xlsx, pptx',
-    supportEmail: 'support@techforma.ru',
+    supportEmail: 'tech.forma@yandex.ru',
     contactPhone: '+7 (999) 123-45-67'
   });
 

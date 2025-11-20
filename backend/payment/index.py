@@ -73,6 +73,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         body_data = json.loads(event.get('body', '{}'))
         action = body_data.get('action')
         
+        print(f"[DEBUG] POST request, action={action}, body_keys={list(body_data.keys())}")
+        
         if 'TerminalKey' in body_data and 'Status' in body_data and not action:
             status = body_data.get('Status')
             order_id = body_data.get('OrderId')

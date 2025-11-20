@@ -1,5 +1,5 @@
 """
-Business: Обработка платежей через Тинькофф Кассу с детальным логированием
+Business: Обработка платежей через Тинькофф Кассу с детальным логированием v2
 Args: event с httpMethod, body, queryStringParameters
 Returns: HTTP response с ссылкой на оплату или обработкой webhook уведомлений
 """
@@ -8,7 +8,11 @@ import json
 import os
 import hashlib
 import psycopg2
+import logging
 from typing import Dict, Any
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_TERMINAL_KEY', '')
 TINKOFF_PASSWORD = os.environ.get('TINKOFF_PASSWORD', '')
@@ -44,21 +48,27 @@ def generate_token(params: Dict[str, Any]) -> str:
     # Password добавляется как параметр с ключом
     token_params['Password'] = TINKOFF_PASSWORD
     
+    logger.info(f"[TOKEN_STEP1] Original params: {params}")
+    logger.info(f"[TOKEN_STEP2] After adding Password: {token_params}")
+    logger.info(f"[TOKEN_STEP3] Password value: '{TINKOFF_PASSWORD}' (length={len(TINKOFF_PASSWORD)})")
+    logger.info(f"[TOKEN_STEP4] TerminalKey: '{TINKOFF_TERMINAL_KEY}'")
+    
     # Сортируем ключи
     sorted_keys = sorted(token_params.keys())
+    logger.info(f"[TOKEN_STEP5] Sorted keys: {sorted_keys}")
     
     # Конкатенируем значения по порядку отсортированных ключей
     values_list = [token_params[k] for k in sorted_keys]
     concatenated = ''.join(values_list)
     
+    logger.info(f"[TOKEN_STEP6] Values list: {values_list}")
+    logger.info(f"[TOKEN_STEP7] Concatenated string: '{concatenated}'")
+    logger.info(f"[TOKEN_STEP8] Concatenated length: {len(concatenated)}")
+    
     # SHA256 хеш
     token_hash = hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
     
-    print(f"[TOKEN_DEBUG] Params: {token_params}")
-    print(f"[TOKEN_DEBUG] Sorted keys: {sorted_keys}")
-    print(f"[TOKEN_DEBUG] Values: {values_list}")
-    print(f"[TOKEN_DEBUG] Concatenated: {concatenated}")
-    print(f"[TOKEN_DEBUG] Hash: {token_hash}")
+    logger.info(f"[TOKEN_STEP9] Final SHA256 hash: {token_hash}")
     
     return token_hash
 
@@ -78,6 +88,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     if method == 'GET':
+        query_params = event.get('queryStringParameters', {})
+        
+        if query_params.get('test') == 'token':
+            test_params = {
+                'TerminalKey': TINKOFF_TERMINAL_KEY,
+                'Amount': 100000,
+                'OrderId': 'test_order_12345'
+            }
+            test_token = generate_token(test_params)
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'isBase64Encoded': False,
+                'body': json.dumps({
+                    'test_mode': True,
+                    'params': test_params,
+                    'generated_token': test_token,
+                    'terminal_key': TINKOFF_TERMINAL_KEY,
+                    'password_length': len(TINKOFF_PASSWORD),
+                    'password_first_4': TINKOFF_PASSWORD[:4] if len(TINKOFF_PASSWORD) >= 4 else TINKOFF_PASSWORD
+                })
+            }
+        
         return {
             'statusCode': 200,
             'headers': {
@@ -95,7 +132,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         body_data = json.loads(event.get('body', '{}'))
         action = body_data.get('action')
         
-        print(f"[DEBUG] POST request, action={action}, body_keys={list(body_data.keys())}")
+        logger.info(f"[DEBUG] POST request, action={action}, body_keys={list(body_data.keys())}")
         
         if 'TerminalKey' in body_data and 'Status' in body_data and not action:
             status = body_data.get('Status')
@@ -139,8 +176,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             user_id = body_data.get('user_id')
             package_id = body_data.get('package_id')
             
-            print(f"[INIT_PAYMENT] user_id={user_id}, package_id={package_id}")
-            print(f"[INIT_PAYMENT] Terminal={TINKOFF_TERMINAL_KEY}, PwdLen={len(TINKOFF_PASSWORD)}")
+            logger.info(f"\n{'='*60}")
+            logger.info(f"[INIT_PAYMENT] Starting payment initialization")
+            logger.info(f"[INIT_PAYMENT] user_id={user_id}, package_id={package_id}")
+            logger.info(f"[INIT_PAYMENT] Terminal='{TINKOFF_TERMINAL_KEY}'")
+            logger.info(f"[INIT_PAYMENT] Password length={len(TINKOFF_PASSWORD)}")
+            logger.info(f"[INIT_PAYMENT] Password first 4 chars='{TINKOFF_PASSWORD[:4]}...'")
+            logger.info(f"{'='*60}\n")
             
             if not package_id or package_id not in BALANCE_PACKAGES:
                 return {
@@ -174,7 +216,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             init_params['SuccessURL'] = success_url
             init_params['FailURL'] = fail_url
             
-            print(f"[REQUEST_TO_TINKOFF] {json.dumps(init_params, ensure_ascii=False)}")
+            logger.info(f"\n{'='*60}")
+            logger.info(f"[REQUEST_TO_TINKOFF] Sending to: {TINKOFF_API_URL}Init")
+            logger.info(f"[REQUEST_TO_TINKOFF] Params: {json.dumps(init_params, ensure_ascii=False, indent=2)}")
+            logger.info(f"{'='*60}\n")
             
             import urllib.request
             import urllib.error
@@ -189,7 +234,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 with urllib.request.urlopen(req) as response:
                     result = json.loads(response.read().decode('utf-8'))
                 
-                print(f"[TINKOFF_RESPONSE] {json.dumps(result, ensure_ascii=False)}")
+                logger.info(f"\n{'='*60}")
+                logger.info(f"[TINKOFF_RESPONSE] Response received:")
+                logger.info(f"[TINKOFF_RESPONSE] {json.dumps(result, ensure_ascii=False, indent=2)}")
+                logger.info(f"{'='*60}\n")
                 
                 if result.get('Success'):
                     return {

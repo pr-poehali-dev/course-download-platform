@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест оплаты Тинькофф</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .log {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .test-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 3px solid #ccc;
+        }
+        .test-item.success {
+            border-left-color: #4CAF50;
+            background: #e8f5e9;
+        }
+        .test-item.error {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        .test-item.pending {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .stat {
+            text-align: center;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            flex: 1;
+            margin: 0 5px;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Тест платежной системы Тинькофф</h1>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="totalTests">0</div>
+                <div class="stat-label">Всего тестов</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="successTests" style="color: #4CAF50;">0</div>
+                <div class="stat-label">Успешно</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="failedTests" style="color: #f44336;">0</div>
+                <div class="stat-label">Ошибок</div>
+            </div>
+        </div>
+
+        <div>
+            <button onclick="runSingleTest()" id="singleBtn">Запустить 1 тест</button>
+            <button onclick="runAllTests()" id="allBtn">Запустить 10 тестов</button>
+            <button onclick="clearLog()" id="clearBtn">Очистить лог</button>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const PAYMENT_URL = 'https://functions.poehali.dev/4b9b82b8-34d8-43e7-a9ac-c3cb0bd67fb1';
+        
+        let totalTests = 0;
+        let successTests = 0;
+        let failedTests = 0;
+
+        function updateStats() {
+            document.getElementById('totalTests').textContent = totalTests;
+            document.getElementById('successTests').textContent = successTests;
+            document.getElementById('failedTests').textContent = failedTests;
+        }
+
+        function addLog(message, className = '') {
+            const log = document.getElementById('log');
+            const item = document.createElement('div');
+            item.className = 'test-item ' + className;
+            item.textContent = message;
+            log.appendChild(item);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            totalTests = 0;
+            successTests = 0;
+            failedTests = 0;
+            updateStats();
+        }
+
+        async function runSingleTest() {
+            const testNum = totalTests + 1;
+            totalTests++;
+            updateStats();
+
+            const timestamp = new Date().toISOString();
+            addLog(`[ТЕСТ ${testNum}] ${timestamp} - Запуск теста...`, 'pending');
+
+            try {
+                const response = await fetch(PAYMENT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'init_payment',
+                        user_id: 1000015,
+                        package_id: '100',
+                        success_url: 'https://techforma.pro/payment/success',
+                        fail_url: 'https://techforma.pro/payment/failed'
+                    })
+                });
+
+                const data = await response.json();
+                
+                addLog(`[ТЕСТ ${testNum}] Статус: ${response.status}`, '');
+                addLog(`[ТЕСТ ${testNum}] Ответ: ${JSON.stringify(data, null, 2)}`, '');
+
+                if (data.payment_url) {
+                    successTests++;
+                    addLog(`[ТЕСТ ${testNum}] ✅ УСПЕХ! Получена ссылка на оплату: ${data.payment_url}`, 'success');
+                } else {
+                    failedTests++;
+                    addLog(`[ТЕСТ ${testNum}] ❌ ОШИБКА: ${data.error || 'Нет payment_url'}`, 'error');
+                    if (data.details) {
+                        addLog(`[ТЕСТ ${testNum}] Детали: ${data.details}`, 'error');
+                    }
+                    if (data.error_code) {
+                        addLog(`[ТЕСТ ${testNum}] Код ошибки: ${data.error_code}`, 'error');
+                    }
+                }
+            } catch (error) {
+                failedTests++;
+                addLog(`[ТЕСТ ${testNum}] ❌ КРИТИЧЕСКАЯ ОШИБКА: ${error.message}`, 'error');
+            }
+
+            updateStats();
+            addLog(`[ТЕСТ ${testNum}] Завершен\n`, '');
+        }
+
+        async function runAllTests() {
+            document.getElementById('allBtn').disabled = true;
+            document.getElementById('singleBtn').disabled = true;
+
+            addLog('========================================', '');
+            addLog('🚀 ЗАПУСК СЕРИИ ИЗ 10 ТЕСТОВ', '');
+            addLog('========================================\n', '');
+
+            for (let i = 0; i < 10; i++) {
+                await runSingleTest();
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            addLog('\n========================================', '');
+            addLog(`📊 ИТОГИ: Всего ${totalTests}, Успешно ${successTests}, Ошибок ${failedTests}`, '');
+            addLog('========================================', '');
+
+            document.getElementById('allBtn').disabled = false;
+            document.getElementById('singleBtn').disabled = false;
+        }
+    </script>
+</body>
+</html>

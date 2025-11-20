@@ -291,7 +291,7 @@ export default function WorkManager({ adminEmail, onWorkAdded }: WorkManagerProp
               <Label htmlFor="title">Название работы *</Label>
               <Input
                 id="title"
-                placeholder="Анализ рынка криптовалют 2024"
+                placeholder="Анализ рынка криптовалют 2025"
                 value={formData.title}
                 onChange={(e) => setFormData({...formData, title: e.target.value})}
               />

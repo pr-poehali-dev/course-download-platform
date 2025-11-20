@@ -414,7 +414,7 @@ export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: 
                   id="register-username"
                   name="username"
                   type="text"
-                  placeholder="techmaster2024"
+                  placeholder="techmaster2025"
                   value={registerData.username}
                   onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
                   autoComplete="username"

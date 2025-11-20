@@ -45,9 +45,9 @@ export default function UsersManagement() {
       totalUploads: 8,
       totalPurchases: 15,
       totalEarned: 1200,
-      registrationDate: '2024-01-15',
+      registrationDate: '2025-01-15',
       status: 'active',
-      lastActivity: '2024-10-20'
+      lastActivity: '2025-01-17'
     },
     {
       id: 2,
@@ -57,9 +57,9 @@ export default function UsersManagement() {
       totalUploads: 12,
       totalPurchases: 8,
       totalEarned: 1800,
-      registrationDate: '2024-02-03',
+      registrationDate: '2025-01-10',
       status: 'active',
-      lastActivity: '2024-10-23'
+      lastActivity: '2025-01-17'
     },
     {
       id: 3,
@@ -69,9 +69,9 @@ export default function UsersManagement() {
       totalUploads: 2,
       totalPurchases: 25,
       totalEarned: 300,
-      registrationDate: '2024-03-12',
+      registrationDate: '2025-01-05',
       status: 'active',
-      lastActivity: '2024-10-22'
+      lastActivity: '2025-01-16'
     },
     {
       id: 4,
@@ -81,9 +81,9 @@ export default function UsersManagement() {
       totalUploads: 15,
       totalPurchases: 5,
       totalEarned: 2250,
-      registrationDate: '2024-01-28',
+      registrationDate: '2025-01-08',
       status: 'active',
-      lastActivity: '2024-10-24'
+      lastActivity: '2025-01-17'
     },
     {
       id: 5,
@@ -93,9 +93,9 @@ export default function UsersManagement() {
       totalUploads: 1,
       totalPurchases: 3,
       totalEarned: 150,
-      registrationDate: '2024-09-05',
+      registrationDate: '2024-12-20',
       status: 'suspended',
-      lastActivity: '2024-09-20'
+      lastActivity: '2025-01-10'
     }
   ]);
 

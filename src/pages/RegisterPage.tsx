@@ -143,7 +143,7 @@ export default function RegisterPage() {
                     id="name"
                     name="username"
                     type="text"
-                    placeholder="techmaster2024"
+                    placeholder="techmaster2025"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     className="pl-10"

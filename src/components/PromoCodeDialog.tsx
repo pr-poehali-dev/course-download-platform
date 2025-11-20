@@ -15,7 +15,7 @@ interface PromoCodeDialogProps {
 }
 
 const PROMO_CODES = {
-  'WELCOME2024': { bonus: 50, description: 'Бонус для новых пользователей' },
+  'WELCOME2025': { bonus: 50, description: 'Бонус для новых пользователей' },
   'STUDENT100': { bonus: 100, description: 'Специальное предложение для студентов' },
   'VIPUSER': { bonus: 200, description: 'Для VIP пользователей' }
 };

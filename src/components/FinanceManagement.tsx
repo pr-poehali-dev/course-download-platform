@@ -31,7 +31,7 @@ export default function FinanceManagement() {
       user: 'Александр Иванов',
       amount: -150,
       work: 'Курсовая по менеджменту',
-      date: '2024-10-24 14:30',
+      date: '2025-01-17 14:30',
       status: 'completed'
     },
     {
@@ -40,7 +40,7 @@ export default function FinanceManagement() {
       user: 'Мария Петрова',
       amount: 200,
       work: 'Проектирование базы данных',
-      date: '2024-10-24 12:15',
+      date: '2025-01-17 12:15',
       status: 'completed'
     },
     {
@@ -49,7 +49,7 @@ export default function FinanceManagement() {
       user: 'Дмитрий Сидоров',
       amount: -100,
       work: 'Анализ финансовых показателей',
-      date: '2024-10-23 18:45',
+      date: '2025-01-16 18:45',
       status: 'completed'
     },
     {
@@ -57,7 +57,7 @@ export default function FinanceManagement() {
       type: 'bonus',
       user: 'Елена Козлова',
       amount: 500,
-      date: '2024-10-23 10:00',
+      date: '2025-01-16 10:00',
       status: 'completed'
     },
     {
@@ -66,7 +66,7 @@ export default function FinanceManagement() {
       user: 'Иван Морозов',
       amount: 150,
       work: 'Разработка мобильного приложения',
-      date: '2024-10-22 16:20',
+      date: '2025-01-15 16:20',
       status: 'completed'
     },
     {
@@ -75,7 +75,7 @@ export default function FinanceManagement() {
       user: 'Александр Иванов',
       amount: -250,
       work: 'Дипломная работа по маркетингу',
-      date: '2024-10-22 09:30',
+      date: '2025-01-15 09:30',
       status: 'pending'
     }
   ]);

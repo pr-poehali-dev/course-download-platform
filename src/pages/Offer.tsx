@@ -158,10 +158,13 @@ export default function Offer() {
                 3.2. Тарифы на баллы (примерные, могут изменяться):
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li>100 баллов — 99 рублей</li>
-                <li>500 баллов — 449 рублей</li>
-                <li>1000 баллов — 799 рублей</li>
+                <li>100 баллов — 500 рублей</li>
+                <li>500 баллов — 2500 рублей</li>
+                <li>1000 баллов — 5000 рублей</li>
               </ul>
+              <p className="text-sm mt-2">
+                <strong>Курс:</strong> 1 балл = 5 рублей
+              </p>
 
               <p className="font-semibold text-foreground mt-4">
                 3.3. Порядок оплаты

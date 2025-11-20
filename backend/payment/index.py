@@ -214,7 +214,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'TerminalKey': TINKOFF_TERMINAL_KEY,
                 'Amount': amount_kopecks,
                 'OrderId': order_id,
-                'Description': f'Покупка {total_points} баллов'
+                'Description': f'Balance {total_points} points'
             }
             
             # Генерируем токен
@@ -225,7 +225,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'TerminalKey': TINKOFF_TERMINAL_KEY,
                 'Amount': amount_kopecks,
                 'OrderId': order_id,
-                'Description': f'Покупка {total_points} баллов',
+                'Description': f'Balance {total_points} points',
                 'Token': token,
                 'DATA': {
                     'user_id': str(user_id),

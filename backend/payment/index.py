@@ -96,10 +96,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         action = body_data.get('action')
         provider = body_data.get('provider', 'yookassa')
         
+        print(f"[PAYMENT] POST request, action={action}, body_keys={list(body_data.keys())}")
+        
         if action == 'init_tinkoff':
             user_id = body_data.get('user_id')
             user_email = body_data.get('user_email')
             package_id = body_data.get('package_id')
+            
+            print(f"[TINKOFF] Init payment: user_id={user_id}, package_id={package_id}, email={user_email}")
             
             if not package_id or package_id not in BALANCE_PACKAGES:
                 return {
@@ -154,7 +158,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ]
             }
             
+            print(f"[TINKOFF] Sending Init request: OrderId={order_id}, Amount={amount_kopecks}")
             result = tinkoff_request('Init', init_params)
+            print(f"[TINKOFF] Response: Success={result.get('Success')}, ErrorCode={result.get('ErrorCode')}, Message={result.get('Message')}")
             
             if result.get('Success'):
                 return {

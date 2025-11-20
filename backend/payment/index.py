@@ -1,5 +1,5 @@
 """
-Business: Обработка платежей через Тинькофф Кассу
+Business: Обработка платежей через Тинькофф Кассу с детальным логированием
 Args: event с httpMethod, body, queryStringParameters
 Returns: HTTP response с ссылкой на оплату или обработкой webhook уведомлений
 """

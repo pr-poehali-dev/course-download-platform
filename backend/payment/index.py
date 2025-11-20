@@ -159,18 +159,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             success_url = body_data.get('success_url', 'https://techforma.pro/payment/success')
             fail_url = body_data.get('fail_url', 'https://techforma.pro/payment/failed')
             
-            # Параметры для Init запроса - все значения должны быть нужных типов
+            # Параметры для Init запроса
             init_params = {
-                'TerminalKey': str(TINKOFF_TERMINAL_KEY),
-                'Amount': int(amount_kopecks),  # Amount ДОЛЖЕН быть числом
-                'OrderId': str(order_id)
+                'TerminalKey': TINKOFF_TERMINAL_KEY,
+                'Amount': amount_kopecks,  # число в копейках
+                'OrderId': order_id
             }
             
+            # Генерируем токен (внутри все будет конвертировано в строки)
             token = generate_token(init_params)
             
+            # Добавляем Token и URL-ы к параметрам запроса
             init_params['Token'] = token
             init_params['SuccessURL'] = success_url
             init_params['FailURL'] = fail_url
+            
+            print(f"[REQUEST_TO_TINKOFF] {json.dumps(init_params, ensure_ascii=False)}")
             
             import urllib.request
             import urllib.error

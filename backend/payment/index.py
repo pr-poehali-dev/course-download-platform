@@ -199,27 +199,41 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             success_url = body_data.get('success_url', 'https://techforma.pro/payment/success')
             fail_url = body_data.get('fail_url', 'https://techforma.pro/payment/failed')
             
+            # Сначала создаём параметры БЕЗ DATA для генерации токена
+            token_params = {
+                'TerminalKey': TINKOFF_TERMINAL_KEY,
+                'Amount': amount_kopecks,
+                'OrderId': order_id,
+                'Description': f'Покупка {total_points} баллов'
+            }
+            
+            # Генерируем токен
+            token = generate_tinkoff_token(token_params)
+            
+            # Теперь создаём полный набор параметров с токеном и DATA
             init_params = {
                 'TerminalKey': TINKOFF_TERMINAL_KEY,
                 'Amount': amount_kopecks,
                 'OrderId': order_id,
                 'Description': f'Покупка {total_points} баллов',
+                'Token': token,
                 'DATA': {
                     'user_id': str(user_id),
                     'user_email': user_email or '',
                     'points': str(total_points),
                     'package_id': package_id
-                }
+                },
+                'SuccessURL': success_url,
+                'FailURL': fail_url
             }
             
-            init_params['Token'] = generate_tinkoff_token(init_params)
-            
-            init_params['SuccessURL'] = success_url
-            init_params['FailURL'] = fail_url
-            
             print(f"[TINKOFF] Sending Init request: OrderId={order_id}, Amount={amount_kopecks}")
+            print(f"[TINKOFF] Init params keys: {list(init_params.keys())}")
+            print(f"[TINKOFF] Token length: {len(init_params.get('Token', ''))}")
             result = tinkoff_request('Init', init_params)
             print(f"[TINKOFF] Response: Success={result.get('Success')}, ErrorCode={result.get('ErrorCode')}, Message={result.get('Message')}")
+            if not result.get('Success'):
+                print(f"[TINKOFF] Full error response: {result}")
             
             if result.get('Success'):
                 return {

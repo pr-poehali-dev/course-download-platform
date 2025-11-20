@@ -58,7 +58,7 @@ export default function RecentlyViewed() {
                     {work.subject}
                   </Badge>
                   <div className="text-sm font-bold text-primary">
-                    {work.price} ₽
+                    {work.price} баллов
                   </div>
                 </div>
               </div>

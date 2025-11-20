@@ -706,7 +706,7 @@ export default function Index() {
                     />
                   </div>
                   <CardTitle className="text-2xl">Маркетплейс работ</CardTitle>
-                  <CardDescription className="text-base">Покупай за баллы (1 балл = 5₽)</CardDescription>
+                  <CardDescription className="text-base">Покупай за баллы от 100</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">

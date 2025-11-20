@@ -21,11 +21,11 @@ export default function HeroSection({ onCatalogClick, onAuthClick, isLoggedIn }:
           
           <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight animate-slide-up">
             Курсовые, Дипломы, Чертежи
-            <span className="block text-yellow-300 mt-2">За баллы или рубли</span>
+            <span className="block text-yellow-300 mt-2">За баллы от 100</span>
           </h1>
           
           <p className="text-xl md:text-2xl mb-10 text-white/90 max-w-2xl mx-auto animate-slide-up animation-delay-100">
-            Тысячи готовых работ от реальных студентов. Покупай за баллы или получай баллы, делясь своими работами.
+            Тысячи готовых работ от реальных студентов. Покупай за баллы и получай баллы, делясь своими работами.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up animation-delay-200">

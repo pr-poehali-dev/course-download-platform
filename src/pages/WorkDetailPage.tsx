@@ -1189,14 +1189,11 @@ export default function WorkDetailPage() {
             <div className="glass-card tech-border rounded-xl p-4 md:p-6 lg:sticky lg:top-20 hover:shadow-xl transition-all">
               <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
                 <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
-                <div className="flex flex-col items-center gap-0.5">
-                  <div className="flex items-baseline justify-center gap-1.5">
-                    <span className="text-3xl md:text-4xl font-extrabold text-primary">
-                      {work.price.toLocaleString()}
-                    </span>
-                    <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
-                  </div>
-                  <span className="text-xs md:text-sm text-gray-500">= {(work.price * 5).toLocaleString()}₽</span>
+                <div className="flex items-baseline justify-center gap-1.5">
+                  <span className="text-3xl md:text-4xl font-extrabold text-primary">
+                    {work.price.toLocaleString()}
+                  </span>
+                  <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
                 </div>
               </div>
 

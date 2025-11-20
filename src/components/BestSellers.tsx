@@ -105,7 +105,7 @@ export default function BestSellers() {
                   </div>
                 </div>
                 <div className="text-lg font-bold text-primary">
-                  {work.price} ₽
+                  {work.price} баллов
                 </div>
               </div>
             </div>

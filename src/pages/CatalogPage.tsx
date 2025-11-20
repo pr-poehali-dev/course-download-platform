@@ -405,7 +405,7 @@ export default function CatalogPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     'name': 'Каталог студенческих работ',
-    'description': 'Готовые курсовые, дипломы, рефераты, чертежи от 200₽',
+    'description': 'Готовые курсовые, дипломы, рефераты, чертежи от 100 баллов',
     'numberOfItems': filteredWorks.length,
     'itemListElement': filteredWorks.slice(0, 20).map((work, index) => ({
       '@type': 'ListItem',

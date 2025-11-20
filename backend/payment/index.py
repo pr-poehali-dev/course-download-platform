@@ -10,8 +10,8 @@ import hashlib
 import psycopg2
 from typing import Dict, Any
 
-TINKOFF_TERMINAL_KEY = '1763583059270DEMO'
-TINKOFF_PASSWORD = 'Isvm4_ae1lIiD9RM'
+TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_TERMINAL_KEY', '')
+TINKOFF_PASSWORD = os.environ.get('TINKOFF_PASSWORD', '')
 TINKOFF_API_URL = 'https://securepay.tinkoff.ru/v2/'
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 

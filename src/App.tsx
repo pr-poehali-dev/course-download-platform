@@ -37,6 +37,7 @@ import DefenseKitBuilder from "./pages/DefenseKitBuilder";
 import SecurityLogsPage from "./pages/SecurityLogsPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentFailedPage from "./pages/PaymentFailedPage";
+import TestPaymentPage from "./pages/TestPaymentPage";
 
 
 
@@ -82,6 +83,7 @@ const App = () => (
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
           <Route path="/payment/failed" element={<PaymentFailedPage />} />
+          <Route path="/test-payment" element={<TestPaymentPage />} />
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

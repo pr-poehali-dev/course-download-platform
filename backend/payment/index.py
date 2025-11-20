@@ -31,17 +31,19 @@ def generate_token(params: Dict[str, Any]) -> str:
     token_params = {}
     for key, value in params.items():
         if key not in ['Token', 'DATA', 'Receipt']:
-            token_params[key] = str(value)
+            token_params[key] = value
     
     token_params['Password'] = TINKOFF_PASSWORD
     
     sorted_keys = sorted(token_params.keys())
-    concatenated = ''.join([str(token_params[k]) for k in sorted_keys])
+    values = [str(token_params[k]) for k in sorted_keys]
+    concatenated = ''.join(values)
     
     token_hash = hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
     
     print(f"[TOKEN_DEBUG] Keys: {sorted_keys}")
-    print(f"[TOKEN_DEBUG] Concatenated length: {len(concatenated)}")
+    print(f"[TOKEN_DEBUG] Values: {values}")
+    print(f"[TOKEN_DEBUG] Concatenated: {concatenated}")
     print(f"[TOKEN_DEBUG] Token hash: {token_hash}")
     
     return token_hash

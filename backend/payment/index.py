@@ -14,8 +14,8 @@ from typing import Dict, Any
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_TERMINAL_KEY', '')
-TINKOFF_PASSWORD = os.environ.get('TINKOFF_PASSWORD', '')
+TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_TERMINAL_KEY', '1763583059270DEMO')
+TINKOFF_PASSWORD = os.environ.get('TINKOFF_PASSWORD', 'Isvm4_ae1lIiD9RM')
 # DEMO терминал использует тестовый URL
 TINKOFF_API_URL = 'https://rest-api-test.tinkoff.ru/v2/'
 DATABASE_URL = os.environ.get('DATABASE_URL', '')

@@ -27,24 +27,38 @@ def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
 def generate_token(params: Dict[str, Any]) -> str:
-    """Генерация токена по документации Тинькофф"""
+    """Генерация токена по документации Тинькофф
+    
+    Алгоритм:
+    1. Берем параметры (кроме Token, DATA, Receipt)
+    2. Добавляем Password как обычный параметр
+    3. Сортируем по ключам
+    4. Конкатенируем значения
+    5. SHA256
+    """
     token_params = {}
     for key, value in params.items():
         if key not in ['Token', 'DATA', 'Receipt']:
-            token_params[key] = value
+            token_params[key] = str(value)
     
+    # Password добавляется как параметр с ключом
     token_params['Password'] = TINKOFF_PASSWORD
     
+    # Сортируем ключи
     sorted_keys = sorted(token_params.keys())
-    values = [str(token_params[k]) for k in sorted_keys]
-    concatenated = ''.join(values)
     
+    # Конкатенируем значения по порядку отсортированных ключей
+    values_list = [token_params[k] for k in sorted_keys]
+    concatenated = ''.join(values_list)
+    
+    # SHA256 хеш
     token_hash = hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
     
-    print(f"[TOKEN_DEBUG] Keys: {sorted_keys}")
-    print(f"[TOKEN_DEBUG] Values: {values}")
+    print(f"[TOKEN_DEBUG] Params: {token_params}")
+    print(f"[TOKEN_DEBUG] Sorted keys: {sorted_keys}")
+    print(f"[TOKEN_DEBUG] Values: {values_list}")
     print(f"[TOKEN_DEBUG] Concatenated: {concatenated}")
-    print(f"[TOKEN_DEBUG] Token hash: {token_hash}")
+    print(f"[TOKEN_DEBUG] Hash: {token_hash}")
     
     return token_hash
 
@@ -145,10 +159,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             success_url = body_data.get('success_url', 'https://techforma.pro/payment/success')
             fail_url = body_data.get('fail_url', 'https://techforma.pro/payment/failed')
             
+            # Параметры для Init запроса - все значения должны быть нужных типов
             init_params = {
-                'TerminalKey': TINKOFF_TERMINAL_KEY,
-                'Amount': amount_kopecks,
-                'OrderId': order_id
+                'TerminalKey': str(TINKOFF_TERMINAL_KEY),
+                'Amount': int(amount_kopecks),  # Amount ДОЛЖЕН быть числом
+                'OrderId': str(order_id)
             }
             
             token = generate_token(init_params)

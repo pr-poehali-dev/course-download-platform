@@ -85,8 +85,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             },
             'isBase64Encoded': False,
             'body': json.dumps({
-                'provider': 'yookassa',
-                'ready': bool(SHOP_ID and SECRET_KEY)
+                'provider': 'tinkoff',
+                'ready': bool(TINKOFF_TERMINAL_KEY and TINKOFF_PASSWORD),
+                'yookassa_ready': bool(SHOP_ID and SECRET_KEY)
             })
         }
     

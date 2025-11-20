@@ -117,6 +117,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             user_id = body_data.get('user_id')
             package_id = body_data.get('package_id')
             
+            print(f"[INIT_PAYMENT] user_id={user_id}, package_id={package_id}")
+            print(f"[INIT_PAYMENT] Terminal={TINKOFF_TERMINAL_KEY}, PwdLen={len(TINKOFF_PASSWORD)}")
+            
             if not package_id or package_id not in BALANCE_PACKAGES:
                 return {
                     'statusCode': 400,
@@ -158,6 +161,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 with urllib.request.urlopen(req) as response:
                     result = json.loads(response.read().decode('utf-8'))
+                
+                print(f"[TINKOFF_RESPONSE] {json.dumps(result, ensure_ascii=False)}")
                 
                 if result.get('Success'):
                     return {

@@ -19,7 +19,9 @@ TINKOFF_TERMINAL_KEY = '1763583059270DEMO'
 TINKOFF_PASSWORD = 'Isvm4_ae1lIiD9RM'
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
-print(f"[INIT_V4_HARDCODED] TINKOFF configured: Terminal={bool(TINKOFF_TERMINAL_KEY)}, Password={bool(TINKOFF_PASSWORD)}, TerminalLen={len(TINKOFF_TERMINAL_KEY) if TINKOFF_TERMINAL_KEY else 0}, PwdLen={len(TINKOFF_PASSWORD) if TINKOFF_PASSWORD else 0}")
+print(f"[INIT_V5_DEBUG] Terminal: {TINKOFF_TERMINAL_KEY}")
+print(f"[INIT_V5_DEBUG] Password chars: {[c for c in TINKOFF_PASSWORD]}")
+print(f"[INIT_V5_DEBUG] Password length: {len(TINKOFF_PASSWORD)}")
 
 TINKOFF_API_URL = 'https://securepay.tinkoff.ru/v2/'
 
@@ -43,10 +45,19 @@ def generate_tinkoff_token(params: Dict[str, Any]) -> str:
     token_params = {k: str(v) for k, v in params.items() if k != 'Token' and k != 'DATA' and k != 'Receipt'}
     token_params['Password'] = TINKOFF_PASSWORD
     
+    print(f"[TOKEN_GEN] Token params keys (sorted): {sorted(token_params.keys())}")
+    print(f"[TOKEN_GEN] Token params values: {[(k, token_params[k]) for k in sorted(token_params.keys())]}")
+    
     sorted_values = [str(token_params[k]) for k in sorted(token_params.keys())]
     concatenated = ''.join(sorted_values)
     
-    return hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
+    print(f"[TOKEN_GEN] Concatenated string: {concatenated}")
+    print(f"[TOKEN_GEN] Concatenated length: {len(concatenated)}")
+    
+    token = hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
+    print(f"[TOKEN_GEN] Generated token: {token}")
+    
+    return token
 
 def tinkoff_request(endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
     """Отправка запроса к API Тинькофф"""

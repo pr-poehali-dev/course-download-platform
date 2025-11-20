@@ -103,9 +103,8 @@ export default function BuyPointsPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          action: 'init_tinkoff',
+          action: 'init_payment',
           user_id: user.id,
-          user_email: user.email,
           package_id: packageIdMap[selectedPackage.id],
           success_url: `${baseUrl}/payment/success`,
           fail_url: `${baseUrl}/payment/failed`

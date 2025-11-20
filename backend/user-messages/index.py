@@ -17,7 +17,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, OPTIONS',
                 'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
                 'Access-Control-Max-Age': '86400'
             },
@@ -77,7 +77,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    elif method == 'POST' and action == 'mark_read':
+    elif method in ['POST', 'PUT'] and action == 'mark_read':
         body_data = json.loads(event.get('body', '{}'))
         message_id = body_data.get('message_id')
         
@@ -92,7 +92,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
         
         cur.execute("""
-            DELETE FROM t_p63326274_course_download_plat.user_messages
+            UPDATE t_p63326274_course_download_plat.user_messages
+            SET is_read = TRUE
             WHERE id = %s AND user_id = %s
         """, (message_id, user_id))
         

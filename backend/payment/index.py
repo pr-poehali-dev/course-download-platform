@@ -16,7 +16,7 @@ from yookassa import Configuration, Payment
 SHOP_ID = os.environ.get('YOOKASSA_SHOP_ID', '')
 SECRET_KEY = os.environ.get('YOOKASSA_SECRET_KEY', '')
 TINKOFF_TERMINAL_KEY = '1763583059270DEMO'
-TINKOFF_PASSWORD = 'Isvm4_ae1lIiD9RM'
+TINKOFF_PASSWORD = 'Isvm4_ae1lIlID9RM'
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 print(f"[INIT_V5_DEBUG] Terminal: {TINKOFF_TERMINAL_KEY}")

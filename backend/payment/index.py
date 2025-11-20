@@ -16,7 +16,7 @@ import urllib.request
 SHOP_ID = os.environ.get('YOOKASSA_SHOP_ID', '')
 SECRET_KEY = os.environ.get('YOOKASSA_SECRET_KEY', '')
 TINKOFF_TERMINAL_KEY = '1763583059270DEMO'
-TINKOFF_PASSWORD = 'lsvm4_ae1IliD9RM'
+TINKOFF_PASSWORD = 'Isvm4_ae1lIiD9RM'
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
 print(f"[INIT_V5_DEBUG] Terminal: {TINKOFF_TERMINAL_KEY}")
@@ -209,12 +209,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             success_url = body_data.get('success_url', 'https://techforma.pro/payment/success')
             fail_url = body_data.get('fail_url', 'https://techforma.pro/payment/failed')
             
-            # Сначала создаём параметры БЕЗ DATA для генерации токена
+            # Сначала создаём параметры БЕЗ DATA для генерации токена - только обязательные
             token_params = {
                 'TerminalKey': TINKOFF_TERMINAL_KEY,
                 'Amount': amount_kopecks,
-                'OrderId': order_id,
-                'Description': f'Balance {total_points} points'
+                'OrderId': order_id
             }
             
             # Генерируем токен
@@ -225,7 +224,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'TerminalKey': TINKOFF_TERMINAL_KEY,
                 'Amount': amount_kopecks,
                 'OrderId': order_id,
-                'Description': f'Balance {total_points} points',
                 'Token': token,
                 'DATA': {
                     'user_id': str(user_id),

@@ -497,32 +497,64 @@ export default function WorkDetailPage() {
     
     setDownloading(true);
     try {
-      const orderResponse = await fetch(`${PURCHASE_WORK_URL}?action=create-order`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Id': String(userId)
-        },
-        body: JSON.stringify({
-          workId: actualWorkId
-        })
-      });
+      let downloadToken;
       
-      const orderData = await orderResponse.json();
-      
-      if (!orderResponse.ok) {
-        throw new Error(orderData.error || 'Ошибка создания заказа');
+      // Если работа уже куплена, просто генерируем токен для скачивания
+      if (isPurchased) {
+        const tokenResponse = await fetch(`${PURCHASE_WORK_URL}?action=generate-token`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': String(userId)
+          },
+          body: JSON.stringify({
+            workId: actualWorkId
+          })
+        });
+        
+        const tokenData = await tokenResponse.json();
+        
+        if (!tokenResponse.ok) {
+          throw new Error(tokenData.error || 'Ошибка генерации токена');
+        }
+        
+        downloadToken = tokenData.token;
+      } else {
+        // Если не куплена, создаём заказ (может списать баллы или перенаправить на оплату)
+        const orderResponse = await fetch(`${PURCHASE_WORK_URL}?action=create-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': String(userId)
+          },
+          body: JSON.stringify({
+            workId: actualWorkId
+          })
+        });
+        
+        const orderData = await orderResponse.json();
+        
+        if (!orderResponse.ok) {
+          throw new Error(orderData.error || 'Ошибка создания заказа');
+        }
+        
+        if (orderData.payUrl) {
+          // Сохраняем ID работы, чтобы вернуться после оплаты
+          localStorage.setItem('pendingWorkPurchase', actualWorkId);
+          window.location.href = orderData.payUrl;
+          return;
+        }
+        
+        // Получаем токен из ответа покупки
+        downloadToken = orderData.downloadToken;
+        
+        // Обновляем баланс пользователя в localStorage (если не админ)
+        if (user.role !== 'admin' && orderData.newBalance !== undefined) {
+          user.balance = orderData.newBalance;
+          localStorage.setItem('user', JSON.stringify(user));
+        }
       }
       
-      if (orderData.payUrl) {
-        // Сохраняем ID работы, чтобы вернуться после оплаты
-        localStorage.setItem('pendingWorkPurchase', actualWorkId);
-        window.location.href = orderData.payUrl;
-        return;
-      }
-      
-      // Получаем токен из ответа покупки
-      const downloadToken = orderData.downloadToken;
       if (!downloadToken) {
         throw new Error('Не получен токен для скачивания');
       }
@@ -575,17 +607,11 @@ export default function WorkDetailPage() {
         }).catch(err => console.error('Failed to track download:', err));
       }
       
-      // Обновляем баланс пользователя в localStorage (если не админ)
-      if (user.role !== 'admin' && orderData.newBalance !== undefined) {
-        user.balance = orderData.newBalance;
-        localStorage.setItem('user', JSON.stringify(user));
-      }
-      
-      const message = orderData.isAdmin 
-        ? '✅ Скачивание началось!\n\nФайл сохранится в папку "Загрузки"' 
-        : orderData.alreadyPurchased 
-          ? '✅ Работа уже куплена!\n\nСкачивание началось...' 
-          : `✅ Покупка успешна!\n\n💰 Списано ${work.price} баллов\n💵 Баланс: ${orderData.newBalance || user.balance}\n\n📥 Скачивание началось...`;
+      const message = isPurchased
+        ? '✅ Работа уже куплена!\n\nСкачивание началось...' 
+        : user.role === 'admin'
+          ? '✅ Скачивание началось!\n\nФайл сохранится в папку "Загрузки"' 
+          : `✅ Покупка успешна!\n\n💰 Списано ${work.price} баллов\n💵 Новый баланс: ${user.balance}\n\n📥 Скачивание началось...`;
       
       alert(message);
       
@@ -1209,6 +1235,11 @@ export default function WorkDetailPage() {
                   <>
                     <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
                     Скачивание...
+                  </>
+                ) : isPurchased ? (
+                  <>
+                    <Icon name="Download" size={18} className="mr-2" />
+                    Скачать работу
                   </>
                 ) : (
                   <>

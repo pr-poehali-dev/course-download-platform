@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tinkoff Payment Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .section h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .response {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.6;
+            display: none;
+        }
+        
+        .response.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            display: block;
+        }
+        
+        .response.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            display: block;
+        }
+        
+        .response pre {
+            margin-top: 10px;
+            background: rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        
+        .saved-payment-id {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            display: none;
+        }
+        
+        .saved-payment-id.show {
+            display: block;
+        }
+        
+        .saved-payment-id strong {
+            font-family: monospace;
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            color: #004085;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        
+        .loader.show {
+            display: block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Tinkoff Payment Tester</h1>
+        <p class="subtitle">Тестирование платежей и возвратов через Тинькофф Кассу</p>
+        
+        <!-- Шаг 1: Создание платежа -->
+        <div class="section">
+            <h2><span class="step-number">1</span>Создать платёж</h2>
+            
+            <div class="input-group">
+                <label>User ID:</label>
+                <input type="number" id="userId" value="1">
+            </div>
+            
+            <div class="input-group">
+                <label>Email:</label>
+                <input type="email" id="userEmail" value="test@example.com">
+            </div>
+            
+            <div class="input-group">
+                <label>Пакет баллов:</label>
+                <select id="packageId">
+                    <option value="100">100 баллов (500₽)</option>
+                    <option value="600">600 баллов (3000₽)</option>
+                    <option value="1500">1500 баллов (7500₽)</option>
+                    <option value="3000">3000 баллов (15000₽)</option>
+                </select>
+            </div>
+            
+            <button onclick="createPayment()">Создать платёж</button>
+            <div class="loader" id="loader1"></div>
+            <div class="response" id="response1"></div>
+            <div class="saved-payment-id" id="savedPaymentId"></div>
+        </div>
+        
+        <!-- Шаг 2: Оплата -->
+        <div class="section">
+            <h2><span class="step-number">2</span>Оплатить (опционально)</h2>
+            
+            <div class="info-box">
+                ℹ️ После создания платежа откроется страница оплаты Тинькофф.<br>
+                <strong>Тестовая карта:</strong> 5536 9137 7684 7658<br>
+                <strong>Срок:</strong> любой будущий | <strong>CVC:</strong> любой | <strong>SMS код:</strong> 12345
+            </div>
+            
+            <button id="openPaymentBtn" onclick="openPaymentUrl()" disabled>Открыть страницу оплаты</button>
+        </div>
+        
+        <!-- Шаг 3: Отмена платежа -->
+        <div class="section">
+            <h2><span class="step-number">3</span>Отменить платёж</h2>
+            
+            <div class="info-box">
+                ℹ️ После отмены Тинькофф автоматически отправит webhook-уведомление с Status=CANCELED или REFUNDED
+            </div>
+            
+            <div class="input-group">
+                <label>Payment ID:</label>
+                <input type="text" id="paymentIdCancel" placeholder="Автоматически заполнится после Шага 1">
+            </div>
+            
+            <button id="cancelBtn" onclick="cancelPayment()" disabled>Отменить платёж</button>
+            <div class="loader" id="loader3"></div>
+            <div class="response" id="response3"></div>
+        </div>
+        
+        <!-- Шаг 4: Проверка логов -->
+        <div class="section">
+            <h2><span class="step-number">4</span>Проверить логи</h2>
+            
+            <div class="info-box">
+                ℹ️ После отмены подожди 10-30 секунд, затем открой консоль браузера (F12) и проверь логи функции
+            </div>
+            
+            <button onclick="window.open('https://console.yandex.cloud', '_blank')">
+                Открыть Yandex Cloud Console
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://functions.poehali.dev/4b9b82b8-34d8-43e7-a9ac-c3cb0bd67fb1';
+        let currentPaymentId = null;
+        let currentPaymentUrl = null;
+
+        async function createPayment() {
+            const userId = document.getElementById('userId').value;
+            const userEmail = document.getElementById('userEmail').value;
+            const packageId = document.getElementById('packageId').value;
+            
+            const loader = document.getElementById('loader1');
+            const response = document.getElementById('response1');
+            const savedBox = document.getElementById('savedPaymentId');
+            
+            loader.classList.add('show');
+            response.style.display = 'none';
+            
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'init_tinkoff',
+                        user_id: parseInt(userId),
+                        user_email: userEmail,
+                        package_id: packageId
+                    })
+                });
+                
+                const data = await res.json();
+                loader.classList.remove('show');
+                
+                if (res.ok && data.payment_id) {
+                    currentPaymentId = data.payment_id;
+                    currentPaymentUrl = data.payment_url;
+                    
+                    document.getElementById('paymentIdCancel').value = currentPaymentId;
+                    document.getElementById('openPaymentBtn').disabled = false;
+                    document.getElementById('cancelBtn').disabled = false;
+                    
+                    response.className = 'response success';
+                    response.innerHTML = `
+                        ✅ <strong>Платёж создан!</strong><br>
+                        Payment ID: <strong>${data.payment_id}</strong><br>
+                        Order ID: ${data.order_id}<br>
+                        Status: ${data.status}
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    
+                    savedBox.innerHTML = `💾 Payment ID сохранён: <strong>${currentPaymentId}</strong>`;
+                    savedBox.classList.add('show');
+                } else {
+                    throw new Error(data.error || 'Ошибка создания платежа');
+                }
+            } catch (error) {
+                loader.classList.remove('show');
+                response.className = 'response error';
+                response.innerHTML = `❌ <strong>Ошибка:</strong> ${error.message}`;
+            }
+        }
+
+        function openPaymentUrl() {
+            if (currentPaymentUrl) {
+                window.open(currentPaymentUrl, '_blank');
+            }
+        }
+
+        async function cancelPayment() {
+            const paymentId = document.getElementById('paymentIdCancel').value;
+            
+            if (!paymentId) {
+                alert('Укажите Payment ID');
+                return;
+            }
+            
+            const loader = document.getElementById('loader3');
+            const response = document.getElementById('response3');
+            
+            loader.classList.add('show');
+            response.style.display = 'none';
+            
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'cancel_tinkoff',
+                        payment_id: paymentId
+                    })
+                });
+                
+                const data = await res.json();
+                loader.classList.remove('show');
+                
+                if (data.Success || data.Status) {
+                    response.className = 'response success';
+                    response.innerHTML = `
+                        ✅ <strong>Платёж отменён!</strong><br>
+                        Тинькофф отправит webhook на наш сервер в течение 10-30 секунд.<br>
+                        Проверь логи через минуту.
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    throw new Error(data.Message || data.error || 'Ошибка отмены');
+                }
+            } catch (error) {
+                loader.classList.remove('show');
+                response.className = 'response error';
+                response.innerHTML = `❌ <strong>Ошибка:</strong> ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

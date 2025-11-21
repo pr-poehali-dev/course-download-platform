@@ -197,9 +197,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
         
         if action == 'tinkoff_notification':
+            print(f"[TINKOFF] Received notification: {json.dumps(body_data, ensure_ascii=False)}")
+            
             status = body_data.get('Status')
             payment_id = body_data.get('PaymentId')
             order_id = body_data.get('OrderId')
+            
+            print(f"[TINKOFF] Status={status}, PaymentId={payment_id}, OrderId={order_id}")
             
             if status == 'CONFIRMED':
                 data_field = body_data.get('DATA', {})

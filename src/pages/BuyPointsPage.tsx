@@ -283,10 +283,11 @@ export default function BuyPointsPage() {
             <div>
               <h4 className="font-semibold mb-2 flex items-center gap-2">
                 <Icon name="HelpCircle" size={18} className="text-primary" />
-                Можно ли вернуть баллы?
+                Можно ли вернуть деньги?
               </h4>
               <p className="text-sm text-muted-foreground">
-                Баллы не подлежат возврату, но вы можете использовать их для покупки любых работ на платформе.
+                Да, возврат возможен в течение 24 часов с момента покупки, если баллы не были использованы. 
+                Обратитесь в поддержку через раздел "Поддержка" в профиле с указанием номера транзакции.
               </p>
             </div>
 

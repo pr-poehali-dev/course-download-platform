@@ -162,6 +162,28 @@ export default function Offer() {
                 <li>500 баллов — 2500 рублей</li>
                 <li>1000 баллов — 5000 рублей</li>
               </ul>
+
+              <p className="font-semibold text-foreground mt-4">
+                3.3. Политика возврата средств
+              </p>
+              <div className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 space-y-2">
+                <p>
+                  <strong>Возврат денежных средств возможен</strong> в следующих случаях:
+                </p>
+                <ul className="list-disc list-inside space-y-2 ml-4">
+                  <li>В течение <strong>24 часов</strong> с момента покупки баллов</li>
+                  <li>При условии, что купленные баллы <strong>не были использованы</strong> (не потрачены на работы)</li>
+                  <li>По решению администрации в исключительных случаях</li>
+                </ul>
+                <p className="mt-3">
+                  <strong>Порядок возврата:</strong> обратитесь в службу поддержки через раздел «Поддержка» 
+                  в личном кабинете или на email <strong>tech.forma@yandex.ru</strong> с указанием номера транзакции. 
+                  Возврат осуществляется на банковскую карту/счет в течение 5-10 рабочих дней.
+                </p>
+                <p className="mt-3 text-sm">
+                  <strong>Внимание:</strong> возврат невозможен, если баллы уже были использованы для покупки работ.
+                </p>
+              </div>
               <p className="text-sm mt-2">
                 <strong>Курс:</strong> 1 балл = 5 рублей
               </p>
@@ -300,7 +322,7 @@ export default function Offer() {
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
                 <strong>8.1.</strong> Пользователь может расторгнуть договор в любой момент, удалив свой аккаунт. 
-                При этом неиспользованные баллы аннулируются без возврата средств.
+                При этом неиспользованные баллы аннулируются. Возврат средств возможен в соответствии с разделом 3.3.
               </p>
               <p>
                 <strong>8.2.</strong> Администратор может расторгнуть договор в одностороннем порядке 

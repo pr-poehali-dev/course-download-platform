@@ -376,6 +376,264 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'body': json.dumps({'status': 'ok'})
             }
         
+        if action == 'request_refund':
+            # Обработка запроса на возврат от пользователя
+            user_id = body_data.get('user_id')
+            transaction_id = body_data.get('transaction_id')
+            reason = body_data.get('reason', '')
+            
+            if not user_id or not transaction_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'user_id и transaction_id обязательны'})
+                }
+            
+            conn = get_db_connection()
+            cur = conn.cursor()
+            
+            try:
+                # Проверяем существование транзакции
+                cur.execute("""
+                    SELECT t.id, t.amount, t.created_at, t.user_id, u.balance
+                    FROM t_p63326274_course_download_plat.transactions t
+                    JOIN t_p63326274_course_download_plat.users u ON t.user_id = u.id
+                    WHERE t.id = %s AND t.user_id = %s AND t.transaction_type = 'balance_topup'
+                """, (transaction_id, user_id))
+                
+                transaction = cur.fetchone()
+                
+                if not transaction:
+                    return {
+                        'statusCode': 404,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({'error': 'Транзакция не найдена'})
+                    }
+                
+                trans_id, amount, created_at, trans_user_id, current_balance = transaction
+                
+                # Проверяем, что прошло менее 24 часов
+                from datetime import datetime, timedelta
+                if datetime.now() - created_at > timedelta(hours=24):
+                    return {
+                        'statusCode': 400,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({'error': 'Прошло более 24 часов с момента покупки. Возврат невозможен.'})
+                    }
+                
+                # Проверяем, что баллы не были потрачены
+                if current_balance < amount:
+                    return {
+                        'statusCode': 400,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({'error': 'Баллы уже были частично использованы. Возврат невозможен.'})
+                    }
+                
+                # Создаём запрос на возврат
+                cur.execute("""
+                    INSERT INTO t_p63326274_course_download_plat.refund_requests
+                    (user_id, transaction_id, amount, reason, status, created_at)
+                    VALUES (%s, %s, %s, %s, 'pending', NOW())
+                    RETURNING id
+                """, (user_id, transaction_id, amount, reason))
+                
+                refund_request_id = cur.fetchone()[0]
+                conn.commit()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({
+                        'success': True,
+                        'refund_request_id': refund_request_id,
+                        'message': 'Запрос на возврат создан. Администратор рассмотрит его в течение 1-2 рабочих дней.'
+                    })
+                }
+            except Exception as e:
+                conn.rollback()
+                return {
+                    'statusCode': 500,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': f'Ошибка: {str(e)}'})
+                }
+            finally:
+                cur.close()
+                conn.close()
+        
+        if action == 'admin_process_refund':
+            # Обработка возврата администратором (одобрение/отклонение)
+            admin_user_id = body_data.get('admin_user_id')
+            refund_request_id = body_data.get('refund_request_id')
+            decision = body_data.get('decision')  # 'approve' или 'reject'
+            admin_comment = body_data.get('admin_comment', '')
+            
+            if not all([admin_user_id, refund_request_id, decision]):
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'Недостаточно параметров'})
+                }
+            
+            conn = get_db_connection()
+            cur = conn.cursor()
+            
+            try:
+                # Проверяем права админа
+                cur.execute("""
+                    SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s
+                """, (admin_user_id,))
+                
+                admin_role = cur.fetchone()
+                if not admin_role or admin_role[0] != 'admin':
+                    return {
+                        'statusCode': 403,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({'error': 'Недостаточно прав'})
+                    }
+                
+                # Получаем информацию о запросе на возврат
+                cur.execute("""
+                    SELECT user_id, transaction_id, amount, status
+                    FROM t_p63326274_course_download_plat.refund_requests
+                    WHERE id = %s
+                """, (refund_request_id,))
+                
+                refund_req = cur.fetchone()
+                if not refund_req:
+                    return {
+                        'statusCode': 404,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({'error': 'Запрос на возврат не найден'})
+                    }
+                
+                user_id, transaction_id, amount, status = refund_req
+                
+                if status != 'pending':
+                    return {
+                        'statusCode': 400,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({'error': 'Запрос уже обработан'})
+                    }
+                
+                if decision == 'approve':
+                    # Списываем баллы у пользователя
+                    cur.execute("""
+                        UPDATE t_p63326274_course_download_plat.users
+                        SET balance = balance - %s
+                        WHERE id = %s AND balance >= %s
+                    """, (amount, user_id, amount))
+                    
+                    if cur.rowcount == 0:
+                        return {
+                            'statusCode': 400,
+                            'headers': {
+                                'Content-Type': 'application/json',
+                                'Access-Control-Allow-Origin': '*'
+                            },
+                            'body': json.dumps({'error': 'Недостаточно баллов на балансе'})
+                        }
+                    
+                    # Записываем транзакцию возврата
+                    cur.execute("""
+                        INSERT INTO t_p63326274_course_download_plat.transactions
+                        (user_id, amount, transaction_type, description)
+                        VALUES (%s, %s, 'refund', %s)
+                    """, (user_id, -amount, f'Возврат средств по запросу #{refund_request_id}'))
+                    
+                    # Обновляем статус запроса
+                    cur.execute("""
+                        UPDATE t_p63326274_course_download_plat.refund_requests
+                        SET status = 'approved', admin_comment = %s, processed_at = NOW()
+                        WHERE id = %s
+                    """, (admin_comment, refund_request_id))
+                    
+                    conn.commit()
+                    
+                    return {
+                        'statusCode': 200,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({
+                            'success': True,
+                            'message': f'Возврат одобрен. {amount} баллов списано с баланса пользователя.'
+                        })
+                    }
+                elif decision == 'reject':
+                    # Отклоняем запрос
+                    cur.execute("""
+                        UPDATE t_p63326274_course_download_plat.refund_requests
+                        SET status = 'rejected', admin_comment = %s, processed_at = NOW()
+                        WHERE id = %s
+                    """, (admin_comment, refund_request_id))
+                    
+                    conn.commit()
+                    
+                    return {
+                        'statusCode': 200,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({
+                            'success': True,
+                            'message': 'Запрос на возврат отклонён.'
+                        })
+                    }
+                else:
+                    return {
+                        'statusCode': 400,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'body': json.dumps({'error': 'Неверное решение'})
+                    }
+            except Exception as e:
+                conn.rollback()
+                return {
+                    'statusCode': 500,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': f'Ошибка: {str(e)}'})
+                }
+            finally:
+                cur.close()
+                conn.close()
+        
         return {
             'statusCode': 400,
             'headers': {

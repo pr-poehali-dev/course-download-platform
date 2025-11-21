@@ -1,24 +1,25 @@
 """
-Business: Обработка платежей через Тинькофф Кассу с детальным логированием v2
+Business: Обработка платежей через ЮКассу и Тинькофф Кассу
 Args: event с httpMethod, body, queryStringParameters
-Returns: HTTP response с ссылкой на оплату или обработкой webhook уведомлений
+Returns: HTTP response с ссылкой на оплату или обработкой уведомлений
 """
 
 import json
 import os
+import uuid
 import hashlib
 import psycopg2
-import logging
 from typing import Dict, Any
+from yookassa import Configuration, Payment
+import urllib.request
 
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
-
+SHOP_ID = os.environ.get('YOOKASSA_SHOP_ID', '')
+SECRET_KEY = os.environ.get('YOOKASSA_SECRET_KEY', '')
 TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_TERMINAL_KEY', '')
 TINKOFF_PASSWORD = os.environ.get('TINKOFF_PASSWORD', '')
-# DEMO терминал использует тестовый URL
-TINKOFF_API_URL = 'https://rest-api-test.tinkoff.ru/v2/'
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
+
+TINKOFF_API_URL = 'https://securepay.tinkoff.ru/v2/'
 
 BALANCE_PACKAGES = {
     '50': {'points': 50, 'price': 250, 'bonus': 0},
@@ -28,50 +29,37 @@ BALANCE_PACKAGES = {
     '1000': {'points': 1000, 'price': 5000, 'bonus': 350},
 }
 
+if SHOP_ID and SECRET_KEY:
+    Configuration.account_id = SHOP_ID
+    Configuration.secret_key = SECRET_KEY
+
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
-def generate_token(params: Dict[str, Any]) -> str:
-    """Генерация токена по документации Тинькофф
-    
-    Алгоритм:
-    1. Берем параметры (кроме Token, DATA, Receipt)
-    2. Добавляем Password как обычный параметр
-    3. Сортируем по ключам
-    4. Конкатенируем значения
-    5. SHA256
-    """
-    token_params = {}
-    for key, value in params.items():
-        if key not in ['Token', 'DATA', 'Receipt']:
-            token_params[key] = str(value)
-    
-    # Password добавляется как параметр с ключом
+def generate_tinkoff_token(params: Dict[str, Any]) -> str:
+    """Генерация токена для подписи запроса к Тинькофф"""
+    token_params = {k: str(v) for k, v in params.items() if k != 'Token' and k != 'DATA' and k != 'Receipt'}
     token_params['Password'] = TINKOFF_PASSWORD
     
-    logger.info(f"[TOKEN_STEP1] Original params: {params}")
-    logger.info(f"[TOKEN_STEP2] After adding Password: {token_params}")
-    logger.info(f"[TOKEN_STEP3] Password value: '{TINKOFF_PASSWORD}' (length={len(TINKOFF_PASSWORD)})")
-    logger.info(f"[TOKEN_STEP4] TerminalKey: '{TINKOFF_TERMINAL_KEY}'")
+    sorted_values = [str(token_params[k]) for k in sorted(token_params.keys())]
+    concatenated = ''.join(sorted_values)
     
-    # Сортируем ключи
-    sorted_keys = sorted(token_params.keys())
-    logger.info(f"[TOKEN_STEP5] Sorted keys: {sorted_keys}")
+    return hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
+
+def tinkoff_request(endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
+    """Отправка запроса к API Тинькофф"""
+    url = TINKOFF_API_URL + endpoint
     
-    # Конкатенируем значения по порядку отсортированных ключей
-    values_list = [token_params[k] for k in sorted_keys]
-    concatenated = ''.join(values_list)
+    json_data = json.dumps(data).encode('utf-8')
     
-    logger.info(f"[TOKEN_STEP6] Values list: {values_list}")
-    logger.info(f"[TOKEN_STEP7] Concatenated string: '{concatenated}'")
-    logger.info(f"[TOKEN_STEP8] Concatenated length: {len(concatenated)}")
+    req = urllib.request.Request(
+        url,
+        data=json_data,
+        headers={'Content-Type': 'application/json'}
+    )
     
-    # SHA256 хеш
-    token_hash = hashlib.sha256(concatenated.encode('utf-8')).hexdigest()
-    
-    logger.info(f"[TOKEN_STEP9] Final SHA256 hash: {token_hash}")
-    
-    return token_hash
+    with urllib.request.urlopen(req) as response:
+        return json.loads(response.read().decode('utf-8'))
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
@@ -82,40 +70,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'headers': {
                 'Access-Control-Allow-Origin': '*',
                 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type',
+                'Access-Control-Allow-Headers': 'Content-Type, X-User-Email',
                 'Access-Control-Max-Age': '86400'
             },
             'body': ''
         }
     
     if method == 'GET':
-        query_params = event.get('queryStringParameters', {})
-        
-        if query_params.get('test') == 'token':
-            test_params = {
-                'TerminalKey': TINKOFF_TERMINAL_KEY,
-                'Amount': 100000,
-                'OrderId': 'test_order_12345'
-            }
-            test_token = generate_token(test_params)
-            
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'isBase64Encoded': False,
-                'body': json.dumps({
-                    'test_mode': True,
-                    'params': test_params,
-                    'generated_token': test_token,
-                    'terminal_key': TINKOFF_TERMINAL_KEY,
-                    'password_length': len(TINKOFF_PASSWORD),
-                    'password_first_4': TINKOFF_PASSWORD[:4] if len(TINKOFF_PASSWORD) >= 4 else TINKOFF_PASSWORD
-                })
-            }
-        
         return {
             'statusCode': 200,
             'headers': {
@@ -125,65 +86,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False,
             'body': json.dumps({
                 'provider': 'tinkoff',
-                'ready': True
+                'ready': bool(TINKOFF_TERMINAL_KEY and TINKOFF_PASSWORD),
+                'yookassa_ready': bool(SHOP_ID and SECRET_KEY)
             })
         }
     
     if method == 'POST':
         body_data = json.loads(event.get('body', '{}'))
         action = body_data.get('action')
+        provider = body_data.get('provider', 'yookassa')
         
-        logger.info(f"[DEBUG] POST request, action={action}, body_keys={list(body_data.keys())}")
-        
-        if 'TerminalKey' in body_data and 'Status' in body_data and not action:
-            status = body_data.get('Status')
-            order_id = body_data.get('OrderId')
-            
-            if status == 'CONFIRMED':
-                order_parts = order_id.split('_')
-                if len(order_parts) >= 3:
-                    user_id = int(order_parts[1])
-                    package_id = order_parts[2]
-                    
-                    if package_id in BALANCE_PACKAGES:
-                        package = BALANCE_PACKAGES[package_id]
-                        points = package['points'] + package['bonus']
-                        
-                        conn = get_db_connection()
-                        cur = conn.cursor()
-                        
-                        try:
-                            cur.execute("""
-                                UPDATE t_p63326274_course_download_plat.users 
-                                SET balance = balance + %s 
-                                WHERE id = %s
-                            """, (points, user_id))
-                            
-                            conn.commit()
-                        finally:
-                            cur.close()
-                            conn.close()
-            
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json.dumps({'OK': 'OK'})
-            }
-        
-        if action == 'init_payment':
+        if action == 'init_tinkoff':
             user_id = body_data.get('user_id')
+            user_email = body_data.get('user_email')
             package_id = body_data.get('package_id')
-            
-            logger.info(f"\n{'='*60}")
-            logger.info(f"[INIT_PAYMENT] Starting payment initialization")
-            logger.info(f"[INIT_PAYMENT] user_id={user_id}, package_id={package_id}")
-            logger.info(f"[INIT_PAYMENT] Terminal='{TINKOFF_TERMINAL_KEY}'")
-            logger.info(f"[INIT_PAYMENT] Password length={len(TINKOFF_PASSWORD)}")
-            logger.info(f"[INIT_PAYMENT] Password first 4 chars='{TINKOFF_PASSWORD[:4]}...'")
-            logger.info(f"{'='*60}\n")
             
             if not package_id or package_id not in BALANCE_PACKAGES:
                 return {
@@ -196,85 +112,270 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             package = BALANCE_PACKAGES[package_id]
+            total_points = package['points'] + package['bonus']
             amount_kopecks = package['price'] * 100
+            
             order_id = f"order_{user_id}_{package_id}_{context.request_id[:8]}"
             
             success_url = body_data.get('success_url', 'https://techforma.pro/payment/success')
             fail_url = body_data.get('fail_url', 'https://techforma.pro/payment/failed')
             
-            # Параметры для Init запроса
             init_params = {
                 'TerminalKey': TINKOFF_TERMINAL_KEY,
-                'Amount': amount_kopecks,  # число в копейках
-                'OrderId': order_id
+                'Amount': amount_kopecks,
+                'OrderId': order_id,
+                'Description': f'Покупка {total_points} баллов',
+                'SuccessURL': success_url,
+                'FailURL': fail_url
             }
             
-            # Генерируем токен (внутри все будет конвертировано в строки)
-            token = generate_token(init_params)
+            init_params['Token'] = generate_tinkoff_token(init_params)
             
-            # Добавляем Token и URL-ы к параметрам запроса
-            init_params['Token'] = token
-            init_params['SuccessURL'] = success_url
-            init_params['FailURL'] = fail_url
+            init_params['DATA'] = {
+                'user_id': str(user_id),
+                'user_email': user_email or '',
+                'points': str(total_points),
+                'package_id': package_id
+            }
             
-            logger.info(f"\n{'='*60}")
-            logger.info(f"[REQUEST_TO_TINKOFF] Sending to: {TINKOFF_API_URL}Init")
-            logger.info(f"[REQUEST_TO_TINKOFF] Params: {json.dumps(init_params, ensure_ascii=False, indent=2)}")
-            logger.info(f"{'='*60}\n")
-            
-            import urllib.request
-            import urllib.error
-            
-            try:
-                req = urllib.request.Request(
-                    TINKOFF_API_URL + 'Init',
-                    data=json.dumps(init_params).encode('utf-8'),
-                    headers={'Content-Type': 'application/json'}
-                )
-                
-                with urllib.request.urlopen(req) as response:
-                    result = json.loads(response.read().decode('utf-8'))
-                
-                logger.info(f"\n{'='*60}")
-                logger.info(f"[TINKOFF_RESPONSE] Response received:")
-                logger.info(f"[TINKOFF_RESPONSE] {json.dumps(result, ensure_ascii=False, indent=2)}")
-                logger.info(f"{'='*60}\n")
-                
-                if result.get('Success'):
-                    return {
-                        'statusCode': 200,
-                        'headers': {
-                            'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*'
-                        },
-                        'body': json.dumps({
-                            'payment_id': result.get('PaymentId'),
-                            'payment_url': result.get('PaymentURL'),
-                            'order_id': order_id
-                        })
+            init_params['Receipt'] = {
+                'Email': user_email or 'noreply@techforma.pro',
+                'Taxation': 'usn_income',
+                'Items': [
+                    {
+                        'Name': f'Баллы TechForma',
+                        'Price': amount_kopecks,
+                        'Quantity': 1.00,
+                        'Amount': amount_kopecks,
+                        'Tax': 'none',
+                        'PaymentMethod': 'full_payment',
+                        'PaymentObject': 'service'
                     }
-                else:
-                    return {
-                        'statusCode': 400,
-                        'headers': {
-                            'Content-Type': 'application/json',
-                            'Access-Control-Allow-Origin': '*'
-                        },
-                        'body': json.dumps({
-                            'error': result.get('Message', 'Payment init failed'),
-                            'details': result.get('Details'),
-                            'error_code': result.get('ErrorCode')
-                        })
-                    }
-            except Exception as e:
+                ]
+            }
+            
+            result = tinkoff_request('Init', init_params)
+            
+            if result.get('Success'):
                 return {
-                    'statusCode': 500,
+                    'statusCode': 200,
                     'headers': {
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
-                    'body': json.dumps({'error': str(e)})
+                    'body': json.dumps({
+                        'payment_id': result.get('PaymentId'),
+                        'payment_url': result.get('PaymentURL'),
+                        'order_id': order_id,
+                        'status': result.get('Status')
+                    })
                 }
+            else:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({
+                        'error': result.get('Message', 'Payment init failed'),
+                        'details': result.get('Details'),
+                        'error_code': result.get('ErrorCode')
+                    })
+                }
+        
+        if action == 'tinkoff_notification':
+            status = body_data.get('Status')
+            payment_id = body_data.get('PaymentId')
+            
+            if status == 'CONFIRMED':
+                data_field = body_data.get('DATA', {})
+                user_id = data_field.get('user_id')
+                user_email = data_field.get('user_email')
+                points = int(data_field.get('points', 0)) if data_field.get('points') else 0
+                
+                if user_id and points > 0:
+                    conn = get_db_connection()
+                    cur = conn.cursor()
+                    
+                    try:
+                        cur.execute("""
+                            UPDATE t_p63326274_course_download_plat.users 
+                            SET balance = balance + %s 
+                            WHERE id = %s
+                        """, (points, int(user_id)))
+                        
+                        cur.execute("""
+                            INSERT INTO t_p63326274_course_download_plat.transactions
+                            (user_id, amount, transaction_type, description)
+                            VALUES (%s, %s, 'balance_topup', %s)
+                        """, (int(user_id), points, f'Пополнение через Тинькофф: {points} баллов'))
+                        
+                        amount_rubles = float(body_data.get('Amount', 0)) / 100
+                        
+                        cur.execute("""
+                            INSERT INTO t_p63326274_course_download_plat.payments 
+                            (user_email, points, amount, payment_id, status, created_at)
+                            VALUES (%s, %s, %s, %s, 'succeeded', NOW())
+                        """, (user_email or '', points, amount_rubles, str(payment_id)))
+                        
+                        conn.commit()
+                    finally:
+                        cur.close()
+                        conn.close()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'OK': 'OK'})
+            }
+        
+        if action == 'create_payment':
+            user_email = body_data.get('user_email')
+            user_id = body_data.get('user_id')
+            package_id = body_data.get('package_id')
+            points = body_data.get('points', 0)
+            price = body_data.get('price', 0)
+            payment_type = body_data.get('payment_type', 'points')  # 'points' or 'premium'
+            
+            if package_id and package_id in BALANCE_PACKAGES:
+                package = BALANCE_PACKAGES[package_id]
+                points = package['points']
+                price = package['price']
+            
+            if not user_email or not price:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'Missing required fields'})
+                }
+            
+            idempotence_key = str(uuid.uuid4())
+            
+            if payment_type == 'premium':
+                description = "Подписка Premium на 30 дней"
+            else:
+                description = f"Покупка {points} баллов"
+            
+            payment = Payment.create({
+                "amount": {
+                    "value": str(price),
+                    "currency": "RUB"
+                },
+                "confirmation": {
+                    "type": "redirect",
+                    "return_url": body_data.get('return_url', 'https://example.com/success')
+                },
+                "capture": True,
+                "description": description,
+                "metadata": {
+                    "user_email": user_email,
+                    "user_id": str(user_id) if user_id else "",
+                    "points": str(points),
+                    "payment_type": payment_type
+                }
+            }, idempotence_key)
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({
+                    'payment_id': payment.id,
+                    'confirmation_url': payment.confirmation.confirmation_url,
+                    'status': payment.status
+                })
+            }
+        
+        if action == 'webhook':
+            notification_type = body_data.get('event')
+            
+            if notification_type == 'payment.succeeded':
+                payment_obj = body_data.get('object', {})
+                payment_id = payment_obj.get('id')
+                metadata = payment_obj.get('metadata', {})
+                user_email = metadata.get('user_email')
+                user_id = metadata.get('user_id')
+                points = int(metadata.get('points', 0)) if metadata.get('points') else 0
+                payment_type = metadata.get('payment_type', 'points')
+                
+                conn = get_db_connection()
+                cur = conn.cursor()
+                
+                try:
+                    if payment_type == 'premium' and user_id:
+                        # Активировать Premium подписку
+                        from datetime import datetime, timedelta
+                        expires_at = datetime.now() + timedelta(days=30)
+                        
+                        cur.execute("""
+                            UPDATE t_p63326274_course_download_plat.users 
+                            SET is_premium = TRUE, premium_expires_at = %s
+                            WHERE id = %s
+                        """, (expires_at, int(user_id)))
+                        
+                        cur.execute("""
+                            INSERT INTO t_p63326274_course_download_plat.subscriptions
+                            (user_id, subscription_type, amount, status, starts_at, expires_at, payment_id)
+                            VALUES (%s, 'premium_monthly', 299, 'active', NOW(), %s, %s)
+                        """, (int(user_id), expires_at, payment_id))
+                        
+                        conn.commit()
+                    
+                    elif user_email and points > 0:
+                        # Начислить баллы
+                        cur.execute("""
+                            UPDATE t_p63326274_course_download_plat.users 
+                            SET balance = balance + %s 
+                            WHERE email = %s
+                        """, (points, user_email))
+                        
+                        cur.execute("""
+                            INSERT INTO t_p63326274_course_download_plat.transactions
+                            (user_id, amount, transaction_type, description)
+                            SELECT id, %s, 'balance_topup', 'Пополнение баланса'
+                            FROM t_p63326274_course_download_plat.users WHERE email = %s
+                        """, (points, user_email))
+                        
+                        conn.commit()
+                    
+                    # Записать платёж
+                    cur.execute("""
+                        INSERT INTO t_p63326274_course_download_plat.payments 
+                        (user_email, points, amount, payment_id, status, created_at)
+                        VALUES (%s, %s, %s, %s, 'succeeded', NOW())
+                    """, (user_email, points, float(payment_obj.get('amount', {}).get('value', 0)), payment_id))
+                    
+                    conn.commit()
+                finally:
+                    cur.close()
+                    conn.close()
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'status': 'ok'})
+                }
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'status': 'ok'})
+            }
         
         return {
             'statusCode': 400,

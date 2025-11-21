@@ -82,8 +82,9 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          action: 'init_payment',
+          action: 'init_tinkoff',
           user_id: user.id,
+          user_email: user.email,
           package_id: packageIdMap[pkg.points],
           success_url: `${baseUrl}/payment/success`,
           fail_url: `${baseUrl}/payment/failed`

@@ -147,13 +147,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             # Проверяем баланс только для не-админов
             if not is_admin and balance < price:
                 conn.rollback()
+                
+                # Генерируем ссылку на пополнение баланса
+                base_url = event.get('headers', {}).get('origin', 'https://techforma.pro')
+                topup_url = f"{base_url}/buy-points"
+                
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps({
                         'error': 'Insufficient balance',
                         'balance': balance,
-                        'required': price
+                        'required': price,
+                        'payUrl': topup_url
                     }),
                     'isBase64Encoded': False
                 }
@@ -430,7 +436,7 @@ def create_order(event: Dict[str, Any]) -> Dict[str, Any]:
         if existing_order:
             order_id, status, amount_cents = existing_order
             site_url = os.environ.get('SITE_URL', 'https://techforma.pro')
-            pay_url = f"{site_url}/payment?orderId={order_id}"
+            pay_url = f"{site_url}/buy-points"
             
             cur.close()
             conn.close()
@@ -460,7 +466,7 @@ def create_order(event: Dict[str, Any]) -> Dict[str, Any]:
         )
         order_id = cur.fetchone()[0]
         
-        pay_url = f"{site_url}/payment?orderId={order_id}"
+        pay_url = f"{site_url}/buy-points"
         
         cur.execute(
             "UPDATE t_p63326274_course_download_plat.orders SET payment_url = %s WHERE id = %s",

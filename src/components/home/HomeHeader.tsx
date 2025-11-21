@@ -125,9 +125,11 @@ export default function HomeHeader({
                       <Icon name="User" size={16} className="mr-2" />
                       Профиль
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onSetPaymentDialogOpen(true)}>
-                      <Icon name="Plus" size={16} className="mr-2" />
-                      Пополнить баланс
+                    <DropdownMenuItem asChild>
+                      <a href="/buy-points">
+                        <Icon name="Plus" size={16} className="mr-2" />
+                        Пополнить баланс
+                      </a>
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onSetPromoDialogOpen(true)}>
                       <Icon name="Gift" size={16} className="mr-2" />

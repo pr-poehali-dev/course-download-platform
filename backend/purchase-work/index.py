@@ -63,6 +63,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         user_id = body.get('userId')
         client_price = body.get('price')
         
+        print(f"[PURCHASE] Starting purchase: user_id={user_id}, work_id={work_id}, client_price={client_price}")
+        
         if not all([work_id, user_id]):
             return {
                 'statusCode': 400,
@@ -144,6 +146,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             buyer_email = user_result[2] if len(user_result) > 2 else None
             is_admin = (role == 'admin')
             
+            print(f"[PURCHASE] User data: balance={balance}, role={role}, is_admin={is_admin}, price={price}")
+            
             # Проверяем баланс только для не-админов
             if not is_admin and balance < price:
                 conn.rollback()
@@ -188,6 +192,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             existing_purchase = cur.fetchone()
             if existing_purchase:
+                print(f"[PURCHASE] Work already purchased, generating re-download token")
                 # Генерируем новый токен для повторного скачивания
                 import secrets
                 from datetime import datetime, timedelta
@@ -219,10 +224,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             # Списываем баллы (только если не админ)
             if not is_admin:
+                print(f"[PURCHASE] Deducting {price} points from user {user_id}, current balance: {balance}")
                 cur.execute(
                     "UPDATE t_p63326274_course_download_plat.users SET balance = balance - %s WHERE id = %s",
                     (price, user_id)
                 )
+            else:
+                print(f"[PURCHASE] Admin user - skipping balance deduction")
             
             # Создаём запись о покупке с комиссией 15%
             commission = int(price * 0.10)
@@ -332,12 +340,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             conn.commit()
             
+            new_balance = balance if is_admin else balance - price
+            print(f"[PURCHASE] Purchase completed! New balance: {new_balance}, token: {download_token[:20]}...")
+            
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
                     'success': True,
-                    'newBalance': balance if is_admin else balance - price,
+                    'newBalance': new_balance,
                     'message': 'Purchase successful',
                     'isAdmin': is_admin,
                     'downloadToken': download_token,

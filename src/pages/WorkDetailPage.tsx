@@ -514,12 +514,9 @@ export default function WorkDetailPage() {
         throw new Error(orderData.error || 'Ошибка создания заказа');
       }
       
-      if (orderData.alreadyPaid) {
-        // Работа уже оплачена, но токен нужен заново
-        alert('Работа уже оплачена. Для скачивания нужен новый токен. Обратитесь в поддержку.');
-        setDownloading(false);
-        return;
-      } else if (orderData.payUrl) {
+      if (orderData.payUrl) {
+        // Сохраняем ID работы, чтобы вернуться после оплаты
+        localStorage.setItem('pendingWorkPurchase', actualWorkId);
         window.location.href = orderData.payUrl;
         return;
       }
@@ -586,11 +583,14 @@ export default function WorkDetailPage() {
       
       const message = orderData.isAdmin 
         ? '✅ Скачивание началось!\n\nФайл сохранится в папку "Загрузки"' 
-        : orderData.alreadyPaid 
-          ? '✅ Работа уже оплачена!\n\nСкачивание началось...' 
+        : orderData.alreadyPurchased 
+          ? '✅ Работа уже куплена!\n\nСкачивание началось...' 
           : `✅ Покупка успешна!\n\n💰 Списано ${work.price} баллов\n💵 Баланс: ${orderData.newBalance || user.balance}\n\n📥 Скачивание началось...`;
       
       alert(message);
+      
+      // Открываем защитный пакет после успешной покупки
+      navigate(`/defense-kit?workId=${actualWorkId}`);
       
     } catch (error) {
       console.error('Purchase/Download error:', error);

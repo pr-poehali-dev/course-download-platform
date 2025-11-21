@@ -9,13 +9,29 @@ import Footer from '@/components/Footer';
 export default function PaymentSuccessPage() {
   const [searchParams] = useSearchParams();
   const [countdown, setCountdown] = useState(10);
+  const [pendingWorkId, setPendingWorkId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const workId = localStorage.getItem('pendingWorkPurchase');
+    setPendingWorkId(workId);
+  }, []);
 
   useEffect(() => {
+    // Проверяем, не была ли это покупка работы
+    const pendingWorkId = localStorage.getItem('pendingWorkPurchase');
+    
     const timer = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
-          window.location.href = '/profile';
+          
+          // Если была попытка купить работу, перенаправляем на неё
+          if (pendingWorkId) {
+            localStorage.removeItem('pendingWorkPurchase');
+            window.location.href = `/work/${pendingWorkId}`;
+          } else {
+            window.location.href = '/profile';
+          }
           return 0;
         }
         return prev - 1;
@@ -45,7 +61,10 @@ export default function PaymentSuccessPage() {
               </CardTitle>
               
               <CardDescription className="text-lg text-slate-600">
-                Баллы уже зачислены на ваш счёт
+                {pendingWorkId 
+                  ? 'Баллы зачислены! Возвращаемся к работе...' 
+                  : 'Баллы уже зачислены на ваш счёт'
+                }
               </CardDescription>
             </CardHeader>
 
@@ -110,7 +129,7 @@ export default function PaymentSuccessPage() {
 
               <div className="text-center pt-4">
                 <p className="text-sm text-slate-500">
-                  Автоматический переход в профиль через{' '}
+                  Автоматический переход {pendingWorkId ? 'к работе' : 'в профиль'} через{' '}
                   <span className="font-semibold text-slate-700">{countdown}</span> сек
                 </p>
               </div>

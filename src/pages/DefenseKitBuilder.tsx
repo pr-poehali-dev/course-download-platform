@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
@@ -29,6 +29,36 @@ export default function DefenseKitBuilder() {
   });
   
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Загружаем данные работы, если передан workId
+  useEffect(() => {
+    const loadWorkData = async () => {
+      if (!workId) return;
+      
+      try {
+        const response = await fetch(`${funcUrls.works}?id=${workId}`);
+        const data = await response.json();
+        
+        if (data.works && data.works.length > 0) {
+          const work = data.works[0];
+          // Предзаполняем заголовок работы
+          setFormData(prev => ({
+            ...prev,
+            title: work.title || ''
+          }));
+          
+          toast({
+            title: 'Данные загружены',
+            description: 'Название работы автоматически заполнено'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading work data:', error);
+      }
+    };
+    
+    loadWorkData();
+  }, [workId, toast]);
   
   const addTask = () => {
     setFormData({

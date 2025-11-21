@@ -186,14 +186,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 (user_id, db_work_id)
             )
             
-            if cur.fetchone():
-                conn.rollback()
+            existing_purchase = cur.fetchone()
+            if existing_purchase:
+                # Генерируем новый токен для повторного скачивания
+                download_token = generate_download_token(user_id, db_work_id)
+                
+                cur.execute(
+                    """INSERT INTO t_p63326274_course_download_plat.download_tokens 
+                    (user_id, work_id, token, expires_at) 
+                    VALUES (%s, %s, %s, NOW() + INTERVAL '1 hour')""",
+                    (user_id, db_work_id, download_token)
+                )
+                
+                conn.commit()
+                
                 return {
                     'statusCode': 200,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps({
                         'success': True,
                         'alreadyPurchased': True,
+                        'downloadToken': download_token,
                         'message': 'Work already purchased'
                     }),
                     'isBase64Encoded': False

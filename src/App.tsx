@@ -37,6 +37,7 @@ import DefenseKitBuilder from "./pages/DefenseKitBuilder";
 import SecurityLogsPage from "./pages/SecurityLogsPage";
 import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentFailedPage from "./pages/PaymentFailedPage";
+import PointsAuditPage from "./pages/PointsAuditPage";
 
 
 
@@ -61,6 +62,7 @@ const App = () => (
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/admin/support" element={<SupportAdmin />} />
           <Route path="/admin/security-logs" element={<SecurityLogsPage />} />
+          <Route path="/admin/points-audit" element={<PointsAuditPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/buy-points" element={<BuyPointsPage />} />
           <Route path="/upload" element={<UploadWorkPage />} />

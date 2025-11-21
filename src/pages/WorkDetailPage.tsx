@@ -519,6 +519,7 @@ export default function WorkDetailPage() {
       
       // Если работа уже куплена, просто генерируем токен для скачивания
       if (isAlreadyPurchased) {
+        console.log('Work already purchased, generating download token...');
         const tokenResponse = await fetch(`${PURCHASE_WORK_URL}?action=generate-token`, {
           method: 'POST',
           headers: {
@@ -538,33 +539,36 @@ export default function WorkDetailPage() {
         
         downloadToken = tokenData.token;
       } else {
-        // Если не куплена, создаём заказ (может списать баллы или перенаправить на оплату)
-        const orderResponse = await fetch(`${PURCHASE_WORK_URL}?action=create-order`, {
+        // Если не куплена, пытаемся купить за баллы
+        console.log('Work not purchased, attempting to purchase with баллы...');
+        const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'X-User-Id': String(userId)
           },
           body: JSON.stringify({
-            workId: actualWorkId
+            workId: actualWorkId,
+            userId: userId,
+            price: work.price
           })
         });
         
-        const orderData = await orderResponse.json();
+        const purchaseData = await purchaseResponse.json();
+        console.log('Purchase response:', purchaseData);
         
-        if (!orderResponse.ok) {
-          throw new Error(orderData.error || 'Ошибка создания заказа');
-        }
-        
-        if (orderData.payUrl) {
-          // Сохраняем ID работы, чтобы вернуться после оплаты
-          localStorage.setItem('pendingWorkPurchase', actualWorkId);
-          window.location.href = orderData.payUrl;
-          return;
+        if (!purchaseResponse.ok) {
+          // Если недостаточно баллов, получим payUrl для пополнения
+          if (purchaseData.payUrl) {
+            localStorage.setItem('pendingWorkPurchase', actualWorkId);
+            window.location.href = purchaseData.payUrl;
+            return;
+          }
+          throw new Error(purchaseData.error || 'Ошибка покупки');
         }
         
         // Получаем токен из ответа покупки
-        downloadToken = orderData.downloadToken;
+        downloadToken = purchaseData.downloadToken;
         
         // Обновляем баланс пользователя в localStorage (если не админ)
         if (user.role !== 'admin' && orderData.newBalance !== undefined) {

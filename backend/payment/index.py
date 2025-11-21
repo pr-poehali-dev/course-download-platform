@@ -95,6 +95,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         action = body_data.get('action')
         provider = body_data.get('provider', 'yookassa')
         
+        # Определяем webhook от Тинькофф по наличию специфичных полей
+        if 'TerminalKey' in body_data and 'Status' in body_data and not action:
+            action = 'tinkoff_notification'
+        
         if action == 'init_tinkoff':
             user_id = body_data.get('user_id')
             user_email = body_data.get('user_email')

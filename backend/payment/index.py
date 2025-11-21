@@ -242,22 +242,47 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             print(f"[TINKOFF] Status={status}, PaymentId={payment_id}, OrderId={order_id}")
             
             if status == 'CONFIRMED':
-                data_field = body_data.get('DATA', {})
-                user_id = data_field.get('user_id')
-                user_email = data_field.get('user_email')
-                points = int(data_field.get('points', 0)) if data_field.get('points') else 0
+                # Парсим OrderId: order_{user_id}_{package_id}_{request_id}
+                order_parts = order_id.split('_')
+                if len(order_parts) >= 3:
+                    user_id = order_parts[1]
+                    package_id = order_parts[2]
+                else:
+                    print(f"[ERROR] Cannot parse OrderId: {order_id}")
+                    user_id = None
+                    package_id = None
+                
+                # Получаем данные пакета
+                if package_id and package_id in BALANCE_PACKAGES:
+                    package = BALANCE_PACKAGES[package_id]
+                    points = package['points'] + package['bonus']
+                else:
+                    points = 0
                 
                 if user_id and points > 0:
                     conn = get_db_connection()
                     cur = conn.cursor()
                     
                     try:
+                        # Получаем email пользователя
+                        cur.execute("""
+                            SELECT email FROM t_p63326274_course_download_plat.users 
+                            WHERE id = %s
+                        """, (int(user_id),))
+                        
+                        user_record = cur.fetchone()
+                        user_email = user_record[0] if user_record else ''
+                        
+                        # Начисляем баллы
                         cur.execute("""
                             UPDATE t_p63326274_course_download_plat.users 
                             SET balance = balance + %s 
                             WHERE id = %s
                         """, (points, int(user_id)))
                         
+                        print(f"[TINKOFF] Updated balance for user_id={user_id}, added {points} points")
+                        
+                        # Записываем транзакцию
                         cur.execute("""
                             INSERT INTO t_p63326274_course_download_plat.transactions
                             (user_id, amount, transaction_type, description)
@@ -266,16 +291,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         
                         amount_rubles = float(body_data.get('Amount', 0)) / 100
                         
+                        # Записываем платёж
                         cur.execute("""
                             INSERT INTO t_p63326274_course_download_plat.payments 
                             (user_email, points, amount, payment_id, status, created_at)
                             VALUES (%s, %s, %s, %s, 'succeeded', NOW())
-                        """, (user_email or '', points, amount_rubles, str(payment_id)))
+                        """, (user_email, points, amount_rubles, str(payment_id)))
                         
                         conn.commit()
+                        print(f"[TINKOFF] Payment processed successfully: PaymentId={payment_id}")
                     finally:
                         cur.close()
                         conn.close()
+                else:
+                    print(f"[WARN] Cannot process payment: user_id={user_id}, points={points}")
             
             elif status == 'REFUNDED' or status == 'PARTIAL_REFUNDED':
                 # Обработка возврата средств

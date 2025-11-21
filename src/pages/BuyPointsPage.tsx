@@ -106,6 +106,8 @@ export default function BuyPointsPage() {
       const data = await response.json();
 
       if (data.payment_url) {
+        // Сохраняем текущий баланс перед оплатой
+        localStorage.setItem('balance_before_payment', String(user.balance || 0));
         window.location.href = data.payment_url;
       } else {
         toast({

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import { authService } from '@/lib/auth';
 import funcUrls from '../../backend/func2url.json';
 
 export default function PaymentSuccessPage() {
@@ -13,16 +14,55 @@ export default function PaymentSuccessPage() {
   const [countdown, setCountdown] = useState(10);
   const [pendingWorkId, setPendingWorkId] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [balanceInfo, setBalanceInfo] = useState<{ old: number; new: number; added: number } | null>(null);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
   
   useEffect(() => {
     const workId = localStorage.getItem('pendingWorkPurchase');
     setPendingWorkId(workId);
+    
+    // Проверяем баланс и показываем начисленные баллы
+    checkBalanceUpdate();
     
     // Если есть pending работа, сразу начинаем её покупку
     if (workId) {
       handleAutoPurchase(workId);
     }
   }, []);
+
+  const checkBalanceUpdate = async () => {
+    try {
+      // Получаем старый баланс из localStorage (если есть)
+      const oldBalanceStr = localStorage.getItem('balance_before_payment');
+      const oldBalance = oldBalanceStr ? parseInt(oldBalanceStr) : 0;
+      
+      // Небольшая задержка для обработки webhook на сервере
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Получаем новый баланс с сервера
+      const user = await authService.verify();
+      if (user) {
+        const newBalance = user.balance || 0;
+        const added = newBalance - oldBalance;
+        
+        setBalanceInfo({
+          old: oldBalance,
+          new: newBalance,
+          added: added > 0 ? added : 0
+        });
+        
+        // Обновляем пользователя в localStorage
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+      
+      // Очищаем старый баланс
+      localStorage.removeItem('balance_before_payment');
+    } catch (error) {
+      console.error('Error checking balance:', error);
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
 
   const handleAutoPurchase = async (workId: string) => {
     setIsProcessing(true);
@@ -167,12 +207,34 @@ export default function PaymentSuccessPage() {
                   ? isProcessing 
                     ? '📥 Скачиваем работу и готовим защитный пакет...' 
                     : 'Баллы зачислены! Возвращаемся к работе...'
-                  : 'Баллы уже зачислены на ваш счёт'
+                  : isLoadingBalance
+                    ? 'Проверяем начисление баллов...'
+                    : balanceInfo && balanceInfo.added > 0
+                      ? `На ваш счёт зачислено ${balanceInfo.added} баллов!`
+                      : 'Баллы уже зачислены на ваш счёт'
                 }
               </CardDescription>
             </CardHeader>
 
             <CardContent className="space-y-6">
+              {balanceInfo && balanceInfo.added > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-6 space-y-3">
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <Icon name="Sparkles" size={24} className="text-green-600" />
+                    <h3 className="text-xl font-bold text-green-900">Баллы начислены!</h3>
+                  </div>
+                  
+                  <div className="text-center space-y-2">
+                    <div className="text-4xl font-bold text-green-600">
+                      +{balanceInfo.added}
+                    </div>
+                    <div className="text-sm text-slate-600">
+                      Новый баланс: <span className="font-semibold text-slate-900">{balanceInfo.new} баллов</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
               {(orderId || paymentId) && (
                 <div className="bg-slate-50 rounded-lg p-4 space-y-2">
                   {orderId && (

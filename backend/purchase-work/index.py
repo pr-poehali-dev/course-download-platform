@@ -189,13 +189,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             existing_purchase = cur.fetchone()
             if existing_purchase:
                 # Генерируем новый токен для повторного скачивания
-                download_token = generate_download_token(user_id, db_work_id)
+                import secrets
+                from datetime import datetime, timedelta
+                
+                download_token = secrets.token_urlsafe(48)
+                token_expires_at = datetime.now() + timedelta(minutes=30)
+                ip_address = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
                 
                 cur.execute(
                     """INSERT INTO t_p63326274_course_download_plat.download_tokens 
-                    (user_id, work_id, token, expires_at) 
-                    VALUES (%s, %s, %s, NOW() + INTERVAL '1 hour')""",
-                    (user_id, db_work_id, download_token)
+                    (token, user_id, work_id, expires_at, ip_address) 
+                    VALUES (%s, %s, %s, %s, %s)""",
+                    (download_token, user_id, db_work_id, token_expires_at, ip_address)
                 )
                 
                 conn.commit()

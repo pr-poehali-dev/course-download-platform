@@ -54,8 +54,6 @@ export default function HomeHeader({
           <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
             <a href="/" className="hover:text-primary transition-colors text-sm">Главная</a>
             <a href="/catalog" className="hover:text-primary transition-colors text-sm">Каталог</a>
-
-            <a href="#blog" className="hover:text-primary transition-colors text-sm">Блог</a>
             <a href="#support" className="hover:text-primary transition-colors text-sm">Поддержка</a>
           </nav>
           
@@ -104,7 +102,7 @@ export default function HomeHeader({
                     <Icon name="Coins" size={16} className="text-primary sm:w-5 sm:h-5" />
                     <span className="text-sm sm:text-base font-bold text-primary">{userBalance}</span>
                   </div>
-                  <p className="text-[10px] text-center text-muted-foreground hidden sm:block">Доступно работ: {availableWorks}</p>
+                  <p className="text-[10px] text-center text-muted-foreground">Доступно работ: {availableWorks}</p>
                 </div>
 
                 <DropdownMenu>
@@ -171,13 +169,6 @@ export default function HomeHeader({
                 onClick={() => onSetMobileMenuOpen(false)}
               >
                 Каталог
-              </a>
-              <a 
-                href="#blog" 
-                className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
-                onClick={() => onSetMobileMenuOpen(false)}
-              >
-                Блог
               </a>
               <a 
                 href="#support" 

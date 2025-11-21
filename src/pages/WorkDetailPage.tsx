@@ -15,6 +15,7 @@ import { recentlyViewedStorage } from '@/utils/recentlyViewed';
 import { getFakeAuthor, incrementViewCount, getViewCount } from '@/utils/fakeAuthors';
 import ReviewsSection from '@/components/ReviewsSection';
 import WorkActivityTracker from '@/components/WorkActivityTracker';
+import { toast } from '@/components/ui/use-toast';
 
 
 interface Work {
@@ -629,13 +630,22 @@ export default function WorkDetailPage() {
         }).catch(err => console.error('Failed to track download:', err));
       }
       
-      const message = isAlreadyPurchased
-        ? '✅ Работа уже куплена!\n\nСкачивание началось...' 
-        : user.role === 'admin'
-          ? '✅ Скачивание началось!\n\nФайл сохранится в папку "Загрузки"' 
-          : `✅ Покупка успешна!\n\n💰 Списано ${work.price} баллов\n💵 Новый баланс: ${user.balance}\n\n📥 Скачивание началось...`;
-      
-      alert(message);
+      if (isAlreadyPurchased) {
+        toast({
+          title: '✅ Работа уже куплена!',
+          description: 'Скачивание началось...',
+        });
+      } else if (user.role === 'admin') {
+        toast({
+          title: '✅ Скачивание началось!',
+          description: 'Файл сохранится в папку "Загрузки"',
+        });
+      } else {
+        toast({
+          title: '✅ Покупка успешна!',
+          description: `Списано ${work.price} баллов. Новый баланс: ${purchaseData.newBalance} баллов. Скачивание началось...`,
+        });
+      }
       
       // Открываем защитный пакет после успешной покупки
       navigate(`/defense-kit?workId=${actualWorkId}`);
@@ -1266,7 +1276,7 @@ export default function WorkDetailPage() {
                 ) : (
                   <>
                     <Icon name="Download" size={18} className="mr-2" />
-                    Купить и скачать
+                    Купить за {work.price} баллов
                   </>
                 )}
               </Button>

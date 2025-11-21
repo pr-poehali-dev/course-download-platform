@@ -94,7 +94,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Work not found'}),
+                    'body': json.dumps({'error': 'Работа не найдена'}),
                     'isBase64Encoded': False
                 }
             
@@ -137,7 +137,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'User not found'}),
+                    'body': json.dumps({'error': 'Пользователь не найден'}),
                     'isBase64Encoded': False
                 }
             
@@ -160,7 +160,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps({
-                        'error': 'Insufficient balance',
+                        'error': 'Недостаточно баллов',
                         'balance': balance,
                         'required': price,
                         'payUrl': topup_url

@@ -229,10 +229,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     "UPDATE t_p63326274_course_download_plat.users SET balance = balance - %s WHERE id = %s",
                     (price, user_id)
                 )
+                
+                # Записываем транзакцию списания баллов у покупателя (ВСЕГДА, независимо от наличия автора)
+                cur.execute(
+                    """INSERT INTO t_p63326274_course_download_plat.transactions
+                    (user_id, amount, type, description)
+                    VALUES (%s, %s, %s, %s)""",
+                    (user_id, -price, 'purchase', f'Покупка работы #{db_work_id}')
+                )
             else:
                 print(f"[PURCHASE] Admin user - skipping balance deduction")
             
-            # Создаём запись о покупке с комиссией 15%
+            # Создаём запись о покупке с комиссией 10%
             commission = int(price * 0.10)
             cur.execute(
                 """INSERT INTO t_p63326274_course_download_plat.purchases 
@@ -263,20 +271,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     (author_id, db_work_id, purchase_id, price, author_share, platform_fee, 'paid')
                 )
                 
-                # Записываем транзакцию списания баллов у покупателя
-                cur.execute(
-                    """INSERT INTO t_p63326274_course_download_plat.transactions
-                    (user_id, amount, type, description)
-                    VALUES (%s, %s, %s, %s)""",
-                    (user_id, -price, 'purchase', f'Покупка работы #{db_work_id}')
-                )
-                
                 # Записываем транзакцию начисления автору
                 cur.execute(
                     """INSERT INTO t_p63326274_course_download_plat.transactions
                     (user_id, amount, type, description)
                     VALUES (%s, %s, %s, %s)""",
-                    (author_id, author_share, 'sale', f'Продажа работы #{db_work_id} (комиссия 15%)')
+                    (author_id, author_share, 'sale', f'Продажа работы #{db_work_id} (комиссия 10%)')
                 )
                 
                 # Получаем email автора для уведомления

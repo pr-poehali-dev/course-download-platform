@@ -19,7 +19,6 @@ interface PointsPackage {
 
 export default function BuyPointsPage() {
   const [selectedPackage, setSelectedPackage] = useState<PointsPackage | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'sbp' | null>(null);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
 
@@ -75,10 +74,10 @@ export default function BuyPointsPage() {
   ];
 
   const handlePurchase = async () => {
-    if (!selectedPackage || !paymentMethod || !user) {
+    if (!selectedPackage || !user) {
       toast({
         title: 'Ошибка',
-        description: 'Выберите пакет и способ оплаты',
+        description: 'Выберите пакет баллов',
         variant: 'destructive'
       });
       return;
@@ -203,90 +202,63 @@ export default function BuyPointsPage() {
         {selectedPackage && (
           <Card className="border-primary">
             <CardHeader>
-              <CardTitle>Способ оплаты</CardTitle>
-              <CardDescription>Выберите удобный способ оплаты</CardDescription>
+              <CardTitle>Подтверждение покупки</CardTitle>
+              <CardDescription>Вы будете перенаправлены на страницу оплаты Тинькофф</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div
-                className={`p-4 border rounded-lg cursor-pointer transition-all hover:border-primary ${
-                  paymentMethod === 'card' ? 'border-primary bg-primary/5' : ''
-                }`}
-                onClick={() => setPaymentMethod('card')}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Icon name="CreditCard" size={24} className="text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Банковская карта</p>
-                    <p className="text-sm text-muted-foreground">Visa, MasterCard, МИР</p>
-                  </div>
-                  {paymentMethod === 'card' && (
-                    <Icon name="CheckCircle2" size={24} className="ml-auto text-primary" />
-                  )}
+              <div className="space-y-3 p-4 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Баллов к зачислению:</span>
+                  <span className="font-semibold text-lg">
+                    {selectedPackage.points + selectedPackage.bonus}
+                  </span>
                 </div>
-              </div>
-
-              <div
-                className={`p-4 border rounded-lg cursor-pointer transition-all hover:border-primary ${
-                  paymentMethod === 'sbp' ? 'border-primary bg-primary/5' : ''
-                }`}
-                onClick={() => setPaymentMethod('sbp')}
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Icon name="Smartphone" size={24} className="text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold">Система Быстрых Платежей (СБП)</p>
-                    <p className="text-sm text-muted-foreground">Оплата через мобильное приложение банка</p>
-                  </div>
-                  {paymentMethod === 'sbp' && (
-                    <Icon name="CheckCircle2" size={24} className="ml-auto text-primary" />
-                  )}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t">
-                <div className="space-y-2 mb-4">
+                {selectedPackage.bonus > 0 && (
                   <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Баллов к зачислению:</span>
-                    <span className="font-semibold text-lg">
-                      {selectedPackage.points + selectedPackage.bonus}
+                    <span className="text-muted-foreground">В том числе бонус:</span>
+                    <span className="font-semibold text-lg text-green-600">
+                      +{selectedPackage.bonus}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">К оплате:</span>
-                    <span className="font-bold text-2xl">{selectedPackage.price} ₽</span>
-                  </div>
+                )}
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <span className="text-muted-foreground">К оплате:</span>
+                  <span className="font-bold text-2xl">{selectedPackage.price} ₽</span>
                 </div>
+              </div>
 
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handlePurchase}
-                  disabled={!paymentMethod || loading}
-                >
-                  {loading ? (
-                    <>
-                      <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                      Создание платежа...
-                    </>
-                  ) : (
-                    <>
-                      <Icon name="ShoppingCart" size={18} className="mr-2" />
-                      Оплатить {selectedPackage.price} ₽
-                    </>
-                  )}
-                </Button>
-
-                <p className="text-xs text-muted-foreground text-center mt-4">
-                  Нажимая кнопку, вы соглашаетесь с{' '}
-                  <Link to="/terms-of-service" className="underline">
-                    условиями использования
-                  </Link>
+              <div className="flex items-center gap-2 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
+                <Icon name="Info" size={18} className="text-blue-600" />
+                <p className="text-sm text-blue-900 dark:text-blue-200">
+                  Доступна оплата картой (Visa, MasterCard, МИР) и через СБП
                 </p>
               </div>
+
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handlePurchase}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                    Создание платежа...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="CreditCard" size={18} className="mr-2" />
+                    Перейти к оплате
+                  </>
+                )}
+              </Button>
+
+              <p className="text-xs text-muted-foreground text-center">
+                Нажимая кнопку, вы соглашаетесь с{' '}
+                <Link to="/terms-of-service" className="underline">
+                  условиями использования
+                </Link>
+              </p>
             </CardContent>
           </Card>
         )}

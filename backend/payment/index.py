@@ -15,7 +15,7 @@ import urllib.request
 
 SHOP_ID = os.environ.get('YOOKASSA_SHOP_ID', '')
 SECRET_KEY = os.environ.get('YOOKASSA_SECRET_KEY', '')
-TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_TERMINAL_KEY', '')
+TINKOFF_TERMINAL_KEY = os.environ.get('TINKOFF_KEY', '')
 TINKOFF_PASSWORD = os.environ.get('TINKOFF_PASSWORD', '')
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 

@@ -1,5 +1,5 @@
 """
-Business: Обработка платежей через ЮКассу и Тинькофф Кассу
+Business: Обработка платежей через ЮКассу и Тинькофф Кассу (боевой терминал)
 Args: event с httpMethod, body, queryStringParameters
 Returns: HTTP response с ссылкой на оплату или обработкой уведомлений
 """

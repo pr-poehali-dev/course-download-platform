@@ -196,6 +196,38 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     })
                 }
         
+        if action == 'cancel_tinkoff':
+            # Отмена платежа через API Тинькофф (для тестирования)
+            payment_id = body_data.get('payment_id')
+            
+            if not payment_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'payment_id is required'})
+                }
+            
+            cancel_params = {
+                'TerminalKey': TINKOFF_TERMINAL_KEY,
+                'PaymentId': str(payment_id)
+            }
+            
+            cancel_params['Token'] = generate_tinkoff_token(cancel_params)
+            
+            result = tinkoff_request('Cancel', cancel_params)
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(result)
+            }
+        
         if action == 'tinkoff_notification':
             print(f"[TINKOFF] Received notification: {json.dumps(body_data, ensure_ascii=False)}")
             

@@ -22,11 +22,10 @@ DATABASE_URL = os.environ.get('DATABASE_URL', '')
 TINKOFF_API_URL = 'https://securepay.tinkoff.ru/v2/'
 
 BALANCE_PACKAGES = {
-    '50': {'points': 50, 'price': 250, 'bonus': 0},
-    '100': {'points': 100, 'price': 500, 'bonus': 20},
-    '200': {'points': 200, 'price': 1000, 'bonus': 50},
-    '500': {'points': 500, 'price': 2500, 'bonus': 150},
-    '1000': {'points': 1000, 'price': 5000, 'bonus': 350},
+    '100': {'points': 100, 'price': 500, 'bonus': 10},
+    '600': {'points': 600, 'price': 3000, 'bonus': 100},
+    '1500': {'points': 1500, 'price': 7500, 'bonus': 300},
+    '3000': {'points': 3000, 'price': 15000, 'bonus': 700},
 }
 
 if SHOP_ID and SECRET_KEY:

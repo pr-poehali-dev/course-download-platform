@@ -6,8 +6,7 @@
       "path": "/",
       "expectedStatus": 200,
       "expectedBody": {
-        "provider": "yookassa",
-        "ready": "boolean"
+        "provider": "tinkoff"
       },
       "bodyMatcher": "partial"
     },

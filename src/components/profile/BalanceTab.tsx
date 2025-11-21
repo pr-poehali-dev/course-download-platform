@@ -16,11 +16,10 @@ interface BalancePackage {
 }
 
 const BALANCE_PACKAGES: BalancePackage[] = [
-  { id: '50', points: 50, price: 250 },
-  { id: '100', points: 100, price: 500, bonus: 20, popular: true },
-  { id: '200', points: 200, price: 1000, bonus: 50 },
-  { id: '500', points: 500, price: 2500, bonus: 150 },
-  { id: '1000', points: 1000, price: 5000, bonus: 350 },
+  { id: '100', points: 100, price: 500, bonus: 10 },
+  { id: '600', points: 600, price: 3000, bonus: 100, popular: true },
+  { id: '1500', points: 1500, price: 7500, bonus: 300 },
+  { id: '3000', points: 3000, price: 15000, bonus: 700 },
 ];
 
 export default function BalanceTab() {

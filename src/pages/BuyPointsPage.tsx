@@ -37,38 +37,31 @@ export default function BuyPointsPage() {
   const packages: PointsPackage[] = [
     {
       id: 1,
-      points: 50,
-      price: 250,
-      bonus: 0,
-      description: 'Для пробы'
+      points: 100,
+      price: 500,
+      bonus: 10,
+      description: 'Стартовый'
     },
     {
       id: 2,
-      points: 100,
-      price: 500,
-      bonus: 20,
+      points: 600,
+      price: 3000,
+      bonus: 100,
       popular: true,
       description: 'Самый популярный'
     },
     {
       id: 3,
-      points: 200,
-      price: 1000,
-      bonus: 50,
+      points: 1500,
+      price: 7500,
+      bonus: 300,
       description: 'Выгодная сделка'
     },
     {
       id: 4,
-      points: 500,
-      price: 2500,
-      bonus: 150,
-      description: 'Максимальная выгода'
-    },
-    {
-      id: 5,
-      points: 1000,
-      price: 5000,
-      bonus: 350,
+      points: 3000,
+      price: 15000,
+      bonus: 700,
       description: 'Для профессионалов'
     }
   ];
@@ -87,11 +80,10 @@ export default function BuyPointsPage() {
 
     try {
       const packageIdMap: Record<number, string> = {
-        1: '50',
-        2: '100',
-        3: '200',
-        4: '500',
-        5: '1000'
+        1: '100',
+        2: '600',
+        3: '1500',
+        4: '3000'
       };
 
       const baseUrl = window.location.origin;

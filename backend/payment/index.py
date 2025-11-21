@@ -235,6 +235,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if action == 'tinkoff_notification':
             print(f"[TINKOFF] Received notification: {json.dumps(body_data, ensure_ascii=False)}")
             
+            # КРИТИЧНО: Проверяем подпись webhook от Тинькофф
+            received_token = body_data.get('Token', '')
+            if received_token:
+                # Генерируем ожидаемую подпись
+                expected_token = generate_tinkoff_token(body_data)
+                
+                if received_token != expected_token:
+                    print(f"[SECURITY] Invalid signature from Tinkoff webhook")
+                    print(f"[SECURITY] Received: {received_token[:20]}...")
+                    print(f"[SECURITY] Expected: {expected_token[:20]}...")
+                    return {
+                        'statusCode': 403,
+                        'headers': {'Content-Type': 'text/plain'},
+                        'body': 'Invalid signature'
+                    }
+                
+                print(f"[SECURITY] Webhook signature verified ✅")
+            else:
+                print(f"[WARN] No Token in webhook, skipping signature check (test mode?)")
+            
             status = body_data.get('Status')
             payment_id = body_data.get('PaymentId')
             order_id = body_data.get('OrderId')
@@ -264,6 +284,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     cur = conn.cursor()
                     
                     try:
+                        # ИДЕМПОТЕНТНОСТЬ: Проверяем, не обработан ли уже этот платёж
+                        cur.execute("""
+                            SELECT id FROM t_p63326274_course_download_plat.payments 
+                            WHERE payment_id = %s
+                        """, (str(payment_id),))
+                        
+                        if cur.fetchone():
+                            print(f"[IDEMPOTENCY] Payment {payment_id} already processed, skipping")
+                            conn.close()
+                            return {
+                                'statusCode': 200,
+                                'headers': {'Content-Type': 'text/plain'},
+                                'body': 'OK (already processed)'
+                            }
+                        
                         # Получаем email пользователя
                         cur.execute("""
                             SELECT email FROM t_p63326274_course_download_plat.users 
@@ -299,7 +334,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         """, (user_email, points, amount_rubles, str(payment_id)))
                         
                         conn.commit()
-                        print(f"[TINKOFF] Payment processed successfully: PaymentId={payment_id}")
+                        print(f"[SUCCESS] Payment {payment_id} processed successfully")
+                    
+                    except Exception as e:
+                        conn.rollback()
+                        print(f"[ERROR] Failed to process payment {payment_id}: {e}")
+                        # В production можно добавить отправку alert
+                    
                     finally:
                         cur.close()
                         conn.close()

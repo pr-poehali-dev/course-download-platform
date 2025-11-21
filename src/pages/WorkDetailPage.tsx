@@ -76,8 +76,11 @@ export default function WorkDetailPage() {
         try {
           const response = await fetch(`${func2url['user-data']}?user_id=${user.id}&action=purchases`);
           const data = await response.json();
+          console.log('Purchases data:', data);
+          console.log('Current work ID:', actualWorkId);
           if (data.purchases) {
             const purchased = data.purchases.some((p: any) => String(p.work_id) === String(actualWorkId));
+            console.log('Is purchased:', purchased);
             setIsPurchased(purchased);
           }
         } catch (error) {
@@ -92,7 +95,7 @@ export default function WorkDetailPage() {
       }
     };
     checkAuth();
-  }, []);
+  }, [actualWorkId]);
 
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
   const API_BASE = 'https://cloud-api.yandex.net/v1/disk/public/resources';
@@ -497,10 +500,25 @@ export default function WorkDetailPage() {
     
     setDownloading(true);
     try {
+      // Перепроверяем покупку перед действием
+      let isAlreadyPurchased = isPurchased;
+      
+      try {
+        const checkResponse = await fetch(`${func2url['user-data']}?user_id=${userId}&action=purchases`);
+        const checkData = await checkResponse.json();
+        if (checkData.purchases) {
+          isAlreadyPurchased = checkData.purchases.some((p: any) => String(p.work_id) === String(actualWorkId));
+          console.log('Double-check: Is purchased?', isAlreadyPurchased);
+          setIsPurchased(isAlreadyPurchased);
+        }
+      } catch (error) {
+        console.error('Error double-checking purchase:', error);
+      }
+      
       let downloadToken;
       
       // Если работа уже куплена, просто генерируем токен для скачивания
-      if (isPurchased) {
+      if (isAlreadyPurchased) {
         const tokenResponse = await fetch(`${PURCHASE_WORK_URL}?action=generate-token`, {
           method: 'POST',
           headers: {
@@ -607,7 +625,7 @@ export default function WorkDetailPage() {
         }).catch(err => console.error('Failed to track download:', err));
       }
       
-      const message = isPurchased
+      const message = isAlreadyPurchased
         ? '✅ Работа уже куплена!\n\nСкачивание началось...' 
         : user.role === 'admin'
           ? '✅ Скачивание началось!\n\nФайл сохранится в папку "Загрузки"' 

@@ -571,8 +571,8 @@ export default function WorkDetailPage() {
         downloadToken = purchaseData.downloadToken;
         
         // Обновляем баланс пользователя в localStorage (если не админ)
-        if (user.role !== 'admin' && orderData.newBalance !== undefined) {
-          user.balance = orderData.newBalance;
+        if (user.role !== 'admin' && purchaseData.newBalance !== undefined) {
+          user.balance = purchaseData.newBalance;
           localStorage.setItem('user', JSON.stringify(user));
         }
       }

@@ -285,7 +285,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         # Записываем транзакцию
                         cur.execute("""
                             INSERT INTO t_p63326274_course_download_plat.transactions
-                            (user_id, amount, transaction_type, description)
+                            (user_id, amount, type, description)
                             VALUES (%s, %s, 'balance_topup', %s)
                         """, (int(user_id), points, f'Пополнение через Тинькофф: {points} баллов'))
                         
@@ -347,7 +347,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             # Записываем транзакцию возврата
                             cur.execute("""
                                 INSERT INTO t_p63326274_course_download_plat.transactions
-                                (user_id, amount, transaction_type, description)
+                                (user_id, amount, type, description)
                                 VALUES (%s, %s, 'refund', %s)
                             """, (user_id, -points, f'Возврат платежа Тинькофф (PaymentId: {payment_id})'))
                             

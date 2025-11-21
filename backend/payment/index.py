@@ -119,11 +119,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             success_url = body_data.get('success_url', 'https://techforma.pro/payment/success')
             fail_url = body_data.get('fail_url', 'https://techforma.pro/payment/failed')
             
+            # URL для уведомлений от Тинькофф (webhook)
+            # Используем URL из func2url.json
+            import json as json_module
+            try:
+                with open('/function/backend/func2url.json', 'r') as f:
+                    func_urls = json_module.load(f)
+                    payment_url = func_urls.get('payment', 'https://functions.poehali.dev/4b9b82b8-34d8-43e7-a9ac-c3cb0bd67fb1')
+            except:
+                payment_url = 'https://functions.poehali.dev/4b9b82b8-34d8-43e7-a9ac-c3cb0bd67fb1'
+            
+            notification_url = f"{payment_url}?action=tinkoff_notification"
+            
             init_params = {
                 'TerminalKey': TINKOFF_TERMINAL_KEY,
                 'Amount': amount_kopecks,
                 'OrderId': order_id,
                 'Description': f'Покупка {total_points} баллов',
+                'NotificationURL': notification_url,
                 'SuccessURL': success_url,
                 'FailURL': fail_url
             }
@@ -186,6 +199,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if action == 'tinkoff_notification':
             status = body_data.get('Status')
             payment_id = body_data.get('PaymentId')
+            order_id = body_data.get('OrderId')
             
             if status == 'CONFIRMED':
                 data_field = body_data.get('DATA', {})
@@ -222,6 +236,52 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     finally:
                         cur.close()
                         conn.close()
+            
+            elif status == 'REFUNDED' or status == 'PARTIAL_REFUNDED':
+                # Обработка возврата средств
+                data_field = body_data.get('DATA', {})
+                user_id = data_field.get('user_id')
+                points = int(data_field.get('points', 0)) if data_field.get('points') else 0
+                
+                if user_id and points > 0:
+                    conn = get_db_connection()
+                    cur = conn.cursor()
+                    
+                    try:
+                        # Списываем баллы у пользователя
+                        cur.execute("""
+                            UPDATE t_p63326274_course_download_plat.users 
+                            SET balance = balance - %s 
+                            WHERE id = %s AND balance >= %s
+                        """, (points, int(user_id), points))
+                        
+                        if cur.rowcount > 0:
+                            # Записываем транзакцию возврата
+                            cur.execute("""
+                                INSERT INTO t_p63326274_course_download_plat.transactions
+                                (user_id, amount, transaction_type, description)
+                                VALUES (%s, %s, 'refund', %s)
+                            """, (int(user_id), -points, f'Возврат платежа Тинькофф (PaymentId: {payment_id})'))
+                            
+                            # Обновляем статус платежа
+                            cur.execute("""
+                                UPDATE t_p63326274_course_download_plat.payments 
+                                SET status = 'refunded'
+                                WHERE payment_id = %s
+                            """, (str(payment_id),))
+                            
+                            conn.commit()
+                        else:
+                            # Недостаточно баллов — записываем в лог
+                            print(f"[WARN] Cannot refund: user {user_id} has insufficient balance ({points} points required)")
+                            
+                    finally:
+                        cur.close()
+                        conn.close()
+            
+            elif status == 'CANCELED' or status == 'REJECTED':
+                # Платёж отменён или отклонён — ничего не делаем, но логируем
+                print(f"[INFO] Payment {payment_id} status: {status} (OrderId: {order_id})")
             
             return {
                 'statusCode': 200,

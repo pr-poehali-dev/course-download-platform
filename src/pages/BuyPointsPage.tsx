@@ -40,7 +40,7 @@ export default function BuyPointsPage() {
       points: 100,
       price: 500,
       bonus: 10,
-      description: 'Стартовый'
+      description: 'Для пробы'
     },
     {
       id: 2,
@@ -62,7 +62,7 @@ export default function BuyPointsPage() {
       points: 3000,
       price: 15000,
       bonus: 700,
-      description: 'Для профессионалов'
+      description: 'Максимальная выгода'
     }
   ];
 

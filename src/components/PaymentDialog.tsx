@@ -26,9 +26,9 @@ interface PaymentPackage {
 }
 
 const PACKAGES: PaymentPackage[] = [
-  { points: 50, price: 250, bonus: 0 },
-  { points: 100, price: 500, bonus: 20, popular: true },
-  { points: 200, price: 1000, bonus: 50 },
+  { points: 100, price: 500, bonus: 10 },
+  { points: 600, price: 3000, bonus: 100, popular: true },
+  { points: 1500, price: 7500, bonus: 300 },
 ];
 
 export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail }: PaymentDialogProps) {
@@ -69,9 +69,9 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
       }
 
       const packageIdMap: Record<number, string> = {
-        50: '50',
         100: '100',
-        200: '200'
+        600: '600',
+        1500: '1500'
       };
       
       const baseUrl = window.location.origin;

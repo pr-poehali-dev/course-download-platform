@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест системы покупок</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 16px;
+        }
+        h1 { font-size: 28px; font-weight: 700; color: #1a202c; margin-bottom: 8px; }
+        .subtitle { color: #718096; margin-bottom: 24px; font-size: 14px; }
+        .test-section { margin-bottom: 24px; }
+        .test-section h2 { font-size: 18px; color: #2d3748; margin-bottom: 12px; }
+        .balance-display { display: flex; gap: 12px; margin-bottom: 12px; }
+        .balance-box {
+            flex: 1;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .balance-label { font-size: 11px; color: #718096; text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
+        .balance-value { font-size: 24px; font-weight: 700; color: #667eea; }
+        .balance-change { font-size: 13px; margin-top: 4px; }
+        .balance-change.negative { color: #f56565; }
+        button {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .log {
+            background: #1a202c;
+            color: #68d391;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+        .log-line { margin-bottom: 4px; }
+        .log-success { color: #68d391; }
+        .log-error { color: #fc8181; }
+        .log-info { color: #63b3ed; }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        .status-success { background: #c6f6d5; color: #22543d; }
+        .status-error { background: #fed7d7; color: #742a2a; }
+        .user-select { display: flex; gap: 8px; margin-bottom: 12px; }
+        .user-option {
+            flex: 1;
+            padding: 12px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 14px;
+        }
+        .user-option.selected { background: #667eea; color: white; border-color: #667eea; }
+        .user-name { font-weight: 600; margin-bottom: 2px; }
+        .user-id { font-size: 11px; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🧪 Тест системы покупок</h1>
+            <p class="subtitle">Проверка списания баллов при покупке работ</p>
+            
+            <div class="test-section">
+                <h2>👤 Выбери пользователя</h2>
+                <div class="user-select">
+                    <div class="user-option selected" data-user-id="1000023" data-username="test_buyer">
+                        <div class="user-name">test_buyer</div>
+                        <div class="user-id">ID: 1000023</div>
+                    </div>
+                    <div class="user-option" data-user-id="1000021" data-username="maximus">
+                        <div class="user-name">maximus</div>
+                        <div class="user-id">ID: 1000021</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="test-section">
+                <h2>💰 Баланс</h2>
+                <div class="balance-display">
+                    <div class="balance-box">
+                        <div class="balance-label">До покупки</div>
+                        <div class="balance-value" id="balanceBefore">—</div>
+                    </div>
+                    <div class="balance-box">
+                        <div class="balance-label">После</div>
+                        <div class="balance-value" id="balanceAfter">—</div>
+                        <div class="balance-change" id="balanceChange"></div>
+                    </div>
+                </div>
+                <button id="checkBalanceBtn" onclick="checkBalance()">Проверить баланс</button>
+            </div>
+            
+            <div class="test-section">
+                <h2>🛒 Покупка</h2>
+                <p style="color: #718096; margin-bottom: 8px; font-size: 13px;">
+                    Работа #4371 • 600 баллов
+                </p>
+                <button id="purchaseBtn" onclick="testPurchase()" disabled>Купить работу</button>
+                <div id="purchaseStatus"></div>
+            </div>
+            
+            <div class="test-section">
+                <h2>📋 Лог</h2>
+                <div class="log" id="log"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const PURCHASE_URL = 'https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9';
+        const USER_DATA_URL = 'https://functions.poehali.dev/c605690e-3ba9-40eb-86cd-4c470a0b3387';
+        
+        let selectedUserId = 1000023;
+        let selectedUsername = 'test_buyer';
+        let balanceBefore = null;
+        
+        document.querySelectorAll('.user-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.user-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedUserId = parseInt(this.dataset.userId);
+                selectedUsername = this.dataset.username;
+                document.getElementById('balanceBefore').textContent = '—';
+                document.getElementById('balanceAfter').textContent = '—';
+                document.getElementById('balanceChange').textContent = '';
+                document.getElementById('purchaseStatus').innerHTML = '';
+                document.getElementById('purchaseBtn').disabled = true;
+                log('info', `Выбран: ${selectedUsername} (ID: ${selectedUserId})`);
+            });
+        });
+        
+        function log(type, message) {
+            const logDiv = document.getElementById('log');
+            const line = document.createElement('div');
+            line.className = `log-line log-${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            line.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(line);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        async function checkBalance() {
+            const btn = document.getElementById('checkBalanceBtn');
+            btn.disabled = true;
+            btn.textContent = 'Проверяю...';
+            log('info', `Запрос баланса ${selectedUsername}...`);
+            
+            try {
+                const response = await fetch(`${USER_DATA_URL}?userId=${selectedUserId}`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    balanceBefore = data.balance;
+                    document.getElementById('balanceBefore').textContent = balanceBefore;
+                    log('success', `✅ Баланс: ${balanceBefore} баллов`);
+                    document.getElementById('purchaseBtn').disabled = false;
+                } else {
+                    log('error', `❌ Ошибка: ${data.error || response.status}`);
+                }
+            } catch (error) {
+                log('error', `❌ Сеть: ${error.message}`);
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Проверить баланс';
+        }
+        
+        async function testPurchase() {
+            const btn = document.getElementById('purchaseBtn');
+            btn.disabled = true;
+            btn.textContent = 'Покупаю...';
+            log('info', `🛒 Покупка работы #4371...`);
+            
+            try {
+                const response = await fetch(PURCHASE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: selectedUserId, workId: 4371, price: 600 })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('success', `✅ Покупка выполнена!`);
+                    
+                    setTimeout(async () => {
+                        log('info', 'Проверяю баланс...');
+                        const balanceResponse = await fetch(`${USER_DATA_URL}?userId=${selectedUserId}`);
+                        const balanceData = await balanceResponse.json();
+                        
+                        if (balanceResponse.ok) {
+                            const balanceAfter = balanceData.balance;
+                            document.getElementById('balanceAfter').textContent = balanceAfter;
+                            const deducted = balanceBefore - balanceAfter;
+                            const changeDiv = document.getElementById('balanceChange');
+                            
+                            if (deducted === 0) {
+                                changeDiv.textContent = '⚠️ Не списались!';
+                                log('error', `❌ Баллы НЕ списались!`);
+                                document.getElementById('purchaseStatus').innerHTML = 
+                                    '<div class="status status-error">❌ Не работает</div>';
+                            } else if (deducted === 600) {
+                                changeDiv.textContent = `−${deducted}`;
+                                changeDiv.className = 'balance-change negative';
+                                log('success', `✅ Списано ${deducted} баллов!`);
+                                document.getElementById('purchaseStatus').innerHTML = 
+                                    '<div class="status status-success">✅ Работает!</div>';
+                            } else {
+                                changeDiv.textContent = `−${deducted}`;
+                                changeDiv.className = 'balance-change negative';
+                                log('error', `⚠️ Списано ${deducted} (не 600)`);
+                                document.getElementById('purchaseStatus').innerHTML = 
+                                    '<div class="status status-error">⚠️ Неверная сумма</div>';
+                            }
+                        }
+                    }, 1500);
+                } else if (response.status === 400 && data.message && data.message.includes('already purchased')) {
+                    log('info', `⚠️ Уже куплена`);
+                    document.getElementById('purchaseStatus').innerHTML = 
+                        '<div class="status status-error">⚠️ Уже куплена</div>';
+                } else {
+                    log('error', `❌ Ошибка: ${data.error || JSON.stringify(data)}`);
+                    document.getElementById('purchaseStatus').innerHTML = 
+                        '<div class="status status-error">❌ Ошибка</div>';
+                }
+            } catch (error) {
+                log('error', `❌ Сеть: ${error.message}`);
+                document.getElementById('purchaseStatus').innerHTML = 
+                    '<div class="status status-error">❌ Ошибка сети</div>';
+            }
+            
+            btn.disabled = false;
+            btn.textContent = 'Купить работу';
+        }
+        
+        log('info', 'Загружено. Выбран: test_buyer');
+    </script>
+</body>
+</html>

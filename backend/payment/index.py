@@ -239,29 +239,48 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             elif status == 'REFUNDED' or status == 'PARTIAL_REFUNDED':
                 # Обработка возврата средств
-                data_field = body_data.get('DATA', {})
-                user_id = data_field.get('user_id')
-                points = int(data_field.get('points', 0)) if data_field.get('points') else 0
+                # Тинькофф не передаёт DATA в уведомлении о возврате, поэтому ищем исходный платёж в БД
+                conn = get_db_connection()
+                cur = conn.cursor()
                 
-                if user_id and points > 0:
-                    conn = get_db_connection()
-                    cur = conn.cursor()
+                try:
+                    # Находим исходный платёж по payment_id
+                    cur.execute("""
+                        SELECT user_email, points FROM t_p63326274_course_download_plat.payments 
+                        WHERE payment_id = %s AND status = 'succeeded'
+                        LIMIT 1
+                    """, (str(payment_id),))
                     
-                    try:
-                        # Списываем баллы у пользователя
-                        cur.execute("""
-                            UPDATE t_p63326274_course_download_plat.users 
-                            SET balance = balance - %s 
-                            WHERE id = %s AND balance >= %s
-                        """, (points, int(user_id), points))
+                    payment_record = cur.fetchone()
+                    
+                    if payment_record:
+                        user_email, points = payment_record
                         
-                        if cur.rowcount > 0:
+                        # Находим user_id по email
+                        cur.execute("""
+                            SELECT id FROM t_p63326274_course_download_plat.users 
+                            WHERE email = %s
+                            LIMIT 1
+                        """, (user_email,))
+                        
+                        user_record = cur.fetchone()
+                        
+                        if user_record and points > 0:
+                            user_id = user_record[0]
+                            
+                            # Списываем баллы у пользователя
+                            cur.execute("""
+                                UPDATE t_p63326274_course_download_plat.users 
+                                SET balance = GREATEST(balance - %s, 0)
+                                WHERE id = %s
+                            """, (points, user_id))
+                            
                             # Записываем транзакцию возврата
                             cur.execute("""
                                 INSERT INTO t_p63326274_course_download_plat.transactions
                                 (user_id, amount, transaction_type, description)
                                 VALUES (%s, %s, 'refund', %s)
-                            """, (int(user_id), -points, f'Возврат платежа Тинькофф (PaymentId: {payment_id})'))
+                            """, (user_id, -points, f'Возврат платежа Тинькофф (PaymentId: {payment_id})'))
                             
                             # Обновляем статус платежа
                             cur.execute("""
@@ -271,13 +290,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             """, (str(payment_id),))
                             
                             conn.commit()
+                            print(f"[INFO] Refund processed: user_id={user_id}, points={points}")
                         else:
-                            # Недостаточно баллов — записываем в лог
-                            print(f"[WARN] Cannot refund: user {user_id} has insufficient balance ({points} points required)")
-                            
-                    finally:
-                        cur.close()
-                        conn.close()
+                            print(f"[WARN] Cannot process refund: user not found or points=0 for payment_id={payment_id}")
+                    else:
+                        print(f"[WARN] Cannot process refund: original payment not found for payment_id={payment_id}")
+                        
+                finally:
+                    cur.close()
+                    conn.close()
             
             elif status == 'CANCELED' or status == 'REJECTED':
                 # Платёж отменён или отклонён — ничего не делаем, но логируем

@@ -1,23 +1,126 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import funcUrls from '../../backend/func2url.json';
 
 export default function PaymentSuccessPage() {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [countdown, setCountdown] = useState(10);
   const [pendingWorkId, setPendingWorkId] = useState<string | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   
   useEffect(() => {
     const workId = localStorage.getItem('pendingWorkPurchase');
     setPendingWorkId(workId);
+    
+    // Если есть pending работа, сразу начинаем её покупку
+    if (workId) {
+      handleAutoPurchase(workId);
+    }
   }, []);
 
+  const handleAutoPurchase = async (workId: string) => {
+    setIsProcessing(true);
+    
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      setIsProcessing(false);
+      return;
+    }
+    
+    const user = JSON.parse(userStr);
+    const userId = user.id;
+    
+    try {
+      // Шаг 1: Создаём заказ
+      const orderResponse = await fetch(`${funcUrls['purchase-work']}?action=create-order`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': String(userId)
+        },
+        body: JSON.stringify({ workId })
+      });
+      
+      const orderData = await orderResponse.json();
+      
+      if (!orderResponse.ok) {
+        throw new Error(orderData.error || 'Ошибка создания заказа');
+      }
+      
+      if (orderData.payUrl) {
+        // Всё ещё недостаточно баллов
+        setIsProcessing(false);
+        return;
+      }
+      
+      const downloadToken = orderData.downloadToken;
+      if (!downloadToken) {
+        throw new Error('Не получен токен для скачивания');
+      }
+      
+      // Шаг 2: Скачивание работы
+      const downloadResponse = await fetch(
+        `${funcUrls['download-work']}?workId=${encodeURIComponent(workId)}&token=${encodeURIComponent(downloadToken)}`,
+        {
+          headers: {
+            'X-User-Id': String(userId)
+          }
+        }
+      );
+      
+      if (!downloadResponse.ok) {
+        throw new Error('Ошибка скачивания');
+      }
+      
+      const downloadData = await downloadResponse.json();
+      
+      // Скачиваем файл
+      try {
+        const fileResponse = await fetch(downloadData.download_url);
+        const blob = await fileResponse.blob();
+        
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = downloadData.filename || `work_${workId}.rar`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (fetchError) {
+        window.location.href = downloadData.download_url;
+      }
+      
+      // Обновляем баланс
+      if (user.role !== 'admin' && orderData.newBalance !== undefined) {
+        user.balance = orderData.newBalance;
+        localStorage.setItem('user', JSON.stringify(user));
+      }
+      
+      // Очищаем pending и сразу переходим к защитному пакету
+      localStorage.removeItem('pendingWorkPurchase');
+      
+      // Небольшая задержка для завершения скачивания
+      setTimeout(() => {
+        navigate(`/defense-kit?workId=${workId}`);
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Auto purchase error:', error);
+      setIsProcessing(false);
+    }
+  };
+
   useEffect(() => {
-    // Проверяем, не была ли это покупка работы
+    // Запускаем таймер только если нет pending работы или обработка завершена
+    if (isProcessing) return;
+    
     const pendingWorkId = localStorage.getItem('pendingWorkPurchase');
     
     const timer = setInterval(() => {
@@ -25,7 +128,6 @@ export default function PaymentSuccessPage() {
         if (prev <= 1) {
           clearInterval(timer);
           
-          // Если была попытка купить работу, перенаправляем на неё
           if (pendingWorkId) {
             localStorage.removeItem('pendingWorkPurchase');
             window.location.href = `/work/${pendingWorkId}`;
@@ -39,7 +141,7 @@ export default function PaymentSuccessPage() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+  }, [isProcessing]);
 
   const orderId = searchParams.get('orderId') || searchParams.get('order_id');
   const paymentId = searchParams.get('paymentId') || searchParams.get('payment_id');
@@ -62,7 +164,9 @@ export default function PaymentSuccessPage() {
               
               <CardDescription className="text-lg text-slate-600">
                 {pendingWorkId 
-                  ? 'Баллы зачислены! Возвращаемся к работе...' 
+                  ? isProcessing 
+                    ? '📥 Скачиваем работу и готовим защитный пакет...' 
+                    : 'Баллы зачислены! Возвращаемся к работе...'
                   : 'Баллы уже зачислены на ваш счёт'
                 }
               </CardDescription>
@@ -129,8 +233,13 @@ export default function PaymentSuccessPage() {
 
               <div className="text-center pt-4">
                 <p className="text-sm text-slate-500">
-                  Автоматический переход {pendingWorkId ? 'к работе' : 'в профиль'} через{' '}
-                  <span className="font-semibold text-slate-700">{countdown}</span> сек
+                  {isProcessing 
+                    ? '⏳ Обрабатываем вашу покупку...'
+                    : <>
+                        Автоматический переход {pendingWorkId ? 'к защитному пакету' : 'в профиль'} через{' '}
+                        <span className="font-semibold text-slate-700">{countdown}</span> сек
+                      </>
+                  }
                 </p>
               </div>
             </CardContent>

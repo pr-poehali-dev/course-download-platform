@@ -343,10 +343,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return {
                 'statusCode': 200,
                 'headers': {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'text/plain',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps({'OK': 'OK'})
+                'isBase64Encoded': False,
+                'body': 'OK'
             }
         
         if action == 'create_payment':

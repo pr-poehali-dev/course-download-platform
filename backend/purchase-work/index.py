@@ -421,7 +421,7 @@ def create_order(event: Dict[str, Any]) -> Dict[str, Any]:
     
     try:
         cur.execute(
-            "SELECT id, title, price FROM t_p63326274_course_download_plat.works WHERE id = %s",
+            "SELECT id, title, price_points, author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
             (work_id,)
         )
         work = cur.fetchone()
@@ -436,73 +436,192 @@ def create_order(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        work_id_db, title, price = work
+        work_id_db, title, price, author_id = work
         
-        if user_has_paid(cur, int(user_id), work_id_db):
+        # Проверяем роль пользователя
+        cur.execute(
+            "SELECT balance, role FROM t_p63326274_course_download_plat.users WHERE id = %s",
+            (user_id,)
+        )
+        user_result = cur.fetchone()
+        
+        if not user_result:
             cur.close()
             conn.close()
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Пользователь не найден'}),
+                'isBase64Encoded': False
+            }
+        
+        balance = user_result[0]
+        role = user_result[1] if user_result[1] else 'user'
+        is_admin = (role == 'admin')
+        
+        # КРИТИЧНО: Запрещаем авторам покупать свои работы
+        if author_id and int(user_id) == int(author_id):
+            conn.rollback()
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 403,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Вы не можете купить свою собственную работу'}),
+                'isBase64Encoded': False
+            }
+        
+        # Проверяем, не куплена ли уже работа
+        if user_has_paid(cur, int(user_id), work_id_db):
+            # Генерируем новый токен для повторного скачивания
+            import secrets
+            from datetime import datetime, timedelta
+            
+            download_token = secrets.token_urlsafe(48)
+            token_expires_at = datetime.now() + timedelta(minutes=30)
+            ip_address = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
+            
+            cur.execute(
+                """INSERT INTO t_p63326274_course_download_plat.download_tokens 
+                (token, user_id, work_id, expires_at, ip_address) 
+                VALUES (%s, %s, %s, %s, %s)""",
+                (download_token, user_id, work_id_db, token_expires_at, ip_address)
+            )
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
                     'ok': True,
                     'alreadyPaid': True,
+                    'downloadToken': download_token,
+                    'tokenExpiresIn': 1800,
                     'message': 'Работа уже куплена'
                 }),
                 'isBase64Encoded': False
             }
         
-        cur.execute(
-            """
-            SELECT id, status, amount_cents FROM t_p63326274_course_download_plat.orders 
-            WHERE user_id = %s AND work_id = %s AND status = 'pending'
-            ORDER BY created_at DESC LIMIT 1
-            """,
-            (user_id, work_id)
-        )
-        existing_order = cur.fetchone()
-        
-        if existing_order:
-            order_id, status, amount_cents = existing_order
+        # Проверяем баланс только для не-админов
+        if not is_admin and balance < price:
+            # Создаем pending заказ для пополнения баланса
+            cur.execute(
+                """
+                INSERT INTO t_p63326274_course_download_plat.orders 
+                (user_id, work_id, status, amount_cents) 
+                VALUES (%s, %s, 'pending', %s) 
+                RETURNING id
+                """,
+                (user_id, work_id, price)
+            )
+            order_id = cur.fetchone()[0]
+            
             site_url = os.environ.get('SITE_URL', 'https://techforma.pro')
             pay_url = f"{site_url}/buy-points"
             
+            cur.execute(
+                "UPDATE t_p63326274_course_download_plat.orders SET payment_url = %s WHERE id = %s",
+                (pay_url, order_id)
+            )
+            
+            conn.commit()
             cur.close()
             conn.close()
+            
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
                     'ok': True,
                     'orderId': order_id,
-                    'amount_cents': amount_cents,
-                    'payUrl': pay_url
+                    'amount_cents': price,
+                    'payUrl': pay_url,
+                    'balance': balance,
+                    'required': price
                 }),
                 'isBase64Encoded': False
             }
         
-        amount_cents = price
-        site_url = os.environ.get('SITE_URL', 'https://techforma.pro')
+        # ✅ У пользователя достаточно баллов - списываем и создаём покупку СРАЗУ!
+        print(f"[CREATE_ORDER] User {user_id} has enough balance ({balance} >= {price}), processing purchase...")
         
+        # Списываем баллы (только если не админ)
+        if not is_admin:
+            cur.execute(
+                "UPDATE t_p63326274_course_download_plat.users SET balance = balance - %s WHERE id = %s",
+                (price, user_id)
+            )
+            
+            # Записываем транзакцию списания баллов у покупателя
+            cur.execute(
+                """INSERT INTO t_p63326274_course_download_plat.transactions
+                (user_id, amount, type, description)
+                VALUES (%s, %s, %s, %s)""",
+                (user_id, -price, 'purchase', f'Покупка работы #{work_id_db}')
+            )
+        
+        # Создаём запись о покупке
+        commission = int(price * 0.10)
         cur.execute(
-            """
-            INSERT INTO t_p63326274_course_download_plat.orders 
-            (user_id, work_id, status, amount_cents) 
-            VALUES (%s, %s, 'pending', %s) 
-            RETURNING id
-            """,
-            (user_id, work_id, amount_cents)
+            """INSERT INTO t_p63326274_course_download_plat.purchases 
+            (buyer_id, work_id, price_paid, commission) VALUES (%s, %s, %s, %s) RETURNING id""",
+            (user_id, work_id_db, price, commission)
         )
-        order_id = cur.fetchone()[0]
+        purchase_id = cur.fetchone()[0]
         
-        pay_url = f"{site_url}/buy-points"
+        # Если есть автор, начисляем ему 90%
+        if author_id:
+            author_share = int(price * 0.90)
+            platform_fee = int(price * 0.10)
+            
+            cur.execute(
+                "UPDATE t_p63326274_course_download_plat.users SET balance = balance + %s WHERE id = %s",
+                (author_share, author_id)
+            )
+            
+            cur.execute(
+                """INSERT INTO t_p63326274_course_download_plat.author_earnings 
+                (author_id, work_id, purchase_id, sale_amount, author_share, platform_fee, status)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                (author_id, work_id_db, purchase_id, price, author_share, platform_fee, 'paid')
+            )
+            
+            cur.execute(
+                """INSERT INTO t_p63326274_course_download_plat.transactions
+                (user_id, amount, type, description)
+                VALUES (%s, %s, %s, %s)""",
+                (author_id, author_share, 'sale', f'Продажа работы #{work_id_db} (комиссия 10%)')
+            )
+        
+        # Обновляем счётчик скачиваний
+        cur.execute(
+            "UPDATE t_p63326274_course_download_plat.works SET downloads = downloads + 1 WHERE id = %s",
+            (work_id_db,)
+        )
+        
+        # Генерируем временный токен для скачивания
+        import secrets
+        from datetime import datetime, timedelta
+        
+        download_token = secrets.token_urlsafe(48)
+        token_expires_at = datetime.now() + timedelta(minutes=30)
+        ip_address = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
         
         cur.execute(
-            "UPDATE t_p63326274_course_download_plat.orders SET payment_url = %s WHERE id = %s",
-            (pay_url, order_id)
+            """INSERT INTO t_p63326274_course_download_plat.download_tokens 
+            (token, user_id, work_id, expires_at, ip_address) 
+            VALUES (%s, %s, %s, %s, %s)""",
+            (download_token, user_id, work_id_db, token_expires_at, ip_address)
         )
         
         conn.commit()
+        
+        new_balance = balance if is_admin else balance - price
+        print(f"[CREATE_ORDER] Purchase completed! New balance: {new_balance}, token: {download_token[:20]}...")
+        
         cur.close()
         conn.close()
         
@@ -511,9 +630,11 @@ def create_order(event: Dict[str, Any]) -> Dict[str, Any]:
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({
                 'ok': True,
-                'orderId': order_id,
-                'amount_cents': amount_cents,
-                'payUrl': pay_url
+                'success': True,
+                'newBalance': new_balance,
+                'downloadToken': download_token,
+                'tokenExpiresIn': 1800,
+                'message': 'Purchase successful'
             }),
             'isBase64Encoded': False
         }
@@ -526,7 +647,7 @@ def create_order(event: Dict[str, Any]) -> Dict[str, Any]:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Ошибка создания заказа'}),
+            'body': json.dumps({'error': f'Ошибка создания заказа: {str(e)}'}),
             'isBase64Encoded': False
         }
 

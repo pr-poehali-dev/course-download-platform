@@ -266,7 +266,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 # Записываем транзакцию списания баллов у покупателя
                 cur.execute(
                     """INSERT INTO t_p63326274_course_download_plat.transactions
-                    (user_id, amount, transaction_type, description)
+                    (user_id, amount, type, description)
                     VALUES (%s, %s, %s, %s)""",
                     (user_id, -price, 'purchase', f'Покупка работы #{db_work_id}')
                 )
@@ -274,7 +274,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 # Записываем транзакцию начисления автору
                 cur.execute(
                     """INSERT INTO t_p63326274_course_download_plat.transactions
-                    (user_id, amount, transaction_type, description)
+                    (user_id, amount, type, description)
                     VALUES (%s, %s, %s, %s)""",
                     (author_id, author_share, 'sale', f'Продажа работы #{db_work_id} (комиссия 15%)')
                 )

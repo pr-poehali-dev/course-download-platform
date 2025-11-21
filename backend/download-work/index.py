@@ -84,40 +84,72 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         try:
             from datetime import datetime, timedelta
             
-            # Проверяем покупку работы (7-дневный доступ)
+            # Проверяем роль пользователя
             cur.execute(
-                """SELECT id, created_at 
-                FROM t_p63326274_course_download_plat.purchases 
-                WHERE buyer_id = %s AND work_id = %s
-                ORDER BY created_at DESC
-                LIMIT 1""",
-                (user_id, work_id)
+                "SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s",
+                (user_id,)
             )
-            purchase_result = cur.fetchone()
+            user_result = cur.fetchone()
             
-            if not purchase_result:
+            if not user_result:
                 return {
-                    'statusCode': 403,
+                    'statusCode': 404,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Вы не купили эту работу'}),
+                    'body': json.dumps({'error': 'Пользователь не найден'}),
                     'isBase64Encoded': False
                 }
             
-            purchase_date = purchase_result[1]
-            download_deadline = purchase_date + timedelta(days=7)
+            user_role = user_result[0] if user_result[0] else 'user'
+            is_admin = (user_role == 'admin')
             
-            # Проверяем, не истёк ли 7-дневный период
-            if datetime.now() > download_deadline:
-                days_passed = (datetime.now() - purchase_date).days
-                return {
-                    'statusCode': 403,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({
-                        'error': 'Download period expired', 
-                        'message': f'Период скачивания истёк {days_passed - 7} дней назад. Для повторного доступа купите работу заново.'
-                    }),
-                    'isBase64Encoded': False
-                }
+            # Проверяем, является ли пользователь автором работы
+            cur.execute(
+                "SELECT author_id FROM t_p63326274_course_download_plat.works WHERE id = %s",
+                (work_id,)
+            )
+            work_author_result = cur.fetchone()
+            is_author = False
+            if work_author_result and work_author_result[0]:
+                is_author = (int(user_id) == int(work_author_result[0]))
+            
+            # Админы и авторы скачивают без проверки покупки
+            if not is_admin and not is_author:
+                # Проверяем покупку работы (7-дневный доступ)
+                cur.execute(
+                    """SELECT id, created_at 
+                    FROM t_p63326274_course_download_plat.purchases 
+                    WHERE buyer_id = %s AND work_id = %s
+                    ORDER BY created_at DESC
+                    LIMIT 1""",
+                    (user_id, work_id)
+                )
+                purchase_result = cur.fetchone()
+                
+                if not purchase_result:
+                    return {
+                        'statusCode': 403,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Вы не купили эту работу'}),
+                        'isBase64Encoded': False
+                    }
+                
+                purchase_date = purchase_result[1]
+                download_deadline = purchase_date + timedelta(days=7)
+                
+                # Проверяем, не истёк ли 7-дневный период
+                if datetime.now() > download_deadline:
+                    days_passed = (datetime.now() - purchase_date).days
+                    return {
+                        'statusCode': 403,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({
+                            'error': 'Download period expired', 
+                            'message': f'Период скачивания истёк {days_passed - 7} дней назад. Для повторного доступа купите работу заново.'
+                        }),
+                        'isBase64Encoded': False
+                    }
+            else:
+                print(f"[DEBUG] User is {'admin' if is_admin else 'author'} - skipping purchase check")
             
             # Записываем факт скачивания
             cur.execute(

@@ -123,7 +123,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Add transaction record
         cur.execute('''
             INSERT INTO t_p63326274_course_download_plat.transactions
-            (user_id, amount, transaction_type, description)
+            (user_id, amount, type, description)
             VALUES (%s, %s, 'promo_code', %s)
         ''', (user_id, bonus_points, f'Промокод {promo_code}'))
         

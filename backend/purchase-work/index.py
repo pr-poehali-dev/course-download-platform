@@ -148,8 +148,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             print(f"[PURCHASE] User data: balance={balance}, role={role}, is_admin={is_admin}, price={price}")
             
-            # Проверяем баланс только для не-админов
-            if not is_admin and balance < price:
+            # Проверяем баланс для всех пользователей (включая админов)
+            if balance < price:
                 conn.rollback()
                 
                 # Генерируем ссылку на пополнение баланса
@@ -222,23 +222,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            # Списываем баллы (только если не админ)
-            if not is_admin:
-                print(f"[PURCHASE] Deducting {price} points from user {user_id}, current balance: {balance}")
-                cur.execute(
-                    "UPDATE t_p63326274_course_download_plat.users SET balance = balance - %s WHERE id = %s",
-                    (price, user_id)
-                )
-                
-                # Записываем транзакцию списания баллов у покупателя (ВСЕГДА, независимо от наличия автора)
-                cur.execute(
-                    """INSERT INTO t_p63326274_course_download_plat.transactions
-                    (user_id, amount, type, description)
-                    VALUES (%s, %s, %s, %s)""",
-                    (user_id, -price, 'purchase', f'Покупка работы #{db_work_id}')
-                )
-            else:
-                print(f"[PURCHASE] Admin user - skipping balance deduction")
+            # Списываем баллы у ВСЕХ пользователей (включая админов)
+            print(f"[PURCHASE] Deducting {price} points from user {user_id}, current balance: {balance}")
+            cur.execute(
+                "UPDATE t_p63326274_course_download_plat.users SET balance = balance - %s WHERE id = %s",
+                (price, user_id)
+            )
+            
+            # Записываем транзакцию списания баллов у покупателя
+            cur.execute(
+                """INSERT INTO t_p63326274_course_download_plat.transactions
+                (user_id, amount, type, description)
+                VALUES (%s, %s, %s, %s)""",
+                (user_id, -price, 'purchase', f'Покупка работы #{db_work_id}')
+            )
             
             # Создаём запись о покупке с комиссией 10%
             commission = int(price * 0.10)

@@ -10,7 +10,7 @@ import os
 import uuid
 from typing import Dict, Any, List
 import psycopg2
-from psycopg2.extras import Json
+import boto3
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
@@ -97,9 +97,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Maximum 3 images allowed'})
         }
     
+    s3_client = boto3.client(
+        's3',
+        endpoint_url='https://storage.yandexcloud.net',
+        aws_access_key_id=os.environ.get('YANDEX_S3_KEY_ID'),
+        aws_secret_access_key=os.environ.get('YANDEX_S3_SECRET_KEY'),
+        region_name='ru-central1'
+    )
+    
+    bucket_name = 'kyra'
     image_urls: List[str] = []
     
-    for img_data in images:
+    for idx, img_data in enumerate(images):
         if not img_data.startswith('data:image'):
             continue
             
@@ -107,14 +116,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         image_bytes = base64.b64decode(encoded)
         
         ext = 'jpg'
+        content_type = 'image/jpeg'
         if 'png' in header:
             ext = 'png'
+            content_type = 'image/png'
         elif 'jpeg' in header or 'jpg' in header:
             ext = 'jpg'
+            content_type = 'image/jpeg'
         
         filename = f"work_cover_{work_id}_{uuid.uuid4().hex[:8]}.{ext}"
+        object_key = f"covers/{filename}"
         
-        public_url = f"https://storage.example.com/covers/{filename}"
+        s3_client.put_object(
+            Bucket=bucket_name,
+            Key=object_key,
+            Body=image_bytes,
+            ContentType=content_type,
+            ACL='public-read'
+        )
+        
+        public_url = f"https://storage.yandexcloud.net/{bucket_name}/{object_key}"
         image_urls.append(public_url)
     
     cur.execute(

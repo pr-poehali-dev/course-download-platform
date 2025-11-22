@@ -69,23 +69,20 @@ export default function WorkDetailPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await authService.verify();
-      setIsLoggedIn(!!user);
+      // ✅ ПРИНУДИТЕЛЬНО получаем СВЕЖИЕ данные из backend, НЕ из localStorage
+      const freshUser = await authService.verify();
+      setIsLoggedIn(!!freshUser);
       
-      // КРИТИЧНО: Выводим все данные пользователя для отладки
-      console.log('🔍 USER DATA CHECK:', {
-        userId: user?.id,
-        username: user?.username,
-        role: user?.role,
-        balance: user?.balance,
-        localStorage_user: localStorage.getItem('user'),
-        workId: actualWorkId
-      });
+      // ✅ КРИТИЧНО: Обновляем localStorage свежими данными сразу после загрузки
+      if (freshUser) {
+        localStorage.setItem('user', JSON.stringify(freshUser));
+        console.log('🔄 localStorage ОБНОВЛЕН свежими данными:', freshUser);
+      }
       
       // Проверяем, куплена ли работа
-      if (user && actualWorkId) {
+      if (freshUser && actualWorkId) {
         try {
-          const response = await fetch(`${func2url['user-data']}?user_id=${user.id}&action=purchases`);
+          const response = await fetch(`${func2url['user-data']}?user_id=${freshUser.id}&action=purchases`);
           const data = await response.json();
           console.log('Purchases data:', data);
           console.log('Current work ID:', actualWorkId);
@@ -100,7 +97,7 @@ export default function WorkDetailPage() {
       }
       
       // Проверяем, является ли пользователь админом
-      if (user && user.role === 'admin') {
+      if (freshUser && freshUser.role === 'admin') {
         setShowUploadButton(true);
         setIsAdmin(true);
       }

@@ -72,6 +72,16 @@ export default function WorkDetailPage() {
       const user = await authService.verify();
       setIsLoggedIn(!!user);
       
+      // КРИТИЧНО: Выводим все данные пользователя для отладки
+      console.log('🔍 USER DATA CHECK:', {
+        userId: user?.id,
+        username: user?.username,
+        role: user?.role,
+        balance: user?.balance,
+        localStorage_user: localStorage.getItem('user'),
+        workId: actualWorkId
+      });
+      
       // Проверяем, куплена ли работа
       if (user && actualWorkId) {
         try {

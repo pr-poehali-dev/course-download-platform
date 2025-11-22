@@ -497,9 +497,16 @@ export default function WorkDetailPage() {
   }, [work, actualWorkId]);
 
   const handlePurchaseAndDownload = async () => {
-    if (!actualWorkId || !work) return;
+    console.log('🔵 BUTTON CLICKED! Starting handlePurchaseAndDownload');
+    
+    if (!actualWorkId || !work) {
+      console.log('❌ Missing workId or work:', { actualWorkId, work });
+      return;
+    }
     
     const userStr = localStorage.getItem('user');
+    console.log('👤 localStorage user:', userStr);
+    
     if (!userStr) {
       alert('Войдите в систему для покупки работы');
       navigate('/login');
@@ -509,7 +516,15 @@ export default function WorkDetailPage() {
     const user = JSON.parse(userStr);
     const userId = user.id;
     
-    console.log('🛒 Starting purchase:', { userId, workId: actualWorkId, price: work.price, userRole: user.role });
+    console.log('🛒 Starting purchase:', { 
+      userId, 
+      workId: actualWorkId, 
+      price: work.price, 
+      userRole: user.role,
+      userBalance: user.balance,
+      isPurchased,
+      isAdmin
+    });
     
     setDownloading(true);
     try {
@@ -1290,7 +1305,16 @@ export default function WorkDetailPage() {
               <Button 
                 size="default"
                 className="w-full font-semibold rounded-lg mb-3 shadow-md hover:shadow-lg transition-all duration-200 h-10 md:h-11 text-sm md:text-base"
-                onClick={handlePurchaseAndDownload}
+                onClick={() => {
+                  console.log('🟢 BUTTON ONCLICK TRIGGERED!', {
+                    isPurchased,
+                    isAdmin,
+                    downloading,
+                    workId: actualWorkId,
+                    workPrice: work?.price
+                  });
+                  handlePurchaseAndDownload();
+                }}
                 disabled={downloading}
               >
                 {downloading ? (

@@ -641,9 +641,14 @@ export default function WorkDetailPage() {
           description: 'Файл сохранится в папку "Загрузки"',
         });
       } else {
+        const oldBalance = user.balance || 0;
+        const deducted = work.price;
+        const newBalance = purchaseData.newBalance || (oldBalance - deducted);
+        
         toast({
-          title: '✅ Покупка успешна!',
-          description: `Списано ${work.price} баллов. Новый баланс: ${purchaseData.newBalance} баллов. Скачивание началось...`,
+          title: '💳 Покупка успешна!',
+          description: `Списано ${deducted} баллов\nНовый баланс: ${newBalance} баллов\n\n📥 Скачивание началось...`,
+          duration: 5000,
         });
       }
       

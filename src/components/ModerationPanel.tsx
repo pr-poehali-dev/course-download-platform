@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import ReviewsModeration from '@/components/ReviewsModeration';
+import func2url from '../../backend/func2url.json';
 
 interface UploadedWork {
   id: number;
@@ -29,6 +30,8 @@ export default function ModerationPanel() {
   const [selectedWork, setSelectedWork] = useState<UploadedWork | null>(null);
   const [rejectionComment, setRejectionComment] = useState('');
   const [processing, setProcessing] = useState(false);
+  const [generatingReviews, setGeneratingReviews] = useState(false);
+  const [reviewsResult, setReviewsResult] = useState<any>(null);
 
   useEffect(() => {
     loadPendingWorks();
@@ -163,6 +166,47 @@ export default function ModerationPanel() {
     });
   };
 
+  const handleGenerateReviews = async () => {
+    if (!confirm('Сгенерировать 2-3 отзыва для всех работ без отзывов?')) return;
+    
+    setGeneratingReviews(true);
+    setReviewsResult(null);
+
+    try {
+      const response = await fetch(`${func2url.reviews}?action=generate_fake`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        },
+        body: JSON.stringify({
+          work_ids: 'all',
+          reviews_per_work: 2
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP ${response.status}`);
+      }
+
+      setReviewsResult(data);
+      toast({
+        title: '✅ Отзывы сгенерированы!',
+        description: `Создано ${data.reviews_created} отзывов для ${data.total_works - data.works_skipped} работ`
+      });
+    } catch (err: any) {
+      toast({
+        title: '❌ Ошибка',
+        description: err.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setGeneratingReviews(false);
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -240,15 +284,51 @@ export default function ModerationPanel() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h3 className="text-lg font-semibold">Работы на модерации</h3>
           <p className="text-sm text-muted-foreground">
             Проверьте и одобрите или отклоните загруженные работы
           </p>
         </div>
-        <Badge variant="secondary">{works.length} работ</Badge>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleGenerateReviews}
+            disabled={generatingReviews}
+            variant="outline"
+            size="sm"
+          >
+            {generatingReviews ? (
+              <>
+                <Icon name="Loader2" className="mr-2 animate-spin" size={16} />
+                Генерация...
+              </>
+            ) : (
+              <>
+                <Icon name="MessageSquare" className="mr-2" size={16} />
+                Сгенерировать отзывы
+              </>
+            )}
+          </Button>
+          <Badge variant="secondary">{works.length} работ</Badge>
+        </div>
       </div>
+
+      {reviewsResult && (
+        <Card className="bg-green-50 border-green-200">
+          <CardContent className="pt-4">
+            <div className="flex items-start gap-3">
+              <Icon name="CheckCircle" className="text-green-600 flex-shrink-0 mt-0.5" size={20} />
+              <div className="text-sm space-y-1">
+                <p className="font-semibold text-green-900">Отзывы успешно сгенерированы!</p>
+                <p className="text-green-800">✅ Создано отзывов: {reviewsResult.reviews_created}</p>
+                <p className="text-green-800">✅ Обработано работ: {reviewsResult.total_works - reviewsResult.works_skipped}</p>
+                <p className="text-green-700">ℹ️ Пропущено (уже есть отзывы): {reviewsResult.works_skipped}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {works.length === 0 ? (
         <Card>

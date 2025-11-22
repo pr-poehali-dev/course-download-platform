@@ -13,6 +13,7 @@ import func2url from '../../backend/func2url.json';
 import BalanceTab from '@/components/profile/BalanceTab';
 import SupportTab from '@/components/profile/SupportTab';
 import TransactionsTab from '@/components/profile/TransactionsTab';
+import ReferralDialog from '@/components/ReferralDialog';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 
@@ -301,6 +302,7 @@ export default function ProfilePage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [referralDialogOpen, setReferralDialogOpen] = useState(false);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -349,12 +351,65 @@ export default function ProfilePage() {
     }
   };
 
-  const handleSaveProfile = () => {
-    setEditMode(false);
-    toast({
-      title: 'Профиль обновлен',
-      description: 'Изменения успешно сохранены'
-    });
+  const handleSaveProfile = async () => {
+    setUploadingAvatar(true);
+    
+    try {
+      const userData = await authService.verify();
+      if (!userData) return;
+
+      // Если есть новый аватар, загружаем его
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append('avatar', avatarFile);
+        formData.append('user_id', String(userData.id));
+
+        const uploadResponse = await fetch(func2url['user-data'], {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!uploadResponse.ok) {
+          throw new Error('Ошибка загрузки аватара');
+        }
+
+        const uploadData = await uploadResponse.json();
+        setAvatarPreview(uploadData.avatar_url);
+        setAvatarFile(null);
+      }
+
+      // Обновляем имя пользователя (если изменилось)
+      if (editedName !== user.name) {
+        const updateResponse = await fetch(func2url['user-data'], {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: userData.id,
+            action: 'update_profile',
+            username: editedName
+          })
+        });
+
+        if (updateResponse.ok) {
+          setUser(prev => ({ ...prev, name: editedName }));
+        }
+      }
+
+      setEditMode(false);
+      toast({
+        title: 'Профиль обновлен',
+        description: 'Изменения успешно сохранены'
+      });
+    } catch (error) {
+      console.error('Profile update error:', error);
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось обновить профиль',
+        variant: 'destructive'
+      });
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -511,6 +566,10 @@ export default function ProfilePage() {
               <TabsTrigger value="support" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-orange-500 data-[state=active]:text-white">
                 <Icon name="Headphones" size={16} className="mr-2" />
                 Техподдержка
+              </TabsTrigger>
+              <TabsTrigger value="referral" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-teal-500 data-[state=active]:text-white">
+                <Icon name="Users" size={16} className="mr-2" />
+                Рефералы
               </TabsTrigger>
               <TabsTrigger value="settings" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-gray-600 data-[state=active]:to-gray-800 data-[state=active]:text-white">
                 <Icon name="Settings" size={16} className="mr-2" />
@@ -860,13 +919,28 @@ export default function ProfilePage() {
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              asChild
+                            >
+                              <Link to={`/work/${upload.id}`}>
+                                <Icon name="Eye" size={14} className="mr-1" />
+                                Просмотр
+                              </Link>
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                toast({
+                                  title: 'Функция в разработке',
+                                  description: 'Редактирование работ скоро будет доступно'
+                                });
+                              }}
+                            >
                               <Icon name="Edit" size={14} className="mr-1" />
                               Редактировать
-                            </Button>
-                            <Button variant="outline" size="sm">
-                              <Icon name="Eye" size={14} className="mr-1" />
-                              Просмотр
                             </Button>
                           </div>
                         </div>
@@ -939,6 +1013,30 @@ export default function ProfilePage() {
               <SupportTab userEmail={user.email} />
             </TabsContent>
 
+            <TabsContent value="referral" className="space-y-4">
+              <Card className="shadow-lg bg-gradient-to-br from-green-50 to-teal-50">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Icon name="Users" size={24} className="text-green-600" />
+                    Реферальная программа
+                  </CardTitle>
+                  <CardDescription>
+                    Приглашайте друзей и зарабатывайте баллы вместе
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => setReferralDialogOpen(true)}
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+                  >
+                    <Icon name="Gift" size={20} className="mr-2" />
+                    Открыть реферальную программу
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             <TabsContent value="settings" className="space-y-4">
               <Card className="shadow-lg">
                 <CardHeader>
@@ -1000,9 +1098,18 @@ export default function ProfilePage() {
 
                   {editMode ? (
                     <div className="flex gap-2">
-                      <Button onClick={handleSaveProfile}>
-                        <Icon name="Save" size={16} className="mr-2" />
-                        Сохранить
+                      <Button onClick={handleSaveProfile} disabled={uploadingAvatar}>
+                        {uploadingAvatar ? (
+                          <>
+                            <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                            Сохранение...
+                          </>
+                        ) : (
+                          <>
+                            <Icon name="Save" size={16} className="mr-2" />
+                            Сохранить
+                          </>
+                        )}
                       </Button>
                       <Button variant="outline" onClick={() => setEditMode(false)}>
                         Отмена
@@ -1016,11 +1123,45 @@ export default function ProfilePage() {
                   )}
                 </CardContent>
               </Card>
+
+              <Card className="shadow-lg border-red-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-red-600">
+                    <Icon name="LogOut" size={20} />
+                    Выход из аккаунта
+                  </CardTitle>
+                  <CardDescription>Завершить текущую сессию</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    variant="destructive" 
+                    onClick={() => {
+                      authService.logout();
+                      navigate('/');
+                      toast({
+                        title: 'Выход выполнен',
+                        description: 'Вы успешно вышли из аккаунта'
+                      });
+                    }}
+                    className="w-full"
+                  >
+                    <Icon name="LogOut" size={16} className="mr-2" />
+                    Выйти из аккаунта
+                  </Button>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
       </div>
       <Footer />
+      
+      <ReferralDialog 
+        open={referralDialogOpen}
+        onOpenChange={setReferralDialogOpen}
+        username={user.name}
+        userId={currentUserId || undefined}
+      />
     </>
   );
 }

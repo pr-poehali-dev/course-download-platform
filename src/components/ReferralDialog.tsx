@@ -59,6 +59,29 @@ export default function ReferralDialog({
     });
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: 'Присоединяйся к Tech Forma!',
+      text: `Зарегистрируйся по моей ссылке и получи 1000 баллов бонусом!`,
+      url: referralLink
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        toast({
+          title: 'Отлично!',
+          description: 'Ссылка отправлена',
+        });
+      } catch (err) {
+        // Пользователь закрыл диалог или ошибка
+      }
+    } else {
+      // Fallback: просто копируем ссылку
+      copyToClipboard();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
@@ -125,7 +148,7 @@ export default function ReferralDialog({
               <Icon name="Copy" size={16} className="mr-2" />
               Копировать ссылку
             </Button>
-            <Button variant="outline" className="flex-1">
+            <Button variant="outline" className="flex-1" onClick={handleShare}>
               <Icon name="Share2" size={16} className="mr-2" />
               Поделиться
             </Button>

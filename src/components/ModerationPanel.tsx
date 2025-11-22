@@ -40,21 +40,10 @@ export default function ModerationPanel() {
   const loadPendingWorks = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0/pending', {
-        headers: { 'X-Admin': 'true' }
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        setWorks(data.works || []);
-      }
+      // Временно отключена загрузка работ на модерации
+      setWorks([]);
     } catch (error) {
       console.error('Error loading works:', error);
-      toast({
-        title: 'Ошибка загрузки',
-        description: 'Не удалось загрузить работы на модерации',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

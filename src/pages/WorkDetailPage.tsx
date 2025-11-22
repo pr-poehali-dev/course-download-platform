@@ -499,6 +499,8 @@ export default function WorkDetailPage() {
     const user = JSON.parse(userStr);
     const userId = user.id;
     
+    console.log('🛒 Starting purchase:', { userId, workId: actualWorkId, price: work.price, userRole: user.role });
+    
     setDownloading(true);
     try {
       // Перепроверяем покупку перед действием
@@ -541,7 +543,14 @@ export default function WorkDetailPage() {
         downloadToken = tokenData.token;
       } else {
         // Если не куплена, пытаемся купить за баллы
-        console.log('Work not purchased, attempting to purchase with баллы...');
+        console.log('💰 Work not purchased, attempting to purchase with баллы...', { 
+          url: PURCHASE_WORK_URL, 
+          userId, 
+          workId: actualWorkId, 
+          price: work.price,
+          userBalance: user.balance,
+          userRole: user.role
+        });
         const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
           method: 'POST',
           headers: {
@@ -556,7 +565,7 @@ export default function WorkDetailPage() {
         });
         
         const purchaseData = await purchaseResponse.json();
-        console.log('Purchase response:', purchaseData);
+        console.log('💳 Purchase response:', purchaseData);
         
         if (!purchaseResponse.ok) {
           // Если недостаточно баллов, получим payUrl для пополнения
@@ -630,12 +639,16 @@ export default function WorkDetailPage() {
         }).catch(err => console.error('Failed to track download:', err));
       }
       
+      console.log('📢 Showing notification:', { isAlreadyPurchased, userRole: user.role, isAdmin: user.role === 'admin' });
+      
       if (isAlreadyPurchased) {
+        console.log('ℹ️ Work already purchased');
         toast({
           title: '✅ Работа уже куплена!',
           description: 'Скачивание началось...',
         });
       } else if (user.role === 'admin') {
+        console.log('👑 Admin download (free)');
         toast({
           title: '✅ Скачивание началось!',
           description: 'Файл сохранится в папку "Загрузки"',
@@ -644,6 +657,8 @@ export default function WorkDetailPage() {
         const oldBalance = user.balance || 0;
         const deducted = work.price;
         const newBalance = purchaseData.newBalance || (oldBalance - deducted);
+        
+        console.log('💸 Showing deduction notification:', { oldBalance, deducted, newBalance });
         
         toast({
           title: '💳 Покупка успешна!',

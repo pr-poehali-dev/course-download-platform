@@ -15,6 +15,7 @@ import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
+import PurchaseNotifications from '@/components/PurchaseNotifications';
 
 interface Work {
   id: string;
@@ -444,6 +445,7 @@ export default function CatalogPage() {
           {JSON.stringify(jsonLdSchema)}
         </script>
       </Helmet>
+      <PurchaseNotifications />
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <Navigation isLoggedIn={isLoggedIn} />
       

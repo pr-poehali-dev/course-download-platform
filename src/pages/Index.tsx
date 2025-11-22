@@ -36,6 +36,7 @@ import SEO from '@/components/SEO';
 import HomeHeader from '@/components/home/HomeHeader';
 import RotatingText from '@/components/home/RotatingText';
 import NewsSection from '@/components/NewsSection';
+import PurchaseNotifications from '@/components/PurchaseNotifications';
 
 
 
@@ -461,6 +462,7 @@ export default function Index() {
         description="Маркетплейс студенческих работ для студентов. Покупай готовые курсовые и дипломы за баллы, продавай свои работы"
         keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, готовые курсовые, учебные материалы"
       />
+      <PurchaseNotifications />
       <div className="min-h-screen w-full overflow-x-hidden bg-white">
         <header className="glass-card tech-border sticky top-0 z-50 w-full shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-4">

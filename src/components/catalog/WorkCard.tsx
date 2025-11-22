@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import PreviewCarousel from '@/components/PreviewCarousel';
 import { getFakeAuthor, getViewCount, incrementViewCount } from '@/utils/fakeAuthors';
+import { getRemainingCopies, shouldShowUrgency, pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
 
 interface Work {
   id: string;
@@ -48,6 +49,11 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
     : work.price;
 
   const author = getFakeAuthor(work.id);
+  
+  // Триггеры срочности для повышения конверсии
+  const showUrgency = shouldShowUrgency(work.id, work.rating);
+  const remainingCopies = getRemainingCopies(work.id);
+  const priceInRubles = pointsToRubles(finalPrice);
 
   useEffect(() => {
     setViewCount(getViewCount(work.id));
@@ -76,6 +82,12 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
           <Badge className="bg-orange-500 text-white shadow-lg">
             <Icon name="Flame" size={12} className="mr-1" />
             Хит
+          </Badge>
+        )}
+        {showUrgency && remainingCopies <= 7 && (
+          <Badge className="bg-red-600 text-white shadow-lg animate-pulse">
+            <Icon name="AlertCircle" size={12} className="mr-1" />
+            Осталось {remainingCopies}
           </Badge>
         )}
       </div>
@@ -200,11 +212,15 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
           <div>
             {work.discount ? (
               <div className="flex flex-col">
-                <span className="text-sm text-gray-400 line-through">{work.price} баллов</span>
-                <span className="text-2xl font-bold text-green-600">{Math.round(finalPrice)} баллов</span>
+                <span className="text-xs text-gray-400 line-through">{formatPrice(pointsToRubles(work.price))}₽</span>
+                <span className="text-2xl font-bold text-green-600">{formatPrice(priceInRubles)}₽</span>
+                <span className="text-xs text-gray-500">{Math.round(finalPrice)} баллов</span>
               </div>
             ) : (
-              <span className="text-2xl font-bold text-gray-900">{work.price} баллов</span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold text-gray-900">{formatPrice(priceInRubles)}₽</span>
+                <span className="text-xs text-gray-500">{work.price} баллов</span>
+              </div>
             )}
           </div>
           <div className="flex gap-2">

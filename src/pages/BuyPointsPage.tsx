@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
+import { getTimeRemaining, formatTime } from '@/utils/urgencyTriggers';
 
 interface PointsPackage {
   id: number;
@@ -21,6 +22,7 @@ export default function BuyPointsPage() {
   const [selectedPackage, setSelectedPackage] = useState<PointsPackage | null>(null);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [timeLeft, setTimeLeft] = useState(getTimeRemaining());
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -32,6 +34,15 @@ export default function BuyPointsPage() {
       setUser(currentUser);
     };
     checkAuth();
+  }, []);
+
+  // Таймер обратного отсчёта для триггера срочности
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(getTimeRemaining());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   const packages: PointsPackage[] = [
@@ -141,6 +152,14 @@ export default function BuyPointsPage() {
 
           <h1 className="text-4xl font-bold mb-2">Покупка баллов</h1>
           <p className="text-muted-foreground">1 балл = 5₽. Пакеты с бонусами выгоднее</p>
+          
+          {/* Триггер срочности - таймер */}
+          <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-lg">
+            <Icon name="Clock" size={16} className="text-red-600" />
+            <span className="text-sm font-medium text-red-900">
+              До конца акции: <span className="font-bold">{formatTime(timeLeft)}</span>
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
@@ -155,9 +174,17 @@ export default function BuyPointsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
                   <CardTitle className="text-2xl">{pkg.points + pkg.bonus}</CardTitle>
-                  {pkg.popular && (
-                    <Badge className="bg-primary">Популярно</Badge>
-                  )}
+                  <div className="flex gap-2">
+                    {pkg.popular && (
+                      <>
+                        <Badge className="bg-primary">Популярно</Badge>
+                        <Badge className="bg-red-600 text-white animate-pulse">
+                          <Icon name="Flame" size={12} className="mr-1" />
+                          Акция
+                        </Badge>
+                      </>
+                    )}
+                  </div>
                 </div>
                 <CardDescription>{pkg.description}</CardDescription>
               </CardHeader>

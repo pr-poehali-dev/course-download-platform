@@ -37,7 +37,9 @@ def get_db_connection():
 
 def generate_tinkoff_token(params: Dict[str, Any]) -> str:
     """Генерация токена для подписи запроса к Тинькофф"""
-    token_params = {k: str(v) for k, v in params.items() if k != 'Token' and k != 'DATA' and k != 'Receipt'}
+    # Исключаем поля, которые не участвуют в подписи
+    excluded_fields = {'Token', 'DATA', 'Receipt', 'CardId', 'Pan', 'ExpDate', 'RebillId'}
+    token_params = {k: str(v) for k, v in params.items() if k not in excluded_fields}
     token_params['Password'] = TINKOFF_PASSWORD
     
     sorted_values = [str(token_params[k]) for k in sorted(token_params.keys())]

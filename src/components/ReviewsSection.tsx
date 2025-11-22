@@ -183,10 +183,16 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
         <h2 className="text-2xl font-bold text-gray-900">
           Отзывы ({reviews.length})
         </h2>
-        {isPurchased && currentUserId && !userHasReviewed && !showForm && (
+        {currentUserId && !userHasReviewed && !showForm && (
           <Button onClick={() => setShowForm(true)}>
             <Icon name="MessageSquare" size={18} className="mr-2" />
             Оставить отзыв
+          </Button>
+        )}
+        {!currentUserId && !showForm && (
+          <Button onClick={() => window.location.href = '/login'} variant="outline">
+            <Icon name="LogIn" size={18} className="mr-2" />
+            Войти чтобы оставить отзыв
           </Button>
         )}
       </div>
@@ -197,6 +203,16 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
             <CardTitle className="text-lg">Напишите отзыв</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
+            {!isPurchased && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                <Icon name="Info" size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-amber-900">Для отзыва нужно купить работу</p>
+                  <p className="text-xs text-amber-700 mt-1">Отзывы могут оставлять только покупатели. Это гарантирует честность отзывов.</p>
+                </div>
+              </div>
+            )}
+            
             <div>
               <label className="block text-sm font-medium mb-2">Оценка</label>
               <div className="flex gap-2">
@@ -205,6 +221,7 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
                     key={star}
                     onClick={() => setRating(star)}
                     className="transition-all"
+                    disabled={!isPurchased}
                   >
                     <Icon
                       name="Star"
@@ -213,7 +230,7 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
                         star <= rating
                           ? 'text-yellow-500 fill-yellow-500'
                           : 'text-gray-300'
-                      }`}
+                      } ${!isPurchased ? 'opacity-50 cursor-not-allowed' : ''}`}
                     />
                   </button>
                 ))}
@@ -227,11 +244,12 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Расскажите о вашем опыте с этой работой..."
                 className="min-h-[120px]"
+                disabled={!isPurchased}
               />
             </div>
 
             <div className="flex gap-2">
-              <Button onClick={handleSubmitReview} disabled={submitting}>
+              <Button onClick={handleSubmitReview} disabled={submitting || !isPurchased}>
                 {submitting ? (
                   <>
                     <Icon name="Loader2" size={18} className="mr-2 animate-spin" />

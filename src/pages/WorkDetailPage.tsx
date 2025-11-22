@@ -497,10 +497,22 @@ export default function WorkDetailPage() {
   }, [work, actualWorkId]);
 
   const handlePurchaseAndDownload = async () => {
+    // Показываем сразу уведомление о начале
+    toast({
+      title: '🔵 Кнопка нажата!',
+      description: 'Начинаем обработку покупки...',
+      duration: 3000,
+    });
+    
     console.log('🔵 BUTTON CLICKED! Starting handlePurchaseAndDownload');
     
     if (!actualWorkId || !work) {
       console.log('❌ Missing workId or work:', { actualWorkId, work });
+      toast({
+        title: '❌ Ошибка',
+        description: `Нет workId или work. workId=${actualWorkId}`,
+        duration: 5000,
+      });
       return;
     }
     
@@ -508,6 +520,11 @@ export default function WorkDetailPage() {
     console.log('👤 localStorage user:', userStr);
     
     if (!userStr) {
+      toast({
+        title: '❌ Нет данных пользователя',
+        description: 'localStorage пуст, перенаправляем на логин',
+        duration: 5000,
+      });
       alert('Войдите в систему для покупки работы');
       navigate('/login');
       return;
@@ -516,15 +533,13 @@ export default function WorkDetailPage() {
     const user = JSON.parse(userStr);
     const userId = user.id;
     
-    console.log('🛒 Starting purchase:', { 
-      userId, 
-      workId: actualWorkId, 
-      price: work.price, 
-      userRole: user.role,
-      userBalance: user.balance,
-      isPurchased,
-      isAdmin
+    toast({
+      title: '👤 Данные пользователя',
+      description: `ID: ${userId}, роль: ${user.role}, баланс: ${user.balance}, isPurchased: ${isPurchased}`,
+      duration: 5000,
     });
+    
+
     
     setDownloading(true);
     try {
@@ -548,6 +563,11 @@ export default function WorkDetailPage() {
       // Если работа уже куплена, просто генерируем токен для скачивания
       if (isAlreadyPurchased) {
         console.log('Work already purchased, generating download token...');
+        toast({
+          title: '✅ Работа уже куплена',
+          description: 'Генерируем токен для скачивания...',
+          duration: 3000,
+        });
         const tokenResponse = await fetch(`${PURCHASE_WORK_URL}?action=generate-token`, {
           method: 'POST',
           headers: {
@@ -575,6 +595,11 @@ export default function WorkDetailPage() {
           price: work.price,
           userBalance: user.balance,
           userRole: user.role
+        });
+        toast({
+          title: '💰 Покупка работы',
+          description: `Списываем ${work.price} баллов с баланса ${user.balance}...`,
+          duration: 3000,
         });
         const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
           method: 'POST',

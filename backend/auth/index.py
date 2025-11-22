@@ -127,6 +127,7 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
     password = body_data.get('password', '')
     security_question = body_data.get('security_question', '')
     security_answer = body_data.get('security_answer', '')
+    referred_by_code = body_data.get('referral_code', '').strip().upper()  # ✅ Реферальный код
     
     if not username or not email or not password or not security_question or not security_answer:
         return {
@@ -192,18 +193,33 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
+        # ✅ Проверяем реферальный код (если указан)
+        referrer_id = None
+        if referred_by_code:
+            cur.execute(
+                "SELECT id FROM t_p63326274_course_download_plat.users WHERE referral_code = %s",
+                (referred_by_code,)
+            )
+            referrer = cur.fetchone()
+            if referrer:
+                referrer_id = referrer[0]
+                print(f"✅ Referral code {referred_by_code} matched to user_id={referrer_id}")
+            else:
+                print(f"⚠️ Invalid referral code: {referred_by_code}")
+        
         password_hash = hash_password(password)
         security_answer_hash = hashlib.sha256(security_answer.lower().strip().encode()).hexdigest()
         referral_code = generate_referral_code(username)
         
+        # ✅ Сохраняем referred_by при регистрации
         cur.execute(
             """
             INSERT INTO t_p63326274_course_download_plat.users 
-            (username, email, password_hash, referral_code, balance, security_question, security_answer_hash, registration_ip) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) 
+            (username, email, password_hash, referral_code, balance, security_question, security_answer_hash, registration_ip, referred_by) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
             RETURNING id
             """,
-            (username, email, password_hash, referral_code, 1000, security_question, security_answer_hash, ip_address)
+            (username, email, password_hash, referral_code, 1000, security_question, security_answer_hash, ip_address, referrer_id)
         )
         user_id = cur.fetchone()[0]
         
@@ -215,6 +231,32 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             """,
             (user_id, 'refill', 1000, 'Бонус при регистрации')
         )
+        
+        # ✅ Если был реферал, начисляем бонус рефереру
+        if referrer_id:
+            REFERRAL_BONUS = 600
+            
+            # Начисляем баллы рефереру
+            cur.execute(
+                """
+                UPDATE t_p63326274_course_download_plat.users 
+                SET balance = balance + %s 
+                WHERE id = %s
+                """,
+                (REFERRAL_BONUS, referrer_id)
+            )
+            
+            # Записываем транзакцию рефереру
+            cur.execute(
+                """
+                INSERT INTO t_p63326274_course_download_plat.transactions 
+                (user_id, type, amount, description) 
+                VALUES (%s, %s, %s, %s)
+                """,
+                (referrer_id, 'referral_bonus', REFERRAL_BONUS, f'Реферальный бонус за пользователя {username}')
+            )
+            
+            print(f"✅ Referral bonus {REFERRAL_BONUS} credited to user_id={referrer_id} for referring {username}")
         
         conn.commit()
         

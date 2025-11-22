@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔗 Тест реферальной системы</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .info {
+            background: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #333;
+        }
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .success {
+            background: #efe;
+            color: #060;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .error {
+            background: #fee;
+            color: #c00;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .link-box {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🔗 Тест реферальной системы Tech Forma</h1>
+            <p style="color: #666; margin-top: 10px;">Проверка работы реферальных ссылок и начисления бонусов</p>
+        </div>
+
+        <div class="card">
+            <h2>1️⃣ Пользователь ker (реферер)</h2>
+            <div class="info">
+                <div class="info-row">
+                    <span class="info-label">ID:</span>
+                    <span class="info-value" id="ker-id">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Username:</span>
+                    <span class="info-value" id="ker-username">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value" id="ker-email">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Баланс:</span>
+                    <span class="info-value" id="ker-balance">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Реферальный код:</span>
+                    <span class="info-value" id="ker-ref-code">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Рефералов:</span>
+                    <span class="info-value" id="ker-ref-count">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Заработано:</span>
+                    <span class="info-value" id="ker-ref-earned">-</span>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 15px;">Реферальная ссылка:</h3>
+            <div class="link-box" id="ker-ref-link">-</div>
+            
+            <button onclick="loadKerData()">🔄 Обновить данные ker</button>
+            <button onclick="copyKerLink()">📋 Копировать ссылку</button>
+        </div>
+
+        <div class="card">
+            <h2>2️⃣ Симуляция регистрации нового пользователя</h2>
+            <p style="color: #666; margin-bottom: 15px;">
+                Зарегистрируем нового пользователя по реферальной ссылке ker
+            </p>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #666; font-size: 14px;">Username:</label>
+                <input type="text" id="new-username" placeholder="test_user_123" 
+                    style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; color: #666; font-size: 14px;">Email:</label>
+                <input type="email" id="new-email" placeholder="test@example.com" 
+                    style="width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px;">
+            </div>
+            
+            <button onclick="registerWithReferral()">🎉 Зарегистрировать с реферальным кодом</button>
+            
+            <div id="register-result"></div>
+        </div>
+
+        <div class="card">
+            <h2>3️⃣ Проверка результатов</h2>
+            <button onclick="checkResults()">✅ Проверить начисление бонусов</button>
+            <div id="results"></div>
+        </div>
+    </div>
+
+    <script>
+        const AUTH_URL = 'https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46';
+        const USER_DATA_URL = 'https://functions.poehali.dev/c605690e-3ba9-40eb-86cd-4c470a0b3387';
+        
+        let kerReferralCode = '';
+        let newUserId = null;
+        
+        async function loadKerData() {
+            try {
+                // Login as ker
+                const loginResponse = await fetch(`${AUTH_URL}?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'ker',
+                        password: 'ker12345'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (!loginData.user) {
+                    throw new Error('Failed to login as ker');
+                }
+                
+                const user = loginData.user;
+                kerReferralCode = user.referral_code;
+                
+                document.getElementById('ker-id').textContent = user.id;
+                document.getElementById('ker-username').textContent = user.username;
+                document.getElementById('ker-email').textContent = user.email;
+                document.getElementById('ker-balance').textContent = `${user.balance} баллов`;
+                document.getElementById('ker-ref-code').textContent = kerReferralCode;
+                
+                // Load referral stats
+                const statsResponse = await fetch(`${USER_DATA_URL}?user_id=${user.id}&action=referrals`);
+                const statsData = await statsResponse.json();
+                
+                if (statsData.referral) {
+                    document.getElementById('ker-ref-count').textContent = statsData.referral.referred_count;
+                    document.getElementById('ker-ref-earned').textContent = `${statsData.referral.total_earned} баллов`;
+                }
+                
+                const refLink = `https://techforma.pro/register?ref=${kerReferralCode}`;
+                document.getElementById('ker-ref-link').textContent = refLink;
+                
+            } catch (error) {
+                console.error('Error loading ker data:', error);
+                alert('Ошибка загрузки данных ker: ' + error.message);
+            }
+        }
+        
+        function copyKerLink() {
+            const link = document.getElementById('ker-ref-link').textContent;
+            navigator.clipboard.writeText(link);
+            alert('✅ Ссылка скопирована!');
+        }
+        
+        async function registerWithReferral() {
+            const username = document.getElementById('new-username').value.trim();
+            const email = document.getElementById('new-email').value.trim();
+            
+            if (!username || !email) {
+                alert('⚠️ Заполните username и email');
+                return;
+            }
+            
+            if (!kerReferralCode) {
+                alert('⚠️ Сначала загрузите данные ker');
+                return;
+            }
+            
+            const resultDiv = document.getElementById('register-result');
+            resultDiv.innerHTML = '<p style="color: #666;">⏳ Регистрируем пользователя...</p>';
+            
+            try {
+                const response = await fetch(`${AUTH_URL}?action=register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: 'Test12345',
+                        security_question: 'Любимый цвет',
+                        security_answer: 'синий',
+                        referral_code: kerReferralCode  // ✅ Передаем реферальный код
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.user) {
+                    newUserId = data.user.id;
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Пользователь успешно зарегистрирован!<br>
+                            ID: ${data.user.id}<br>
+                            Username: ${data.user.username}<br>
+                            Email: ${data.user.email}<br>
+                            Стартовый баланс: ${data.user.balance} баллов<br>
+                            Реферальный код: ${data.user.referral_code}<br>
+                            <strong>Использован код рефера: ${kerReferralCode}</strong>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ ${data.error || 'Ошибка регистрации'}</div>`;
+                }
+                
+            } catch (error) {
+                console.error('Registration error:', error);
+                resultDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        }
+        
+        async function checkResults() {
+            if (!newUserId) {
+                alert('⚠️ Сначала зарегистрируйте пользователя');
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p style="color: #666;">⏳ Проверяем начисление бонусов...</p>';
+            
+            try {
+                // Обновляем данные ker
+                await loadKerData();
+                
+                // Получаем баланс нового пользователя
+                const loginResponse = await fetch(`${AUTH_URL}?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('new-username').value,
+                        password: 'Test12345'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                resultsDiv.innerHTML = `
+                    <div class="success">
+                        <h3 style="margin-top: 0;">📊 Результаты проверки:</h3>
+                        
+                        <h4>Реферер (ker):</h4>
+                        <ul>
+                            <li>Баланс: ${document.getElementById('ker-balance').textContent}</li>
+                            <li>Рефералов: ${document.getElementById('ker-ref-count').textContent}</li>
+                            <li>Заработано: ${document.getElementById('ker-ref-earned').textContent}</li>
+                        </ul>
+                        
+                        <h4>Новый пользователь:</h4>
+                        <ul>
+                            <li>ID: ${loginData.user.id}</li>
+                            <li>Username: ${loginData.user.username}</li>
+                            <li>Баланс: ${loginData.user.balance} баллов</li>
+                        </ul>
+                        
+                        <h4>Ожидаемые результаты:</h4>
+                        <ul>
+                            <li>✅ ker должен получить +600 баллов</li>
+                            <li>✅ Новый пользователь должен получить 1000 баллов</li>
+                            <li>✅ Счетчик рефералов ker должен увеличиться на 1</li>
+                            <li>✅ Заработано ker должно увеличиться на 600 баллов</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Check results error:', error);
+                resultsDiv.innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        }
+        
+        // Загружаем данные ker при открытии страницы
+        loadKerData();
+    </script>
+</body>
+</html>

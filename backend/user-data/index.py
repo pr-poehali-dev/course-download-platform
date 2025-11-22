@@ -126,10 +126,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             ''', (user_id,))
             referred_count = cur.fetchone()[0]
             
-            # Calculate total referral earnings (10% from transactions)
+            # Calculate total referral earnings from referral_bonus transactions
             cur.execute('''
                 SELECT COALESCE(SUM(amount), 0) FROM t_p63326274_course_download_plat.transactions
-                WHERE user_id = %s AND transaction_type = 'referral_bonus'
+                WHERE user_id = %s AND type = 'referral_bonus'
             ''', (user_id,))
             total_earned = cur.fetchone()[0]
             

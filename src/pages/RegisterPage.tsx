@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,9 @@ import SEO from '@/components/SEO';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const referralCode = searchParams.get('ref') || '';
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,6 +29,17 @@ export default function RegisterPage() {
   const [captchaNum1] = useState(() => Math.floor(Math.random() * 10) + 1);
   const [captchaNum2] = useState(() => Math.floor(Math.random() * 10) + 1);
   const [captchaAnswer, setCaptchaAnswer] = useState('');
+
+  // Показываем уведомление, если пришли по реферальной ссылке
+  useEffect(() => {
+    if (referralCode) {
+      toast({
+        title: '🎉 Реферальная ссылка активна',
+        description: 'При регистрации вы получите 1000 баллов, а ваш друг — 600 баллов!',
+        duration: 5000,
+      });
+    }
+  }, [referralCode]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +91,8 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
           security_question: formData.security_question,
-          security_answer: formData.security_answer
+          security_answer: formData.security_answer,
+          referral_code: referralCode  // ✅ Передаем реферальный код
         })
       });
 
@@ -134,6 +149,18 @@ export default function RegisterPage() {
             <CardDescription>Заполните данные для создания аккаунта</CardDescription>
           </CardHeader>
           <CardContent>
+            {referralCode && (
+              <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center gap-2 text-green-700">
+                  <Icon name="Gift" size={20} />
+                  <div>
+                    <p className="font-semibold text-sm">Реферальный бонус активирован!</p>
+                    <p className="text-xs">Код: <span className="font-mono font-bold">{referralCode}</span></p>
+                    <p className="text-xs mt-1">Вы получите 1000 баллов, ваш друг — 600 баллов</p>
+                  </div>
+                </div>
+              </div>
+            )}
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Никнейм</Label>

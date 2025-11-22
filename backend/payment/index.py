@@ -172,7 +172,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ]
             }
             
+            print(f"[TINKOFF] Init request params: {json.dumps({k: v for k, v in init_params.items() if k not in ['Token', 'Receipt']}, ensure_ascii=False)}")
+            
             result = tinkoff_request('Init', init_params)
+            
+            print(f"[TINKOFF] Init response: {json.dumps(result, ensure_ascii=False)}")
             
             if result.get('Success'):
                 return {

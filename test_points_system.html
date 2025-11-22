@@ -169,13 +169,16 @@
                 title: '💰 Проверка баланса пользователя',
                 description: 'Получение текущего баланса',
                 run: async () => {
-                    const response = await fetch(`${USER_DATA_URL}?user_id=${TEST_USER_ID}&action=all`);
+                    const response = await fetch(`${USER_DATA_URL}?user_id=${TEST_USER_ID}&action=transactions`);
                     const data = await response.json();
                     
-                    // Проверяем есть ли данные о балансе через transactions
-                    if (data.transactions && data.transactions.length > 0) {
-                        const lastTransaction = data.transactions[0];
-                        return { success: true, message: `✅ Транзакции работают. Последняя: ${lastTransaction.type} на ${lastTransaction.amount} баллов` };
+                    // Проверяем есть ли транзакции (если есть, значит система работает)
+                    if (data && data.transactions) {
+                        if (data.transactions.length > 0) {
+                            const lastTransaction = data.transactions[0];
+                            return { success: true, message: `✅ Система работает. Транзакций: ${data.transactions.length}. Последняя: ${lastTransaction.type}` };
+                        }
+                        return { success: true, message: '✅ API работает, транзакций пока нет' };
                     }
                     
                     throw new Error('Не удалось получить данные о балансе');

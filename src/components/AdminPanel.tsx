@@ -60,6 +60,9 @@ export default function AdminPanel() {
     setLoading(true);
     try {
       const response = await fetch(func2url.works);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
       const data = await response.json();
       
       if (data.works) {
@@ -81,6 +84,13 @@ export default function AdminPanel() {
       }
     } catch (error) {
       console.error('Failed to load stats:', error);
+      setStats({
+        totalWorks: 0,
+        totalUsers: 0,
+        totalPurchases: 0,
+        totalRevenue: 0,
+        popularWorks: []
+      });
     } finally {
       setLoading(false);
     }

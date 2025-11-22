@@ -119,4 +119,9 @@ export const authService = {
   getToken(): string | null {
     return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
   },
+
+  getUserId(): number | null {
+    const userId = localStorage.getItem('userId') || sessionStorage.getItem('userId');
+    return userId ? parseInt(userId, 10) : null;
+  },
 };

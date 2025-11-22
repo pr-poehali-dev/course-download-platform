@@ -89,6 +89,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 })
             result['purchases'] = purchases
         
+        # Get transactions history
+        if action in ['all', 'transactions']:
+            cur.execute('''
+                SELECT id, type, amount, description, created_at
+                FROM t_p63326274_course_download_plat.transactions
+                WHERE user_id = %s
+                ORDER BY created_at DESC
+                LIMIT 100
+            ''', (user_id,))
+            transactions = []
+            for row in cur.fetchall():
+                transactions.append({
+                    'id': row[0],
+                    'type': row[1],
+                    'amount': row[2],
+                    'description': row[3],
+                    'created_at': row[4].isoformat() if row[4] else None
+                })
+            result['transactions'] = transactions
+        
         # Get referral stats
         if action in ['all', 'referrals']:
             # Get referral code

@@ -12,6 +12,7 @@ import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import BalanceTab from '@/components/profile/BalanceTab';
 import SupportTab from '@/components/profile/SupportTab';
+import TransactionsTab from '@/components/profile/TransactionsTab';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 
@@ -78,6 +79,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const DOWNLOAD_WORK_URL = func2url['download-work'];
   const YANDEX_DISK_URL = 'https://disk.yandex.ru/d/usjmeUqnkY9IfQ';
@@ -172,6 +174,7 @@ export default function ProfilePage() {
       }
       
       setIsAuthenticated(true);
+      setCurrentUserId(userData.id);
       setUser({
         name: userData.username,
         email: userData.email,
@@ -480,6 +483,10 @@ export default function ProfilePage() {
               <TabsTrigger value="balance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white">
                 <Icon name="Wallet" size={16} className="mr-2" />
                 Баланс
+              </TabsTrigger>
+              <TabsTrigger value="transactions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-blue-500 data-[state=active]:text-white">
+                <Icon name="Receipt" size={16} className="mr-2" />
+                История баллов
               </TabsTrigger>
               <TabsTrigger value="messages" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white relative">
                 <Icon name="Mail" size={16} className="mr-2" />
@@ -907,6 +914,10 @@ export default function ProfilePage() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="transactions" className="space-y-4">
+              {currentUserId && <TransactionsTab userId={currentUserId} />}
             </TabsContent>
 
             <TabsContent value="support" className="space-y-4">

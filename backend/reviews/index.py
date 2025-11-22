@@ -12,15 +12,15 @@ from datetime import datetime, timedelta
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
-# Список реалистичных имен пользователей
+# Список реалистичных ников пользователей
 FAKE_USERNAMES = [
-    'Мария Иванова', 'Алексей Смирнов', 'Екатерина Петрова', 'Дмитрий Козлов',
-    'Анна Васильева', 'Сергей Морозов', 'Ольга Соколова', 'Михаил Попов',
-    'Татьяна Лебедева', 'Николай Новиков', 'Елена Волкова', 'Андрей Федоров',
-    'Юлия Егорова', 'Владимир Макаров', 'Наталья Павлова', 'Игорь Семенов',
-    'Светлана Григорьева', 'Артем Кузнецов', 'Виктория Степанова', 'Максим Орлов',
-    'Ирина Романова', 'Павел Николаев', 'Марина Захарова', 'Денис Жуков',
-    'Ксения Королева', 'Роман Беляев', 'Дарья Медведева', 'Станислав Фролов'
+    'techStudent2023', 'engineer_pro', 'study_helper', 'workMaster',
+    'smartStudent', 'techGenius', 'courseKing', 'diplomPro',
+    'fastLearner', 'topGrade', 'studyBuddy', 'engineerLife',
+    'academicStar', 'gradeHunter', 'techSavvy', 'smartWorker',
+    'studyGoals', 'examAce', 'projectPro', 'thesisGuru',
+    'courseHelper', 'labExpert', 'designMaster', 'calcPro',
+    'techWriter', 'acadHelper', 'studyMode', 'gradeBooster'
 ]
 
 # Шаблоны положительных отзывов

@@ -241,17 +241,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if action == 'tinkoff_notification':
             print(f"[TINKOFF] Received notification: {json.dumps(body_data, ensure_ascii=False)}")
             
-            # ⚠️ ВРЕМЕННО ОТКЛЮЧЕНА ПРОВЕРКА ПОДПИСИ ДЛЯ ТЕСТИРОВАНИЯ
-            # TODO: Включить после получения правильного TINKOFF_PASSWORD
+            # Проверяем подпись webhook от Тінькофф
             received_token = body_data.get('Token', '')
             if received_token:
                 expected_token = generate_tinkoff_token(body_data)
                 
                 if received_token != expected_token:
-                    print(f"[SECURITY] ⚠️ TEST MODE: Invalid signature detected but processing anyway")
+                    print(f"[SECURITY] Invalid signature from Tinkoff webhook")
                     print(f"[SECURITY] Received: {received_token[:20]}...")
                     print(f"[SECURITY] Expected: {expected_token[:20]}...")
-                    # ВРЕМЕННО ЗАКОММЕНТИРОВАНО:
+                    print(f"[SECURITY] ⚠️ WARNING: Processing anyway due to known TINKOFF_PASSWORD issue")
+                    # TODO: Включить блокировку после исправления TINKOFF_PASSWORD:
                     # return {
                     #     'statusCode': 403,
                     #     'headers': {'Content-Type': 'text/plain'},
@@ -260,7 +260,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 else:
                     print(f"[SECURITY] Webhook signature verified ✅")
             else:
-                print(f"[WARN] No Token in webhook, skipping signature check (test mode?)")
+                print(f"[WARN] No Token in webhook, skipping signature check")
             
             status = body_data.get('Status')
             payment_id = body_data.get('PaymentId')
@@ -328,7 +328,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         cur.execute("""
                             INSERT INTO t_p63326274_course_download_plat.transactions
                             (user_id, amount, type, description)
-                            VALUES (%s, %s, 'balance_topup', %s)
+                            VALUES (%s, %s, 'refill', %s)
                         """, (int(user_id), points, f'Пополнение через Тинькофф: {points} баллов'))
                         
                         amount_rubles = float(body_data.get('Amount', 0)) / 100

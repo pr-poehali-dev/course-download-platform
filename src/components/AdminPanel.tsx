@@ -6,7 +6,6 @@ import { toast } from '@/components/ui/use-toast';
 import WorkManager from '@/components/WorkManager';
 import WorksManagement from '@/components/WorksManagement';
 import UsersManagement from '@/components/UsersManagement';
-import FinanceManagement from '@/components/FinanceManagement';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import PlatformSettings from '@/components/PlatformSettings';
 import SupportAdmin from '@/components/SupportAdmin';
@@ -187,51 +186,7 @@ export default function AdminPanel() {
         </TabsContent>
 
         <TabsContent value="settings" className="space-y-6">
-          <FinanceManagement />
           <PlatformSettings />
-        </TabsContent>
-
-        <TabsContent value="seller-stats" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Card className="gradient-green-yellow">
-              <CardHeader className="pb-2">
-                <div className="text-white/80 flex items-center gap-2 text-sm">
-                  <Icon name="FileText" size={18} />
-                  Загружено работ
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-1">12</div>
-                <p className="text-sm text-white/80">В каталоге</p>
-              </CardContent>
-            </Card>
-
-            <Card className="gradient-purple-pink">
-              <CardHeader className="pb-2">
-                <div className="text-white/80 flex items-center gap-2 text-sm">
-                  <Icon name="Download" size={18} />
-                  Продано работ
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-1">48</div>
-                <p className="text-sm text-white/80">Всего скачиваний</p>
-              </CardContent>
-            </Card>
-
-            <Card className="gradient-orange-red">
-              <CardHeader className="pb-2">
-                <div className="text-white/80 flex items-center gap-2 text-sm">
-                  <Icon name="Coins" size={18} />
-                  Баланс
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold text-white mb-1">4,800</div>
-                <p className="text-sm text-white/80">баллов заработано</p>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
       </Tabs>
     </div>

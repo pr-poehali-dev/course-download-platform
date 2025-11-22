@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../backend/func2url.json';
 import {
   Dialog,
   DialogContent,
@@ -36,72 +37,30 @@ interface User {
 }
 
 export default function UsersManagement() {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: 1,
-      name: 'Александр Иванов',
-      email: 'alex.ivanov@example.com',
-      balance: 350,
-      totalUploads: 8,
-      totalPurchases: 15,
-      totalEarned: 1200,
-      registrationDate: '2025-01-15',
-      status: 'active',
-      lastActivity: '2025-01-17'
-    },
-    {
-      id: 2,
-      name: 'Мария Петрова',
-      email: 'maria.petrova@example.com',
-      balance: 150,
-      totalUploads: 12,
-      totalPurchases: 8,
-      totalEarned: 1800,
-      registrationDate: '2025-01-10',
-      status: 'active',
-      lastActivity: '2025-01-17'
-    },
-    {
-      id: 3,
-      name: 'Дмитрий Сидоров',
-      email: 'dmitry.sidorov@example.com',
-      balance: 0,
-      totalUploads: 2,
-      totalPurchases: 25,
-      totalEarned: 300,
-      registrationDate: '2025-01-05',
-      status: 'active',
-      lastActivity: '2025-01-16'
-    },
-    {
-      id: 4,
-      name: 'Елена Козлова',
-      email: 'elena.kozlova@example.com',
-      balance: 520,
-      totalUploads: 15,
-      totalPurchases: 5,
-      totalEarned: 2250,
-      registrationDate: '2025-01-08',
-      status: 'active',
-      lastActivity: '2025-01-17'
-    },
-    {
-      id: 5,
-      name: 'Иван Морозов',
-      email: 'ivan.morozov@example.com',
-      balance: 80,
-      totalUploads: 1,
-      totalPurchases: 3,
-      totalEarned: 150,
-      registrationDate: '2024-12-20',
-      status: 'suspended',
-      lastActivity: '2025-01-10'
-    }
-  ]);
-
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      toast({
+        title: 'Функция в разработке',
+        description: 'Управление пользователями будет доступно в следующей версии'
+      });
+      setUsers([]);
+    } catch (error) {
+      console.error('Failed to load users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleStatusChange = (userId: number, newStatus: 'active' | 'blocked' | 'suspended') => {
     const updatedUsers = users.map(user =>
@@ -140,6 +99,19 @@ export default function UsersManagement() {
     const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center py-12">
+            <Icon name="Loader2" size={48} className="mx-auto text-muted-foreground mb-4 animate-spin" />
+            <p className="text-muted-foreground">Загрузка пользователей...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const getStatusBadge = (status: string) => {
     switch (status) {

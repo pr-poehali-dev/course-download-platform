@@ -79,6 +79,30 @@ export default function Index() {
   const userBalance = currentUser?.balance || 0;
   const availableWorks = realWorks.filter(work => (work.price_points || work.price || 0) <= userBalance).length;
 
+  // ✅ Функция для обновления баланса из backend
+  const refreshBalance = async () => {
+    try {
+      const freshUser = await authService.verify();
+      if (freshUser) {
+        setCurrentUser(freshUser);
+        localStorage.setItem('user', JSON.stringify(freshUser));
+        toast({
+          title: '✅ Баланс обновлён',
+          description: `Текущий баланс: ${freshUser.balance} баллов`,
+          duration: 2000,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to refresh balance:', error);
+      toast({
+        title: '❌ Ошибка',
+        description: 'Не удалось обновить баланс',
+        variant: 'destructive',
+        duration: 2000,
+      });
+    }
+  };
+
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -482,11 +506,20 @@ export default function Index() {
                       )}
                     </Button>
                     
-                    <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-1">
                       <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-primary/10 rounded-full">
                         <Icon name="Coins" size={16} className="text-primary sm:w-5 sm:h-5" />
                         <span className="font-semibold text-sm sm:text-base">{userBalance}</span>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={refreshBalance}
+                        className="h-8 w-8"
+                        title="Обновить баланс"
+                      >
+                        <Icon name="RefreshCw" size={16} />
+                      </Button>
                     </div>
                     
                     <Button 

@@ -7,6 +7,7 @@ interface NavigationProps {
   onFavoritesClick?: () => void;
   onPromoClick?: () => void;
   onPaymentClick?: () => void;
+  onRefreshBalance?: () => void;
   userBalance?: number;
   cartCount?: number;
   favoritesCount?: number;
@@ -18,6 +19,7 @@ export default function Navigation({
   onFavoritesClick,
   onPromoClick,
   onPaymentClick,
+  onRefreshBalance,
   userBalance = 0,
   cartCount = 0,
   favoritesCount = 0,
@@ -74,11 +76,25 @@ export default function Navigation({
             )}
             
             {onPromoClick && (
-              <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-1">
                 <div className="flex items-center gap-1.5 md:gap-2 px-2 md:px-4 py-1.5 md:py-2 bg-primary/10 rounded-full cursor-pointer" onClick={onPromoClick}>
                   <Icon name="Coins" size={16} className="text-primary md:w-5 md:h-5" />
                   <span className="font-semibold text-sm md:text-base">{userBalance}</span>
                 </div>
+                {onRefreshBalance && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRefreshBalance();
+                    }}
+                    className="h-8 w-8"
+                    title="Обновить баланс"
+                  >
+                    <Icon name="RefreshCw" size={16} />
+                  </Button>
+                )}
               </div>
             )}
             

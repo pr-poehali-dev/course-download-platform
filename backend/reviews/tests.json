@@ -11,6 +11,18 @@
       "method": "OPTIONS",
       "path": "/",
       "expectedStatus": 200
+    },
+    {
+      "name": "Generate fake reviews (unauthorized)",
+      "method": "POST",
+      "path": "/?action=generate_fake",
+      "headers": {
+        "X-Admin-Email": "wrong@email.com"
+      },
+      "body": {
+        "work_ids": [1, 2]
+      },
+      "expectedStatus": 403
     }
   ]
 }

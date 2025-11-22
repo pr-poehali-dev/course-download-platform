@@ -276,6 +276,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 where_clauses.append("title NOT LIKE %s")
                 params.append('[УДАЛЕНО]%')
                 
+                # Фильтрация по статусу
+                status_filter = query_params.get('status')
+                if status_filter:
+                    where_clauses.append("status = %s")
+                    params.append(status_filter)
+                elif not author_id:
+                    # Для каталога показываем только одобренные работы
+                    where_clauses.append("status = %s")
+                    params.append('approved')
+                
                 # Фильтрация по автору (для профиля пользователя)
                 if author_id:
                     where_clauses.append("author_id = %s")
@@ -640,6 +650,59 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'views': stats[0] if stats[0] else 0,
                     'downloads': stats[1] if stats[1] else 0,
                     'reviewsCount': stats[2] if stats[2] else 0
+                })
+            }
+        finally:
+            cur.close()
+            conn.close()
+    
+    if method == 'PUT':
+        body_data = json.loads(event.get('body', '{}'))
+        work_id = body_data.get('work_id')
+        new_status = body_data.get('status')
+        rejection_reason = body_data.get('rejection_reason')
+        
+        admin_email = event.get('headers', {}).get('X-Admin-Email') or event.get('headers', {}).get('x-admin-email')
+        if admin_email != 'rekrutiw@yandex.ru':
+            return {
+                'statusCode': 403,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Admin access required'})
+            }
+        
+        if not work_id or not new_status:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'work_id and status required'})
+            }
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            if rejection_reason:
+                cur.execute("""
+                    UPDATE t_p63326274_course_download_plat.works 
+                    SET status = %s, moderation_comment = %s
+                    WHERE id = %s
+                """, (new_status, rejection_reason, work_id))
+            else:
+                cur.execute("""
+                    UPDATE t_p63326274_course_download_plat.works 
+                    SET status = %s
+                    WHERE id = %s
+                """, (new_status, work_id))
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'success': True,
+                    'work_id': work_id,
+                    'status': new_status
                 })
             }
         finally:

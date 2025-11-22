@@ -40,8 +40,25 @@ export default function ModerationPanel() {
   const loadPendingWorks = async () => {
     setLoading(true);
     try {
-      // Временно отключена загрузка работ на модерации
-      setWorks([]);
+      const response = await fetch(`${func2url.works}?status=pending`);
+      const data = await response.json();
+      
+      if (data.works) {
+        setWorks(data.works.map((w: any) => ({
+          id: w.id,
+          user_id: w.author_id,
+          title: w.title,
+          work_type: w.work_type,
+          subject: w.subject,
+          description: w.description,
+          price_points: w.price_points,
+          file_name: w.file_url || 'work.rar',
+          file_size: 0,
+          moderation_status: w.status,
+          moderation_comment: null,
+          created_at: w.created_at
+        })));
+      }
     } catch (error) {
       console.error('Error loading works:', error);
     } finally {
@@ -56,21 +73,21 @@ export default function ModerationPanel() {
 
     setProcessing(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0/moderate', {
-        method: 'POST',
+      const response = await fetch(func2url.works, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin': 'true'
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
         },
         body: JSON.stringify({
-          workId: work.id,
-          action: 'approve'
+          work_id: work.id,
+          status: 'approved'
         })
       });
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (response.ok) {
         toast({
           title: 'Работа одобрена',
           description: 'Работа опубликована в каталоге'
@@ -104,22 +121,22 @@ export default function ModerationPanel() {
 
     setProcessing(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0/moderate', {
-        method: 'POST',
+      const response = await fetch(func2url.works, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin': 'true'
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
         },
         body: JSON.stringify({
-          workId: selectedWork.id,
-          action: 'reject',
-          comment: rejectionComment
+          work_id: selectedWork.id,
+          status: 'rejected',
+          rejection_reason: rejectionComment
         })
       });
 
       const result = await response.json();
 
-      if (response.ok && result.success) {
+      if (response.ok) {
         toast({
           title: 'Работа отклонена',
           description: 'Автору отправлено уведомление на почту'

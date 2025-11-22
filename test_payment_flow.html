@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Тест оплаты через Tinkoff</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .info {
+            background: #f3f4f6;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            color: #666;
+            font-size: 14px;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #333;
+        }
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .success {
+            background: #efe;
+            color: #060;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .error {
+            background: #fee;
+            color: #c00;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+        .log {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .step {
+            background: #fff9e6;
+            border-left: 4px solid #ffa500;
+            padding: 12px 16px;
+            margin: 12px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>🧪 Полный тест платёжной системы Tinkoff</h1>
+            <p style="color: #666; margin-top: 10px;">Проверка всех этапов оплаты от создания до зачисления баллов</p>
+        </div>
+
+        <div class="card">
+            <h2>Шаг 1: Текущий баланс пользователя ker</h2>
+            <div class="info">
+                <div class="info-row">
+                    <span class="info-label">User ID:</span>
+                    <span class="info-value" id="user-id">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Username:</span>
+                    <span class="info-value" id="username">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value" id="email">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Баланс ДО оплаты:</span>
+                    <span class="info-value" id="balance-before">-</span>
+                </div>
+            </div>
+            <button onclick="loadUserBalance()">🔄 Загрузить баланс</button>
+        </div>
+
+        <div class="card">
+            <h2>Шаг 2: Создание платежа через Tinkoff API</h2>
+            <div class="step">
+                📦 Пакет: 100 баллов + 10 бонус = 110 баллов<br>
+                💰 Стоимость: 500 рублей
+            </div>
+            <button onclick="createPayment()" id="create-btn">💳 Создать платёж</button>
+            <div id="payment-result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Шаг 3: Имитация webhook от Tinkoff</h2>
+            <div class="step">
+                ⚠️ Обычно этот запрос приходит от Tinkoff автоматически после оплаты.<br>
+                Здесь мы имитируем его вручную для теста.
+            </div>
+            <button onclick="simulateWebhook()" id="webhook-btn" disabled>📨 Отправить webhook (CONFIRMED)</button>
+            <div id="webhook-result"></div>
+        </div>
+
+        <div class="card">
+            <h2>Шаг 4: Проверка зачисления баллов</h2>
+            <div class="info">
+                <div class="info-row">
+                    <span class="info-label">Баланс ПОСЛЕ оплаты:</span>
+                    <span class="info-value" id="balance-after">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Изменение:</span>
+                    <span class="info-value" id="balance-diff">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Ожидалось:</span>
+                    <span class="info-value">+110 баллов</span>
+                </div>
+            </div>
+            <button onclick="checkBalance()">✅ Проверить баланс</button>
+        </div>
+
+        <div class="card">
+            <h2>📋 Логи операций</h2>
+            <div class="log" id="logs"></div>
+        </div>
+    </div>
+
+    <script>
+        const AUTH_URL = 'https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46';
+        const PAYMENT_URL = 'https://functions.poehali.dev/4b9b82b8-34d8-43e7-a9ac-c3cb0bd67fb1';
+        
+        let userId = 1000015;
+        let userEmail = 'mrekrutiv@mail.ru';
+        let balanceBefore = 0;
+        let orderId = null;
+        let paymentId = null;
+        
+        function log(message) {
+            const logsDiv = document.getElementById('logs');
+            const timestamp = new Date().toLocaleTimeString();
+            logsDiv.textContent += `[${timestamp}] ${message}\n`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+        
+        async function loadUserBalance() {
+            try {
+                log('Загружаем баланс пользователя ker...');
+                
+                const response = await fetch(`${AUTH_URL}?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'ker',
+                        password: 'ker12345'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.user) {
+                    userId = data.user.id;
+                    userEmail = data.user.email;
+                    balanceBefore = data.user.balance;
+                    
+                    document.getElementById('user-id').textContent = userId;
+                    document.getElementById('username').textContent = data.user.username;
+                    document.getElementById('email').textContent = userEmail;
+                    document.getElementById('balance-before').textContent = `${balanceBefore} баллов`;
+                    
+                    log(`✅ Баланс загружен: ${balanceBefore} баллов`);
+                } else {
+                    log('❌ Ошибка загрузки баланса');
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`);
+            }
+        }
+        
+        async function createPayment() {
+            try {
+                log('Создаём платёж через Tinkoff API...');
+                
+                const resultDiv = document.getElementById('payment-result');
+                resultDiv.innerHTML = '<p style="color: #666;">⏳ Создание платежа...</p>';
+                
+                const response = await fetch(PAYMENT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'init_tinkoff',
+                        user_id: userId,
+                        user_email: userEmail,
+                        package_id: '100',
+                        success_url: 'https://techforma.pro/payment/success',
+                        fail_url: 'https://techforma.pro/payment/failed'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.payment_id) {
+                    orderId = data.order_id;
+                    paymentId = data.payment_id;
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Платёж создан!<br>
+                            Order ID: ${orderId}<br>
+                            Payment ID: ${paymentId}<br>
+                            Status: ${data.status}<br>
+                            <a href="${data.payment_url}" target="_blank" style="color: #060;">🔗 Открыть форму оплаты</a>
+                        </div>
+                    `;
+                    
+                    document.getElementById('webhook-btn').disabled = false;
+                    
+                    log(`✅ Платёж создан: Order ${orderId}, Payment ${paymentId}`);
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ ${data.error || 'Ошибка создания платежа'}</div>`;
+                    log(`❌ Ошибка создания платежа: ${JSON.stringify(data)}`);
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`);
+                document.getElementById('payment-result').innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        }
+        
+        async function simulateWebhook() {
+            if (!orderId || !paymentId) {
+                alert('⚠️ Сначала создайте платёж');
+                return;
+            }
+            
+            try {
+                log('Отправляем webhook от имени Tinkoff...');
+                
+                const resultDiv = document.getElementById('webhook-result');
+                resultDiv.innerHTML = '<p style="color: #666;">⏳ Отправка webhook...</p>';
+                
+                // Симулируем webhook от Tinkoff без Token (для упрощения теста)
+                const webhookData = {
+                    TerminalKey: '1763705676294',
+                    OrderId: orderId,
+                    Success: true,
+                    Status: 'CONFIRMED',
+                    PaymentId: paymentId,
+                    ErrorCode: '0',
+                    Amount: 50000  // 500 рублей в копейках
+                };
+                
+                log(`Webhook payload: ${JSON.stringify(webhookData, null, 2)}`);
+                
+                const response = await fetch(PAYMENT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(webhookData)
+                });
+                
+                const responseText = await response.text();
+                
+                log(`Ответ от сервера (${response.status}): ${responseText}`);
+                
+                if (response.status === 200) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            ✅ Webhook обработан успешно!<br>
+                            Status: ${response.status}<br>
+                            Response: ${responseText}
+                        </div>
+                    `;
+                    log('✅ Webhook обработан успешно');
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error">
+                            ❌ Ошибка обработки webhook<br>
+                            Status: ${response.status}<br>
+                            Response: ${responseText}
+                        </div>
+                    `;
+                    log(`❌ Webhook вернул статус ${response.status}`);
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`);
+                document.getElementById('webhook-result').innerHTML = `<div class="error">❌ ${error.message}</div>`;
+            }
+        }
+        
+        async function checkBalance() {
+            try {
+                log('Проверяем баланс после оплаты...');
+                
+                const response = await fetch(`${AUTH_URL}?action=login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: 'ker',
+                        password: 'ker12345'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.user) {
+                    const balanceAfter = data.user.balance;
+                    const diff = balanceAfter - balanceBefore;
+                    
+                    document.getElementById('balance-after').textContent = `${balanceAfter} баллов`;
+                    document.getElementById('balance-diff').textContent = `${diff > 0 ? '+' : ''}${diff} баллов`;
+                    
+                    if (diff === 110) {
+                        log(`✅ Баллы зачислены успешно! +${diff} баллов`);
+                    } else {
+                        log(`⚠️ Ожидалось +110 баллов, получено +${diff} баллов`);
+                    }
+                }
+                
+            } catch (error) {
+                log(`❌ Ошибка: ${error.message}`);
+            }
+        }
+        
+        // Автоматически загружаем баланс при открытии страницы
+        loadUserBalance();
+    </script>
+</body>
+</html>

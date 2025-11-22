@@ -266,6 +266,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 offset = int(query_params.get('offset', 0))
                 category = query_params.get('category')
                 search = query_params.get('search')
+                author_id = query_params.get('author_id')
                 
                 # Базовый запрос
                 where_clauses = []
@@ -274,6 +275,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 # Исключаем удалённые записи
                 where_clauses.append("title NOT LIKE %s")
                 params.append('[УДАЛЕНО]%')
+                
+                # Фильтрация по автору (для профиля пользователя)
+                if author_id:
+                    where_clauses.append("author_id = %s")
+                    params.append(int(author_id))
                 
                 if category and category != 'all':
                     where_clauses.append("category = %s")

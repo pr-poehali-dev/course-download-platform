@@ -196,14 +196,25 @@ export default function ProfilePage() {
           setUnreadCount(messagesData.messages.filter((m: UserMessage) => !m.is_read).length);
         }
         
-        const userDataResponse = await fetch(`${func2url['user-data']}?user_id=${userData.id}&action=purchases`);
+        const userDataResponse = await fetch(`${func2url['user-data']}?user_id=${userData.id}&action=all`);
         const userDataJson = await userDataResponse.json();
+        
+        if (userDataJson.stats) {
+          setUser(prev => ({
+            ...prev,
+            worksUploaded: userDataJson.stats.works_uploaded || 0,
+            worksPurchased: userDataJson.stats.works_purchased || 0,
+            totalEarned: userDataJson.stats.total_earned || 0,
+            totalSpent: userDataJson.stats.total_spent || 0
+          }));
+        }
+        
         if (userDataJson.purchases) {
           setPurchases(userDataJson.purchases.map((p: any) => ({
-            id: p.work_id,
-            workTitle: p.work_title || 'Работа',
+            id: p.id,
+            workTitle: p.title || 'Работа',
             price: p.price_paid || 0,
-            date: p.created_at || new Date().toISOString(),
+            date: p.purchased_at || new Date().toISOString(),
             downloadUrl: ''
           })));
         }
@@ -582,20 +593,24 @@ export default function ProfilePage() {
                     <Button 
                       className="w-full justify-start bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white" 
                       size="lg"
-                      onClick={() => {
-                        const balanceTab = document.querySelector('[value="balance"]') as HTMLElement;
-                        balanceTab?.click();
-                      }}
+                      asChild
                     >
-                      <Icon name="Wallet" size={20} className="mr-2" />
-                      Пополнить баланс
+                      <Link to="/buy-points">
+                        <Icon name="Wallet" size={20} className="mr-2" />
+                        Пополнить баланс
+                      </Link>
                     </Button>
 
-                    <Button className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white" size="lg" asChild>
-                      <Link to="/support">
-                        <Icon name="MessageCircle" size={20} className="mr-2" />
-                        Связаться с поддержкой
-                      </Link>
+                    <Button 
+                      className="w-full justify-start bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white" 
+                      size="lg"
+                      onClick={() => {
+                        const supportTab = document.querySelector('[value="support"]') as HTMLElement;
+                        supportTab?.click();
+                      }}
+                    >
+                      <Icon name="MessageCircle" size={20} className="mr-2" />
+                      Связаться с поддержкой
                     </Button>
                   </CardContent>
                 </Card>

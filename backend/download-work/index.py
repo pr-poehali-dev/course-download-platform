@@ -60,10 +60,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
     
     if not user_id:
+        print(f"[SECURITY] Unauthorized download attempt for work_id={work_id}")
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'User authentication required'}),
+            'body': json.dumps({'error': 'Для скачивания работы необходимо войти в систему'}),
             'isBase64Encoded': False
         }
     

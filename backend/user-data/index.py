@@ -139,6 +139,46 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'total_earned': total_earned
             }
         
+        # Get user statistics (works uploaded by this user)
+        if action in ['all', 'stats']:
+            # Count works uploaded by user (where author_id = user_id)
+            cur.execute('''
+                SELECT COUNT(*) FROM t_p63326274_course_download_plat.works
+                WHERE author_id = %s
+            ''', (user_id,))
+            works_uploaded = cur.fetchone()[0]
+            
+            # Count purchases by this user
+            cur.execute('''
+                SELECT COUNT(*) FROM t_p63326274_course_download_plat.purchases
+                WHERE buyer_id = %s
+            ''', (user_id,))
+            works_purchased = cur.fetchone()[0]
+            
+            # Total earned from selling works (where user is author)
+            cur.execute('''
+                SELECT COALESCE(SUM(p.price_paid), 0) 
+                FROM t_p63326274_course_download_plat.purchases p
+                JOIN t_p63326274_course_download_plat.works w ON p.work_id = w.id
+                WHERE w.author_id = %s
+            ''', (user_id,))
+            total_earned_from_sales = cur.fetchone()[0]
+            
+            # Total spent on purchases
+            cur.execute('''
+                SELECT COALESCE(SUM(price_paid), 0) 
+                FROM t_p63326274_course_download_plat.purchases
+                WHERE buyer_id = %s
+            ''', (user_id,))
+            total_spent = cur.fetchone()[0]
+            
+            result['stats'] = {
+                'works_uploaded': works_uploaded,
+                'works_purchased': works_purchased,
+                'total_earned': total_earned_from_sales,
+                'total_spent': total_spent
+            }
+        
         return {
             'statusCode': 200,
             'headers': headers,

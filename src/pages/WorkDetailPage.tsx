@@ -533,16 +533,39 @@ export default function WorkDetailPage() {
     const user = JSON.parse(userStr);
     const userId = user.id;
     
-    toast({
-      title: '👤 Данные пользователя',
-      description: `ID: ${userId}, роль: ${user.role}, баланс: ${user.balance}, isPurchased: ${isPurchased}`,
-      duration: 5000,
-    });
-    
-
-    
     setDownloading(true);
+    
     try {
+      // ✅ КРИТИЧНО: Получаем СВЕЖИЕ данные пользователя из backend перед покупкой
+      toast({
+        title: '🔄 Получаем актуальный баланс',
+        description: 'Проверяем ваш текущий баланс в базе данных...',
+        duration: 2000,
+      });
+      
+      const authResponse = await fetch(func2url['auth'] + '?action=verify', {
+        headers: {
+          'X-Auth-Token': localStorage.getItem('token') || ''
+        }
+      });
+      
+      let freshUser = user;
+      if (authResponse.ok) {
+        const authData = await authResponse.json();
+        if (authData.user) {
+          freshUser = authData.user;
+          // Обновляем localStorage свежими данными
+          localStorage.setItem('user', JSON.stringify(freshUser));
+          console.log('✅ Fresh user data from backend:', freshUser);
+        }
+      }
+      
+      toast({
+        title: '👤 Актуальные данные',
+        description: `ID: ${userId}, баланс: ${freshUser.balance} баллов, роль: ${freshUser.role}`,
+        duration: 3000,
+      });
+      
       // Перепроверяем покупку перед действием
       let isAlreadyPurchased = isPurchased;
       
@@ -587,18 +610,18 @@ export default function WorkDetailPage() {
         
         downloadToken = tokenData.token;
       } else {
-        // Если не куплена, пытаемся купить за баллы
+        // Если не куплена, пытаемся купить за баллы (используем freshUser!)
         console.log('💰 Work not purchased, attempting to purchase with баллы...', { 
           url: PURCHASE_WORK_URL, 
           userId, 
           workId: actualWorkId, 
           price: work.price,
-          userBalance: user.balance,
-          userRole: user.role
+          userBalance: freshUser.balance,
+          userRole: freshUser.role
         });
         toast({
           title: '💰 Покупка работы',
-          description: `Списываем ${work.price} баллов с баланса ${user.balance}...`,
+          description: `Списываем ${work.price} баллов с баланса ${freshUser.balance}...`,
           duration: 3000,
         });
         const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
@@ -631,9 +654,9 @@ export default function WorkDetailPage() {
         downloadToken = purchaseData.downloadToken;
         
         // Обновляем баланс пользователя в localStorage (если не админ)
-        if (user.role !== 'admin' && purchaseData.newBalance !== undefined) {
-          user.balance = purchaseData.newBalance;
-          localStorage.setItem('user', JSON.stringify(user));
+        if (freshUser.role !== 'admin' && purchaseData.newBalance !== undefined) {
+          freshUser.balance = purchaseData.newBalance;
+          localStorage.setItem('user', JSON.stringify(freshUser));
         }
       }
       
@@ -689,7 +712,7 @@ export default function WorkDetailPage() {
         }).catch(err => console.error('Failed to track download:', err));
       }
       
-      console.log('📢 Showing notification:', { isAlreadyPurchased, userRole: user.role, isAdmin: user.role === 'admin' });
+      console.log('📢 Showing notification:', { isAlreadyPurchased, userRole: freshUser.role, isAdmin: freshUser.role === 'admin' });
       
       if (isAlreadyPurchased) {
         console.log('ℹ️ Work already purchased');
@@ -697,14 +720,14 @@ export default function WorkDetailPage() {
           title: '✅ Работа уже куплена!',
           description: 'Скачивание началось...',
         });
-      } else if (user.role === 'admin') {
+      } else if (freshUser.role === 'admin') {
         console.log('👑 Admin download (free)');
         toast({
           title: '✅ Скачивание началось!',
           description: 'Файл сохранится в папку "Загрузки"',
         });
       } else {
-        const oldBalance = user.balance || 0;
+        const oldBalance = freshUser.balance || 0;
         const deducted = work.price;
         const newBalance = purchaseData.newBalance || (oldBalance - deducted);
         

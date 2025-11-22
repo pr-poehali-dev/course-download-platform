@@ -602,12 +602,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         try:
             if activity_type == 'view':
                 cur.execute(
-                    "UPDATE t_p63326274_course_download_plat.works SET views = COALESCE(views, 0) + 1 WHERE id = %s",
+                    "UPDATE t_p63326274_course_download_plat.works SET views = COALESCE(views, 0) + 1, downloads = COALESCE(downloads, 0) + 1 WHERE id = %s",
                     (work_id,)
                 )
             elif activity_type == 'download':
                 cur.execute(
-                    "UPDATE t_p63326274_course_download_plat.works SET downloads = COALESCE(downloads, 0) + 1 WHERE id = %s",
+                    "UPDATE t_p63326274_course_download_plat.works SET downloads = COALESCE(downloads, 0) + 1, views = COALESCE(views, 0) + 1 WHERE id = %s",
                     (work_id,)
                 )
             elif activity_type == 'review':

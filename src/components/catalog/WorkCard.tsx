@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import PreviewCarousel from '@/components/PreviewCarousel';
 import { getFakeAuthor, getViewCount, incrementViewCount } from '@/utils/fakeAuthors';
-import { getRemainingCopies, shouldShowUrgency, pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
+import { getRemainingCopies, shouldShowUrgency, pointsToRubles, formatPrice, getCurrentViewers, getLastPurchaseTime } from '@/utils/urgencyTriggers';
+import LastPurchaseBadge from '@/components/LastPurchaseBadge';
 
 interface Work {
   id: string;
@@ -54,6 +55,8 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
   const showUrgency = shouldShowUrgency(work.id, work.rating);
   const remainingCopies = getRemainingCopies(work.id);
   const priceInRubles = pointsToRubles(finalPrice);
+  const currentViewers = getCurrentViewers(work.id);
+  const lastPurchaseMinutes = getLastPurchaseTime(work.id);
 
   useEffect(() => {
     setViewCount(getViewCount(work.id));
@@ -105,6 +108,7 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
       </button>
 
       <div className="relative h-56 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+        <LastPurchaseBadge minutesAgo={lastPurchaseMinutes} />
         {hasPreview ? (
           <PreviewCarousel 
             previews={coverImages!} 
@@ -208,6 +212,23 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
           </div>
         )}
 
+        <div className="flex items-center justify-between gap-3 mb-3 text-xs">
+          <div className="flex items-center gap-1.5 py-1.5 px-3 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+            <span className="text-blue-700 font-medium">
+              Смотрят {currentViewers} {currentViewers === 1 ? 'человек' : currentViewers < 5 ? 'человека' : 'человек'}
+            </span>
+          </div>
+          {lastPurchaseMinutes <= 30 && (
+            <div className="flex items-center gap-1.5 text-green-700">
+              <Icon name="Clock" size={12} className="text-green-600" />
+              <span className="font-medium">
+                Купили {lastPurchaseMinutes}м назад
+              </span>
+            </div>
+          )}
+        </div>
+
         <div className="flex items-center justify-between pt-3 border-t">
           <div>
             {work.discount ? (
@@ -257,9 +278,10 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
             {!isAdmin && (
               <Button 
                 onClick={handleBuyClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 relative overflow-hidden group"
               >
-                Купить
+                <span className="relative z-10">Купить</span>
+                <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               </Button>
             )}
           </div>

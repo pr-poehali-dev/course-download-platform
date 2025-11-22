@@ -37,6 +37,8 @@ import HomeHeader from '@/components/home/HomeHeader';
 import RotatingText from '@/components/home/RotatingText';
 import NewsSection from '@/components/NewsSection';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
+import ExitIntentModal from '@/components/ExitIntentModal';
+import DiscountProgressBar from '@/components/DiscountProgressBar';
 
 
 
@@ -463,6 +465,8 @@ export default function Index() {
         keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, готовые курсовые, учебные материалы"
       />
       <PurchaseNotifications />
+      <ExitIntentModal />
+      {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-white">
         <header className="glass-card tech-border sticky top-0 z-50 w-full shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-4">

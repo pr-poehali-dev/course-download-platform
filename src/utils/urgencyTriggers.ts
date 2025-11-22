@@ -62,3 +62,23 @@ export function pointsToRubles(points: number): number {
 export function formatPrice(rubles: number): string {
   return rubles.toLocaleString('ru-RU');
 }
+
+/**
+ * Генерирует количество людей, которые сейчас смотрят работу
+ * От 2 до 15 человек (создаёт эффект популярности)
+ */
+export function getCurrentViewers(workId: string | number): number {
+  const id = typeof workId === 'string' ? parseInt(workId, 10) || 0 : workId;
+  const baseViewers = 2 + (id % 8); // 2-9 базовых
+  const timeBonus = Math.floor((Date.now() / 1000 / 60) % 7); // 0-6 по времени
+  return baseViewers + timeBonus;
+}
+
+/**
+ * Генерирует время последней покупки (в минутах назад)
+ * От 3 до 45 минут
+ */
+export function getLastPurchaseTime(workId: string | number): number {
+  const id = typeof workId === 'string' ? parseInt(workId, 10) || 0 : workId;
+  return 3 + (id % 43); // 3-45 минут
+}

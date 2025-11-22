@@ -16,6 +16,8 @@ import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
+import ExitIntentModal from '@/components/ExitIntentModal';
+import DiscountProgressBar from '@/components/DiscountProgressBar';
 
 interface Work {
   id: string;
@@ -64,6 +66,7 @@ export default function CatalogPage() {
   const [userId, setUserId] = useState<number | null>(null);
   const [quickViewWork, setQuickViewWork] = useState<Work | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [userBalance, setUserBalance] = useState(0);
 
 
   useEffect(() => {
@@ -73,6 +76,7 @@ export default function CatalogPage() {
       setIsAdmin(user?.role === 'admin');
       if (user) {
         setUserId(user.id);
+        setUserBalance(user.balance || 0);
         loadFavorites(user.id);
       }
     };
@@ -446,6 +450,8 @@ export default function CatalogPage() {
         </script>
       </Helmet>
       <PurchaseNotifications />
+      <ExitIntentModal />
+      {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <Navigation isLoggedIn={isLoggedIn} />
       

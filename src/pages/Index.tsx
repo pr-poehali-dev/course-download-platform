@@ -39,6 +39,7 @@ import NewsSection from '@/components/NewsSection';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
+import TestExitModal from '@/components/TestExitModal';
 
 
 
@@ -466,6 +467,7 @@ export default function Index() {
       />
       <PurchaseNotifications />
       <ExitIntentModal />
+      <TestExitModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-white">
         <header className="glass-card tech-border sticky top-0 z-50 w-full shadow-sm">

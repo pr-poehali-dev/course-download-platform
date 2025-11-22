@@ -5,7 +5,7 @@ interface LastPurchaseBadgeProps {
 }
 
 export default function LastPurchaseBadge({ minutesAgo }: LastPurchaseBadgeProps) {
-  if (minutesAgo > 30) return null;
+  if (minutesAgo > 45) return null;
 
   return (
     <div className="absolute bottom-4 left-4 z-10 bg-gradient-to-r from-green-500 to-green-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg flex items-center gap-1.5 animate-pulse">

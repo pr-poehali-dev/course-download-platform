@@ -80,5 +80,5 @@ export function getCurrentViewers(workId: string | number): number {
  */
 export function getLastPurchaseTime(workId: string | number): number {
   const id = typeof workId === 'string' ? parseInt(workId, 10) || 0 : workId;
-  return 3 + (id % 43); // 3-45 минут
+  return 3 + (id % 28); // 3-30 минут (показываем чаще)
 }

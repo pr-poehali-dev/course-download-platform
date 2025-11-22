@@ -26,7 +26,7 @@ export default function ReferralDialog({
   const [earned, setEarned] = useState(0);
   const [loading, setLoading] = useState(true);
   
-  const referralLink = referralCode ? `https://techforma.pro/register?ref=${referralCode}` : '';
+  const referralLink = referralCode ? `${window.location.origin}/register?ref=${referralCode}` : '';
 
   useEffect(() => {
     const loadReferralData = async () => {

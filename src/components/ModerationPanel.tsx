@@ -162,13 +162,14 @@ export default function ModerationPanel() {
     setReviewsResult(null);
 
     try {
-      const response = await fetch(`${func2url.reviews}?action=generate_fake`, {
+      const response = await fetch(func2url.reviews, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'X-Admin-Email': 'rekrutiw@yandex.ru'
         },
         body: JSON.stringify({
+          action: 'generate_fake',
           work_ids: 'all',
           reviews_per_work: 2
         })

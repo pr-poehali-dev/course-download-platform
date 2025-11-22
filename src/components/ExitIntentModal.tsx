@@ -63,7 +63,7 @@ export default function ExitIntentModal() {
             Не упустите специальное предложение
           </p>
           <p className="text-sm text-gray-500">
-            Получите дополнительные <span className="font-bold text-green-600">+100 баллов</span> при первой покупке пакета
+            Получите <span className="font-bold text-green-600">бонусные баллы</span> при покупке больших пакетов
           </p>
         </div>
 
@@ -83,7 +83,7 @@ export default function ExitIntentModal() {
           <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
             <Icon name="Zap" size={24} className="text-purple-600 flex-shrink-0" />
             <span className="text-sm text-gray-700">
-              Только сегодня: бонус +100 баллов
+              Скидки до 15% при покупке пакетов
             </span>
           </div>
         </div>
@@ -97,7 +97,7 @@ export default function ExitIntentModal() {
             className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold h-12"
           >
             <Icon name="Gift" size={18} className="mr-2" />
-            Получить бонус
+            Пополнить баланс
           </Button>
           <Button
             onClick={() => setIsVisible(false)}
@@ -109,7 +109,7 @@ export default function ExitIntentModal() {
         </div>
 
         <p className="text-xs text-center text-gray-400 mt-4">
-          Предложение действует только для новых пользователей
+          Бонусные баллы начисляются автоматически при покупке пакетов
         </p>
       </div>
 

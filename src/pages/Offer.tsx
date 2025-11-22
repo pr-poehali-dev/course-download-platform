@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
 import Footer from '@/components/Footer';
+import AgeBadge from '@/components/AgeBadge';
 
 export default function Offer() {
   return (
@@ -25,7 +26,10 @@ export default function Offer() {
             <Icon name="FileText" size={14} className="mr-2" />
             Договор-оферта
           </Badge>
-          <h1 className="text-4xl font-bold mb-4">Договор-оферта на оказание информационных услуг</h1>
+          <div className="flex items-center gap-4 mb-4">
+            <h1 className="text-4xl font-bold">Договор-оферта на оказание информационных услуг</h1>
+            <AgeBadge />
+          </div>
           <p className="text-muted-foreground">
             Дата публикации: {new Date().toLocaleDateString('ru-RU')}
           </p>

@@ -39,7 +39,7 @@ import NewsSection from '@/components/NewsSection';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
-import TestExitModal from '@/components/TestExitModal';
+
 
 
 
@@ -467,7 +467,6 @@ export default function Index() {
       />
       <PurchaseNotifications />
       <ExitIntentModal />
-      <TestExitModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-white">
         <header className="glass-card tech-border sticky top-0 z-50 w-full shadow-sm">
@@ -1601,9 +1600,6 @@ export default function Index() {
             <div className="border-t mt-8 pt-8">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-sm text-muted-foreground">
                 <p>© 2025 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
-                <div className="flex items-center justify-center">
-                  <AgeBadge />
-                </div>
               </div>
             </div>
           </div>

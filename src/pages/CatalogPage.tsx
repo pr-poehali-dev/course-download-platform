@@ -18,6 +18,7 @@ import { Helmet } from 'react-helmet-async';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
+import { getCurrentViewers, getLastPurchaseTime, pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
 
 interface Work {
   id: string;
@@ -509,6 +510,10 @@ export default function CatalogPage() {
             <TooltipProvider>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {filteredWorks.map((work) => {
+                  const currentViewers = getCurrentViewers(work.id);
+                  const lastPurchaseMinutes = getLastPurchaseTime(work.id);
+                  const priceInRubles = pointsToRubles(work.price);
+                  
                   const cardContent = (
                     <>
                       <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
@@ -605,6 +610,23 @@ export default function CatalogPage() {
                       {work.description}
                     </p>
                     
+                    <div className="flex items-center justify-between gap-2 mb-3 text-xs">
+                      <div className="flex items-center gap-1.5 py-1 px-2 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                        <span className="text-blue-700 font-medium">
+                          {currentViewers} {currentViewers === 1 ? 'смотрит' : currentViewers < 5 ? 'смотрят' : 'смотрят'}
+                        </span>
+                      </div>
+                      {lastPurchaseMinutes <= 30 && (
+                        <div className="flex items-center gap-1 text-green-700">
+                          <Icon name="Clock" size={11} className="text-green-600" />
+                          <span className="font-medium">
+                            {lastPurchaseMinutes}м назад
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center gap-2 text-xs text-gray-600">
                         <Icon name="Package" size={14} className="text-blue-600" />
@@ -629,8 +651,8 @@ export default function CatalogPage() {
                           </div>
                         ) : (
                           <div className="flex flex-col">
-                            <span className="text-xl font-bold text-gray-900">{work.price} б.</span>
-                            <span className="text-xs text-gray-500">({work.price * 5}₽)</span>
+                            <span className="text-2xl font-bold text-gray-900">{formatPrice(priceInRubles)}₽</span>
+                            <span className="text-xs text-gray-500">{work.price} баллов</span>
                           </div>
                         )}
                       </div>
@@ -652,10 +674,18 @@ export default function CatalogPage() {
                           </Button>
                         )}
                         {!isAdmin && (
-                          <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5">
-                            <Icon name="ArrowRight" size={16} />
-                            Купить
-                          </div>
+                          <Button
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold relative overflow-hidden group"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.location.href = `/work/${work.id}`;
+                            }}
+                          >
+                            <span className="relative z-10">Купить</span>
+                            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+                          </Button>
                         )}
                       </div>
                     </div>

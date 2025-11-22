@@ -54,7 +54,7 @@ export default function Footer() {
               <AgeBadge />
             </div>
             <div className="text-xs opacity-75">
-              <p>ИП Гагарская Е.А. | ИНН 290540407146</p>
+              <p>ИП Гагарская Елизавета Александровна | ИНН 290540407146</p>
               <p className="mt-1">г. Санкт-Петербург</p>
             </div>
           </div>

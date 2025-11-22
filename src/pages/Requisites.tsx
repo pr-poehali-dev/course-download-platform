@@ -65,7 +65,7 @@ export default function Requisites() {
                   <Icon name="User" size={16} className="mt-1 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Владелец:</p>
-                    <p className="text-sm text-muted-foreground">ИП Гагарская Е.А.</p>
+                    <p className="text-sm text-muted-foreground">ИП Гагарская Елизавета Александровна</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-2">

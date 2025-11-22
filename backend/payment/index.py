@@ -392,11 +392,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                 WHERE id = %s
                             """, (points, user_id))
                             
-                            # Записываем транзакцию возврата
+                            # Записываем транзакцию возврата (используем отрицательное значение)
                             cur.execute("""
                                 INSERT INTO t_p63326274_course_download_plat.transactions
                                 (user_id, amount, type, description)
-                                VALUES (%s, %s, 'refund', %s)
+                                VALUES (%s, %s, 'purchase', %s)
                             """, (user_id, -points, f'Возврат платежа Тинькофф (PaymentId: {payment_id})'))
                             
                             # Обновляем статус платежа

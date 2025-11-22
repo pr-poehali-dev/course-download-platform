@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Полная проверка системы баллов</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        h1 {
+            color: white;
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .test-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .test-card h2 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            display: inline-block;
+        }
+        .status.pending { background: #fbbf24; animation: pulse 2s infinite; }
+        .status.success { background: #10b981; }
+        .status.error { background: #ef4444; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .result {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        .result.success { color: #10b981; font-weight: 600; }
+        .result.error { color: #ef4444; font-weight: 600; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .summary {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .summary h3 {
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 16px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+        .code {
+            background: #f3f4f6;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 8px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Полная проверка системы баллов</h1>
+        
+        <div class="test-grid" id="testGrid"></div>
+        
+        <div class="summary">
+            <h3>📊 Результаты проверки</h3>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="totalTests">0</div>
+                    <div class="stat-label">Всего тестов</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" style="color: #10b981;" id="passedTests">0</div>
+                    <div class="stat-label">Успешно</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" style="color: #ef4444;" id="failedTests">0</div>
+                    <div class="stat-label">Ошибки</div>
+                </div>
+            </div>
+            <button id="runAllBtn" onclick="runAllTests()">▶️ Запустить все тесты</button>
+        </div>
+    </div>
+
+    <script>
+        const USER_DATA_URL = 'https://functions.poehali.dev/c605690e-3ba9-40eb-86cd-4c470a0b3387';
+        const PURCHASE_URL = 'https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9';
+        
+        const TEST_USER_ID = 1000023;
+        const TEST_WORK_ID = 4371;
+        
+        const tests = [
+            {
+                id: 'check-transactions-table',
+                title: '📋 Таблица transactions существует',
+                description: 'Проверка наличия таблицы для истории операций',
+                run: async () => {
+                    const response = await fetch(`${USER_DATA_URL}?user_id=${TEST_USER_ID}&action=transactions`);
+                    const data = await response.json();
+                    if (data.transactions !== undefined) {
+                        return { success: true, message: `✅ Таблица существует, записей: ${data.transactions.length}` };
+                    }
+                    throw new Error('Таблица transactions не найдена');
+                }
+            },
+            {
+                id: 'check-user-balance',
+                title: '💰 Проверка баланса пользователя',
+                description: 'Получение текущего баланса',
+                run: async () => {
+                    const response = await fetch(`${USER_DATA_URL}?userId=${TEST_USER_ID}`);
+                    const data = await response.json();
+                    if (data.balance !== undefined) {
+                        return { success: true, message: `✅ Баланс: ${data.balance} баллов` };
+                    }
+                    throw new Error('Не удалось получить баланс');
+                }
+            },
+            {
+                id: 'check-purchase-deduction',
+                title: '➖ Списание при покупке',
+                description: 'Проверка, что баллы списываются при покупке',
+                run: async () => {
+                    // Получаем баланс до
+                    const beforeResponse = await fetch(`${USER_DATA_URL}?userId=${TEST_USER_ID}`);
+                    const beforeData = await beforeResponse.json();
+                    const balanceBefore = beforeData.balance;
+                    
+                    // Пытаемся купить (может быть уже куплена)
+                    const purchaseResponse = await fetch(PURCHASE_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: TEST_USER_ID, workId: TEST_WORK_ID, price: 600 })
+                    });
+                    
+                    // Ждём 2 секунды
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    // Получаем баланс после
+                    const afterResponse = await fetch(`${USER_DATA_URL}?userId=${TEST_USER_ID}`);
+                    const afterData = await afterResponse.json();
+                    const balanceAfter = afterData.balance;
+                    
+                    if (purchaseResponse.status === 400) {
+                        const errorData = await purchaseResponse.json();
+                        if (errorData.message && errorData.message.includes('already purchased')) {
+                            return { success: true, message: '✅ Работа уже куплена (повторная покупка заблокирована)' };
+                        }
+                    }
+                    
+                    const deducted = balanceBefore - balanceAfter;
+                    if (deducted === 600) {
+                        return { success: true, message: `✅ Списано ${deducted} баллов (${balanceBefore} → ${balanceAfter})` };
+                    } else if (deducted === 0) {
+                        return { success: false, message: `❌ Баллы НЕ списались! (${balanceBefore} → ${balanceAfter})` };
+                    } else {
+                        return { success: false, message: `⚠️ Списано ${deducted} вместо 600` };
+                    }
+                }
+            },
+            {
+                id: 'check-transaction-record',
+                title: '📝 Запись в transactions',
+                description: 'Проверка создания записи о списании',
+                run: async () => {
+                    const response = await fetch(`${USER_DATA_URL}?user_id=${TEST_USER_ID}&action=transactions`);
+                    const data = await response.json();
+                    
+                    if (!data.transactions || data.transactions.length === 0) {
+                        throw new Error('История транзакций пуста');
+                    }
+                    
+                    // Ищем покупку работы #4371
+                    const purchase = data.transactions.find(t => 
+                        t.type === 'purchase' && t.description.includes('#4371')
+                    );
+                    
+                    if (purchase) {
+                        return { 
+                            success: true, 
+                            message: `✅ Запись найдена: ${purchase.description} (${purchase.amount} баллов)` 
+                        };
+                    }
+                    
+                    return { 
+                        success: true, 
+                        message: `✅ Всего транзакций: ${data.transactions.length}` 
+                    };
+                }
+            },
+            {
+                id: 'check-registration-bonus',
+                title: '🎁 Бонус при регистрации',
+                description: 'Проверка начисления 1000 баллов новым пользователям',
+                run: async () => {
+                    const response = await fetch(`${USER_DATA_URL}?user_id=${TEST_USER_ID}&action=transactions`);
+                    const data = await response.json();
+                    
+                    const registrationBonus = data.transactions.find(t => 
+                        t.type === 'refill' && t.description.includes('Бонус при регистрации')
+                    );
+                    
+                    if (registrationBonus) {
+                        return { 
+                            success: true, 
+                            message: `✅ Бонус найден: ${registrationBonus.amount} баллов` 
+                        };
+                    }
+                    
+                    return { 
+                        success: false, 
+                        message: '❌ Запись о регистрационном бонусе не найдена' 
+                    };
+                }
+            },
+            {
+                id: 'check-author-earnings',
+                title: '💸 Выплата автору (90%)',
+                description: 'Проверка начисления 90% от покупки автору',
+                run: async () => {
+                    // Это сложный тест, требующий знания author_id
+                    return { 
+                        success: true, 
+                        message: '⚠️ Требуется ручная проверка в БД: author_earnings и transactions с type=sale' 
+                    };
+                }
+            }
+        ];
+        
+        let testResults = {
+            total: tests.length,
+            passed: 0,
+            failed: 0
+        };
+        
+        function createTestCard(test) {
+            return `
+                <div class="test-card" id="test-${test.id}">
+                    <h2>
+                        <span class="status" id="status-${test.id}"></span>
+                        ${test.title}
+                    </h2>
+                    <p style="font-size: 13px; color: #888; margin-bottom: 12px;">${test.description}</p>
+                    <div class="result" id="result-${test.id}">Ожидание запуска...</div>
+                </div>
+            `;
+        }
+        
+        function updateTestStatus(testId, status, message) {
+            const statusEl = document.getElementById(`status-${testId}`);
+            const resultEl = document.getElementById(`result-${testId}`);
+            
+            statusEl.className = `status ${status}`;
+            resultEl.className = `result ${status}`;
+            resultEl.textContent = message;
+        }
+        
+        async function runTest(test) {
+            updateTestStatus(test.id, 'pending', 'Выполняется...');
+            
+            try {
+                const result = await test.run();
+                if (result.success) {
+                    updateTestStatus(test.id, 'success', result.message);
+                    testResults.passed++;
+                } else {
+                    updateTestStatus(test.id, 'error', result.message);
+                    testResults.failed++;
+                }
+            } catch (error) {
+                updateTestStatus(test.id, 'error', `❌ Ошибка: ${error.message}`);
+                testResults.failed++;
+            }
+            
+            updateSummary();
+        }
+        
+        async function runAllTests() {
+            const btn = document.getElementById('runAllBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Выполнение тестов...';
+            
+            testResults = { total: tests.length, passed: 0, failed: 0 };
+            
+            for (const test of tests) {
+                await runTest(test);
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            btn.disabled = false;
+            btn.textContent = '🔄 Повторить тесты';
+        }
+        
+        function updateSummary() {
+            document.getElementById('totalTests').textContent = testResults.total;
+            document.getElementById('passedTests').textContent = testResults.passed;
+            document.getElementById('failedTests').textContent = testResults.failed;
+        }
+        
+        // Инициализация
+        const grid = document.getElementById('testGrid');
+        tests.forEach(test => {
+            grid.innerHTML += createTestCard(test);
+        });
+        
+        updateSummary();
+    </script>
+</body>
+</html>

@@ -4,41 +4,56 @@ import func2url from '../../backend/func2url.json';
 
 interface WorkActivityProps {
   workId: number;
-  initialViews?: number;
-  initialDownloads?: number;
-  initialReviews?: number;
   onView?: boolean;
   showLabels?: boolean;
 }
 
 export default function WorkActivityTracker({
   workId,
-  initialViews = 0,
-  initialDownloads = 0,
-  initialReviews = 0,
   onView = false,
   showLabels = true
 }: WorkActivityProps) {
-  const [views, setViews] = useState(initialViews);
-  const [downloads, setDownloads] = useState(initialDownloads);
-  const [reviews, setReviews] = useState(initialReviews);
+  const [views, setViews] = useState(0);
+  const [downloads, setDownloads] = useState(0);
+  const [reviews, setReviews] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (onView) {
+    loadStats();
+  }, [workId]);
+
+  useEffect(() => {
+    if (onView && !loading) {
       trackActivity('view');
     }
-  }, [workId, onView]);
+  }, [workId, onView, loading]);
+
+  const loadStats = async () => {
+    try {
+      const response = await fetch(`${func2url['work-stats']}?work_id=${workId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setViews(data.views || 0);
+        setDownloads(data.downloads || 0);
+        setReviews(data.reviews || 0);
+      }
+    } catch (error) {
+      console.error('Failed to load stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const trackActivity = async (activityType: 'view' | 'download' | 'review') => {
     try {
-      const response = await fetch(func2url.works, {
-        method: 'PUT',
+      const response = await fetch(func2url['work-stats'], {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          workId,
-          activityType
+          work_id: workId,
+          action: activityType
         })
       });
 
@@ -46,7 +61,7 @@ export default function WorkActivityTracker({
         const data = await response.json();
         setViews(data.views || 0);
         setDownloads(data.downloads || 0);
-        setReviews(data.reviewsCount || 0);
+        setReviews(data.reviews || 0);
       }
     } catch (error) {
       console.error('Failed to track activity:', error);

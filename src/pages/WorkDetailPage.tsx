@@ -1413,8 +1413,14 @@ export default function WorkDetailPage() {
 
               </div>
 
-              <div className="mt-5 pt-5 border-t border-border">
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+              <div className="mt-5 pt-5 border-t border-border space-y-3">
+                <WorkActivityTracker 
+                  workId={parseInt(actualWorkId || '0')} 
+                  onView={true}
+                  showLabels={true}
+                />
+                
+                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground pt-3 border-t">
                   <Icon name="Lock" size={14} />
                   <span>Безопасная покупка</span>
                 </div>

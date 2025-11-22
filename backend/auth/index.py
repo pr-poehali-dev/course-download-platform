@@ -344,7 +344,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
         cur = conn.cursor()
         cur.execute(
             """
-            SELECT id, username, email, balance, referral_code, is_premium, premium_expires_at, created_at
+            SELECT id, username, email, balance, referral_code, is_premium, premium_expires_at, created_at, role
             FROM t_p63326274_course_download_plat.users 
             WHERE id = %s
             """,
@@ -362,7 +362,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        user_id, username, email, balance, referral_code, is_premium, premium_expires_at, created_at = user
+        user_id, username, email, balance, referral_code, is_premium, premium_expires_at, created_at, role = user
         
         return {
             'statusCode': 200,
@@ -374,6 +374,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
                     'email': email,
                     'balance': balance,
                     'referral_code': referral_code,
+                    'role': role,
                     'is_premium': is_premium,
                     'premium_expires_at': premium_expires_at.isoformat() if premium_expires_at else None,
                     'created_at': created_at.isoformat() if created_at else None

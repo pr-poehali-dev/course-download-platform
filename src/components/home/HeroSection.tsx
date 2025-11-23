@@ -97,8 +97,8 @@ export default function HeroSection({ onCatalogClick, onAuthClick, isLoggedIn }:
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-3">
                 <Icon name="Users" size={24} className="text-green-600" />
               </div>
-              <p className="text-2xl font-bold text-gray-800">2500+</p>
-              <p className="text-xs sm:text-sm text-gray-600">Довольных студентов</p>
+              <p className="text-2xl font-bold text-gray-800">Растём</p>
+              <p className="text-xs sm:text-sm text-gray-600">Сообщество студентов</p>
             </div>
 
             <div className="flex flex-col items-center p-4 bg-white/60 backdrop-blur-sm rounded-xl">

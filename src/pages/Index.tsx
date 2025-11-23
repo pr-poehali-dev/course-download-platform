@@ -671,9 +671,16 @@ export default function Index() {
               
               <AnimatedHeroText />
               
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Более 500 работ для ознакомления и самостоятельной переработки
-              </p>
+              <div className="mb-8 px-4">
+                <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                  <span className="inline-block animate-fade-in font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    500+ работ
+                  </span>
+                  <span className="inline-block animate-fade-in ml-2">
+                    для ознакомления и самостоятельной переработки
+                  </span>
+                </p>
+              </div>
 
               {!isLoggedIn && (
                 <div className="mb-8 px-4">

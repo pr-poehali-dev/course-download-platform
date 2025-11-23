@@ -163,8 +163,8 @@ export default function Offer() {
               </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
                 <li>100 баллов — 500 рублей</li>
-                <li>500 баллов — 2500 рублей</li>
-                <li>1000 баллов — 5000 рублей</li>
+                <li>600 баллов — 3000 рублей</li>
+                <li>1500 баллов — 7500 рублей</li>
               </ul>
 
               <p className="font-semibold text-foreground mt-4">

@@ -42,6 +42,7 @@ import DiscountProgressBar from '@/components/DiscountProgressBar';
 import GuaranteesSection from '@/components/GuaranteesSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import AnimatedHeroText from '@/components/AnimatedHeroText';
+import AnimatedCounter from '@/components/AnimatedCounter';
 
 
 
@@ -465,7 +466,7 @@ export default function Index() {
     <>
       <SEO 
         title="Tech Forma — Платформа обмена учебными материалами (18+)"
-        description="Маркетплейс учебных материалов для студентов. Более 500 работ для ознакомления. Материалы предназначены исключительно для образовательных целей и самостоятельной переработки."
+        description="Маркетплейс учебных материалов для студентов. 500+ работ доступны для изучения. Современная технологичная платформа для обмена знаниями."
         keywords="учебные материалы, студенческие работы, образовательная платформа, примеры работ, методические материалы, маркетплейс для студентов"
       />
       <PurchaseNotifications />
@@ -671,15 +672,24 @@ export default function Index() {
               
               <AnimatedHeroText />
               
-              <div className="mb-8 px-4">
-                <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-                  <span className="inline-block animate-fade-in font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    500+ работ
-                  </span>
-                  <span className="inline-block animate-fade-in ml-2">
-                    для ознакомления и самостоятельной переработки
-                  </span>
-                </p>
+              <div className="mb-8 px-4 min-h-[120px] flex items-center justify-center">
+                <div className="relative inline-block group">
+                  <div className="absolute -inset-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur-3xl opacity-30 group-hover:opacity-40 animate-pulse transition-opacity"></div>
+                  <div className="relative bg-white/50 backdrop-blur-sm rounded-2xl px-8 py-6 border-2 border-white/60 shadow-2xl group-hover:scale-105 transition-transform duration-300">
+                    <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight flex items-baseline gap-3">
+                      <span className="inline-block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent drop-shadow-lg">
+                        <AnimatedCounter target={500} duration={2500} />+
+                      </span>
+                      <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent font-bold">
+                        работ
+                      </span>
+                    </h3>
+                    <div className="mt-2 flex items-center justify-center gap-2 text-sm text-slate-600">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span className="font-medium">Каталог постоянно пополняется</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {!isLoggedIn && (

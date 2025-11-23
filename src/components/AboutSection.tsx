@@ -13,7 +13,7 @@ export default function AboutSection() {
           </Badge>
           <h2 className="text-5xl font-bold mb-4">Маркетплейс учебных материалов</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Платформа для обмена студенческими работами — для ознакомления и самостоятельной переработки
+            Современная платформа для обмена студенческими работами и знаниями
           </p>
         </div>
 

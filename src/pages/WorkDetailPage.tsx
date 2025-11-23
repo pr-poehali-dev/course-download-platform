@@ -957,9 +957,9 @@ export default function WorkDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <SEO 
-        title={work ? `${work.title} — купить за ${work.price} баллов` : 'Просмотр работы'}
-        description={work ? `${work.workType} по предмету "${work.subject}". ${work.description.substring(0, 150)}` : 'Детальная информация о студенческой работе'}
-        keywords={work ? `${work.workType}, ${work.subject}, курсовая, диплом, купить` : 'студенческие работы'}
+        title={work ? `${work.title} — пример работы за ${work.price} баллов` : 'Просмотр работы'}
+        description={work ? `${work.workType} по предмету "${work.subject}" для ознакомления. ${work.description.substring(0, 150)}` : 'Пример студенческой работы'}
+        keywords={work ? `${work.workType}, ${work.subject}, пример курсовой, пример диплома, учебные материалы` : 'студенческие работы'}
       />
       <Navigation isLoggedIn={isLoggedIn} />
       
@@ -1375,7 +1375,7 @@ export default function WorkDetailPage() {
                 ) : (
                   <>
                     <Icon name="Download" size={18} className="mr-2" />
-                    Купить за {work.price} баллов
+                    Получить доступ за {work.price} баллов
                   </>
                 )}
               </Button>
@@ -1386,7 +1386,7 @@ export default function WorkDetailPage() {
                 className="w-full font-semibold rounded-lg mb-4 md:mb-5 h-10 md:h-11 text-sm md:text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => {
                   if (!isPurchased) {
-                    alert('⚠️ Сначала нужно купить работу, чтобы создать пакет для защиты');
+                    alert('⚠️ Сначала нужно получить доступ к работе, чтобы создать пакет для защиты');
                     return;
                   }
                   navigate(`/defense-kit?workId=${actualWorkId}`);
@@ -1394,7 +1394,7 @@ export default function WorkDetailPage() {
                 disabled={!isPurchased}
               >
                 <Icon name="GraduationCap" size={18} className="mr-2" />
-                {isPurchased ? 'Создать пакет для защиты' : '🔒 Купите работу для пакета защиты'}
+                {isPurchased ? 'Создать пакет для защиты' : '🔒 Получите доступ для пакета защиты'}
               </Button>
 
               <div className="space-y-2.5 md:space-y-3">

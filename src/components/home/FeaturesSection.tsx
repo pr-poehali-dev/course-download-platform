@@ -32,7 +32,7 @@ export default function FeaturesSection() {
               </div>
               <h3 className="text-xl font-bold mb-2 text-center">Быстро</h3>
               <p className="text-muted-foreground text-center">
-                Мгновенный доступ к работам после покупки. Скачивай сразу.
+                Доступ к материалам за 2 минуты после оплаты. Скачивай сразу.
               </p>
             </CardContent>
           </Card>

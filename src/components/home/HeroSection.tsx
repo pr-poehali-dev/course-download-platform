@@ -23,15 +23,15 @@ export default function HeroSection({ onCatalogClick, onAuthClick, isLoggedIn }:
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              Готовые студенческие работы
+              База примеров студенческих работ
             </span>
             <br />
-            <span className="text-gray-800">за 2 минуты</span>
+            <span className="text-gray-800">для ознакомления</span>
           </h1>
 
           <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Более <strong>500 проверенных работ</strong> по всем предметам. 
-            Мгновенный доступ после покупки.
+            Более <strong>500 примеров работ</strong> по всем предметам. 
+            Доступ к материалам за 2 минуты.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
@@ -71,7 +71,7 @@ export default function HeroSection({ onCatalogClick, onAuthClick, isLoggedIn }:
           {!isLoggedIn && (
             <div className="pt-4">
               <p className="text-sm text-gray-500">
-                🎁 <strong>1000 баллов (5000₽)</strong> за регистрацию — купите первую работу бесплатно
+                🎁 <strong>1000 баллов (5000₽)</strong> за регистрацию — получите доступ к материалам бесплатно
               </p>
             </div>
           )}
@@ -90,7 +90,7 @@ export default function HeroSection({ onCatalogClick, onAuthClick, isLoggedIn }:
                 <Icon name="FileCheck" size={24} className="text-purple-600" />
               </div>
               <p className="text-2xl font-bold text-gray-800">500+</p>
-              <p className="text-xs sm:text-sm text-gray-600">Готовых работ</p>
+              <p className="text-xs sm:text-sm text-gray-600">Примеров работ</p>
             </div>
 
             <div className="flex flex-col items-center p-4 bg-white/60 backdrop-blur-sm rounded-xl">

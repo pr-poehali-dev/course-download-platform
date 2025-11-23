@@ -73,7 +73,7 @@ export default function AboutSection() {
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
                 Загрузите работу — получите баллы. Или купите баллы, чтобы получить 
-                доступ к работам других студентов для изучения и переработки.
+                доступ к примерам работ для ознакомления и обучения.
               </p>
             </CardContent>
           </Card>

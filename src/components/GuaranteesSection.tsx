@@ -15,7 +15,7 @@ export default function GuaranteesSection() {
     {
       icon: 'Clock',
       title: 'Мгновенный доступ',
-      description: 'Получите работу сразу после покупки — за 2 минуты'
+      description: 'Получите доступ к материалам сразу после оплаты — за 2 минуты'
     },
     {
       icon: 'Headphones',
@@ -80,7 +80,7 @@ export default function GuaranteesSection() {
               </h3>
               <div className="space-y-2 text-sm text-gray-700">
                 <p>
-                  <strong>1.</strong> Скачали работу, но она не подходит? Напишите в поддержку в течение 24 часов
+                  <strong>1.</strong> Получили доступ, но материал не подходит? Напишите в поддержку в течение 24 часов
                 </p>
                 <p>
                   <strong>2.</strong> Опишите проблему — почему работа не соответствует описанию

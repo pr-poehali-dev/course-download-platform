@@ -672,24 +672,13 @@ export default function Index() {
               
               <AnimatedHeroText />
               
-              <div className="mb-8 px-4 min-h-[120px] flex items-center justify-center">
-                <div className="relative inline-block group">
-                  <div className="absolute -inset-6 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-3xl blur-3xl opacity-30 group-hover:opacity-40 animate-pulse transition-opacity"></div>
-                  <div className="relative bg-white/50 backdrop-blur-sm rounded-2xl px-8 py-6 border-2 border-white/60 shadow-2xl group-hover:scale-105 transition-transform duration-300">
-                    <h3 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight flex items-baseline gap-3">
-                      <span className="inline-block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent drop-shadow-lg">
-                        <AnimatedCounter target={500} duration={2500} />+
-                      </span>
-                      <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent font-bold">
-                        работ
-                      </span>
-                    </h3>
-                    <div className="mt-2 flex items-center justify-center gap-2 text-sm text-slate-600">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="font-medium">Каталог постоянно пополняется</span>
-                    </div>
-                  </div>
-                </div>
+              <div className="mb-8 px-4">
+                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-700">
+                  <span className="inline-block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <AnimatedCounter target={500} duration={2500} />+ работ
+                  </span>
+                  <span className="ml-2 text-slate-500 text-lg sm:text-xl md:text-2xl font-normal">в каталоге</span>
+                </p>
               </div>
 
               {!isLoggedIn && (

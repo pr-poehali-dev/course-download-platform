@@ -79,21 +79,7 @@ export default function AboutSection() {
           </Card>
         </div>
 
-        <div className="bg-primary/5 rounded-2xl p-8 max-w-4xl mx-auto border-2 border-primary/10">
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <Icon name="Lightbulb" size={24} className="text-yellow-600" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold mb-2">Для чего это нужно?</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                <strong>⚠️ Важно:</strong> Все материалы предназначены <strong>исключительно для ознакомления и самостоятельной переработки</strong>. 
-                Использование работ "как есть" без переработки может привести к обвинениям в плагиате. 
-                Пользователь самостоятельно несёт ответственность за использование материалов.
-              </p>
-            </div>
-          </div>
-        </div>
+
       </div>
     </section>
   );

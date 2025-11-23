@@ -51,7 +51,7 @@ export default function BuyPointsPage() {
       points: 100,
       price: 500,
       bonus: 10,
-      description: 'Для пробы'
+      description: '1 реферат или эссе'
     },
     {
       id: 2,
@@ -59,21 +59,21 @@ export default function BuyPointsPage() {
       price: 3000,
       bonus: 100,
       popular: true,
-      description: 'Самый популярный'
+      description: '1 курсовая + 1 реферат'
     },
     {
       id: 3,
       points: 1500,
       price: 7500,
       bonus: 300,
-      description: 'Выгодная сделка'
+      description: '1 диплом + 3 реферата'
     },
     {
       id: 4,
       points: 3000,
       price: 15000,
       bonus: 700,
-      description: 'Максимальная выгода'
+      description: '1 магистерская + 2 курсовые'
     }
   ];
 
@@ -173,11 +173,11 @@ export default function BuyPointsPage() {
             >
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-2xl">{pkg.points + pkg.bonus}</CardTitle>
+                  <CardTitle className="text-2xl">{pkg.points + pkg.bonus} баллов</CardTitle>
                   <div className="flex gap-2">
                     {pkg.popular && (
                       <>
-                        <Badge className="bg-primary">Популярно</Badge>
+                        <Badge className="bg-primary">⭐ Популярно</Badge>
                         <Badge className="bg-red-600 text-white animate-pulse">
                           <Icon name="Flame" size={12} className="mr-1" />
                           Акция
@@ -186,7 +186,9 @@ export default function BuyPointsPage() {
                     )}
                   </div>
                 </div>
-                <CardDescription>{pkg.description}</CardDescription>
+                <CardDescription className="text-base font-medium">
+                  📚 {pkg.description}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">

@@ -102,7 +102,7 @@ export default function HomeHeader({
                     <Icon name="Coins" size={16} className="text-primary sm:w-5 sm:h-5" />
                     <span className="text-sm sm:text-base font-bold text-primary">{userBalance}</span>
                   </div>
-                  <p className="text-[10px] text-center text-muted-foreground">Доступно работ: {availableWorks}</p>
+                  <p className="text-[10px] text-center text-muted-foreground">{(userBalance * 5).toLocaleString('ru-RU')}₽ • {availableWorks} работ</p>
                 </div>
 
                 <DropdownMenu>
@@ -115,7 +115,7 @@ export default function HomeHeader({
                     <DropdownMenuLabel>
                       <div className="flex flex-col">
                         <span>{username}</span>
-                        <span className="text-xs text-muted-foreground font-normal">{userBalance} баллов</span>
+                        <span className="text-xs text-muted-foreground font-normal">{userBalance} баллов ({(userBalance * 5).toLocaleString('ru-RU')}₽)</span>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />

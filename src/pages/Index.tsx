@@ -39,6 +39,8 @@ import NewsSection from '@/components/NewsSection';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
+import GuaranteesSection from '@/components/GuaranteesSection';
+import TestimonialsSection from '@/components/TestimonialsSection';
 
 
 
@@ -666,13 +668,24 @@ export default function Index() {
                 </h2>
               </div>
               
-              <div className="mb-6 sm:mb-8">
-                <RotatingText />
-              </div>
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent px-4">
+                Готовые студенческие работы за 2 минуты
+              </h3>
               
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Покупай готовые курсовые и дипломы за баллы. Продавай свои работы и зарабатывай.
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
+                Более 500 проверенных работ по всем предметам. Мгновенный доступ после покупки.
               </p>
+
+              {!isLoggedIn && (
+                <div className="mb-8 px-4">
+                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-full shadow-lg">
+                    <Icon name="Gift" size={20} className="text-green-600" />
+                    <span className="text-sm sm:text-base font-bold text-gray-800">
+                      🎁 1000 баллов (5000₽) в подарок за регистрацию
+                    </span>
+                  </div>
+                </div>
+              )}
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
                 <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
@@ -681,10 +694,18 @@ export default function Index() {
                     Смотреть каталог
                   </a>
                 </Button>
-                <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg shadow-xl border-2" onClick={() => !isLoggedIn ? setAuthDialogOpen(true) : setProfileDialogOpen(true)}>
-                  <Icon name="Upload" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                  Загрузить работу
-                </Button>
+                {!isLoggedIn && (
+                  <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-sm sm:text-base lg:text-lg shadow-xl" onClick={() => setAuthDialogOpen(true)}>
+                    <Icon name="Gift" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+                    Получить подарок
+                  </Button>
+                )}
+                {isLoggedIn && (
+                  <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg shadow-xl border-2" onClick={() => setProfileDialogOpen(true)}>
+                    <Icon name="Upload" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+                    Загрузить работу
+                  </Button>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 max-w-4xl mx-auto px-2">
@@ -829,6 +850,10 @@ export default function Index() {
             </div>
           </div>
         </section>
+
+        <GuaranteesSection />
+        
+        <TestimonialsSection />
 
         <section className="py-20 bg-white relative overflow-hidden">
           <div className="absolute top-10 left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>

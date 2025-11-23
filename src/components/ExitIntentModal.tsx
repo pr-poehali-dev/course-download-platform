@@ -7,15 +7,11 @@ export default function ExitIntentModal() {
   const [hasShown, setHasShown] = useState(false);
 
   useEffect(() => {
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (hasShown) return;
-      
-      if (e.clientY <= 0) {
-        setIsVisible(true);
-        setHasShown(true);
-        localStorage.setItem('exit_intent_shown', Date.now().toString());
-      }
-    };
+    const isLoggedIn = localStorage.getItem('user');
+    if (isLoggedIn) {
+      setHasShown(true);
+      return;
+    }
 
     const lastShown = localStorage.getItem('exit_intent_shown');
     if (lastShown) {
@@ -26,9 +22,24 @@ export default function ExitIntentModal() {
       }
     }
 
+    const timeOnPage = Date.now();
+    
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (hasShown) return;
+      
+      const timeSpent = Date.now() - timeOnPage;
+      if (timeSpent < 30000) return;
+      
+      if (e.clientY <= 0) {
+        setIsVisible(true);
+        setHasShown(true);
+        localStorage.setItem('exit_intent_shown', Date.now().toString());
+      }
+    };
+
     setTimeout(() => {
       document.addEventListener('mouseleave', handleMouseLeave);
-    }, 5000);
+    }, 30000);
 
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave);

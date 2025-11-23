@@ -672,7 +672,7 @@ export default function Index() {
               <AnimatedHeroText />
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Более 500 работ для ознакомления и самостоятельной переработки. Только для лиц 18+
+                Более 500 работ для ознакомления и самостоятельной переработки
               </p>
 
               {!isLoggedIn && (
@@ -1633,15 +1633,7 @@ export default function Index() {
 
             <div className="border-t mt-8 pt-8">
               <div className="flex flex-col items-center gap-3 text-center">
-                <div className="text-xs text-gray-400 space-y-1">
-                  <p className="font-semibold text-gray-500">ИП Иванов Иван Иванович</p>
-                  <p>ИНН: 123456789012 | ОГРНИП: 123456789012345</p>
-                  <p>Адрес: г. Москва, ул. Примерная, д. 1, офис 1</p>
-                  <p>Email: tech.forma@yandex.ru</p>
-                  <p className="text-gray-400 mt-2">18+</p>
-                </div>
-                
-                <p className="text-sm text-muted-foreground mt-2">
+                <p className="text-sm text-muted-foreground">
                   © 2025 Tech Forma. Все права защищены.
                 </p>
               </div>

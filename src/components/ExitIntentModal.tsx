@@ -64,37 +64,37 @@ export default function ExitIntentModal() {
         </button>
 
         <div className="text-center mb-6">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center">
-            <Icon name="AlertCircle" size={40} className="text-white" />
+          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
+            <Icon name="Gift" size={40} className="text-white" />
           </div>
           <h2 className="text-3xl font-bold mb-3 text-gray-900">
-            Подождите! 🎁
+            Получите 1000 баллов! 🎁
           </h2>
           <p className="text-lg text-gray-600 mb-2">
-            Не упустите специальное предложение
+            Зарегистрируйтесь прямо сейчас
           </p>
           <p className="text-sm text-gray-500">
-            Получите <span className="font-bold text-green-600">бонусные баллы</span> при покупке больших пакетов
+            Это <span className="font-bold text-green-600">5000₽ в подарок</span> — купите первую работу бесплатно!
           </p>
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-            <Icon name="CheckCircle" size={24} className="text-green-600 flex-shrink-0" />
+            <Icon name="Clock" size={24} className="text-green-600 flex-shrink-0" />
             <span className="text-sm text-gray-700">
-              Мгновенный доступ к работе после оплаты
+              Доступ к работе за 2 минуты после покупки
             </span>
           </div>
           <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <Icon name="Shield" size={24} className="text-blue-600 flex-shrink-0" />
             <span className="text-sm text-gray-700">
-              Гарантия возврата денег 7 дней
+              Возврат баллов в течение 24 часов, если не подошла работа
             </span>
           </div>
           <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
             <Icon name="Zap" size={24} className="text-purple-600 flex-shrink-0" />
             <span className="text-sm text-gray-700">
-              Скидки до 15% при покупке пакетов
+              Бонусные баллы до +700 при покупке пакетов
             </span>
           </div>
         </div>

@@ -463,9 +463,9 @@ export default function Index() {
   return (
     <>
       <SEO 
-        title="Главная"
-        description="Маркетплейс студенческих работ для студентов. Покупай готовые курсовые и дипломы за баллы, продавай свои работы"
-        keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, готовые курсовые, учебные материалы"
+        title="Tech Forma — Готовые студенческие работы за 2 минуты"
+        description="Более 500 проверенных работ. Купите курсовую, диплом или реферат за баллы. Мгновенный доступ. 1000 баллов в подарок при регистрации!"
+        keywords="купить курсовую работу, купить диплом, готовые студенческие работы, курсовые работы на заказ, рефераты купить"
       />
       <PurchaseNotifications />
       <ExitIntentModal />
@@ -478,7 +478,7 @@ export default function Index() {
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
                 <div className="flex flex-col min-w-0">
                   <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Платформа для студентов</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Готовые студенческие работы</p>
                 </div>
               </div>
               

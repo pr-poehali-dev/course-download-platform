@@ -11,9 +11,9 @@ export default function AboutSection() {
             <Icon name="Info" size={14} className="mr-2" />
             О платформе
           </Badge>
-          <h2 className="text-5xl font-bold mb-4">Платформа обмена знаниями</h2>
+          <h2 className="text-5xl font-bold mb-4">Готовые студенческие работы</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Студенты помогают друг другу — делятся работами и получают доступ к материалам для обучения
+            Купите проверенную работу за баллы и получите мгновенный доступ
           </p>
         </div>
 
@@ -27,8 +27,8 @@ export default function AboutSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
-                Помогать студентам учиться эффективнее через обмен материалами. 
-                Платформа работает как база референсных работ для обучения.
+                Помочь студентам сэкономить время и получить доступ к качественным работам. 
+                Мы предлагаем более 500 проверенных работ по всем предметам.
               </p>
             </CardContent>
           </Card>
@@ -42,8 +42,8 @@ export default function AboutSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
-                Платформа обеспечивает безопасное хранение материалов. Авторы сами 
-                несут ответственность за качество и оригинальность своих работ.
+                Все работы проходят модерацию перед публикацией. 
+                Гарантируем возврат баллов в течение 24 часов, если работа не подошла.
               </p>
             </CardContent>
           </Card>
@@ -57,8 +57,8 @@ export default function AboutSection() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground leading-relaxed">
-                Присоединяйся к растущему сообществу студентов, которые помогают 
-                друг другу учиться эффективнее через обмен материалами.
+                Более 2500 студентов уже используют наш сервис. 
+                Присоединяйтесь и получайте 1000 баллов в подарок при регистрации!
               </p>
             </CardContent>
           </Card>

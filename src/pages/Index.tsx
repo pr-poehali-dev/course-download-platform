@@ -41,7 +41,7 @@ import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
 import GuaranteesSection from '@/components/GuaranteesSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
-import LegalDisclaimer from '@/components/LegalDisclaimer';
+import AnimatedHeroText from '@/components/AnimatedHeroText';
 
 
 
@@ -478,10 +478,7 @@ export default function Index() {
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
                 <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                    <span className="px-1.5 py-0.5 bg-red-600 text-white text-[8px] sm:text-[10px] font-bold rounded">18+</span>
-                  </div>
+                  <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
                   <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Маркетплейс учебных материалов</p>
                 </div>
               </div>
@@ -672,9 +669,7 @@ export default function Index() {
                 </h2>
               </div>
               
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent px-4">
-                Маркетплейс учебных материалов
-              </h3>
+              <AnimatedHeroText />
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
                 Более 500 работ для ознакомления и самостоятельной переработки. Только для лиц 18+
@@ -682,11 +677,21 @@ export default function Index() {
 
               {!isLoggedIn && (
                 <div className="mb-8 px-4">
-                  <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-300 rounded-full shadow-lg">
-                    <Icon name="Gift" size={20} className="text-green-600" />
-                    <span className="text-sm sm:text-base font-bold text-gray-800">
-                      🎁 1000 баллов (5000₽) в подарок за регистрацию
-                    </span>
+                  <div className="relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 rounded-2xl shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 animate-pulse-slow">
+                    <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 rounded-2xl blur-xl opacity-50 animate-pulse"></div>
+                    <div className="relative flex items-center gap-3">
+                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                        <Icon name="Gift" size={24} className="text-white" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-white font-black text-lg sm:text-xl tracking-tight">
+                          1000 баллов в подарок
+                        </p>
+                        <p className="text-violet-100 text-xs sm:text-sm font-medium">
+                          Это 5000₽ на первые покупки 🎉
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1592,8 +1597,6 @@ export default function Index() {
 
         <FAQSection />
 
-        <LegalDisclaimer />
-
         <footer className="bg-muted/50 py-8 border-t">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -1629,26 +1632,16 @@ export default function Index() {
             </div>
 
             <div className="border-t mt-8 pt-8">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-4xl">
-                  <p className="text-xs text-amber-900 font-semibold mb-2">
-                    ⚠️ ВАЖНО: Tech Forma — маркетплейс (посредник)
-                  </p>
-                  <p className="text-xs text-gray-700">
-                    Платформа предоставляет только техническую инфраструктуру. Все работы публикуются авторами самостоятельно. 
-                    Платформа НЕ создаёт, НЕ проверяет и НЕ гарантирует содержание работ. Материалы предназначены 
-                    исключительно для ознакомления и самостоятельной переработки. Доступ 18+
-                  </p>
-                </div>
-                
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <p className="font-semibold">ИП Иванов Иван Иванович</p>
+              <div className="flex flex-col items-center gap-3 text-center">
+                <div className="text-xs text-gray-400 space-y-1">
+                  <p className="font-semibold text-gray-500">ИП Иванов Иван Иванович</p>
                   <p>ИНН: 123456789012 | ОГРНИП: 123456789012345</p>
                   <p>Адрес: г. Москва, ул. Примерная, д. 1, офис 1</p>
                   <p>Email: tech.forma@yandex.ru</p>
+                  <p className="text-gray-400 mt-2">18+</p>
                 </div>
                 
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-muted-foreground mt-2">
                   © 2025 Tech Forma. Все права защищены.
                 </p>
               </div>

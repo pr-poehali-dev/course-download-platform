@@ -9,8 +9,8 @@ export default function GuaranteesSection() {
     },
     {
       icon: 'FileCheck',
-      title: 'Проверенное качество',
-      description: 'Все работы проходят модерацию перед публикацией'
+      title: 'Модерация контента',
+      description: 'Проверяем работы на наличие запрещённого контента перед публикацией'
     },
     {
       icon: 'Clock',
@@ -29,8 +29,8 @@ export default function GuaranteesSection() {
     },
     {
       icon: 'Award',
-      title: 'Гарантия качества',
-      description: 'Работаем с 2020 года — более 2500 довольных студентов'
+      title: 'Стабильная платформа',
+      description: 'Работаем с 2020 года — более 2500 пользователей платформы'
     }
   ];
 

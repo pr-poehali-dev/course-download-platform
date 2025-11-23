@@ -46,8 +46,11 @@ export default function HomeHeader({
           <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
             <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
             <div className="flex flex-col min-w-0">
-              <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-              <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Готовые студенческие работы</p>
+              <div className="flex items-center gap-2">
+                <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
+                <span className="px-1.5 py-0.5 bg-red-600 text-white text-[8px] sm:text-[10px] font-bold rounded">18+</span>
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Маркетплейс учебных материалов</p>
             </div>
           </div>
           

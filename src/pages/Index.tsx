@@ -41,6 +41,7 @@ import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
 import GuaranteesSection from '@/components/GuaranteesSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
+import LegalDisclaimer from '@/components/LegalDisclaimer';
 
 
 
@@ -463,9 +464,9 @@ export default function Index() {
   return (
     <>
       <SEO 
-        title="Tech Forma — Готовые студенческие работы за 2 минуты"
-        description="Более 500 проверенных работ. Купите курсовую, диплом или реферат за баллы. Мгновенный доступ. 1000 баллов в подарок при регистрации!"
-        keywords="купить курсовую работу, купить диплом, готовые студенческие работы, курсовые работы на заказ, рефераты купить"
+        title="Tech Forma — Платформа обмена учебными материалами (18+)"
+        description="Маркетплейс учебных материалов для студентов. Более 500 работ для ознакомления. Материалы предназначены исключительно для образовательных целей и самостоятельной переработки."
+        keywords="учебные материалы, студенческие работы, образовательная платформа, примеры работ, методические материалы, маркетплейс для студентов"
       />
       <PurchaseNotifications />
       <ExitIntentModal />
@@ -477,8 +478,11 @@ export default function Index() {
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
                 <div className="flex flex-col min-w-0">
-                  <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Готовые студенческие работы</p>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
+                    <span className="px-1.5 py-0.5 bg-red-600 text-white text-[8px] sm:text-[10px] font-bold rounded">18+</span>
+                  </div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Маркетплейс учебных материалов</p>
                 </div>
               </div>
               
@@ -669,11 +673,11 @@ export default function Index() {
               </div>
               
               <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent px-4">
-                Готовые студенческие работы за 2 минуты
+                Маркетплейс учебных материалов
               </h3>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Более 500 проверенных работ по всем предметам. Мгновенный доступ после покупки.
+                Более 500 работ для ознакомления и самостоятельной переработки. Только для лиц 18+
               </p>
 
               {!isLoggedIn && (
@@ -711,7 +715,7 @@ export default function Index() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 max-w-4xl mx-auto px-2">
                 <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
                   <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-blue-600 to-blue-400 bg-clip-text text-transparent mb-2">500+</div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-600">Готовых работ</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-600">Работ для изучения</p>
                 </div>
                 <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
                   <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-purple-600 to-purple-400 bg-clip-text text-transparent mb-2">
@@ -1461,12 +1465,12 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="Shield" size={20} className="text-primary" />
-                    Какая уникальность готовых работ?
+                    Что делать с скачанным материалом?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Уникальность готовых работ составляет от 95%.
+                    Используйте материал как образец для самостоятельной переработки. Прямое копирование может привести к проблемам с плагиатом.
                   </p>
                 </CardContent>
               </Card>
@@ -1550,7 +1554,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Да! Загружайте свои курсовые, дипломы и рефераты. За каждую загруженную работу вы получаете баллы, а за каждую покупку — 90% от стоимости. Это отличный способ заработать на старых работах.
+                    Да! Загружайте свои работы. За каждую загруженную работу вы получаете баллы. Вы подтверждаете авторство и несёте ответственность за содержание.
                   </p>
                 </CardContent>
               </Card>
@@ -1564,7 +1568,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Да, покупка готовых работ как образцов для изучения абсолютно легальна. Это аналогично покупке учебника или методического пособия. Важно использовать материал этично: дорабатывать, перефразировать и добавлять авторские идеи.
+                    Tech Forma — это маркетплейс (посредник), предоставляющий техническую платформу для обмена учебными материалами. Все материалы предназначены исключительно для ознакомления и самостоятельной переработки. Пользователь самостоятельно несёт ответственность за их использование.
                   </p>
                 </CardContent>
               </Card>
@@ -1587,6 +1591,8 @@ export default function Index() {
         </section>
 
         <FAQSection />
+
+        <LegalDisclaimer />
 
         <footer className="bg-muted/50 py-8 border-t">
           <div className="container mx-auto px-4">
@@ -1623,8 +1629,28 @@ export default function Index() {
             </div>
 
             <div className="border-t mt-8 pt-8">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-sm text-muted-foreground">
-                <p>© 2025 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
+              <div className="flex flex-col items-center gap-4 text-center">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 max-w-4xl">
+                  <p className="text-xs text-amber-900 font-semibold mb-2">
+                    ⚠️ ВАЖНО: Tech Forma — маркетплейс (посредник)
+                  </p>
+                  <p className="text-xs text-gray-700">
+                    Платформа предоставляет только техническую инфраструктуру. Все работы публикуются авторами самостоятельно. 
+                    Платформа НЕ создаёт, НЕ проверяет и НЕ гарантирует содержание работ. Материалы предназначены 
+                    исключительно для ознакомления и самостоятельной переработки. Доступ 18+
+                  </p>
+                </div>
+                
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p className="font-semibold">ИП Иванов Иван Иванович</p>
+                  <p>ИНН: 123456789012 | ОГРНИП: 123456789012345</p>
+                  <p>Адрес: г. Москва, ул. Примерная, д. 1, офис 1</p>
+                  <p>Email: tech.forma@yandex.ru</p>
+                </div>
+                
+                <p className="text-sm text-muted-foreground">
+                  © 2025 Tech Forma. Все права защищены.
+                </p>
               </div>
             </div>
           </div>

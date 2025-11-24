@@ -17,6 +17,9 @@ import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
+import AgeBanner from '@/components/AgeBanner';
+import AgeVerificationModal from '@/components/AgeVerificationModal';
+import DiscountProgressBar from '@/components/DiscountProgressBar';
 import { getCurrentViewers, getLastPurchaseTime, pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
 
 interface Work {
@@ -408,7 +411,7 @@ export default function CatalogPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     'name': 'Каталог студенческих работ',
-    'description': 'Готовые курсовые, дипломы, рефераты, чертежи от 200₽',
+    'description': 'Примеры курсовых, дипломов, рефератов, чертежей для изучения',
     'numberOfItems': filteredWorks.length,
     'itemListElement': filteredWorks.slice(0, 20).map((work, index) => ({
       '@type': 'ListItem',
@@ -440,25 +443,27 @@ export default function CatalogPage() {
   return (
     <>
       <SEO 
-        title="Каталог работ"
-        description="Каталог студенческих работ: курсовые, дипломы, рефераты, чертежи. Купить готовые работы за баллы по выгодным ценам"
-        keywords="курсовые работы, дипломы, рефераты, чертежи, купить студенческие работы, каталог работ, готовые работы"
+        title="Каталог примеров работ (18+)"
+        description="Каталог примеров работ для изучения: курсовые, дипломы, рефераты, чертежи. Доступ к примерам за баллы. Только для ознакомления 18+"
+        keywords="примеры работ, образцы курсовых, примеры дипломов, референсные работы, каталог примеров для изучения, материалы 18+"
       />
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify(jsonLdSchema)}
         </script>
       </Helmet>
+      <AgeVerificationModal />
       <PurchaseNotifications />
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
+      <AgeBanner />
       <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">Каталог готовых работ</h1>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">Каталог примеров работ (18+)</h1>
             <Badge className="glass-card border-blue-200 text-sm">
               <Icon name="FileText" size={14} className="mr-1" />
               {filteredWorks.length} {filteredWorks.length === 1 ? 'работа' : filteredWorks.length < 5 ? 'работы' : 'работ'}
@@ -643,16 +648,10 @@ export default function CatalogPage() {
                         {work.discount ? (
                           <div className="flex flex-col">
                             <span className="text-xs text-gray-400 line-through">{work.price} б.</span>
-                            <div className="flex flex-col">
-                              <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} б.</span>
-                              <span className="text-xs text-gray-500">({Math.round(work.price * (1 - work.discount / 100)) * 5}₽)</span>
-                            </div>
+                            <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} баллов</span>
                           </div>
                         ) : (
-                          <div className="flex flex-col">
-                            <span className="text-2xl font-bold text-gray-900">{formatPrice(priceInRubles)}₽</span>
-                            <span className="text-xs text-gray-500">{work.price} баллов</span>
-                          </div>
+                          <span className="text-2xl font-bold text-gray-900">{work.price} баллов</span>
                         )}
                       </div>
                       <div className="flex gap-2 items-center">

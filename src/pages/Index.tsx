@@ -44,6 +44,7 @@ import GuaranteesSection from '@/components/GuaranteesSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import AnimatedHeroText from '@/components/AnimatedHeroText';
 import AnimatedCounter from '@/components/AnimatedCounter';
+import DiscountProgressBar from '@/components/DiscountProgressBar';
 
 
 
@@ -470,10 +471,12 @@ export default function Index() {
         description="500+ примеров работ ТОЛЬКО для ознакомления и изучения структуры по ГОСТ. Справочные материалы 18+"
         keywords="примеры работ для ознакомления, референсные работы для изучения, база примеров курсовых, образцы оформления по ГОСТ"
       />
+      <AgeVerificationModal />
       <PurchaseNotifications />
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-white">
+        <AgeBanner />
         <header className="glass-card tech-border sticky top-0 z-50 w-full shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-4">
             <div className="flex items-center justify-between gap-2">
@@ -764,10 +767,10 @@ export default function Index() {
                 Возможности платформы
               </Badge>
               <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">
-                Всё для успешной учёбы
+                База референсных материалов
               </h2>
               <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-                Современные инструменты для студентов
+                Примеры работ для изучения структуры и оформления (18+)
               </p>
             </div>
 
@@ -782,21 +785,21 @@ export default function Index() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <CardTitle className="text-2xl">Маркетплейс работ</CardTitle>
-                  <CardDescription className="text-base">Покупай за баллы от 100</CardDescription>
+                  <CardTitle className="text-2xl">Каталог примеров работ</CardTitle>
+                  <CardDescription className="text-base">Доступ к примерам для ознакомления</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Курсовые, дипломы, чертежи</span>
+                    <span>Примеры курсовых, дипломов, чертежей</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Мгновенный доступ</span>
+                    <span>Для изучения структуры и оформления</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Обмен знаниями</span>
+                    <span>Только для ознакомления (18+)</span>
                   </div>
                   <Button className="w-full mt-4" variant="outline" asChild>
                     <a href="/catalog">
@@ -817,22 +820,22 @@ export default function Index() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <CardTitle className="text-2xl">Стань автором</CardTitle>
-                  <CardDescription className="text-base">Делись знаниями с сообществом</CardDescription>
+                  <CardTitle className="text-2xl">Размести свои работы</CardTitle>
+                  <CardDescription className="text-base">Помогай изучать правильное оформление</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Публикуй свои работы</span>
+                    <span>Размещай примеры своих работ</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Статистика скачиваний</span>
+                    <span>Статистика просмотров</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Обмен знаниями</span>
+                    <span>Только для ознакомления (18+)</span>
                   </div>
                   <Button 
                     className="w-full mt-4" 

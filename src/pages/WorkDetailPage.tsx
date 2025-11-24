@@ -17,6 +17,8 @@ import ReviewsSection from '@/components/ReviewsSection';
 import WorkActivityTracker from '@/components/WorkActivityTracker';
 import { toast } from '@/components/ui/use-toast';
 import { pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
+import AgeBanner from '@/components/AgeBanner';
+import AgeVerificationModal from '@/components/AgeVerificationModal';
 
 
 interface Work {
@@ -967,13 +969,16 @@ export default function WorkDetailPage() {
     : work.price;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
-      <SEO 
-        title={work ? `${work.title} — пример работы за ${finalPrice} баллов` : 'Просмотр работы'}
-        description={work ? `${work.workType} по предмету "${work.subject}" для ознакомления. ${work.description.substring(0, 150)}` : 'Пример студенческой работы'}
-        keywords={work ? `${work.workType}, ${work.subject}, пример курсовой, пример диплома, учебные материалы` : 'студенческие работы'}
-      />
-      <Navigation isLoggedIn={isLoggedIn} />
+    <>
+      <AgeVerificationModal />
+      <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
+        <SEO 
+          title={work ? `${work.title} — пример для изучения (18+)` : 'Просмотр примера работы'}
+          description={work ? `Пример ${work.workType} по предмету "${work.subject}" ТОЛЬКО для ознакомления и изучения структуры. ${work.description.substring(0, 150)}` : 'Пример работы для изучения структуры и оформления 18+'}
+          keywords={work ? `пример ${work.workType}, ${work.subject}, образец для изучения, референсная работа, материалы 18+` : 'примеры работ для изучения'}
+        />
+        <AgeBanner />
+        <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-4 md:py-6 mt-16 max-w-[1200px]">
         <Button 
@@ -1363,9 +1368,6 @@ export default function WorkDetailPage() {
                       </span>
                       <span className="text-base md:text-lg font-medium text-green-600">баллов</span>
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {formatPrice(pointsToRubles(Math.round(work.price * (1 - work.discount / 100))))}₽
-                    </div>
                     <Badge className="bg-red-500 text-white mt-2">−{work.discount}%</Badge>
                   </div>
                 ) : (
@@ -1375,9 +1377,6 @@ export default function WorkDetailPage() {
                         {work.price.toLocaleString()}
                       </span>
                       <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {formatPrice(pointsToRubles(work.price))}₽
                     </div>
                   </div>
                 )}
@@ -1632,5 +1631,6 @@ export default function WorkDetailPage() {
 
       <Footer />
     </div>
+    </>
   );
 }

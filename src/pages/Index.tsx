@@ -693,7 +693,7 @@ export default function Index() {
                           1000 баллов в подарок
                         </p>
                         <p className="text-violet-100 text-xs sm:text-sm font-medium">
-                          Это 5000₽ на первые покупки 🎉
+                          Это 1000₽ на первые покупки 🎉
                         </p>
                       </div>
                     </div>

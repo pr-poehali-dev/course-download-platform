@@ -74,7 +74,7 @@ export default function ExitIntentModal() {
             Зарегистрируйтесь прямо сейчас
           </p>
           <p className="text-sm text-gray-500">
-            Это <span className="font-bold text-green-600">5000₽ в подарок</span> — получите доступ к материалам бесплатно!
+            Это <span className="font-bold text-green-600">1000₽ в подарок</span> — получите доступ к материалам бесплатно!
           </p>
         </div>
 

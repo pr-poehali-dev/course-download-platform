@@ -37,7 +37,7 @@ export default function HeroSection({ onCatalogClick, onAuthClick, isLoggedIn }:
               <Icon name="Gift" size={28} className="text-white" />
               <div className="text-left">
                 <p className="text-white font-bold text-lg">1000 баллов в подарок</p>
-                <p className="text-white/90 text-sm">Это 5000₽ на первые покупки 🔥</p>
+                <p className="text-white/90 text-sm">Это 1000₽ на первые покупки 🔥</p>
               </div>
             </div>
           </div>

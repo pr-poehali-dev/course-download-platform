@@ -38,7 +38,6 @@ import RotatingText from '@/components/home/RotatingText';
 import NewsSection from '@/components/NewsSection';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
-import DiscountProgressBar from '@/components/DiscountProgressBar';
 import GuaranteesSection from '@/components/GuaranteesSection';
 import TestimonialsSection from '@/components/TestimonialsSection';
 import AnimatedHeroText from '@/components/AnimatedHeroText';
@@ -1476,12 +1475,12 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="Shield" size={20} className="text-primary" />
-                    Что делать с скачанным материалом?
+                    Для чего нужны примеры работ?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Используйте материал как образец для самостоятельной переработки. Прямое копирование может привести к проблемам с плагиатом.
+                    Все работы предоставлены для ознакомления и изучения структуры оформления. Используйте их как референс для понимания требований ГОСТ, структуры разделов и стиля изложения при подготовке собственной работы.
                   </p>
                 </CardContent>
               </Card>
@@ -1537,7 +1536,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    В каталоге 500+ работ по техническим дисциплинам. База пополняется ежедневно.
+                    В каталоге 500+ примеров работ по техническим дисциплинам для ознакомления: курсовые проекты, дипломные работы, лабораторные, чертежи. База референсных материалов пополняется ежедневно.
                   </p>
                 </CardContent>
               </Card>

@@ -40,7 +40,7 @@ export default function PurchaseNotifications() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Показываем уведомление каждые 40-60 секунд
+    // Показываем уведомление каждые 15 минут
     const showNotification = () => {
       const notification = generateNotification();
       setNotifications([notification]);
@@ -55,10 +55,10 @@ export default function PurchaseNotifications() {
     // Первое уведомление через 15 секунд после загрузки страницы
     const initialTimeout = setTimeout(showNotification, 15000);
 
-    // Последующие уведомления каждые 40-60 секунд
+    // Последующие уведомления каждые 15 минут (900000 мс)
     const interval = setInterval(() => {
       showNotification();
-    }, 40000 + Math.random() * 20000);
+    }, 900000);
 
     return () => {
       clearTimeout(initialTimeout);

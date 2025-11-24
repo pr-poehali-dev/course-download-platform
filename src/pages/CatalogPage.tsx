@@ -17,7 +17,6 @@ import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
-import DiscountProgressBar from '@/components/DiscountProgressBar';
 import { getCurrentViewers, getLastPurchaseTime, pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
 
 interface Work {

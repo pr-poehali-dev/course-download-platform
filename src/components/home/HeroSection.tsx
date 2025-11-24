@@ -24,12 +24,12 @@ export default function HeroSection({ onCatalogClick, onAuthClick, isLoggedIn }:
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
             <span className="block text-gray-900 mb-2">Tech Forma</span>
             <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent text-3xl sm:text-4xl md:text-5xl">
-              Лабораторную работу за 2 минуты
+              База референсных работ
             </span>
           </h1>
 
           <p className="text-xl sm:text-2xl font-semibold text-gray-700 max-w-2xl mx-auto">
-            <span className="text-purple-600">500+ работ</span> в каталоге
+            <span className="text-purple-600">500+ примеров работ</span> для ознакомления и изучения структуры
           </p>
 
           <div className="inline-block px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl shadow-lg">

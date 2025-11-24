@@ -30,6 +30,8 @@ import RecentlyViewed from '@/components/RecentlyViewed';
 import FAQSection from '@/components/FAQSection';
 
 import AgeBadge from '@/components/AgeBadge';
+import AgeBanner from '@/components/AgeBanner';
+import AgeVerificationModal from '@/components/AgeVerificationModal';
 import CookieBanner from '@/components/CookieBanner';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 import SEO from '@/components/SEO';
@@ -464,9 +466,9 @@ export default function Index() {
   return (
     <>
       <SEO 
-        title="Tech Forma — Платформа обмена учебными материалами (18+)"
-        description="Маркетплейс учебных материалов для студентов. 500+ работ доступны для изучения. Современная технологичная платформа для обмена знаниями."
-        keywords="учебные материалы, студенческие работы, образовательная платформа, примеры работ, методические материалы, маркетплейс для студентов"
+        title="Tech Forma — База референсных работ для изучения (18+)"
+        description="500+ примеров работ ТОЛЬКО для ознакомления и изучения структуры по ГОСТ. Справочные материалы 18+"
+        keywords="примеры работ для ознакомления, референсные работы для изучения, база примеров курсовых, образцы оформления по ГОСТ"
       />
       <PurchaseNotifications />
       <ExitIntentModal />
@@ -659,7 +661,7 @@ export default function Index() {
               <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 glass-card rounded-full mb-4 sm:mb-8 animate-fade-in border border-blue-500/20">
                 <Icon name="Sparkles" size={18} className="text-blue-600 sm:w-5 sm:h-5" />
                 <span className="text-xs sm:text-sm font-semibold text-slate-700">
-                  Профессиональная платформа для студентов
+                  База примеров для изучения структуры работ (18+)
                 </span>
               </div>
               
@@ -881,10 +883,10 @@ export default function Index() {
                   Профессиональные инструменты
                 </Badge>
                 <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">
-                  Технологичная платформа для студентов
+                  Справочная база для студентов
                 </h2>
                 <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-                  Всё необходимое для успешной учёбы в одном месте
+                  Примеры работ для изучения структуры оформления (18+)
                 </p>
               </div>
 
@@ -1461,7 +1463,7 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="HelpCircle" size={20} className="text-primary" />
-                    Как купить работу на платформе?
+                    Как получить доступ к примерам работ?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1559,12 +1561,12 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="Upload" size={20} className="text-primary" />
-                    Могу ли я продавать свои работы?
+                    Могу ли я размещать свои работы как примеры?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Да! Загружайте свои работы. За каждую загруженную работу вы получаете баллы. Вы подтверждаете авторство и несёте ответственность за содержание.
+                    Да! Размещайте свои работы как референсные материалы для ознакомления. За каждую размещённую работу вы получаете баллы. Вы подтверждаете авторство и несёте ответственность за содержание.
                   </p>
                 </CardContent>
               </Card>
@@ -1710,6 +1712,8 @@ export default function Index() {
       />
 
       <CookieBanner />
+      <AgeBanner />
+      <AgeVerificationModal />
     </>
   );
 }

@@ -12,10 +12,10 @@ interface SEOProps {
 }
 
 const DEFAULT_SEO = {
-  title: 'Tech Forma — Маркетплейс студенческих работ',
-  description: 'Каталог курсовых, дипломов, чертежей. Маркетплейс для студентов. Покупай за баллы, продавай свои работы.',
-  keywords: 'курсовые работы, дипломы, рефераты, студенческие работы купить, чертежи, маркетплейс работ',
-  ogImage: 'https://cdn.poehali.dev/internal/img/og.png',
+  title: 'Курсовые работы и дипломы от 200₽ — купить готовую работу с гарантией качества | Tech Forma',
+  description: 'Купить курсовые работы и дипломы от 200₽. 500+ готовых студенческих работ по всем предметам. Мгновенное скачивание, гарантия уникальности 95%. Где купить курсовую работу недорого? У нас!',
+  keywords: 'курсовые работы купить, дипломы купить, купить курсовую работу недорого, купить дипломную работу, готовые курсовые работы, готовые дипломы, где купить курсовую, купить курсовую цена',
+  ogImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e25efd0b-8d04-4b71-b6d0-2a3a0d0123a4.jpg',
   siteName: 'Tech Forma',
   baseUrl: 'https://techforma.pro'
 };
@@ -90,35 +90,78 @@ export default function SEO({
     
     const jsonLd = isHomePage ? {
       '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      'name': DEFAULT_SEO.siteName,
-      'alternateName': 'TechForma',
-      'url': DEFAULT_SEO.baseUrl,
-      'description': DEFAULT_SEO.description,
-      'publisher': {
-        '@type': 'Organization',
-        'name': DEFAULT_SEO.siteName,
-        'url': DEFAULT_SEO.baseUrl,
-        'logo': {
-          '@type': 'ImageObject',
-          'url': 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg'
-        }
-      },
-      'potentialAction': {
-        '@type': 'SearchAction',
-        'target': {
-          '@type': 'EntryPoint',
-          'urlTemplate': `${DEFAULT_SEO.baseUrl}/catalog?search={search_term_string}`
+      '@graph': [
+        {
+          '@type': 'WebSite',
+          '@id': `${DEFAULT_SEO.baseUrl}/#website`,
+          'name': DEFAULT_SEO.siteName,
+          'alternateName': 'TechForma',
+          'url': DEFAULT_SEO.baseUrl,
+          'description': DEFAULT_SEO.description,
+          'potentialAction': {
+            '@type': 'SearchAction',
+            'target': {
+              '@type': 'EntryPoint',
+              'urlTemplate': `${DEFAULT_SEO.baseUrl}/catalog?search={search_term_string}`
+            },
+            'query-input': 'required name=search_term_string'
+          }
         },
-        'query-input': 'required name=search_term_string'
-      },
-      'offers': {
-        '@type': 'AggregateOffer',
-        'priceCurrency': 'RUB',
-        'lowPrice': '200',
-        'highPrice': '3000',
-        'offerCount': '500+'
-      }
+        {
+          '@type': 'Organization',
+          '@id': `${DEFAULT_SEO.baseUrl}/#organization`,
+          'name': DEFAULT_SEO.siteName,
+          'url': DEFAULT_SEO.baseUrl,
+          'logo': {
+            '@type': 'ImageObject',
+            'url': 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg'
+          },
+          'contactPoint': {
+            '@type': 'ContactPoint',
+            'email': 'tech.forma@yandex.ru',
+            'contactType': 'customer support',
+            'areaServed': 'RU',
+            'availableLanguage': 'Russian'
+          }
+        },
+        {
+          '@type': 'WebPage',
+          '@id': `${DEFAULT_SEO.baseUrl}/#webpage`,
+          'url': DEFAULT_SEO.baseUrl,
+          'name': fullTitle,
+          'description': metaDescription,
+          'isPartOf': {
+            '@id': `${DEFAULT_SEO.baseUrl}/#website`
+          },
+          'about': {
+            '@id': `${DEFAULT_SEO.baseUrl}/#organization`
+          }
+        },
+        {
+          '@type': 'ItemList',
+          'name': 'Категории работ',
+          'itemListElement': [
+            {
+              '@type': 'ListItem',
+              'position': 1,
+              'name': 'Курсовые работы',
+              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=course`
+            },
+            {
+              '@type': 'ListItem',
+              'position': 2,
+              'name': 'Дипломные работы',
+              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=diploma`
+            },
+            {
+              '@type': 'ListItem',
+              'position': 3,
+              'name': 'Рефераты',
+              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=referat`
+            }
+          ]
+        }
+      ]
     } : {
       '@context': 'https://schema.org',
       '@type': 'WebSite',

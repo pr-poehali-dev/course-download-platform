@@ -6,5 +6,8 @@ http://www.techforma.ru/* https://techforma.pro/:splat 301!
 https://www.techforma.pro/* https://techforma.pro/:splat 301!
 http://www.techforma.pro/* https://techforma.pro/:splat 301!
 
+# Удаление мультислэша (trailing slash)
+/*/  /:splat  301
+
 # SPA routing
 /*    /index.html   200

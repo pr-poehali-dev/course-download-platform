@@ -57,6 +57,3 @@ Disallow: /
 
 # Карта сайта
 Sitemap: https://techforma.pro/sitemap.xml
-
-# Хост для Яндекса
-Host: techforma.pro

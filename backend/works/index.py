@@ -1,7 +1,7 @@
 """
 Business: Управление работами (добавление, получение, обновление, импорт с Яндекс.Диска)
 Args: event с httpMethod, body, queryStringParameters
-Returns: HTTP response с данными работ
+Returns: HTTP response с данными работ (включая discount поле)
 """
 
 import json

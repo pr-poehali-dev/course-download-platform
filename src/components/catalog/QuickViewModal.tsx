@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import PreviewCarousel from '@/components/PreviewCarousel';
+import { pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
 
 interface Work {
   id: string;
@@ -179,11 +180,15 @@ export default function QuickViewModal({ work, open, onClose }: QuickViewModalPr
                         <div className="flex flex-col">
                           <span className="text-sm text-gray-400 line-through">{work.price} баллов</span>
                           <span className="text-3xl font-bold text-green-600">{Math.round(finalPrice)} баллов</span>
+                          <span className="text-xs text-gray-500">{formatPrice(pointsToRubles(Math.round(finalPrice)))}₽</span>
                         </div>
                         <Badge className="bg-red-500 text-white">−{work.discount}%</Badge>
                       </div>
                     ) : (
-                      <span className="text-3xl font-bold text-gray-900">{work.price} баллов</span>
+                      <div className="flex flex-col">
+                        <span className="text-3xl font-bold text-gray-900">{work.price} баллов</span>
+                        <span className="text-xs text-gray-500">{formatPrice(pointsToRubles(work.price))}₽</span>
+                      </div>
                     )}
                   </div>
                 </div>

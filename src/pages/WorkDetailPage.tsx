@@ -16,6 +16,7 @@ import { getFakeAuthor, incrementViewCount, getViewCount } from '@/utils/fakeAut
 import ReviewsSection from '@/components/ReviewsSection';
 import WorkActivityTracker from '@/components/WorkActivityTracker';
 import { toast } from '@/components/ui/use-toast';
+import { pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
 
 
 interface Work {
@@ -39,6 +40,7 @@ interface Work {
   downloadsCount?: number;
   reviewsCount?: number;
   keywords?: string[];
+  discount?: number;
 }
 
 export default function WorkDetailPage() {
@@ -608,17 +610,23 @@ export default function WorkDetailPage() {
         downloadToken = tokenData.token;
       } else {
         // Если не куплена, пытаемся купить за баллы (используем freshUser!)
+        const finalPrice = work.discount 
+          ? Math.round(work.price * (1 - work.discount / 100)) 
+          : work.price;
+        
         console.log('💰 Work not purchased, attempting to purchase with баллы...', { 
           url: PURCHASE_WORK_URL, 
           userId, 
           workId: actualWorkId, 
-          price: work.price,
+          price: finalPrice,
+          originalPrice: work.price,
+          discount: work.discount,
           userBalance: freshUser.balance,
           userRole: freshUser.role
         });
         toast({
           title: '💰 Покупка работы',
-          description: `Списываем ${work.price} баллов с баланса ${freshUser.balance}...`,
+          description: `Списываем ${finalPrice} баллов с баланса ${freshUser.balance}...`,
           duration: 3000,
         });
         const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
@@ -630,7 +638,7 @@ export default function WorkDetailPage() {
           body: JSON.stringify({
             workId: actualWorkId,
             userId: userId,
-            price: work.price
+            price: finalPrice
           })
         });
         
@@ -954,10 +962,14 @@ export default function WorkDetailPage() {
     return null;
   }
 
+  const finalPrice = work.discount 
+    ? Math.round(work.price * (1 - work.discount / 100)) 
+    : work.price;
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <SEO 
-        title={work ? `${work.title} — пример работы за ${work.price} баллов` : 'Просмотр работы'}
+        title={work ? `${work.title} — пример работы за ${finalPrice} баллов` : 'Просмотр работы'}
         description={work ? `${work.workType} по предмету "${work.subject}" для ознакомления. ${work.description.substring(0, 150)}` : 'Пример студенческой работы'}
         keywords={work ? `${work.workType}, ${work.subject}, пример курсовой, пример диплома, учебные материалы` : 'студенческие работы'}
       />
@@ -1337,12 +1349,38 @@ export default function WorkDetailPage() {
             <div className="glass-card tech-border rounded-xl p-4 md:p-6 lg:sticky lg:top-20 hover:shadow-xl transition-all">
               <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
                 <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
-                <div className="flex items-baseline justify-center gap-1.5">
-                  <span className="text-3xl md:text-4xl font-extrabold text-primary">
-                    {work.price.toLocaleString()}
-                  </span>
-                  <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
-                </div>
+                {work.discount ? (
+                  <div className="space-y-1">
+                    <div className="flex items-baseline justify-center gap-1.5">
+                      <span className="text-lg text-gray-400 line-through">
+                        {work.price.toLocaleString()}
+                      </span>
+                      <span className="text-sm text-gray-400">баллов</span>
+                    </div>
+                    <div className="flex items-baseline justify-center gap-1.5">
+                      <span className="text-3xl md:text-4xl font-extrabold text-green-600">
+                        {Math.round(work.price * (1 - work.discount / 100)).toLocaleString()}
+                      </span>
+                      <span className="text-base md:text-lg font-medium text-green-600">баллов</span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {formatPrice(pointsToRubles(Math.round(work.price * (1 - work.discount / 100))))}₽
+                    </div>
+                    <Badge className="bg-red-500 text-white mt-2">−{work.discount}%</Badge>
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <div className="flex items-baseline justify-center gap-1.5">
+                      <span className="text-3xl md:text-4xl font-extrabold text-primary">
+                        {work.price.toLocaleString()}
+                      </span>
+                      <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {formatPrice(pointsToRubles(work.price))}₽
+                    </div>
+                  </div>
+                )}
               </div>
 
 
@@ -1375,7 +1413,7 @@ export default function WorkDetailPage() {
                 ) : (
                   <>
                     <Icon name="Download" size={18} className="mr-2" />
-                    Получить доступ за {work.price} баллов
+                    Получить доступ за {work.discount ? Math.round(work.price * (1 - work.discount / 100)) : work.price} баллов
                   </>
                 )}
               </Button>
@@ -1465,8 +1503,13 @@ export default function WorkDetailPage() {
                       <Badge variant="outline" className="text-xs">
                         {similarWork.subject}
                       </Badge>
-                      <div className="text-sm font-bold text-primary">
-                        {similarWork.price} ₽
+                      <div className="flex flex-col items-end">
+                        <div className="text-sm font-bold text-primary">
+                          {similarWork.price} баллов
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {formatPrice(pointsToRubles(similarWork.price))}₽
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -151,7 +151,7 @@ export default function BuyPointsPage() {
           </Button>
 
           <h1 className="text-4xl font-bold mb-2">Покупка баллов</h1>
-          <p className="text-muted-foreground">1 балл = 1₽. Пакеты с бонусами выгоднее</p>
+          <p className="text-muted-foreground">1 балл = 5₽. Пакеты с бонусами выгоднее</p>
           
           {/* Триггер срочности - таймер */}
           <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-red-50 border border-red-200 rounded-lg">

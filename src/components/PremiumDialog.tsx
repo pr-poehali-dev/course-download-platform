@@ -164,19 +164,19 @@ export default function PremiumDialog({
                 <div className="space-y-2">
                   <div className="flex justify-between items-center p-2 bg-white rounded-lg">
                     <span className="text-muted-foreground">Без Premium: 10 работ по 100 баллов</span>
-                    <span className="font-bold text-red-600">1000₽</span>
+                    <span className="font-bold text-red-600">5000₽</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-white rounded-lg">
                     <span className="text-muted-foreground">С Premium: 10 работ по 70 баллов</span>
-                    <span className="font-bold text-green-600">700₽</span>
+                    <span className="font-bold text-green-600">3500₽</span>
                   </div>
                   <div className="flex justify-between items-center p-2 bg-white rounded-lg">
                     <span className="text-muted-foreground">+ Подписка</span>
                     <span className="font-bold">+399₽</span>
                   </div>
                   <div className="border-t-2 border-purple-300 pt-2 flex justify-between items-center">
-                    <span className="font-bold text-lg">Итого экономия:</span>
-                    <span className="font-bold text-2xl text-green-600">-99₽</span>
+                    <span className="font-bold text-lg">Экономия:</span>
+                    <span className="font-bold text-2xl text-green-600">1101₽!</span>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground italic mt-2">

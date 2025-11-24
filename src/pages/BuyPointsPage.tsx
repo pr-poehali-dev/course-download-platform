@@ -51,7 +51,7 @@ export default function BuyPointsPage() {
       points: 100,
       price: 500,
       bonus: 10,
-      description: '1 реферат или эссе'
+      description: 'Для пробы'
     },
     {
       id: 2,
@@ -59,21 +59,21 @@ export default function BuyPointsPage() {
       price: 3000,
       bonus: 100,
       popular: true,
-      description: '1 курсовая + 1 реферат'
+      description: 'Самый популярный'
     },
     {
       id: 3,
       points: 1500,
       price: 7500,
       bonus: 300,
-      description: '1 диплом + 3 реферата'
+      description: 'Выгодная сделка'
     },
     {
       id: 4,
       points: 3000,
       price: 15000,
       bonus: 700,
-      description: '1 магистерская + 2 курсовые'
+      description: 'Максимальная выгода'
     }
   ];
 
@@ -173,11 +173,11 @@ export default function BuyPointsPage() {
             >
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
-                  <CardTitle className="text-2xl">{pkg.points + pkg.bonus} баллов</CardTitle>
+                  <CardTitle className="text-2xl">{pkg.points + pkg.bonus}</CardTitle>
                   <div className="flex gap-2">
                     {pkg.popular && (
                       <>
-                        <Badge className="bg-primary">⭐ Популярно</Badge>
+                        <Badge className="bg-primary">Популярно</Badge>
                         <Badge className="bg-red-600 text-white animate-pulse">
                           <Icon name="Flame" size={12} className="mr-1" />
                           Акция
@@ -186,9 +186,7 @@ export default function BuyPointsPage() {
                     )}
                   </div>
                 </div>
-                <CardDescription className="text-base font-medium">
-                  📚 {pkg.description}
-                </CardDescription>
+                <CardDescription>{pkg.description}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -297,7 +295,7 @@ export default function BuyPointsPage() {
                 Как использовать баллы?
               </h4>
               <p className="text-sm text-muted-foreground">
-                Баллы используются для покупки студенческих работ в нашем каталоге. 1 балл = 5 рублей при покупке работ. Покупайте больше баллов — получайте больше бонусных баллов в подарок!
+                Баллы используются для покупки студенческих работ в нашем каталоге. 1 балл = 1 рубль при покупке работ. Покупайте больше баллов — получайте больше бонусных баллов в подарок!
               </p>
             </div>
 

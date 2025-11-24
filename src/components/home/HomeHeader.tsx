@@ -47,7 +47,7 @@ export default function HomeHeader({
             <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
             <div className="flex flex-col min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-              <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Маркетплейс учебных материалов</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Готовые студенческие работы</p>
             </div>
           </div>
           
@@ -102,7 +102,7 @@ export default function HomeHeader({
                     <Icon name="Coins" size={16} className="text-primary sm:w-5 sm:h-5" />
                     <span className="text-sm sm:text-base font-bold text-primary">{userBalance}</span>
                   </div>
-                  <p className="text-[10px] text-center text-muted-foreground">{(userBalance * 5).toLocaleString('ru-RU')}₽ • {availableWorks} работ</p>
+                  <p className="text-[10px] text-center text-muted-foreground">Доступно работ: {availableWorks}</p>
                 </div>
 
                 <DropdownMenu>
@@ -115,7 +115,7 @@ export default function HomeHeader({
                     <DropdownMenuLabel>
                       <div className="flex flex-col">
                         <span>{username}</span>
-                        <span className="text-xs text-muted-foreground font-normal">{userBalance} баллов ({(userBalance * 5).toLocaleString('ru-RU')}₽)</span>
+                        <span className="text-xs text-muted-foreground font-normal">{userBalance} баллов</span>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />

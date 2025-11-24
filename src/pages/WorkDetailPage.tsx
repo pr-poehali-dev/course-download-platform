@@ -16,9 +16,6 @@ import { getFakeAuthor, incrementViewCount, getViewCount } from '@/utils/fakeAut
 import ReviewsSection from '@/components/ReviewsSection';
 import WorkActivityTracker from '@/components/WorkActivityTracker';
 import { toast } from '@/components/ui/use-toast';
-import { pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
-import AgeBanner from '@/components/AgeBanner';
-import AgeVerificationModal from '@/components/AgeVerificationModal';
 
 
 interface Work {
@@ -42,7 +39,6 @@ interface Work {
   downloadsCount?: number;
   reviewsCount?: number;
   keywords?: string[];
-  discount?: number;
 }
 
 export default function WorkDetailPage() {
@@ -612,23 +608,17 @@ export default function WorkDetailPage() {
         downloadToken = tokenData.token;
       } else {
         // Если не куплена, пытаемся купить за баллы (используем freshUser!)
-        const finalPrice = work.discount 
-          ? Math.round(work.price * (1 - work.discount / 100)) 
-          : work.price;
-        
         console.log('💰 Work not purchased, attempting to purchase with баллы...', { 
           url: PURCHASE_WORK_URL, 
           userId, 
           workId: actualWorkId, 
-          price: finalPrice,
-          originalPrice: work.price,
-          discount: work.discount,
+          price: work.price,
           userBalance: freshUser.balance,
           userRole: freshUser.role
         });
         toast({
           title: '💰 Покупка работы',
-          description: `Списываем ${finalPrice} баллов с баланса ${freshUser.balance}...`,
+          description: `Списываем ${work.price} баллов с баланса ${freshUser.balance}...`,
           duration: 3000,
         });
         const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
@@ -640,7 +630,7 @@ export default function WorkDetailPage() {
           body: JSON.stringify({
             workId: actualWorkId,
             userId: userId,
-            price: finalPrice
+            price: work.price
           })
         });
         
@@ -964,21 +954,14 @@ export default function WorkDetailPage() {
     return null;
   }
 
-  const finalPrice = work.discount 
-    ? Math.round(work.price * (1 - work.discount / 100)) 
-    : work.price;
-
   return (
-    <>
-      <AgeVerificationModal />
-      <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
-        <SEO 
-          title={work ? `${work.title} — пример для изучения (18+)` : 'Просмотр примера работы'}
-          description={work ? `Пример ${work.workType} по предмету "${work.subject}" ТОЛЬКО для ознакомления и изучения структуры. ${work.description.substring(0, 150)}` : 'Пример работы для изучения структуры и оформления 18+'}
-          keywords={work ? `пример ${work.workType}, ${work.subject}, образец для изучения, референсная работа, материалы 18+` : 'примеры работ для изучения'}
-        />
-        <AgeBanner />
-        <Navigation isLoggedIn={isLoggedIn} />
+    <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
+      <SEO 
+        title={work ? `${work.title} — купить за ${work.price} баллов` : 'Просмотр работы'}
+        description={work ? `${work.workType} по предмету "${work.subject}". ${work.description.substring(0, 150)}` : 'Детальная информация о студенческой работе'}
+        keywords={work ? `${work.workType}, ${work.subject}, курсовая, диплом, купить` : 'студенческие работы'}
+      />
+      <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-4 md:py-6 mt-16 max-w-[1200px]">
         <Button 
@@ -1354,32 +1337,12 @@ export default function WorkDetailPage() {
             <div className="glass-card tech-border rounded-xl p-4 md:p-6 lg:sticky lg:top-20 hover:shadow-xl transition-all">
               <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
                 <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
-                {work.discount ? (
-                  <div className="space-y-1">
-                    <div className="flex items-baseline justify-center gap-1.5">
-                      <span className="text-lg text-gray-400 line-through">
-                        {work.price.toLocaleString()}
-                      </span>
-                      <span className="text-sm text-gray-400">баллов</span>
-                    </div>
-                    <div className="flex items-baseline justify-center gap-1.5">
-                      <span className="text-3xl md:text-4xl font-extrabold text-green-600">
-                        {Math.round(work.price * (1 - work.discount / 100)).toLocaleString()}
-                      </span>
-                      <span className="text-base md:text-lg font-medium text-green-600">баллов</span>
-                    </div>
-                    <Badge className="bg-red-500 text-white mt-2">−{work.discount}%</Badge>
-                  </div>
-                ) : (
-                  <div className="space-y-1">
-                    <div className="flex items-baseline justify-center gap-1.5">
-                      <span className="text-3xl md:text-4xl font-extrabold text-primary">
-                        {work.price.toLocaleString()}
-                      </span>
-                      <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
-                    </div>
-                  </div>
-                )}
+                <div className="flex items-baseline justify-center gap-1.5">
+                  <span className="text-3xl md:text-4xl font-extrabold text-primary">
+                    {work.price.toLocaleString()}
+                  </span>
+                  <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
+                </div>
               </div>
 
 
@@ -1412,7 +1375,7 @@ export default function WorkDetailPage() {
                 ) : (
                   <>
                     <Icon name="Download" size={18} className="mr-2" />
-                    Получить доступ за {work.discount ? Math.round(work.price * (1 - work.discount / 100)) : work.price} баллов
+                    Купить за {work.price} баллов
                   </>
                 )}
               </Button>
@@ -1423,7 +1386,7 @@ export default function WorkDetailPage() {
                 className="w-full font-semibold rounded-lg mb-4 md:mb-5 h-10 md:h-11 text-sm md:text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => {
                   if (!isPurchased) {
-                    alert('⚠️ Сначала нужно получить доступ к работе, чтобы создать пакет для защиты');
+                    alert('⚠️ Сначала нужно купить работу, чтобы создать пакет для защиты');
                     return;
                   }
                   navigate(`/defense-kit?workId=${actualWorkId}`);
@@ -1431,7 +1394,7 @@ export default function WorkDetailPage() {
                 disabled={!isPurchased}
               >
                 <Icon name="GraduationCap" size={18} className="mr-2" />
-                {isPurchased ? 'Создать пакет для защиты' : '🔒 Получите доступ для пакета защиты'}
+                {isPurchased ? 'Создать пакет для защиты' : '🔒 Купите работу для пакета защиты'}
               </Button>
 
               <div className="space-y-2.5 md:space-y-3">
@@ -1502,13 +1465,8 @@ export default function WorkDetailPage() {
                       <Badge variant="outline" className="text-xs">
                         {similarWork.subject}
                       </Badge>
-                      <div className="flex flex-col items-end">
-                        <div className="text-sm font-bold text-primary">
-                          {similarWork.price} баллов
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {formatPrice(pointsToRubles(similarWork.price))}₽
-                        </div>
+                      <div className="text-sm font-bold text-primary">
+                        {similarWork.price} ₽
                       </div>
                     </div>
                   </div>
@@ -1631,6 +1589,5 @@ export default function WorkDetailPage() {
 
       <Footer />
     </div>
-    </>
   );
 }

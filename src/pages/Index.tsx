@@ -30,8 +30,6 @@ import RecentlyViewed from '@/components/RecentlyViewed';
 import FAQSection from '@/components/FAQSection';
 
 import AgeBadge from '@/components/AgeBadge';
-import AgeBanner from '@/components/AgeBanner';
-import AgeVerificationModal from '@/components/AgeVerificationModal';
 import CookieBanner from '@/components/CookieBanner';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 import SEO from '@/components/SEO';
@@ -40,12 +38,8 @@ import RotatingText from '@/components/home/RotatingText';
 import NewsSection from '@/components/NewsSection';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
-import GuaranteesSection from '@/components/GuaranteesSection';
-import TestimonialsSection from '@/components/TestimonialsSection';
-import AnimatedHeroText from '@/components/AnimatedHeroText';
-import AnimatedCounter from '@/components/AnimatedCounter';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
-
+import TestExitModal from '@/components/TestExitModal';
 
 
 
@@ -467,16 +461,15 @@ export default function Index() {
   return (
     <>
       <SEO 
-        title="Tech Forma — База референсных работ для изучения (18+)"
-        description="500+ примеров работ ТОЛЬКО для ознакомления и изучения структуры по ГОСТ. Справочные материалы 18+"
-        keywords="примеры работ для ознакомления, референсные работы для изучения, база примеров курсовых, образцы оформления по ГОСТ"
+        title="Главная"
+        description="Маркетплейс студенческих работ для студентов. Покупай готовые курсовые и дипломы за баллы, продавай свои работы"
+        keywords="курсовые работы купить, дипломы, рефераты, студенческие работы, маркетплейс работ, готовые курсовые, учебные материалы"
       />
-      <AgeVerificationModal />
       <PurchaseNotifications />
       <ExitIntentModal />
+      <TestExitModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-white">
-        <AgeBanner />
         <header className="glass-card tech-border sticky top-0 z-50 w-full shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-4">
             <div className="flex items-center justify-between gap-2">
@@ -484,7 +477,7 @@ export default function Index() {
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
                 <div className="flex flex-col min-w-0">
                   <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Маркетплейс учебных материалов</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Платформа для студентов</p>
                 </div>
               </div>
               
@@ -664,7 +657,7 @@ export default function Index() {
               <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 glass-card rounded-full mb-4 sm:mb-8 animate-fade-in border border-blue-500/20">
                 <Icon name="Sparkles" size={18} className="text-blue-600 sm:w-5 sm:h-5" />
                 <span className="text-xs sm:text-sm font-semibold text-slate-700">
-                  База примеров для изучения структуры работ (18+)
+                  Профессиональная платформа для студентов
                 </span>
               </div>
               
@@ -674,37 +667,13 @@ export default function Index() {
                 </h2>
               </div>
               
-              <AnimatedHeroText />
-              
-              <div className="mb-8 px-4">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-700">
-                  <span className="inline-block bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    <AnimatedCounter target={500} duration={2500} />+ работ
-                  </span>
-                  <span className="ml-2 text-slate-500 text-lg sm:text-xl md:text-2xl font-normal">в каталоге</span>
-                </p>
+              <div className="mb-6 sm:mb-8">
+                <RotatingText />
               </div>
-
-              {!isLoggedIn && (
-                <div className="mb-8 px-4">
-                  <div className="relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 rounded-2xl shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 hover:scale-105 animate-pulse-slow">
-                    <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 rounded-2xl blur-xl opacity-50 animate-pulse"></div>
-                    <div className="relative flex items-center gap-3">
-                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                        <Icon name="Gift" size={24} className="text-white" />
-                      </div>
-                      <div className="text-left">
-                        <p className="text-white font-black text-lg sm:text-xl tracking-tight">
-                          1000 баллов в подарок
-                        </p>
-                        <p className="text-violet-100 text-xs sm:text-sm font-medium">
-                          Это 5000₽ на первые покупки 🎉
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
+              
+              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
+                Покупай готовые курсовые и дипломы за баллы. Продавай свои работы и зарабатывай.
+              </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
                 <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
@@ -713,24 +682,16 @@ export default function Index() {
                     Смотреть каталог
                   </a>
                 </Button>
-                {!isLoggedIn && (
-                  <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-sm sm:text-base lg:text-lg shadow-xl" onClick={() => setAuthDialogOpen(true)}>
-                    <Icon name="Gift" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                    Получить подарок
-                  </Button>
-                )}
-                {isLoggedIn && (
-                  <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg shadow-xl border-2" onClick={() => setProfileDialogOpen(true)}>
-                    <Icon name="Upload" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
-                    Загрузить работу
-                  </Button>
-                )}
+                <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg shadow-xl border-2" onClick={() => !isLoggedIn ? setAuthDialogOpen(true) : setProfileDialogOpen(true)}>
+                  <Icon name="Upload" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+                  Загрузить работу
+                </Button>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 max-w-4xl mx-auto px-2">
                 <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
                   <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-blue-600 to-blue-400 bg-clip-text text-transparent mb-2">500+</div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-600">Работ для изучения</p>
+                  <p className="text-xs sm:text-sm font-medium text-slate-600">Готовых работ</p>
                 </div>
                 <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
                   <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-purple-600 to-purple-400 bg-clip-text text-transparent mb-2">
@@ -767,10 +728,10 @@ export default function Index() {
                 Возможности платформы
               </Badge>
               <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">
-                База референсных материалов
+                Всё для успешной учёбы
               </h2>
               <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-                Примеры работ для изучения структуры и оформления (18+)
+                Современные инструменты для студентов
               </p>
             </div>
 
@@ -785,21 +746,21 @@ export default function Index() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <CardTitle className="text-2xl">Каталог примеров работ</CardTitle>
-                  <CardDescription className="text-base">Доступ к примерам для ознакомления</CardDescription>
+                  <CardTitle className="text-2xl">Маркетплейс работ</CardTitle>
+                  <CardDescription className="text-base">Покупай за баллы от 100</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Примеры курсовых, дипломов, чертежей</span>
+                    <span>Курсовые, дипломы, чертежи</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Для изучения структуры и оформления</span>
+                    <span>Мгновенный доступ</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Только для ознакомления (18+)</span>
+                    <span>Обмен знаниями</span>
                   </div>
                   <Button className="w-full mt-4" variant="outline" asChild>
                     <a href="/catalog">
@@ -820,22 +781,22 @@ export default function Index() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <CardTitle className="text-2xl">Размести свои работы</CardTitle>
-                  <CardDescription className="text-base">Помогай изучать правильное оформление</CardDescription>
+                  <CardTitle className="text-2xl">Стань автором</CardTitle>
+                  <CardDescription className="text-base">Делись знаниями с сообществом</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Размещай примеры своих работ</span>
+                    <span>Публикуй свои работы</span>
                   </div>
 
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Статистика просмотров</span>
+                    <span>Статистика скачиваний</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Только для ознакомления (18+)</span>
+                    <span>Обмен знаниями</span>
                   </div>
                   <Button 
                     className="w-full mt-4" 
@@ -870,10 +831,6 @@ export default function Index() {
           </div>
         </section>
 
-        <GuaranteesSection />
-        
-        <TestimonialsSection />
-
         <section className="py-20 bg-white relative overflow-hidden">
           <div className="absolute top-10 left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
@@ -886,10 +843,10 @@ export default function Index() {
                   Профессиональные инструменты
                 </Badge>
                 <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">
-                  Справочная база для студентов
+                  Технологичная платформа для студентов
                 </h2>
                 <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-                  Примеры работ для изучения структуры оформления (18+)
+                  Всё необходимое для успешной учёбы в одном месте
                 </p>
               </div>
 
@@ -1466,7 +1423,7 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="HelpCircle" size={20} className="text-primary" />
-                    Как получить доступ к примерам работ?
+                    Как купить работу на платформе?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -1480,12 +1437,12 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="Shield" size={20} className="text-primary" />
-                    Для чего нужны примеры работ?
+                    Какая уникальность готовых работ?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Все работы предоставлены для ознакомления и изучения структуры оформления. Используйте их как референс для понимания требований ГОСТ, структуры разделов и стиля изложения при подготовке собственной работы.
+                    Уникальность готовых работ составляет от 95%.
                   </p>
                 </CardContent>
               </Card>
@@ -1541,7 +1498,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    В каталоге 500+ примеров работ по техническим дисциплинам для ознакомления: курсовые проекты, дипломные работы, лабораторные, чертежи. База референсных материалов пополняется ежедневно.
+                    В каталоге 500+ работ по техническим дисциплинам. База пополняется ежедневно.
                   </p>
                 </CardContent>
               </Card>
@@ -1564,12 +1521,12 @@ export default function Index() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Icon name="Upload" size={20} className="text-primary" />
-                    Могу ли я размещать свои работы как примеры?
+                    Могу ли я продавать свои работы?
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Да! Размещайте свои работы как референсные материалы для ознакомления. За каждую размещённую работу вы получаете баллы. Вы подтверждаете авторство и несёте ответственность за содержание.
+                    Да! Загружайте свои курсовые, дипломы и рефераты. За каждую загруженную работу вы получаете баллы, а за каждую покупку — 90% от стоимости. Это отличный способ заработать на старых работах.
                   </p>
                 </CardContent>
               </Card>
@@ -1583,7 +1540,7 @@ export default function Index() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Tech Forma — это маркетплейс (посредник), предоставляющий техническую платформу для обмена учебными материалами. Все материалы предназначены исключительно для ознакомления и самостоятельной переработки. Пользователь самостоятельно несёт ответственность за их использование.
+                    Да, покупка готовых работ как образцов для изучения абсолютно легальна. Это аналогично покупке учебника или методического пособия. Важно использовать материал этично: дорабатывать, перефразировать и добавлять авторские идеи.
                   </p>
                 </CardContent>
               </Card>
@@ -1642,10 +1599,11 @@ export default function Index() {
             </div>
 
             <div className="border-t mt-8 pt-8">
-              <div className="flex flex-col items-center gap-3 text-center">
-                <p className="text-sm text-muted-foreground">
-                  © 2025 Tech Forma. Все права защищены.
-                </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-sm text-muted-foreground">
+                <p>© 2025 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
+                <div className="flex items-center justify-center">
+                  <AgeBadge />
+                </div>
               </div>
             </div>
           </div>
@@ -1715,8 +1673,6 @@ export default function Index() {
       />
 
       <CookieBanner />
-      <AgeBanner />
-      <AgeVerificationModal />
     </>
   );
 }

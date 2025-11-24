@@ -233,14 +233,14 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
           <div>
             {work.discount ? (
               <div className="flex flex-col">
-                <span className="text-xs text-gray-400 line-through">{work.price} баллов</span>
-                <span className="text-2xl font-bold text-green-600">{Math.round(finalPrice)} баллов</span>
-                <span className="text-xs text-gray-500">{formatPrice(priceInRubles)}₽</span>
+                <span className="text-xs text-gray-400 line-through">{formatPrice(pointsToRubles(work.price))}₽</span>
+                <span className="text-2xl font-bold text-green-600">{formatPrice(priceInRubles)}₽</span>
+                <span className="text-xs text-gray-500">{Math.round(finalPrice)} баллов</span>
               </div>
             ) : (
               <div className="flex flex-col">
-                <span className="text-2xl font-bold text-gray-900">{work.price} баллов</span>
-                <span className="text-xs text-gray-500">{formatPrice(priceInRubles)}₽</span>
+                <span className="text-2xl font-bold text-gray-900">{formatPrice(priceInRubles)}₽</span>
+                <span className="text-xs text-gray-500">{work.price} баллов</span>
               </div>
             )}
           </div>

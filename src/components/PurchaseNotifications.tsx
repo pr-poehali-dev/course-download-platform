@@ -12,9 +12,9 @@ interface Notification {
 }
 
 const FAKE_NAMES = [
-  'Alex_2024', 'Mari_Student', 'Dima_SPb', 'Elena_99', 'Ivan_MGU',
-  'Anna_Lux', 'Sergey_Tech', 'Olga_R', 'Max_Boss', 'Tanya_N',
-  'Andrey_Code', 'Natasha_D', 'Pavel_K', 'Kate_Study', 'Vlad_Power'
+  'Александр К.', 'Мария В.', 'Дмитрий С.', 'Елена П.', 'Иван М.',
+  'Анна Л.', 'Сергей Т.', 'Ольга Р.', 'Максим Б.', 'Татьяна Н.',
+  'Андрей Ж.', 'Наталья Д.', 'Павел К.', 'Екатерина С.', 'Владимир И.'
 ];
 
 const WORK_TYPES = [
@@ -40,7 +40,7 @@ export default function PurchaseNotifications() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    // Показываем уведомление каждые 15 минут
+    // Показываем уведомление каждые 15-30 секунд
     const showNotification = () => {
       const notification = generateNotification();
       setNotifications([notification]);
@@ -52,13 +52,13 @@ export default function PurchaseNotifications() {
       }, 5000);
     };
 
-    // Первое уведомление через 15 секунд после загрузки страницы
-    const initialTimeout = setTimeout(showNotification, 15000);
+    // Первое уведомление через 5 секунд после загрузки страницы
+    const initialTimeout = setTimeout(showNotification, 5000);
 
-    // Последующие уведомления каждые 15 минут (900000 мс)
+    // Последующие уведомления каждые 20-30 секунд
     const interval = setInterval(() => {
       showNotification();
-    }, 900000);
+    }, 20000 + Math.random() * 10000);
 
     return () => {
       clearTimeout(initialTimeout);

@@ -17,10 +17,7 @@ import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
-import AgeBanner from '@/components/AgeBanner';
-import AgeVerificationModal from '@/components/AgeVerificationModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
-import { getCurrentViewers, getLastPurchaseTime, pointsToRubles, formatPrice } from '@/utils/urgencyTriggers';
 
 interface Work {
   id: string;
@@ -411,7 +408,7 @@ export default function CatalogPage() {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     'name': 'Каталог студенческих работ',
-    'description': 'Примеры курсовых, дипломов, рефератов, чертежей для изучения',
+    'description': 'Готовые курсовые, дипломы, рефераты, чертежи от 200₽',
     'numberOfItems': filteredWorks.length,
     'itemListElement': filteredWorks.slice(0, 20).map((work, index) => ({
       '@type': 'ListItem',
@@ -443,27 +440,25 @@ export default function CatalogPage() {
   return (
     <>
       <SEO 
-        title="Каталог примеров работ (18+)"
-        description="Каталог примеров работ для изучения: курсовые, дипломы, рефераты, чертежи. Доступ к примерам за баллы. Только для ознакомления 18+"
-        keywords="примеры работ, образцы курсовых, примеры дипломов, референсные работы, каталог примеров для изучения, материалы 18+"
+        title="Каталог работ"
+        description="Каталог студенческих работ: курсовые, дипломы, рефераты, чертежи. Купить готовые работы за баллы по выгодным ценам"
+        keywords="курсовые работы, дипломы, рефераты, чертежи, купить студенческие работы, каталог работ, готовые работы"
       />
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify(jsonLdSchema)}
         </script>
       </Helmet>
-      <AgeVerificationModal />
       <PurchaseNotifications />
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
-      <AgeBanner />
       <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">Каталог примеров работ (18+)</h1>
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">Каталог готовых работ</h1>
             <Badge className="glass-card border-blue-200 text-sm">
               <Icon name="FileText" size={14} className="mr-1" />
               {filteredWorks.length} {filteredWorks.length === 1 ? 'работа' : filteredWorks.length < 5 ? 'работы' : 'работ'}
@@ -514,10 +509,6 @@ export default function CatalogPage() {
             <TooltipProvider>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                 {filteredWorks.map((work) => {
-                  const currentViewers = getCurrentViewers(work.id);
-                  const lastPurchaseMinutes = getLastPurchaseTime(work.id);
-                  const priceInRubles = pointsToRubles(work.price);
-                  
                   const cardContent = (
                     <>
                       <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
@@ -614,23 +605,6 @@ export default function CatalogPage() {
                       {work.description}
                     </p>
                     
-                    <div className="flex items-center justify-between gap-2 mb-3 text-xs">
-                      <div className="flex items-center gap-1.5 py-1 px-2 bg-blue-50 border border-blue-200 rounded-lg">
-                        <div className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-                        <span className="text-blue-700 font-medium">
-                          {currentViewers} {currentViewers === 1 ? 'смотрит' : currentViewers < 5 ? 'смотрят' : 'смотрят'}
-                        </span>
-                      </div>
-                      {lastPurchaseMinutes <= 30 && (
-                        <div className="flex items-center gap-1 text-green-700">
-                          <Icon name="Clock" size={11} className="text-green-600" />
-                          <span className="font-medium">
-                            {lastPurchaseMinutes}м назад
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    
                     <div className="space-y-2 mb-3">
                       <div className="flex items-center gap-2 text-xs text-gray-600">
                         <Icon name="Package" size={14} className="text-blue-600" />
@@ -648,10 +622,16 @@ export default function CatalogPage() {
                         {work.discount ? (
                           <div className="flex flex-col">
                             <span className="text-xs text-gray-400 line-through">{work.price} б.</span>
-                            <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} баллов</span>
+                            <div className="flex flex-col">
+                              <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} б.</span>
+                              <span className="text-xs text-gray-500">({Math.round(work.price * (1 - work.discount / 100)) * 5}₽)</span>
+                            </div>
                           </div>
                         ) : (
-                          <span className="text-2xl font-bold text-gray-900">{work.price} баллов</span>
+                          <div className="flex flex-col">
+                            <span className="text-xl font-bold text-gray-900">{work.price} б.</span>
+                            <span className="text-xs text-gray-500">({work.price * 5}₽)</span>
+                          </div>
                         )}
                       </div>
                       <div className="flex gap-2 items-center">
@@ -672,18 +652,10 @@ export default function CatalogPage() {
                           </Button>
                         )}
                         {!isAdmin && (
-                          <Button
-                            size="sm"
-                            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold relative overflow-hidden group"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              window.location.href = `/work/${work.id}`;
-                            }}
-                          >
-                            <span className="relative z-10">Купить</span>
-                            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-                          </Button>
+                          <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5">
+                            <Icon name="ArrowRight" size={16} />
+                            Купить
+                          </div>
                         )}
                       </div>
                     </div>

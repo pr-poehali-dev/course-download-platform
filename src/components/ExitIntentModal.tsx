@@ -7,11 +7,15 @@ export default function ExitIntentModal() {
   const [hasShown, setHasShown] = useState(false);
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('user');
-    if (isLoggedIn) {
-      setHasShown(true);
-      return;
-    }
+    const handleMouseLeave = (e: MouseEvent) => {
+      if (hasShown) return;
+      
+      if (e.clientY <= 0) {
+        setIsVisible(true);
+        setHasShown(true);
+        localStorage.setItem('exit_intent_shown', Date.now().toString());
+      }
+    };
 
     const lastShown = localStorage.getItem('exit_intent_shown');
     if (lastShown) {
@@ -22,24 +26,9 @@ export default function ExitIntentModal() {
       }
     }
 
-    const timeOnPage = Date.now();
-    
-    const handleMouseLeave = (e: MouseEvent) => {
-      if (hasShown) return;
-      
-      const timeSpent = Date.now() - timeOnPage;
-      if (timeSpent < 30000) return;
-      
-      if (e.clientY <= 0) {
-        setIsVisible(true);
-        setHasShown(true);
-        localStorage.setItem('exit_intent_shown', Date.now().toString());
-      }
-    };
-
     setTimeout(() => {
       document.addEventListener('mouseleave', handleMouseLeave);
-    }, 30000);
+    }, 5000);
 
     return () => {
       document.removeEventListener('mouseleave', handleMouseLeave);
@@ -64,37 +53,37 @@ export default function ExitIntentModal() {
         </button>
 
         <div className="text-center mb-6">
-          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center">
-            <Icon name="Gift" size={40} className="text-white" />
+          <div className="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-red-500 to-orange-500 rounded-full flex items-center justify-center">
+            <Icon name="AlertCircle" size={40} className="text-white" />
           </div>
           <h2 className="text-3xl font-bold mb-3 text-gray-900">
-            Получите 1000 баллов! 🎁
+            Подождите! 🎁
           </h2>
           <p className="text-lg text-gray-600 mb-2">
-            Зарегистрируйтесь прямо сейчас
+            Не упустите специальное предложение
           </p>
           <p className="text-sm text-gray-500">
-            Это <span className="font-bold text-green-600">5000₽ в подарок</span> — получите доступ к материалам бесплатно!
+            Получите дополнительные <span className="font-bold text-green-600">+100 баллов</span> при первой покупке пакета
           </p>
         </div>
 
         <div className="space-y-3">
           <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-            <Icon name="Clock" size={24} className="text-green-600 flex-shrink-0" />
+            <Icon name="CheckCircle" size={24} className="text-green-600 flex-shrink-0" />
             <span className="text-sm text-gray-700">
-              Доступ к работе за 2 минуты после покупки
+              Мгновенный доступ к работе после оплаты
             </span>
           </div>
           <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <Icon name="Shield" size={24} className="text-blue-600 flex-shrink-0" />
             <span className="text-sm text-gray-700">
-              Возврат баллов в течение 24 часов, если не подошла работа
+              Гарантия возврата денег 7 дней
             </span>
           </div>
           <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-200">
             <Icon name="Zap" size={24} className="text-purple-600 flex-shrink-0" />
             <span className="text-sm text-gray-700">
-              Бонусные баллы до +700 при покупке пакетов
+              Только сегодня: бонус +100 баллов
             </span>
           </div>
         </div>
@@ -108,7 +97,7 @@ export default function ExitIntentModal() {
             className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold h-12"
           >
             <Icon name="Gift" size={18} className="mr-2" />
-            Пополнить баланс
+            Получить бонус
           </Button>
           <Button
             onClick={() => setIsVisible(false)}
@@ -120,7 +109,7 @@ export default function ExitIntentModal() {
         </div>
 
         <p className="text-xs text-center text-gray-400 mt-4">
-          Бонусные баллы начисляются автоматически при покупке пакетов
+          Предложение действует только для новых пользователей
         </p>
       </div>
 

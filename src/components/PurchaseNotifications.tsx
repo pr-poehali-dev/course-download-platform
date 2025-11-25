@@ -9,6 +9,7 @@ interface Notification {
   name: string;
   workType: string;
   timeAgo: string;
+  avatar: string;
 }
 
 const FAKE_NAMES = [
@@ -19,6 +20,11 @@ const FAKE_NAMES = [
   'hunter', 'comet', 'nova', 'viper', 'eagle'
 ];
 
+const AVATAR_PATTERNS = [
+  'abstract', 'bauhaus', 'beam', 'marble', 'pixel',
+  'ring', 'sunset', 'shapes'
+];
+
 const WORK_TYPES = [
   'курсовую работу', 'дипломную работу', 'реферат', 
   'отчёт по практике', 'контрольную работу', 'лабораторную работу'
@@ -27,13 +33,15 @@ const WORK_TYPES = [
 function generateNotification(): Notification {
   const randomName = FAKE_NAMES[Math.floor(Math.random() * FAKE_NAMES.length)];
   const randomWorkType = WORK_TYPES[Math.floor(Math.random() * WORK_TYPES.length)];
+  const randomPattern = AVATAR_PATTERNS[Math.floor(Math.random() * AVATAR_PATTERNS.length)];
   const minutesAgo = Math.floor(Math.random() * 45) + 1; // 1-45 минут назад
   
   return {
     id: Date.now(),
     name: randomName,
     workType: randomWorkType,
-    timeAgo: minutesAgo === 1 ? '1 минуту назад' : `${minutesAgo} минут назад`
+    timeAgo: minutesAgo === 1 ? '1 минуту назад' : `${minutesAgo} минут назад`,
+    avatar: `https://api.dicebear.com/7.x/${randomPattern}/svg?seed=${randomName}`
   };
 }
 
@@ -82,9 +90,11 @@ export default function PurchaseNotifications() {
       }}
     >
       <div className="bg-white dark:bg-gray-800 shadow-2xl rounded-lg p-4 pr-6 border border-gray-200 dark:border-gray-700 flex items-center gap-3 max-w-sm">
-        <div className="flex-shrink-0 w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
-          <Icon name="ShoppingBag" size={20} className="text-green-600 dark:text-green-400" />
-        </div>
+        <img 
+          src={notification.avatar} 
+          alt={notification.name}
+          className="flex-shrink-0 w-10 h-10 rounded-full"
+        />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
             {notification.name}

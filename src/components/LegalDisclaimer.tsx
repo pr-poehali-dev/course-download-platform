@@ -49,11 +49,10 @@ export default function LegalDisclaimer() {
                   ⚖️ Юридическая информация:
                 </p>
                 <p className="text-xs text-gray-600">
-                  Администратор: ИП Иванов Иван Иванович<br/>
-                  ИНН: 123456789012<br/>
-                  ОГРНИП: 123456789012345<br/>
+                  Администратор: ИП Гагарская Елизавета Александровна<br/>
+                  ИНН: 290540407146<br/>
                   Email: tech.forma@yandex.ru<br/>
-                  Адрес: г. Москва, ул. Примерная, д. 1, офис 1
+                  Адрес: г. Санкт-Петербург
                 </p>
 
                 <div className="mt-4 pt-4 border-t border-gray-300">

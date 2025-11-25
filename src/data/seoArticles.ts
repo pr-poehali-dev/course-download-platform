@@ -24,7 +24,7 @@ export const seoArticles: SEOArticle[] = [
       'купить готовую курсовую 2025'
     ],
     publishedAt: '2025-01-15',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cf4ec9f2-8937-4cdc-8478-e9adb8e7c1e3.jpg',
+    coverImage: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=1200&h=600&fit=crop',
     content: `# Где купить курсовую работу недорого в 2025 году — ТОП-5 платформ
 
 ## Введение
@@ -150,7 +150,7 @@ Work5 работает с 2010 года и имеет репутацию над�
       'как не попасть на мошенников'
     ],
     publishedAt: '2025-01-10',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/816465f3-69d3-4606-aed2-50f897edcaa9.jpg',
+    coverImage: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1200&h=600&fit=crop',
     content: `# Как купить курсовую работу безопасно — пошаговая инструкция 2025
 
 ## Введение
@@ -316,7 +316,7 @@ Work5 работает с 2010 года и имеет репутацию над�
       'дешевые курсовые работы'
     ],
     publishedAt: '2025-01-05',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e25efd0b-8d04-4b71-b6d0-2a3a0d0123a4.jpg',
+    coverImage: 'https://images.unsplash.com/photo-1554224311-beee460c201a?w=1200&h=600&fit=crop',
     content: `# Сколько стоит купить курсовую работу в 2025 году — актуальные цены
 
 ## Введение

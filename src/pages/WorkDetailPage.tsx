@@ -336,6 +336,7 @@ export default function WorkDetailPage() {
           const folderPublicUrl = data.yandex_disk_link || data.file_url || YANDEX_DISK_URL;
 
           const previewUrl: string | null = data.preview_image_url || null;
+          const coverImages: string[] = data.cover_images || [];
           
           // Get real composition and description from Yandex Disk
           let parsedDescription = data.description || generateDetailedDescription(workType, title, subject);
@@ -358,7 +359,9 @@ export default function WorkDetailPage() {
             console.log('Could not fetch real composition, using default');
           }
           
-          if (previewUrl) {
+          if (coverImages && coverImages.length > 0) {
+            setGallery(coverImages);
+          } else if (previewUrl) {
             setGallery([previewUrl]);
           }
           

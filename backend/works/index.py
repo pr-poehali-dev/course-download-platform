@@ -175,7 +175,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     SELECT id, title, work_type, subject, description, composition, 
                            price_points, rating, downloads, created_at, yandex_disk_link, 
                            preview_image_url, file_url, author_id, preview_urls,
-                           author_name, language, software, views_count, reviews_count, keywords, downloads_count
+                           author_name, language, software, views_count, reviews_count, keywords, downloads_count, cover_images, discount
                     FROM t_p63326274_course_download_plat.works WHERE id = %s
                 """, (work_id,))
                 row = cur.fetchone()
@@ -211,6 +211,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 else:
                     keywords = []
                 
+                cover_images = row[22] if row[22] else []
+                if not isinstance(cover_images, list):
+                    cover_images = []
+                
                 work = {
                     'id': row[0],
                     'title': row[1],
@@ -233,7 +237,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'views_count': row[18] or 0,
                     'reviews_count': row[19] or 0,
                     'keywords': keywords,
-                    'downloads_count': row[21] or 0
+                    'downloads_count': row[21] or 0,
+                    'cover_images': cover_images,
+                    'discount': row[23] or 0
                 }
                 
                 cur.execute("""
@@ -314,12 +320,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 query = f"""
                     SELECT id, title, work_type, subject, description, 
                            price_points, rating, downloads, category, preview_image_url, author_id, preview_urls,
-                           author_name, language, software, views_count, reviews_count, keywords, file_url, downloads_count
+                           author_name, language, software, views_count, reviews_count, keywords, file_url, downloads_count, discount
                     FROM t_p63326274_course_download_plat.works 
                     WHERE {where_sql}
                     ORDER BY created_at DESC
                     LIMIT %s OFFSET %s
-                """
+                    """
                 params.extend([limit, offset])
                 cur.execute(query, params)
                 
@@ -369,7 +375,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'reviews_count': row[16] or 0,
                         'keywords': keywords,
                         'file_url': row[18],
-                        'downloads_count': row[19] or 0
+                        'downloads_count': row[19] or 0,
+                        'discount': row[20] or 0
                     }
                     works.append(work)
                 

@@ -28,8 +28,6 @@ import AboutSection from '@/components/AboutSection';
 import RecentlyViewed from '@/components/RecentlyViewed';
 
 import FAQSection from '@/components/FAQSection';
-
-import AgeBadge from '@/components/AgeBadge';
 import CookieBanner from '@/components/CookieBanner';
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 import SEO from '@/components/SEO';

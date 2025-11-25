@@ -494,6 +494,43 @@ export default function WorkDetailPage() {
     fetchSimilarWorks();
   }, [work, actualWorkId]);
 
+  const handleDeleteWork = async () => {
+    if (!window.confirm('⚠️ Вы уверены, что хотите удалить эту работу? Это действие необратимо!')) {
+      return;
+    }
+    
+    try {
+      const response = await fetch(`${func2url['delete-work']}?workId=${actualWorkId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка удаления работы');
+      }
+      
+      toast({
+        title: '✅ Работа удалена',
+        description: 'Работа успешно удалена из каталога',
+      });
+      
+      setTimeout(() => {
+        navigate('/catalog');
+      }, 1500);
+    } catch (error) {
+      console.error('Error deleting work:', error);
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось удалить работу',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const handlePurchaseAndDownload = async () => {
     // Показываем сразу уведомление о начале
     toast({
@@ -1159,6 +1196,16 @@ export default function WorkDetailPage() {
                       disabled={uploadingImage}
                     />
                   </label>
+                  
+                  <Button 
+                    type="button"
+                    variant="destructive"
+                    className="w-full"
+                    onClick={handleDeleteWork}
+                  >
+                    <Icon name="Trash2" className="mr-2 h-4 w-4" />
+                    🗑️ Удалить работу
+                  </Button>
                 </div>
               )}
             </div>

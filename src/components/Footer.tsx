@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
-import AgeBadge from '@/components/AgeBadge';
 
 export default function Footer() {
   return (

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
+import { Helmet } from 'react-helmet-async';
 
 interface BreadcrumbItem {
   label: string;
@@ -24,10 +25,12 @@ export default function Breadcrumbs({ items }: BreadcrumbsProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(jsonLd)}
+        </script>
+      </Helmet>
+      
       <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6" aria-label="Хлебные крошки">
         {items.map((item, index) => (
           <div key={index} className="flex items-center gap-2">

@@ -19,7 +19,6 @@ import { Helmet } from 'react-helmet-async';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
-import Breadcrumbs from '@/components/Breadcrumbs';
 
 interface Work {
   id: string;
@@ -460,7 +459,8 @@ export default function CatalogPage() {
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
         <Breadcrumbs items={[
-          { name: 'Каталог работ', href: '/catalog' }
+          { label: 'Главная', href: '/' },
+          { label: 'Каталог работ' }
         ]} />
         
         <div className="mb-8">

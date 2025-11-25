@@ -8,6 +8,8 @@ import Icon from '@/components/ui/icon';
 import SEO from '@/components/SEO';
 import func2url from '../../backend/func2url.json';
 import ReactMarkdown from 'react-markdown';
+import { seoArticles, SEOArticle } from '@/data/seoArticles';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
 
 interface BlogPost {
   id: number;
@@ -27,13 +29,20 @@ export default function BlogPage() {
   const { slug } = useParams();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [currentPost, setCurrentPost] = useState<BlogPost | null>(null);
+  const [currentSEOArticle, setCurrentSEOArticle] = useState<SEOArticle | null>(null);
   const [loading, setLoading] = useState(true);
 
   const BLOG_API = func2url.blog;
 
   useEffect(() => {
     if (slug) {
-      loadPost(slug);
+      const seoArticle = seoArticles.find(a => a.slug === slug);
+      if (seoArticle) {
+        setCurrentSEOArticle(seoArticle);
+        setLoading(false);
+      } else {
+        loadPost(slug);
+      }
     } else {
       loadPosts();
     }
@@ -46,10 +55,34 @@ export default function BlogPage() {
       const data = await response.json();
 
       if (data.success) {
-        setPosts(data.posts);
+        const combinedPosts = [...data.posts, ...seoArticles.map(article => ({
+          id: parseInt(article.id),
+          title: article.title,
+          slug: article.slug,
+          excerpt: article.excerpt,
+          coverImageUrl: article.coverImage,
+          status: 'published',
+          viewsCount: 0,
+          publishedAt: article.publishedAt,
+          createdAt: article.publishedAt,
+          updatedAt: article.publishedAt
+        }))];
+        setPosts(combinedPosts);
       }
     } catch (error) {
       console.error('Failed to load posts:', error);
+      setPosts(seoArticles.map(article => ({
+        id: parseInt(article.id),
+        title: article.title,
+        slug: article.slug,
+        excerpt: article.excerpt,
+        coverImageUrl: article.coverImage,
+        status: 'published',
+        viewsCount: 0,
+        publishedAt: article.publishedAt,
+        createdAt: article.publishedAt,
+        updatedAt: article.publishedAt
+      })));
     } finally {
       setLoading(false);
     }
@@ -95,6 +128,100 @@ export default function BlogPage() {
     );
   }
 
+  if (currentSEOArticle) {
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      'headline': currentSEOArticle.title,
+      'description': currentSEOArticle.excerpt,
+      'datePublished': currentSEOArticle.publishedAt,
+      'author': {
+        '@type': 'Organization',
+        'name': 'Tech Forma'
+      },
+      'publisher': {
+        '@type': 'Organization',
+        'name': 'Tech Forma',
+        'logo': {
+          '@type': 'ImageObject',
+          'url': 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg'
+        }
+      },
+      'image': currentSEOArticle.coverImage,
+      'keywords': currentSEOArticle.keywords.join(', ')
+    };
+
+    return (
+      <>
+        <SEO
+          title={currentSEOArticle.title}
+          description={currentSEOArticle.excerpt}
+          keywords={currentSEOArticle.keywords.join(', ')}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <div className="min-h-screen bg-white">
+          <Navigation />
+          
+          <article className="container max-w-4xl mx-auto px-4 py-12 mt-16">
+            <Breadcrumbs items={[
+              { label: 'Главная', href: '/' },
+              { label: 'Блог', href: '/blog' },
+              { label: currentSEOArticle.title }
+            ]} />
+            
+            <Link to="/blog" className="inline-flex items-center text-primary hover:underline mb-8">
+              <Icon name="ArrowLeft" size={18} className="mr-2" />
+              Назад к блогу
+            </Link>
+
+            {currentSEOArticle.coverImage && (
+              <img
+                src={currentSEOArticle.coverImage}
+                alt={currentSEOArticle.title}
+                className="w-full h-[400px] object-cover rounded-2xl mb-8"
+              />
+            )}
+
+            <div className="flex items-center gap-4 mb-6 flex-wrap">
+              <Badge className="bg-primary text-white">{currentSEOArticle.category}</Badge>
+              <div className="flex items-center text-sm text-muted-foreground gap-4">
+                <div className="flex items-center gap-1">
+                  <Icon name="Calendar" size={16} />
+                  {formatDate(currentSEOArticle.publishedAt)}
+                </div>
+              </div>
+            </div>
+
+            <h1 className="text-4xl font-bold mb-6">{currentSEOArticle.title}</h1>
+
+            <div className="prose prose-lg max-w-none prose-headings:font-bold prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h3:text-xl prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-strong:text-primary prose-ul:my-4 prose-li:my-2 prose-table:border-collapse prose-table:w-full prose-th:border prose-th:p-3 prose-th:bg-gray-100 prose-td:border prose-td:p-3">
+              <ReactMarkdown>{currentSEOArticle.content}</ReactMarkdown>
+            </div>
+
+            <div className="mt-12 p-6 bg-primary/5 rounded-lg border border-primary/20">
+              <h3 className="text-xl font-bold mb-3">💡 Готовы купить курсовую работу?</h3>
+              <p className="text-muted-foreground mb-4">
+                На Tech Forma более 500 готовых работ от 200₽. Мгновенное скачивание, гарантия качества!
+              </p>
+              <a
+                href="/catalog"
+                className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-semibold"
+              >
+                <Icon name="BookOpen" size={18} className="mr-2" />
+                Смотреть каталог работ
+              </a>
+            </div>
+          </article>
+
+          <Footer />
+        </div>
+      </>
+    );
+  }
+
   if (currentPost) {
     return (
       <>
@@ -106,7 +233,13 @@ export default function BlogPage() {
         <div className="min-h-screen bg-white">
           <Navigation />
           
-          <article className="container max-w-4xl mx-auto px-4 py-12">
+          <article className="container max-w-4xl mx-auto px-4 py-12 mt-16">
+            <Breadcrumbs items={[
+              { label: 'Главная', href: '/' },
+              { label: 'Блог', href: '/blog' },
+              { label: currentPost.title }
+            ]} />
+            
             <Link to="/blog" className="inline-flex items-center text-primary hover:underline mb-8">
               <Icon name="ArrowLeft" size={18} className="mr-2" />
               Назад к блогу
@@ -157,11 +290,16 @@ export default function BlogPage() {
       <div className="min-h-screen bg-white">
         <Navigation />
 
-        <div className="container max-w-7xl mx-auto px-4 py-12">
+        <div className="container max-w-7xl mx-auto px-4 py-12 mt-16">
+          <Breadcrumbs items={[
+            { label: 'Главная', href: '/' },
+            { label: 'Блог' }
+          ]} />
+          
           <div className="mb-12">
-            <h1 className="text-5xl font-bold mb-4">Блог Tech Forma</h1>
+            <h1 className="text-5xl font-bold mb-4">Блог Tech Forma — полезные статьи для студентов</h1>
             <p className="text-xl text-muted-foreground">
-              Новости платформы, полезные статьи и обновления
+              Гайды по покупке курсовых работ, сравнения цен, инструкции и актуальная информация 2025 года
             </p>
           </div>
 

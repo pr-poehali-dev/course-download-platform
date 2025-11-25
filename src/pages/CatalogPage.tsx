@@ -5,6 +5,7 @@ import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import QuickViewModal from '@/components/catalog/QuickViewModal';
+import Breadcrumbs from '@/components/seo/Breadcrumbs';
 
 import CatalogFilters from '@/components/catalog/CatalogFilters';
 import PreviewCarousel from '@/components/PreviewCarousel';
@@ -18,6 +19,7 @@ import { Helmet } from 'react-helmet-async';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 interface Work {
   id: string;
@@ -457,6 +459,10 @@ export default function CatalogPage() {
       <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-6 mt-16 max-w-[1400px]">
+        <Breadcrumbs items={[
+          { name: 'Каталог работ', href: '/catalog' }
+        ]} />
+        
         <div className="mb-8">
           <div className="mb-8 text-center">
             <h1 className="text-3xl md:text-4xl font-bold mb-3">

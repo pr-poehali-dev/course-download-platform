@@ -66,14 +66,17 @@ export default function SEOContentSection() {
             </div>
 
             <p className="text-lg leading-relaxed">
-              <strong>Как купить курсовую работу на Tech Forma?</strong> Это очень просто: выберите нужную работу в каталоге, 
+              <strong>Как купить курсовую работу на Tech Forma?</strong> Это очень просто: выберите нужную работу в{' '}
+              <a href="/catalog" className="text-primary font-semibold hover:underline">каталоге готовых работ</a>, 
               добавьте в корзину, оплатите удобным способом и сразу получите доступ к скачиванию. 
               Весь процесс занимает не более 2-3 минут.
             </p>
 
             <p className="text-lg leading-relaxed">
-              Наш каталог регулярно пополняется новыми работами от студентов и авторов. 
+              Наш <a href="/catalog" className="text-primary font-semibold hover:underline">каталог студенческих работ</a>{' '}
+              регулярно пополняется новыми материалами от авторов. 
               Если вы не нашли нужную работу, вы можете заказать написание новой курсовой или дипломной работы у наших авторов.
+              Также рекомендуем почитать наш <a href="/blog" className="text-primary font-semibold hover:underline">блог с полезными статьями</a> для студентов.
             </p>
 
             <div className="bg-blue-50 p-6 rounded-lg border-l-4 border-primary">

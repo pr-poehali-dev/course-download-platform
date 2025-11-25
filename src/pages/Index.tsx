@@ -43,6 +43,9 @@ import SEOHeroSection from '@/components/home/SEOHeroSection';
 import WorkCategoriesSection from '@/components/home/WorkCategoriesSection';
 import SEOContentSection from '@/components/home/SEOContentSection';
 import SEOFAQSection from '@/components/home/SEOFAQSection';
+import PopularCategoriesLinks from '@/components/home/PopularCategoriesLinks';
+import CategoryLinksSection from '@/components/seo/CategoryLinksSection';
+import PopularSearches from '@/components/seo/PopularSearches';
 
 
 
@@ -470,6 +473,83 @@ export default function Index() {
         keywords="курсовые работы купить, дипломы купить, купить курсовую работу недорого, купить дипломную работу, готовые курсовые работы, готовые дипломы, где купить курсовую, купить курсовую цена, дипломная работа купить"
         canonical="https://techforma.pro/"
       />
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "EducationalOrganization",
+            "name": "Tech Forma",
+            "url": "https://techforma.pro",
+            "logo": "https://techforma.pro/logo.png",
+            "description": "Платформа для покупки готовых курсовых работ и дипломов от 200₽. 500+ студенческих работ с гарантией качества",
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "RU"
+            },
+            "contactPoint": {
+              "@type": "ContactPoint",
+              "email": "tech.forma@yandex.ru",
+              "contactType": "customer service"
+            },
+            "sameAs": [
+              "https://techforma.pro"
+            ],
+            "offers": {
+              "@type": "AggregateOffer",
+              "priceCurrency": "RUB",
+              "lowPrice": "200",
+              "highPrice": "3000",
+              "offerCount": "500"
+            }
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Где купить курсовую работу недорого?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "На Tech Forma вы можете купить готовые курсовые работы от 200₽. Это самые низкие цены на рынке студенческих работ. У нас более 500 готовых курсовых по всем предметам с гарантией уникальности 95%."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Сколько стоит купить курсовую работу?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Цены на готовые курсовые работы начинаются от 200₽ и зависят от предмета, объема и сложности. Средняя стоимость курсовой работы — 300-500₽."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Можно ли купить дипломную работу?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Да, в нашем каталоге есть готовые дипломные работы и ВКР по разным специальностям. Цены на дипломы начинаются от 500₽. Все дипломные работы проверены на уникальность."
+                }
+              }
+            ]
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Главная",
+                "item": "https://techforma.pro/"
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
       <PurchaseNotifications />
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
@@ -1576,7 +1656,13 @@ export default function Index() {
           </div>
         </section>
 
+        <CategoryLinksSection />
+        
+        <PopularSearches />
+        
         <SEOContentSection />
+        
+        <PopularCategoriesLinks />
         
         <SEOFAQSection />
 

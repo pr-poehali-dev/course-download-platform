@@ -41,6 +41,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     software = body_data.get('software')
     keywords = body_data.get('keywords')
     author_name = body_data.get('authorName')
+    cover_images = body_data.get('coverImages')
+    preview_image_url = body_data.get('previewImageUrl')
     
     if not work_id:
         return {
@@ -95,6 +97,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         else:
             escaped_author = author_name.replace("'", "''")
             updates.append(f"author_name = '{escaped_author}'")
+    
+    if cover_images is not None:
+        cover_images_json = json.dumps(cover_images, ensure_ascii=False).replace("'", "''")
+        updates.append(f"cover_images = '{cover_images_json}'")
+    
+    if preview_image_url is not None:
+        if preview_image_url == '':
+            updates.append("preview_image_url = NULL")
+        else:
+            escaped_preview = preview_image_url.replace("'", "''")
+            updates.append(f"preview_image_url = '{escaped_preview}'")
     
     if not updates:
         cursor.close()

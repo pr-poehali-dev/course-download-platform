@@ -87,14 +87,41 @@ export default function WorksManagement() {
   const handleSaveEdit = async () => {
     if (!editingWork) return;
 
-    toast({
-      title: 'Работа обновлена',
-      description: `"${editingWork.title}" успешно обновлена`
-    });
-    
-    const updatedWorks = works.map(w => w.id === editingWork.id ? editingWork : w);
-    setWorks(updatedWorks);
-    setEditingWork(null);
+    try {
+      const response = await fetch(func2url['update-work'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workId: editingWork.id,
+          title: editingWork.title,
+          description: editingWork.description,
+          composition: editingWork.composition,
+          coverImages: editingWork.cover_images || [],
+          previewImageUrl: editingWork.preview_image_url || ''
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Ошибка при обновлении работы');
+      }
+
+      toast({
+        title: 'Работа обновлена',
+        description: `"${editingWork.title}" успешно обновлена`
+      });
+      
+      const updatedWorks = works.map(w => w.id === editingWork.id ? editingWork : w);
+      setWorks(updatedWorks);
+      setEditingWork(null);
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось обновить работу',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleDelete = async (workId: number) => {

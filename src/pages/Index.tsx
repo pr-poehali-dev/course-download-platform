@@ -39,6 +39,10 @@ import NewsSection from '@/components/NewsSection';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
+import SEOHeroSection from '@/components/home/SEOHeroSection';
+import WorkCategoriesSection from '@/components/home/WorkCategoriesSection';
+import SEOContentSection from '@/components/home/SEOContentSection';
+import SEOFAQSection from '@/components/home/SEOFAQSection';
 
 
 
@@ -645,6 +649,16 @@ export default function Index() {
             )}
           </div>
         </header>
+
+        <SEOHeroSection onCatalogClick={() => window.location.href = '/catalog'} />
+
+        <WorkCategoriesSection onCatalogClick={(category) => {
+          if (category) {
+            window.location.href = `/catalog?category=${category}`;
+          } else {
+            window.location.href = '/catalog';
+          }
+        }} />
 
         <section className="relative py-12 sm:py-20 lg:py-32 overflow-hidden bg-gradient-to-b from-white via-blue-50/30 to-white">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiMzYjgyZjYiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
@@ -1562,7 +1576,9 @@ export default function Index() {
           </div>
         </section>
 
-        <FAQSection />
+        <SEOContentSection />
+        
+        <SEOFAQSection />
 
         <footer className="bg-muted/50 py-8 border-t">
           <div className="container mx-auto px-4">

@@ -51,7 +51,6 @@ export default function Footer() {
           <div className="flex flex-col items-center justify-center gap-3 text-center text-sm text-muted-foreground">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <p>© 2025 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
-              <AgeBadge />
             </div>
             <div className="text-xs opacity-75">
               <p>ИП Гагарская Елизавета Александровна | ИНН 290540407146</p>

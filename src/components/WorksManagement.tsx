@@ -127,13 +127,34 @@ export default function WorksManagement() {
   const handleDelete = async (workId: number) => {
     if (!confirm('Вы уверены, что хотите удалить эту работу?')) return;
 
-    const updatedWorks = works.filter(w => w.id !== workId);
-    setWorks(updatedWorks);
+    try {
+      const response = await fetch(`${func2url['delete-work']}?workId=${workId}`, {
+        method: 'DELETE',
+        headers: {
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        }
+      });
 
-    toast({
-      title: 'Работа удалена',
-      description: 'Работа успешно удалена из каталога'
-    });
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Ошибка при удалении работы');
+      }
+
+      const updatedWorks = works.filter(w => w.id !== workId);
+      setWorks(updatedWorks);
+
+      toast({
+        title: 'Работа удалена',
+        description: 'Работа успешно удалена из каталога'
+      });
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось удалить работу',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleStatusChange = async (workId: number, newStatus: 'active' | 'moderation' | 'blocked') => {

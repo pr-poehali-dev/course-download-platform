@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Missing workId",
+      "method": "DELETE",
+      "path": "/",
+      "expectedStatus": 400
+    },
+    {
+      "name": "Unauthorized access",
+      "method": "DELETE",
+      "path": "/?workId=1",
+      "expectedStatus": 403
+    }
+  ]
+}

@@ -39,6 +39,7 @@ interface Work {
   downloadsCount?: number;
   reviewsCount?: number;
   keywords?: string[];
+  discount?: number;
 }
 
 export default function WorkDetailPage() {
@@ -608,17 +609,23 @@ export default function WorkDetailPage() {
         downloadToken = tokenData.token;
       } else {
         // Если не куплена, пытаемся купить за баллы (используем freshUser!)
+        const finalPrice = work.discount 
+          ? Math.round(work.price * (1 - work.discount / 100))
+          : work.price;
+        
         console.log('💰 Work not purchased, attempting to purchase with баллы...', { 
           url: PURCHASE_WORK_URL, 
           userId, 
           workId: actualWorkId, 
-          price: work.price,
+          price: finalPrice,
+          originalPrice: work.price,
+          discount: work.discount,
           userBalance: freshUser.balance,
           userRole: freshUser.role
         });
         toast({
           title: '💰 Покупка работы',
-          description: `Списываем ${work.price} баллов с баланса ${freshUser.balance}...`,
+          description: `Списываем ${finalPrice} баллов с баланса ${freshUser.balance}...`,
           duration: 3000,
         });
         const purchaseResponse = await fetch(PURCHASE_WORK_URL, {
@@ -630,7 +637,7 @@ export default function WorkDetailPage() {
           body: JSON.stringify({
             workId: actualWorkId,
             userId: userId,
-            price: work.price
+            price: finalPrice
           })
         });
         
@@ -692,20 +699,20 @@ export default function WorkDetailPage() {
         URL.revokeObjectURL(url);
         
         // Отслеживаем скачивание
-        fetch(func2url.works, {
-          method: 'PUT',
+        fetch(func2url['work-stats'], {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ workId: actualWorkId, activityType: 'download' })
+          body: JSON.stringify({ work_id: parseInt(actualWorkId), action: 'download' })
         }).catch(err => console.error('Failed to track download:', err));
       } catch (fetchError) {
         // Если fetch не сработал, открываем в новой вкладке
         window.location.href = downloadData.download_url;
         
         // Отслеживаем скачивание
-        fetch(func2url.works, {
-          method: 'PUT',
+        fetch(func2url['work-stats'], {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ workId: actualWorkId, activityType: 'download' })
+          body: JSON.stringify({ work_id: parseInt(actualWorkId), action: 'download' })
         }).catch(err => console.error('Failed to track download:', err));
       }
       
@@ -725,7 +732,10 @@ export default function WorkDetailPage() {
         });
       } else {
         const oldBalance = freshUser.balance || 0;
-        const deducted = work.price;
+        const finalPrice = work.discount 
+          ? Math.round(work.price * (1 - work.discount / 100))
+          : work.price;
+        const deducted = finalPrice;
         const newBalance = purchaseData.newBalance || (oldBalance - deducted);
         
         console.log('💸 Showing deduction notification:', { oldBalance, deducted, newBalance });
@@ -735,6 +745,11 @@ export default function WorkDetailPage() {
           description: `Списано ${deducted} баллов\nНовый баланс: ${newBalance} баллов\n\n📥 Скачивание началось...`,
           duration: 5000,
         });
+      }
+      
+      // Обновляем статус покупки
+      if (!isAlreadyPurchased) {
+        setIsPurchased(true);
       }
       
       // Открываем защитный пакет после успешной покупки
@@ -1338,10 +1353,29 @@ export default function WorkDetailPage() {
               <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
                 <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
                 <div className="flex items-baseline justify-center gap-1.5">
-                  <span className="text-3xl md:text-4xl font-extrabold text-primary">
-                    {work.price.toLocaleString()}
-                  </span>
-                  <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
+                  {work.discount ? (
+                    <div className="flex flex-col items-center gap-1">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xl md:text-2xl font-semibold text-muted-foreground line-through">
+                          {work.price.toLocaleString()}
+                        </span>
+                        <Badge className="bg-red-500 text-white text-xs">−{work.discount}%</Badge>
+                      </div>
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-3xl md:text-4xl font-extrabold text-green-600">
+                          {Math.round(work.price * (1 - work.discount / 100)).toLocaleString()}
+                        </span>
+                        <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="text-3xl md:text-4xl font-extrabold text-primary">
+                        {work.price.toLocaleString()}
+                      </span>
+                      <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
+                    </>
+                  )}
                 </div>
               </div>
 
@@ -1375,7 +1409,7 @@ export default function WorkDetailPage() {
                 ) : (
                   <>
                     <Icon name="Download" size={18} className="mr-2" />
-                    Купить за {work.price} баллов
+                    Купить за {work.discount ? Math.round(work.price * (1 - work.discount / 100)).toLocaleString() : work.price.toLocaleString()} баллов
                   </>
                 )}
               </Button>

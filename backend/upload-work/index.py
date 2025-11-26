@@ -58,23 +58,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = get_db_connection()
         cur = conn.cursor()
         
-        # Вставляем работу в БД  
-        cur.execute("""
+        # Экранируем строки для Simple Query Protocol
+        safe_title = title.replace("'", "''")
+        safe_work_type = work_type.replace("'", "''")
+        safe_description = description.replace("'", "''")
+        safe_file_name = file_name.replace("'", "''") if file_name else 'work.rar'
+        
+        # Вставляем работу в БД используя Simple Query Protocol
+        cur.execute(f"""
             INSERT INTO t_p63326274_course_download_plat.works 
             (title, work_type, subject, description, price_points, 
-             created_at, updated_at, author_id, status, category, price, downloads, views_count)
-            VALUES (%s, %s, %s, %s, %s, NOW(), NOW(), %s, 'pending', %s, %s, 0, 0)
+             created_at, updated_at, author_id, status, category, price, downloads, views_count, file_url)
+            VALUES ('{safe_title}', '{safe_work_type}', 'Общая', '{safe_description}', {int(price_points)}, 
+                    NOW(), NOW(), {int(author_id)}, 'pending', '{safe_work_type}', {int(price_points)}, 0, 0, '{safe_file_name}')
             RETURNING id
-        """, (
-            title,
-            work_type,
-            'Общая',  # subject 
-            description,
-            int(price_points),
-            author_id,
-            work_type,
-            int(price_points)
-        ))
+        """)
         
         work_id = cur.fetchone()[0]
         conn.commit()

@@ -25,7 +25,7 @@ interface ReviewsSectionProps {
   isAdmin?: boolean;
 }
 
-export default function ReviewsSection({ workId, isPurchased, isAdmin = false }: ReviewsSectionProps) {
+export default function ReviewsSection({ workId, isPurchased: initialIsPurchased, isAdmin = false }: ReviewsSectionProps) {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [rating, setRating] = useState(5);
@@ -33,6 +33,7 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
   const [submitting, setSubmitting] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [isPurchased, setIsPurchased] = useState(initialIsPurchased);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -49,6 +50,27 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
       loadReviews();
     }
   }, [workId]);
+
+  useEffect(() => {
+    setIsPurchased(initialIsPurchased);
+  }, [initialIsPurchased]);
+
+  const recheckPurchaseStatus = async () => {
+    if (!currentUserId || !workId) return false;
+    
+    try {
+      const response = await fetch(`${func2url['user-data']}?user_id=${currentUserId}&action=purchases`);
+      const data = await response.json();
+      if (data.purchases) {
+        const purchased = data.purchases.some((p: any) => String(p.work_id) === String(workId));
+        setIsPurchased(purchased);
+        return purchased;
+      }
+    } catch (error) {
+      console.error('Error checking purchase status:', error);
+    }
+    return false;
+  };
 
   const loadReviews = async () => {
     try {
@@ -74,7 +96,9 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
       return;
     }
 
-    if (!isPurchased) {
+    const actuallyPurchased = await recheckPurchaseStatus();
+    
+    if (!actuallyPurchased) {
       toast({
         title: 'Ошибка',
         description: 'Купите работу чтобы оставить отзыв',
@@ -184,7 +208,10 @@ export default function ReviewsSection({ workId, isPurchased, isAdmin = false }:
           Отзывы ({reviews.length})
         </h2>
         {currentUserId && !userHasReviewed && !showForm && (
-          <Button onClick={() => setShowForm(true)}>
+          <Button onClick={async () => {
+            await recheckPurchaseStatus();
+            setShowForm(true);
+          }}>
             <Icon name="MessageSquare" size={18} className="mr-2" />
             Оставить отзыв
           </Button>

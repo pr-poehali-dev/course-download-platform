@@ -60,8 +60,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     conn = psycopg2.connect(dsn)
     cursor = conn.cursor()
     
-    delete_query = f"DELETE FROM t_p63326274_course_download_plat.works WHERE id = {int(work_id)}"
-    cursor.execute(delete_query)
+    cursor.execute(
+        "DELETE FROM t_p63326274_course_download_plat.works WHERE id = %s",
+        (int(work_id),)
+    )
     conn.commit()
     
     cursor.close()

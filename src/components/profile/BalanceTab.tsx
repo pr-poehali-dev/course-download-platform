@@ -15,6 +15,12 @@ interface BalancePackage {
   popular?: boolean;
 }
 
+const DISCOUNT_TIERS = [
+  { threshold: 100, discount: 5 },
+  { threshold: 600, discount: 10 },
+  { threshold: 1500, discount: 15 },
+];
+
 const BALANCE_PACKAGES: BalancePackage[] = [
   { id: '100', points: 100, price: 500, bonus: 10 },
   { id: '600', points: 600, price: 3000, bonus: 100, popular: true },
@@ -123,6 +129,13 @@ export default function BalanceTab() {
                   {pkg.bonus && (
                     <Badge variant="secondary" className="bg-green-50 text-green-700">
                       Итого: {pkg.points + pkg.bonus} баллов
+                    </Badge>
+                  )}
+
+                  {DISCOUNT_TIERS.find(tier => tier.threshold === pkg.points) && (
+                    <Badge variant="secondary" className="bg-blue-50 text-blue-700">
+                      <Icon name="Tag" size={12} className="mr-1" />
+                      Скидка {DISCOUNT_TIERS.find(tier => tier.threshold === pkg.points)!.discount}% на работы
                     </Badge>
                   )}
 

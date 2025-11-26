@@ -88,13 +88,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Either images or composition is required'})
         }
     
-    if len(images) > 3:
+    if len(images) > 4:
         cur.close()
         conn.close()
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Maximum 3 images allowed'})
+            'body': json.dumps({'error': 'Maximum 4 images allowed'})
         }
     
     s3_client = boto3.client(

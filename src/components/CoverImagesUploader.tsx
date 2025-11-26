@@ -34,10 +34,10 @@ export default function CoverImagesUploader({
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     
-    if (files.length + selectedFiles.length > 3) {
+    if (files.length + selectedFiles.length > 4) {
       toast({
         title: 'Слишком много файлов',
-        description: 'Можно загрузить максимум 3 изображения',
+        description: 'Можно загрузить максимум 4 изображения',
         variant: 'destructive'
       });
       return;
@@ -198,10 +198,10 @@ export default function CoverImagesUploader({
                 type="button"
                 variant="outline"
                 onClick={() => document.getElementById('cover-upload')?.click()}
-                disabled={uploading || selectedFiles.length >= 3}
+                disabled={uploading || selectedFiles.length >= 4}
               >
                 <Icon name="Upload" size={16} className="mr-2" />
-                Выбрать файлы ({selectedFiles.length}/3)
+                Выбрать файлы ({selectedFiles.length}/4)
               </Button>
             </div>
           </div>

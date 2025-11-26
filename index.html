@@ -71,7 +71,71 @@
   </head>
 
 <body>
-<div id="root"></div>
+<div id="root">
+  <!-- SEO-контент для роботов поисковых систем -->
+  <noscript>
+    <h1>Купить курсовые работы и дипломы от 200₽ — Tech Forma</h1>
+    <p>Более 500 готовых студенческих работ по всем предметам с гарантией уникальности 95%. Мгновенное скачивание после оплаты.</p>
+  </noscript>
+  
+  <!-- Скрытый контент для индексации (будет заменен React) -->
+  <div style="position: absolute; left: -9999px; top: -9999px;" aria-hidden="true">
+    <h1>Купить курсовые работы и дипломы от 200₽ | Tech Forma</h1>
+    <h2>Готовые студенческие работы с гарантией качества</h2>
+    <p>Tech Forma — платформа для покупки готовых курсовых работ, дипломов, рефератов и контрольных по всем предметам. Более 500 работ в каталоге с гарантией уникальности 95%. Мгновенное скачивание после оплаты.</p>
+    
+    <h3>Преимущества Tech Forma:</h3>
+    <ul>
+      <li>Низкие цены от 200₽ за работу</li>
+      <li>500+ готовых работ по всем предметам</li>
+      <li>Гарантия уникальности 95%</li>
+      <li>Мгновенное скачивание после оплаты</li>
+      <li>Бонусные баллы за покупки</li>
+      <li>Умный помощник TechMentor с ИИ</li>
+    </ul>
+    
+    <h3>Популярные категории:</h3>
+    <nav>
+      <a href="/catalog?category=курсовая">Курсовые работы</a>
+      <a href="/catalog?category=диплом">Дипломные работы</a>
+      <a href="/catalog?category=реферат">Рефераты</a>
+      <a href="/catalog?category=контрольная">Контрольные работы</a>
+      <a href="/catalog?category=эссе">Эссе</a>
+      <a href="/catalog?category=отчет">Отчеты по практике</a>
+    </nav>
+    
+    <h3>Популярные предметы:</h3>
+    <ul>
+      <li>Математика и высшая математика</li>
+      <li>Физика и механика</li>
+      <li>Химия и биология</li>
+      <li>Программирование и информатика</li>
+      <li>Экономика и менеджмент</li>
+      <li>Юриспруденция и право</li>
+      <li>История и обществознание</li>
+      <li>Иностранные языки</li>
+    </ul>
+    
+    <h3>Как купить работу:</h3>
+    <ol>
+      <li>Зарегистрируйтесь на платформе Tech Forma</li>
+      <li>Пополните баланс баллами через удобный способ оплаты</li>
+      <li>Найдите нужную работу в каталоге по предмету или типу</li>
+      <li>Скачайте работу мгновенно после оплаты баллами</li>
+    </ol>
+    
+    <p>Все работы на Tech Forma проверены на уникальность и соответствуют требованиям российских вузов. Гарантия качества и возврата средств.</p>
+    
+    <address>
+      <strong>Tech Forma</strong><br>
+      ИП Бубнов Вячеслав Евгеньевич<br>
+      ИНН: 781026651890<br>
+      ОГРНИП: 324784700193035<br>
+      Адрес: 197198, г. Санкт-Петербург, пр-кт Богатырский, д. 18, корп. 1, кв. 95<br>
+      Email: info@techforma.pro
+    </address>
+  </div>
+</div>
 <script type="module" src="/src/main.tsx"></script>
 
 <!-- Yandex.Metrika counter -->
@@ -113,5 +177,120 @@
   gtag('config', 'G-XXXXXXXXXX');
 </script>
 <!-- /Google Analytics -->
+
+<!-- Schema.org разметка для поисковиков -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Tech Forma",
+  "alternateName": "ТехФорма",
+  "url": "https://techforma.pro",
+  "description": "Платформа для покупки готовых курсовых работ, дипломов и рефератов от 200₽. 500+ работ с гарантией уникальности 95%.",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://techforma.pro/catalog?search={search_term_string}",
+    "query-input": "required name=search_term_string"
+  },
+  "inLanguage": "ru-RU"
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Tech Forma",
+  "legalName": "ИП Бубнов Вячеслав Евгеньевич",
+  "url": "https://techforma.pro",
+  "logo": "https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg",
+  "description": "Платформа для студентов с готовыми работами и ИИ-помощником",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "пр-кт Богатырский, д. 18, корп. 1, кв. 95",
+    "addressLocality": "Санкт-Петербург",
+    "postalCode": "197198",
+    "addressCountry": "RU"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "info@techforma.pro",
+    "contactType": "customer service",
+    "availableLanguage": "Russian"
+  },
+  "sameAs": [
+    "https://techforma.pro"
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Готовые студенческие работы",
+  "description": "Каталог готовых курсовых, дипломов и рефератов",
+  "numberOfItems": 500,
+  "itemListElement": [
+    {
+      "@type": "Product",
+      "name": "Курсовые работы",
+      "description": "Готовые курсовые работы по всем предметам",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "RUB",
+        "lowPrice": "200",
+        "highPrice": "1500",
+        "offerCount": "200+"
+      }
+    },
+    {
+      "@type": "Product",
+      "name": "Дипломные работы",
+      "description": "Готовые дипломные работы и ВКР",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "RUB",
+        "lowPrice": "500",
+        "highPrice": "3000",
+        "offerCount": "150+"
+      }
+    },
+    {
+      "@type": "Product",
+      "name": "Рефераты",
+      "description": "Готовые рефераты по всем предметам",
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "RUB",
+        "lowPrice": "200",
+        "highPrice": "800",
+        "offerCount": "100+"
+      }
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Главная",
+      "item": "https://techforma.pro/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Каталог работ",
+      "item": "https://techforma.pro/catalog"
+    }
+  ]
+}
+</script>
 </body>
 </html>

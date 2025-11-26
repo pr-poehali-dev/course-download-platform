@@ -1471,7 +1471,7 @@ export default function WorkDetailPage() {
                 ) : (
                   <>
                     <Icon name="Download" size={18} className="mr-2" />
-                    Купить за {work.discount ? Math.round(work.price * (1 - work.discount / 100)).toLocaleString() : work.price.toLocaleString()} баллов
+                    Купить за {(work.discount || userDiscount > 0) ? Math.round(work.price * (1 - (work.discount || userDiscount) / 100)).toLocaleString() : work.price.toLocaleString()} баллов
                   </>
                 )}
               </Button>

@@ -19,6 +19,7 @@ import { Helmet } from 'react-helmet-async';
 import PurchaseNotifications from '@/components/PurchaseNotifications';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
+import { getUserDiscount } from '@/utils/discount';
 
 interface Work {
   id: string;
@@ -68,6 +69,7 @@ export default function CatalogPage() {
   const [quickViewWork, setQuickViewWork] = useState<Work | null>(null);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userBalance, setUserBalance] = useState(0);
+  const userDiscount = getUserDiscount(userBalance);
 
 
   useEffect(() => {
@@ -635,12 +637,12 @@ export default function CatalogPage() {
 
                     <div className="flex items-center justify-between pt-3 border-t">
                       <div>
-                        {work.discount ? (
+                        {(work.discount || userDiscount > 0) ? (
                           <div className="flex flex-col">
                             <span className="text-xs text-gray-400 line-through">{work.price} б.</span>
                             <div className="flex flex-col">
-                              <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - work.discount / 100))} б.</span>
-                              <span className="text-xs text-gray-500">({Math.round(work.price * (1 - work.discount / 100)) * 5}₽)</span>
+                              <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - (work.discount || userDiscount) / 100))} б.</span>
+                              <span className="text-xs text-gray-500">({Math.round(work.price * (1 - (work.discount || userDiscount) / 100)) * 5}₽)</span>
                             </div>
                           </div>
                         ) : (

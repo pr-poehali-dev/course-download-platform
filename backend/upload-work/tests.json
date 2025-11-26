@@ -10,8 +10,7 @@
         "category": "coursework",
         "price": 600,
         "authorId": 999999,
-        "fileName": "test_work.docx",
-        "file": "base64_encoded_file_data"
+        "fileName": "test_work.docx"
       },
       "expectedStatus": 200,
       "expectedBody": {

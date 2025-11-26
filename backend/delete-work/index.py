@@ -61,36 +61,30 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cursor = conn.cursor()
     
     try:
-        # Delete related records first
+        work_id_int = int(work_id)
+        
         cursor.execute(
-            "DELETE FROM t_p63326274_course_download_plat.purchases WHERE work_id = %s",
-            (int(work_id),)
+            f"DELETE FROM t_p63326274_course_download_plat.purchases WHERE work_id = {work_id_int}"
         )
         
         cursor.execute(
-            "DELETE FROM t_p63326274_course_download_plat.reviews WHERE work_id = %s",
-            (int(work_id),)
+            f"DELETE FROM t_p63326274_course_download_plat.reviews WHERE work_id = {work_id_int}"
         )
         
         cursor.execute(
-            "DELETE FROM t_p63326274_course_download_plat.user_downloads WHERE work_id = %s",
-            (int(work_id),)
+            f"DELETE FROM t_p63326274_course_download_plat.user_downloads WHERE work_id = {work_id_int}"
         )
         
         cursor.execute(
-            "DELETE FROM t_p63326274_course_download_plat.work_stats WHERE work_id = %s",
-            (int(work_id),)
+            f"DELETE FROM t_p63326274_course_download_plat.work_stats WHERE work_id = {work_id_int}"
         )
         
         cursor.execute(
-            "DELETE FROM t_p63326274_course_download_plat.download_tokens WHERE work_id = %s",
-            (int(work_id),)
+            f"DELETE FROM t_p63326274_course_download_plat.download_tokens WHERE work_id = {work_id_int}"
         )
         
-        # Finally delete the work itself
         cursor.execute(
-            "DELETE FROM t_p63326274_course_download_plat.works WHERE id = %s",
-            (int(work_id),)
+            f"DELETE FROM t_p63326274_course_download_plat.works WHERE id = {work_id_int}"
         )
         
         conn.commit()

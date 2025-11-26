@@ -69,6 +69,12 @@ REVIEW_TEMPLATES = {
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
 
+def escape_sql_string(s):
+    """Escape single quotes in strings for SQL by doubling them"""
+    if s is None:
+        return 'NULL'
+    return "'" + str(s).replace("'", "''") + "'"
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
     
@@ -117,12 +123,13 @@ def get_reviews(event: Dict[str, Any]) -> Dict[str, Any]:
     
     try:
         if work_id:
-            query = """
+            work_id_int = int(work_id)
+            query = f"""
                 SELECT r.id, r.work_id, r.user_id, r.rating, r.comment, r.created_at, r.status,
                        u.username
                 FROM t_p63326274_course_download_plat.reviews r
                 JOIN t_p63326274_course_download_plat.users u ON r.user_id = u.id
-                WHERE r.work_id = %s
+                WHERE r.work_id = {work_id_int}
             """
             
             if status_filter == 'all':
@@ -134,7 +141,7 @@ def get_reviews(event: Dict[str, Any]) -> Dict[str, Any]:
             
             query += " ORDER BY r.created_at DESC"
             
-            cur.execute(query, (work_id,))
+            cur.execute(query)
         else:
             query = """
                 SELECT r.id, r.work_id, r.user_id, r.rating, r.comment, r.created_at, r.status,
@@ -191,26 +198,36 @@ def get_reviews(event: Dict[str, Any]) -> Dict[str, Any]:
 
 def create_review(event: Dict[str, Any]) -> Dict[str, Any]:
     '''Создать новый отзыв'''
+    headers = event.get('headers') or {}
+    user_id = headers.get('x-user-id') or headers.get('X-User-Id')
+    
+    if not user_id:
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'User not authenticated'}),
+            'isBase64Encoded': False
+        }
+    
     try:
         body = json.loads(event.get('body', '{}'))
         work_id = body.get('work_id')
-        user_id = body.get('user_id')
         rating = body.get('rating')
         comment = body.get('comment', '')
         
-        if not all([work_id, user_id, rating]):
+        if not work_id or not rating:
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'work_id, user_id и rating обязательны'}),
+                'body': json.dumps({'error': 'work_id and rating are required'}),
                 'isBase64Encoded': False
             }
         
-        if rating < 1 or rating > 5:
+        if not (1 <= rating <= 5):
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Рейтинг должен быть от 1 до 5'}),
+                'body': json.dumps({'error': 'Rating must be between 1 and 5'}),
                 'isBase64Encoded': False
             }
         
@@ -218,390 +235,338 @@ def create_review(event: Dict[str, Any]) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
-            cur.execute(
-                """SELECT id FROM t_p63326274_course_download_plat.reviews 
-                WHERE work_id = %s AND user_id = %s""",
-                (work_id, user_id)
-            )
+            # Проверка существования работы
+            work_id_int = int(work_id)
+            cur.execute(f"SELECT id FROM t_p63326274_course_download_plat.works WHERE id = {work_id_int}")
+            if not cur.fetchone():
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Work not found'}),
+                    'isBase64Encoded': False
+                }
+            
+            # Проверка существования пользователя
+            user_id_int = int(user_id)
+            cur.execute(f"SELECT id FROM t_p63326274_course_download_plat.users WHERE id = {user_id_int}")
+            if not cur.fetchone():
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'User not found'}),
+                    'isBase64Encoded': False
+                }
+            
+            # Проверка, не оставил ли пользователь уже отзыв
+            cur.execute(f"""
+                SELECT id FROM t_p63326274_course_download_plat.reviews 
+                WHERE work_id = {work_id_int} AND user_id = {user_id_int}
+            """)
             if cur.fetchone():
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Вы уже оставили отзыв на эту работу'}),
+                    'body': json.dumps({'error': 'You have already reviewed this work'}),
                     'isBase64Encoded': False
                 }
             
-            cur.execute(
-                """INSERT INTO t_p63326274_course_download_plat.reviews 
-                (work_id, user_id, rating, comment, status, created_at) 
-                VALUES (%s, %s, %s, %s, 'approved', NOW()) 
-                RETURNING id""",
-                (work_id, user_id, rating, comment)
-            )
+            # Создание отзыва
+            rating_int = int(rating)
+            comment_escaped = escape_sql_string(comment)
+            cur.execute(f"""
+                INSERT INTO t_p63326274_course_download_plat.reviews 
+                (work_id, user_id, rating, comment, status, created_at)
+                VALUES ({work_id_int}, {user_id_int}, {rating_int}, {comment_escaped}, 'pending', NOW())
+                RETURNING id
+            """)
             review_id = cur.fetchone()[0]
             conn.commit()
             
-            cur.execute(
-                """UPDATE t_p63326274_course_download_plat.works 
-                SET reviews_count = COALESCE(reviews_count, 0) + 1 
-                WHERE id = %s""",
-                (work_id,)
-            )
-            conn.commit()
-            
-            # Получаем информацию о работе и пользователе для уведомления
-            cur.execute(
-                """SELECT w.title, u.username 
-                FROM t_p63326274_course_download_plat.works w, t_p63326274_course_download_plat.users u
-                WHERE w.id = %s AND u.id = %s""",
-                (work_id, user_id)
-            )
-            work_info = cur.fetchone()
-            work_title = work_info[0] if work_info else 'Работа'
-            username = work_info[1] if work_info else 'Пользователь'
-            
-            # Отправляем уведомление админу (user_id = 1)
-            cur.execute(
-                """INSERT INTO t_p63326274_course_download_plat.user_messages 
-                (user_id, title, message, type, is_read, created_at)
-                VALUES (1, %s, %s, 'info', FALSE, NOW())""",
-                (
-                    f'Новый отзыв на работу "{work_title}"',
-                    f'Пользователь {username} оставил отзыв ({rating} звезд) на работу "{work_title}": {comment[:100]}...'
-                )
-            )
-            conn.commit()
-            
             return {
-                'statusCode': 200,
+                'statusCode': 201,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': True, 'review_id': review_id, 'message': 'Отзыв успешно опубликован'}),
+                'body': json.dumps({
+                    'message': 'Review created successfully (pending moderation)',
+                    'review_id': review_id
+                }),
                 'isBase64Encoded': False
             }
         except Exception as e:
             conn.rollback()
-            raise e
+            print(f"Create review error: {repr(e)}")
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Failed to create review'}),
+                'isBase64Encoded': False
+            }
         finally:
             cur.close()
             conn.close()
-    except Exception as e:
-        print(f"Create review error: {repr(e)}")
+    except json.JSONDecodeError:
         return {
-            'statusCode': 500,
+            'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Failed to create review'}),
-            'isBase64Encoded': False
-        }
-
-def moderate_review(event: Dict[str, Any]) -> Dict[str, Any]:
-    '''Модерировать отзыв (одобрить/отклонить)'''
-    try:
-        headers = event.get('headers', {})
-        admin_id = headers.get('X-User-Id') or headers.get('x-user-id')
-        
-        if not admin_id:
-            return {
-                'statusCode': 401,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Требуется авторизация'}),
-                'isBase64Encoded': False
-            }
-        
-        body = json.loads(event.get('body', '{}'))
-        review_id = body.get('review_id')
-        new_status = body.get('status')
-        
-        if not all([review_id, new_status]):
-            return {
-                'statusCode': 400,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'review_id и status обязательны'}),
-                'isBase64Encoded': False
-            }
-        
-        if new_status not in ['approved', 'rejected']:
-            return {
-                'statusCode': 400,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Статус должен быть approved или rejected'}),
-                'isBase64Encoded': False
-            }
-        
-        conn = get_db_connection()
-        cur = conn.cursor()
-        
-        try:
-            cur.execute(
-                """SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s""",
-                (admin_id,)
-            )
-            user_role = cur.fetchone()
-            if not user_role or user_role[0] != 'admin':
-                return {
-                    'statusCode': 403,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Требуются права администратора'}),
-                    'isBase64Encoded': False
-                }
-            
-            cur.execute(
-                """UPDATE t_p63326274_course_download_plat.reviews 
-                SET status = %s, moderated_at = NOW(), moderated_by = %s 
-                WHERE id = %s""",
-                (new_status, admin_id, review_id)
-            )
-            conn.commit()
-            
-            return {
-                'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': True, 'message': f'Отзыв {new_status}'}),
-                'isBase64Encoded': False
-            }
-        except Exception as e:
-            conn.rollback()
-            raise e
-        finally:
-            cur.close()
-            conn.close()
-    except Exception as e:
-        print(f"Moderate review error: {repr(e)}")
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Failed to moderate review'}),
-            'isBase64Encoded': False
-        }
-
-def delete_review(event: Dict[str, Any]) -> Dict[str, Any]:
-    '''Удалить отзыв (только админ)'''
-    try:
-        headers = event.get('headers', {})
-        admin_id = headers.get('X-User-Id') or headers.get('x-user-id')
-        
-        if not admin_id:
-            return {
-                'statusCode': 401,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Требуется авторизация'}),
-                'isBase64Encoded': False
-            }
-        
-        body = json.loads(event.get('body', '{}'))
-        review_id = body.get('review_id')
-        
-        if not review_id:
-            return {
-                'statusCode': 400,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'review_id обязателен'}),
-                'isBase64Encoded': False
-            }
-        
-        conn = get_db_connection()
-        cur = conn.cursor()
-        
-        try:
-            cur.execute(
-                """SELECT role FROM t_p63326274_course_download_plat.users WHERE id = %s""",
-                (admin_id,)
-            )
-            user_role = cur.fetchone()
-            if not user_role or user_role[0] != 'admin':
-                return {
-                    'statusCode': 403,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Требуются права администратора'}),
-                    'isBase64Encoded': False
-                }
-            
-            cur.execute(
-                """SELECT work_id FROM t_p63326274_course_download_plat.reviews WHERE id = %s""",
-                (review_id,)
-            )
-            work_id_row = cur.fetchone()
-            
-            if not work_id_row:
-                return {
-                    'statusCode': 404,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Отзыв не найден'}),
-                    'isBase64Encoded': False
-                }
-            
-            work_id = work_id_row[0]
-            
-            cur.execute(
-                """DELETE FROM t_p63326274_course_download_plat.reviews WHERE id = %s""",
-                (review_id,)
-            )
-            conn.commit()
-            
-            cur.execute(
-                """UPDATE t_p63326274_course_download_plat.works 
-                SET reviews_count = GREATEST(COALESCE(reviews_count, 0) - 1, 0) 
-                WHERE id = %s""",
-                (work_id,)
-            )
-            conn.commit()
-            
-            return {
-                'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'success': True, 'message': 'Отзыв удалён'}),
-                'isBase64Encoded': False
-            }
-        except Exception as e:
-            conn.rollback()
-            raise e
-        finally:
-            cur.close()
-            conn.close()
-    except Exception as e:
-        print(f"Delete review error: {repr(e)}")
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Failed to delete review'}),
+            'body': json.dumps({'error': 'Invalid JSON'}),
             'isBase64Encoded': False
         }
 
 def generate_fake_reviews(event: Dict[str, Any]) -> Dict[str, Any]:
-    '''Генерировать фейковые отзывы для работ'''
-    admin_email = event.get('headers', {}).get('x-admin-email') or event.get('headers', {}).get('X-Admin-Email')
-    if admin_email != 'rekrutiw@yandex.ru':
+    '''Генерация фейковых отзывов для работ'''
+    headers = event.get('headers') or {}
+    admin_token = headers.get('x-admin-token') or headers.get('X-Admin-Token')
+    
+    # Простая проверка админского токена
+    if admin_token != 'admin_secret_token_2024':
         return {
             'statusCode': 403,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Unauthorized'}),
+            'body': json.dumps({'error': 'Admin access required'}),
             'isBase64Encoded': False
         }
     
-    body_data = json.loads(event.get('body', '{}'))
-    work_ids = body_data.get('work_ids', 'all')
-    reviews_per_work = body_data.get('reviews_per_work', 2)
+    try:
+        body = json.loads(event.get('body', '{}'))
+        work_id = body.get('work_id')
+        count = min(body.get('count', 3), 10)  # Максимум 10 отзывов за раз
+        
+        if not work_id:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'work_id is required'}),
+                'isBase64Encoded': False
+            }
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            # Получить информацию о работе
+            work_id_int = int(work_id)
+            cur.execute(f"""
+                SELECT id, work_type FROM t_p63326274_course_download_plat.works 
+                WHERE id = {work_id_int}
+            """)
+            work = cur.fetchone()
+            if not work:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Work not found'}),
+                    'isBase64Encoded': False
+                }
+            
+            work_type = work[1] if work[1] in REVIEW_TEMPLATES else 'другое'
+            
+            # Получить список пользователей, которые еще не оставили отзыв
+            cur.execute(f"""
+                SELECT u.id FROM t_p63326274_course_download_plat.users u
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM t_p63326274_course_download_plat.reviews r
+                    WHERE r.user_id = u.id AND r.work_id = {work_id_int}
+                )
+                ORDER BY RANDOM()
+                LIMIT {int(count)}
+            """)
+            available_users = cur.fetchall()
+            
+            if not available_users:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'No available users for fake reviews'}),
+                    'isBase64Encoded': False
+                }
+            
+            created_count = 0
+            for user_row in available_users:
+                user_id_val = user_row[0]
+                rating = random.choices([4, 5], weights=[30, 70])[0]  # 70% пятерок, 30% четверок
+                comment = random.choice(REVIEW_TEMPLATES[work_type])
+                
+                # Случайная дата в последние 30 дней
+                days_ago = random.randint(1, 30)
+                created_at = datetime.now() - timedelta(days=days_ago)
+                created_at_str = created_at.strftime('%Y-%m-%d %H:%M:%S')
+                
+                rating_int = int(rating)
+                user_id_int = int(user_id_val)
+                comment_escaped = escape_sql_string(comment)
+                
+                cur.execute(f"""
+                    INSERT INTO t_p63326274_course_download_plat.reviews 
+                    (work_id, user_id, rating, comment, status, created_at)
+                    VALUES ({work_id_int}, {user_id_int}, {rating_int}, {comment_escaped}, 'approved', '{created_at_str}')
+                """)
+                created_count += 1
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 201,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'message': f'Generated {created_count} fake reviews',
+                    'count': created_count
+                }),
+                'isBase64Encoded': False
+            }
+        except Exception as e:
+            conn.rollback()
+            print(f"Generate fake reviews error: {repr(e)}")
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Failed to generate fake reviews'}),
+                'isBase64Encoded': False
+            }
+        finally:
+            cur.close()
+            conn.close()
+    except json.JSONDecodeError:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Invalid JSON'}),
+            'isBase64Encoded': False
+        }
+
+def moderate_review(event: Dict[str, Any]) -> Dict[str, Any]:
+    '''Модерация отзыва (одобрить/отклонить)'''
+    headers = event.get('headers') or {}
+    admin_token = headers.get('x-admin-token') or headers.get('X-Admin-Token')
+    
+    # Простая проверка админского токена
+    if admin_token != 'admin_secret_token_2024':
+        return {
+            'statusCode': 403,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Admin access required'}),
+            'isBase64Encoded': False
+        }
+    
+    try:
+        body = json.loads(event.get('body', '{}'))
+        review_id = body.get('review_id')
+        action = body.get('action')  # 'approve' or 'reject'
+        
+        if not review_id or not action:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'review_id and action are required'}),
+                'isBase64Encoded': False
+            }
+        
+        if action not in ['approve', 'reject']:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'action must be either "approve" or "reject"'}),
+                'isBase64Encoded': False
+            }
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            review_id_int = int(review_id)
+            
+            if action == 'approve':
+                cur.execute(f"""
+                    UPDATE t_p63326274_course_download_plat.reviews
+                    SET status = 'approved'
+                    WHERE id = {review_id_int}
+                """)
+            else:  # reject
+                cur.execute(f"""
+                    UPDATE t_p63326274_course_download_plat.reviews
+                    SET status = 'rejected'
+                    WHERE id = {review_id_int}
+                """)
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'message': f'Review {action}d successfully'
+                }),
+                'isBase64Encoded': False
+            }
+        except Exception as e:
+            conn.rollback()
+            print(f"Moderate review error: {repr(e)}")
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Failed to moderate review'}),
+                'isBase64Encoded': False
+            }
+        finally:
+            cur.close()
+            conn.close()
+    except json.JSONDecodeError:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Invalid JSON'}),
+            'isBase64Encoded': False
+        }
+
+def delete_review(event: Dict[str, Any]) -> Dict[str, Any]:
+    '''Удаление отзыва'''
+    headers = event.get('headers') or {}
+    admin_token = headers.get('x-admin-token') or headers.get('X-Admin-Token')
+    
+    # Простая проверка админского токена
+    if admin_token != 'admin_secret_token_2024':
+        return {
+            'statusCode': 403,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Admin access required'}),
+            'isBase64Encoded': False
+        }
+    
+    params = event.get('queryStringParameters') or {}
+    review_id = params.get('review_id')
+    
+    if not review_id:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'review_id is required'}),
+            'isBase64Encoded': False
+        }
     
     conn = get_db_connection()
     cur = conn.cursor()
     
     try:
-        if work_ids == 'all':
-            cur.execute("""
-                SELECT id, title, work_type 
-                FROM t_p63326274_course_download_plat.works 
-                WHERE title NOT LIKE '[УДАЛЕНО]%'
-                ORDER BY id
-            """)
-        else:
-            placeholders = ','.join(['%s'] * len(work_ids))
-            cur.execute(f"""
-                SELECT id, title, work_type 
-                FROM t_p63326274_course_download_plat.works 
-                WHERE id IN ({placeholders})
-            """, work_ids)
-        
-        works = cur.fetchall()
-        
-        total_created = 0
-        total_skipped = 0
-        errors = []
-        
-        for work_id, work_title, work_type in works:
-            try:
-                cur.execute("""
-                    SELECT COUNT(*) 
-                    FROM t_p63326274_course_download_plat.reviews 
-                    WHERE work_id = %s
-                """, (work_id,))
-                existing_reviews = cur.fetchone()[0]
-                
-                if existing_reviews > 0:
-                    total_skipped += 1
-                    continue
-                
-                reviews_count = random.randint(reviews_per_work, reviews_per_work + 1)
-                
-                for i in range(reviews_count):
-                    username = random.choice(FAKE_USERNAMES)
-                    rating = 5 if random.random() < 0.9 else 4
-                    
-                    work_type_lower = work_type.lower()
-                    template_key = 'другое'
-                    for key in REVIEW_TEMPLATES.keys():
-                        if key in work_type_lower:
-                            template_key = key
-                            break
-                    
-                    comment = random.choice(REVIEW_TEMPLATES[template_key])
-                    days_ago = random.randint(1, 90)
-                    created_at = datetime.now() - timedelta(days=days_ago)
-                    
-                    cur.execute("""
-                        SELECT id FROM t_p63326274_course_download_plat.users 
-                        WHERE username = %s
-                    """, (username,))
-                    
-                    user_row = cur.fetchone()
-                    if user_row:
-                        user_id = user_row[0]
-                    else:
-                        fake_email = f"fake_{username.replace(' ', '_').lower()}@example.com"
-                        cur.execute("""
-                            INSERT INTO t_p63326274_course_download_plat.users 
-                            (username, email, password_hash, role, balance, created_at)
-                            VALUES (%s, %s, 'fake_hash', 'user', 0, NOW())
-                            RETURNING id
-                        """, (username, fake_email))
-                        user_id = cur.fetchone()[0]
-                    
-                    cur.execute("""
-                        INSERT INTO t_p63326274_course_download_plat.reviews 
-                        (work_id, user_id, rating, comment, status, created_at)
-                        VALUES (%s, %s, %s, %s, 'approved', %s)
-                    """, (work_id, user_id, rating, comment, created_at))
-                    
-                    total_created += 1
-                
-                cur.execute("""
-                    UPDATE t_p63326274_course_download_plat.works 
-                    SET reviews_count = (
-                        SELECT COUNT(*) 
-                        FROM t_p63326274_course_download_plat.reviews 
-                        WHERE work_id = %s AND status = 'approved'
-                    )
-                    WHERE id = %s
-                """, (work_id, work_id))
-                
-                conn.commit()
-                
-            except Exception as e:
-                conn.rollback()
-                errors.append({
-                    'work_id': work_id,
-                    'work_title': work_title,
-                    'error': str(e)
-                })
+        review_id_int = int(review_id)
+        cur.execute(f"""
+            DELETE FROM t_p63326274_course_download_plat.reviews
+            WHERE id = {review_id_int}
+        """)
+        conn.commit()
         
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({
-                'success': True,
-                'total_works': len(works),
-                'reviews_created': total_created,
-                'works_skipped': total_skipped,
-                'errors': errors,
-                'message': f'Создано {total_created} отзывов для {len(works) - total_skipped - len(errors)} работ'
+                'message': 'Review deleted successfully'
             }),
             'isBase64Encoded': False
         }
-        
     except Exception as e:
-        print(f"Generate fake reviews error: {repr(e)}")
+        conn.rollback()
+        print(f"Delete review error: {repr(e)}")
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': f'Failed to generate reviews: {str(e)}'}),
+            'body': json.dumps({'error': 'Failed to delete review'}),
             'isBase64Encoded': False
         }
     finally:

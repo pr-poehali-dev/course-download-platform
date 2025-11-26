@@ -16,6 +16,7 @@ import { getFakeAuthor, incrementViewCount, getViewCount } from '@/utils/fakeAut
 import ReviewsSection from '@/components/ReviewsSection';
 import WorkActivityTracker from '@/components/WorkActivityTracker';
 import { toast } from '@/components/ui/use-toast';
+import { getUserDiscount } from '@/utils/discount';
 
 
 interface Work {
@@ -66,6 +67,7 @@ export default function WorkDetailPage() {
   const [editedWork, setEditedWork] = useState<Partial<Work>>({});
   const [isPurchased, setIsPurchased] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [userDiscount, setUserDiscount] = useState<number>(0);
 
 
   useEffect(() => {
@@ -78,6 +80,11 @@ export default function WorkDetailPage() {
       if (freshUser) {
         localStorage.setItem('user', JSON.stringify(freshUser));
         console.log('🔄 localStorage ОБНОВЛЕН свежими данными:', freshUser);
+        
+        // Рассчитываем дисконт пользователя на основе баланса
+        const discount = getUserDiscount(freshUser.balance || 0);
+        setUserDiscount(discount);
+        console.log(`💰 Баланс: ${freshUser.balance}, Скидка: ${discount}%`);
       }
       
       // Проверяем, куплена ли работа
@@ -649,8 +656,9 @@ export default function WorkDetailPage() {
         downloadToken = tokenData.token;
       } else {
         // Если не куплена, пытаемся купить за баллы (используем freshUser!)
-        const finalPrice = work.discount 
-          ? Math.round(work.price * (1 - work.discount / 100))
+        const applicableDiscount = work.discount || userDiscount;
+        const finalPrice = applicableDiscount > 0
+          ? Math.round(work.price * (1 - applicableDiscount / 100))
           : work.price;
         
         console.log('💰 Work not purchased, attempting to purchase with баллы...', { 
@@ -696,6 +704,10 @@ export default function WorkDetailPage() {
         
         // Получаем токен из ответа покупки
         downloadToken = purchaseData.downloadToken;
+        
+        // Обновляем статус покупки
+        setIsPurchased(true);
+        console.log('✅ Work purchased! Setting isPurchased to true');
         
         // Обновляем баланс пользователя в localStorage (если не админ)
         if (freshUser.role !== 'admin' && purchaseData.newBalance !== undefined) {
@@ -1403,17 +1415,17 @@ export default function WorkDetailPage() {
               <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
                 <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
                 <div className="flex items-baseline justify-center gap-1.5">
-                  {work.discount ? (
+                  {(work.discount || userDiscount > 0) ? (
                     <div className="flex flex-col items-center gap-1">
                       <div className="flex items-baseline gap-2">
                         <span className="text-xl md:text-2xl font-semibold text-muted-foreground line-through">
                           {work.price.toLocaleString()}
                         </span>
-                        <Badge className="bg-red-500 text-white text-xs">−{work.discount}%</Badge>
+                        <Badge className="bg-red-500 text-white text-xs">−{work.discount || userDiscount}%</Badge>
                       </div>
                       <div className="flex items-baseline gap-1.5">
                         <span className="text-3xl md:text-4xl font-extrabold text-green-600">
-                          {Math.round(work.price * (1 - work.discount / 100)).toLocaleString()}
+                          {Math.round(work.price * (1 - (work.discount || userDiscount) / 100)).toLocaleString()}
                         </span>
                         <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
                       </div>

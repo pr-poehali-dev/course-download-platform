@@ -60,11 +60,49 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     conn = psycopg2.connect(dsn)
     cursor = conn.cursor()
     
-    cursor.execute(
-        "DELETE FROM t_p63326274_course_download_plat.works WHERE id = %s",
-        (int(work_id),)
-    )
-    conn.commit()
+    try:
+        # Delete related records first
+        cursor.execute(
+            "DELETE FROM t_p63326274_course_download_plat.purchases WHERE work_id = %s",
+            (int(work_id),)
+        )
+        
+        cursor.execute(
+            "DELETE FROM t_p63326274_course_download_plat.reviews WHERE work_id = %s",
+            (int(work_id),)
+        )
+        
+        cursor.execute(
+            "DELETE FROM t_p63326274_course_download_plat.user_downloads WHERE work_id = %s",
+            (int(work_id),)
+        )
+        
+        cursor.execute(
+            "DELETE FROM t_p63326274_course_download_plat.work_stats WHERE work_id = %s",
+            (int(work_id),)
+        )
+        
+        cursor.execute(
+            "DELETE FROM t_p63326274_course_download_plat.download_tokens WHERE work_id = %s",
+            (int(work_id),)
+        )
+        
+        # Finally delete the work itself
+        cursor.execute(
+            "DELETE FROM t_p63326274_course_download_plat.works WHERE id = %s",
+            (int(work_id),)
+        )
+        
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        cursor.close()
+        conn.close()
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': f'Database error: {str(e)}'})
+        }
     
     cursor.close()
     conn.close()

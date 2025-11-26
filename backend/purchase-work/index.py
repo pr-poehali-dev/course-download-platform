@@ -146,10 +146,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             buyer_email = user_result[2] if len(user_result) > 2 else None
             is_admin = (role == 'admin')
             
-            print(f"[PURCHASE] User data: balance={balance}, role={role}, is_admin={is_admin}, price={price}")
+            # Рассчитываем дисконт пользователя на основе баланса
+            user_discount = 0
+            if balance >= 1500:
+                user_discount = 15
+            elif balance >= 600:
+                user_discount = 10
+            elif balance >= 100:
+                user_discount = 5
+            
+            # Применяем дисконт к цене
+            final_price = price
+            if user_discount > 0:
+                final_price = round(price * (1 - user_discount / 100))
+                print(f"[PURCHASE] Applying {user_discount}% discount: {price} -> {final_price}")
+            
+            print(f"[PURCHASE] User data: balance={balance}, role={role}, is_admin={is_admin}, original_price={price}, final_price={final_price}, discount={user_discount}%")
             
             # Проверяем баланс для всех пользователей (включая админов)
-            if balance < price:
+            if balance < final_price:
                 conn.rollback()
                 
                 # Генерируем ссылку на пополнение баланса
@@ -162,7 +177,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({
                         'error': 'Недостаточно баллов',
                         'balance': balance,
-                        'required': price,
+                        'required': final_price,
                         'payUrl': topup_url
                     }),
                     'isBase64Encoded': False
@@ -223,10 +238,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 }
             
             # Списываем баллы у ВСЕХ пользователей (включая админов)
-            print(f"[PURCHASE] Deducting {price} points from user {user_id}, current balance: {balance}")
+            print(f"[PURCHASE] Deducting {final_price} points from user {user_id}, current balance: {balance}")
             cur.execute(
                 "UPDATE t_p63326274_course_download_plat.users SET balance = balance - %s WHERE id = %s",
-                (price, user_id)
+                (final_price, user_id)
             )
             
             # Записываем транзакцию списания баллов у покупателя
@@ -234,25 +249,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """INSERT INTO t_p63326274_course_download_plat.transactions
                 (user_id, amount, type, description)
                 VALUES (%s, %s, %s, %s)""",
-                (user_id, -price, 'purchase', f'Покупка работы #{db_work_id}')
+                (user_id, -final_price, 'purchase', f'Покупка работы #{db_work_id}')
             )
             
             # Создаём запись о покупке с комиссией 10%
-            commission = int(price * 0.10)
+            commission = int(final_price * 0.10)
             cur.execute(
                 """INSERT INTO t_p63326274_course_download_plat.purchases 
                 (buyer_id, work_id, price_paid, commission) VALUES (%s, %s, %s, %s) RETURNING id""",
-                (user_id, db_work_id, price, commission)
+                (user_id, db_work_id, final_price, commission)
             )
             purchase_id = cur.fetchone()[0]
             
             # author_id уже получен в work_result выше
             author_id = work_author_id
             
-            # Если есть автор, начисляем ему 90% (price - 10% комиссии)
+            # Если есть автор, начисляем ему 90% (final_price - 10% комиссии)
             if author_id:
-                author_share = int(price * 0.90)
-                platform_fee = int(price * 0.10)
+                author_share = int(final_price * 0.90)
+                platform_fee = int(final_price * 0.10)
                 
                 # Начисляем автору 90% от цены работы
                 cur.execute(
@@ -265,7 +280,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     """INSERT INTO t_p63326274_course_download_plat.author_earnings 
                     (author_id, work_id, purchase_id, sale_amount, author_share, platform_fee, status)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                    (author_id, db_work_id, purchase_id, price, author_share, platform_fee, 'paid')
+                    (author_id, db_work_id, purchase_id, final_price, author_share, platform_fee, 'paid')
                 )
                 
                 # Записываем транзакцию начисления автору

@@ -386,7 +386,19 @@ export default function ModerationPanel() {
                     <p className="text-sm mt-2">{work.description}</p>
                   </CardDescription>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap">
+                  {work.file_name && (
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      asChild
+                    >
+                      <a href={`${func2url['download-work']}?workId=${work.id}`} download target="_blank" rel="noopener noreferrer">
+                        <Icon name="Download" size={14} className="mr-2" />
+                        Скачать файлы
+                      </a>
+                    </Button>
+                  )}
                   <Button 
                     size="sm" 
                     variant="default"

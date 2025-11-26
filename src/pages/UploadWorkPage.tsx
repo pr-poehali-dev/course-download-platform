@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import PlagiarismChecker from '@/components/PlagiarismChecker';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,8 +20,6 @@ import {
 export default function UploadWorkPage() {
   const navigate = useNavigate();
   const [uploading, setUploading] = useState(false);
-  const [showPlagiarismCheck, setShowPlagiarismCheck] = useState(false);
-  const [plagiarismResult, setPlagiarismResult] = useState<any>(null);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -70,28 +67,10 @@ export default function UploadWorkPage() {
       return;
     }
 
-    setShowPlagiarismCheck(true);
+    handleSubmit();
   };
 
   const handleSubmit = async () => {
-    if (!plagiarismResult) {
-      toast({
-        title: 'Ошибка',
-        description: 'Сначала проверьте работу на уникальность',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (plagiarismResult.status === 'rejected') {
-      toast({
-        title: 'Низкая уникальность',
-        description: 'Работа не может быть опубликована из-за плагиата',
-        variant: 'destructive'
-      });
-      return;
-    }
-
     setUploading(true);
 
     try {
@@ -149,7 +128,7 @@ export default function UploadWorkPage() {
       setUploading(false);
       toast({
         title: 'Работа загружена!',
-        description: `Уникальность: ${plagiarismResult.uniqueness_percent.toFixed(1)}%. Работа отправлена на модерацию.`
+        description: 'Работа отправлена на модерацию. Вы получите уведомление о результатах.'
       });
       navigate('/profile');
     } catch (error) {
@@ -283,7 +262,7 @@ export default function UploadWorkPage() {
                     id="file"
                     type="file"
                     className="hidden"
-                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                    accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.cdw,.frw,.max,.spw,.kompas,.a3d,.m3d,.rar,.zip,.7z"
                     onChange={handleFileChange}
                     required
                   />
@@ -310,7 +289,7 @@ export default function UploadWorkPage() {
                   </label>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Поддерживаемые форматы: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX
+                  Поддерживаемые форматы: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, CDW, FRW, MAX, SPW, KOMPAS, A3D, M3D, RAR, ZIP, 7Z
                   <br />
                   Максимальный размер файла: 50 МБ
                 </p>
@@ -362,41 +341,23 @@ export default function UploadWorkPage() {
                 </div>
               </div>
 
-              {!showPlagiarismCheck ? (
-                <Button type="submit" className="w-full" size="lg">
-                  <Icon name="Shield" size={18} className="mr-2" />
-                  Проверить на плагиат
-                </Button>
-              ) : (
-                <Button 
-                  type="button" 
-                  className="w-full" 
-                  size="lg" 
-                  disabled={uploading || !plagiarismResult}
-                  onClick={handleSubmit}
-                >
-                  {uploading ? (
-                    <>
-                      <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                      Загрузка...
-                    </>
-                  ) : (
-                    <>
-                      <Icon name="Upload" size={18} className="mr-2" />
-                      Загрузить работу на модерацию
-                    </>
-                  )}
-                </Button>
-              )}
+              <Button type="submit" className="w-full" size="lg" disabled={uploading}>
+                {uploading ? (
+                  <>
+                    <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+                    Загрузка...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="Upload" size={18} className="mr-2" />
+                    Отправить на модерацию
+                  </>
+                )}
+              </Button>
             </CardContent>
           </Card>
 
-          {showPlagiarismCheck && (
-            <PlagiarismChecker
-              textContent={formData.description}
-              onCheckComplete={(result) => setPlagiarismResult(result)}
-            />
-          )}
+
 
           <div className="text-center">
             <p className="text-xs text-muted-foreground">

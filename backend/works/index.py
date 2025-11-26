@@ -171,13 +171,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         try:
             if work_id:
-                cur.execute("""
+                cur.execute(f"""
                     SELECT id, title, work_type, subject, description, composition, 
                            price_points, rating, downloads, created_at, yandex_disk_link, 
                            preview_image_url, file_url, author_id, preview_urls,
                            author_name, language, software, views_count, reviews_count, keywords, downloads_count, cover_images, discount
-                    FROM t_p63326274_course_download_plat.works WHERE id = %s
-                """, (work_id,))
+                    FROM t_p63326274_course_download_plat.works WHERE id = {int(work_id)}
+                """)
                 row = cur.fetchone()
                 
                 if not row:
@@ -242,10 +242,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'discount': row[23] or 0
                 }
                 
-                cur.execute("""
+                cur.execute(f"""
                     SELECT file_url, file_type, display_order
-                    FROM t_p63326274_course_download_plat.work_files WHERE work_id = %s ORDER BY display_order
-                """, (work_id,))
+                    FROM t_p63326274_course_download_plat.work_files WHERE work_id = {int(work_id)} ORDER BY display_order
+                """)
                 
                 work['files'] = [
                     {'url': f[0], 'type': f[1], 'order': f[2]}
@@ -253,11 +253,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 ]
                 
                 # Инкрементируем счётчик просмотров
-                cur.execute("""
+                cur.execute(f"""
                     UPDATE t_p63326274_course_download_plat.works 
                     SET views_count = COALESCE(views_count, 0) + 1 
-                    WHERE id = %s
-                """, (work_id,))
+                    WHERE id = {int(work_id)}
+                """)
                 conn.commit()
                 
                 return {
@@ -276,35 +276,30 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 # Базовый запрос
                 where_clauses = []
-                params = []
                 
                 # Исключаем удалённые записи
-                where_clauses.append("title NOT LIKE %s")
-                params.append('[УДАЛЕНО]%')
+                where_clauses.append("title NOT LIKE '[УДАЛЕНО]%'")
                 
                 # Фильтрация по статусу
                 status_filter = query_params.get('status')
                 if status_filter:
-                    where_clauses.append("status = %s")
-                    params.append(status_filter)
+                    safe_status = status_filter.replace("'", "''")
+                    where_clauses.append(f"status = '{safe_status}'")
                 elif not author_id:
                     # Для каталога показываем только одобренные работы
-                    where_clauses.append("status = %s")
-                    params.append('approved')
+                    where_clauses.append("status = 'approved'")
                 
                 # Фильтрация по автору (для профиля пользователя)
                 if author_id:
-                    where_clauses.append("author_id = %s")
-                    params.append(int(author_id))
+                    where_clauses.append(f"author_id = {int(author_id)}")
                 
                 if category and category != 'all':
-                    where_clauses.append("category = %s")
-                    params.append(category)
+                    safe_category = category.replace("'", "''")
+                    where_clauses.append(f"category = '{safe_category}'")
                 
                 if search:
-                    where_clauses.append("(title ILIKE %s OR description ILIKE %s)")
-                    search_pattern = f'%{search}%'
-                    params.extend([search_pattern, search_pattern])
+                    safe_search = search.replace("'", "''")
+                    where_clauses.append(f"(title ILIKE '%{safe_search}%' OR description ILIKE '%{safe_search}%')")
                 
                 where_sql = " AND ".join(where_clauses)
                 
@@ -313,7 +308,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     SELECT COUNT(*) FROM t_p63326274_course_download_plat.works 
                     WHERE {where_sql}
                 """
-                cur.execute(count_query, params)
+                cur.execute(count_query)
                 total = cur.fetchone()[0]
                 
                 # Получить работы с пагинацией
@@ -324,10 +319,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     FROM t_p63326274_course_download_plat.works 
                     WHERE {where_sql}
                     ORDER BY created_at DESC
-                    LIMIT %s OFFSET %s
+                    LIMIT {int(limit)} OFFSET {int(offset)}
                     """
-                params.extend([limit, offset])
-                cur.execute(query, params)
+                cur.execute(query)
                 
                 works = []
                 for row in cur.fetchall():
@@ -603,68 +597,57 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     if method == 'PUT':
         body_data = json.loads(event.get('body', '{}'))
-        work_id = body_data.get('workId')
+        
+        # Handle activity tracking (views, downloads, reviews)
         activity_type = body_data.get('activityType')
-        
-        if not work_id or not activity_type:
-            return {
-                'statusCode': 400,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'workId and activityType required'})
-            }
-        
-        conn = get_db_connection()
-        cur = conn.cursor()
-        
-        try:
-            if activity_type == 'view':
-                cur.execute(
-                    "UPDATE t_p63326274_course_download_plat.works SET views = COALESCE(views, 0) + 1, downloads = COALESCE(downloads, 0) + 1 WHERE id = %s",
-                    (work_id,)
-                )
-            elif activity_type == 'download':
-                cur.execute(
-                    "UPDATE t_p63326274_course_download_plat.works SET downloads = COALESCE(downloads, 0) + 1, views = COALESCE(views, 0) + 1 WHERE id = %s",
-                    (work_id,)
-                )
-            elif activity_type == 'review':
-                cur.execute(
-                    "UPDATE t_p63326274_course_download_plat.works SET reviews_count = COALESCE(reviews_count, 0) + 1 WHERE id = %s",
-                    (work_id,)
-                )
-            
-            cur.execute(
-                "SELECT views, downloads, reviews_count FROM t_p63326274_course_download_plat.works WHERE id = %s",
-                (work_id,)
-            )
-            stats = cur.fetchone()
-            
-            conn.commit()
-            
-            if not stats:
+        if activity_type:
+            work_id = body_data.get('workId')
+            if not work_id:
                 return {
-                    'statusCode': 404,
+                    'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Work not found'})
+                    'body': json.dumps({'error': 'workId required'})
                 }
             
-            return {
-                'statusCode': 200,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({
-                    'success': True,
-                    'workId': work_id,
-                    'views': stats[0] if stats[0] else 0,
-                    'downloads': stats[1] if stats[1] else 0,
-                    'reviewsCount': stats[2] if stats[2] else 0
-                })
-            }
-        finally:
-            cur.close()
-            conn.close()
-    
-    if method == 'PUT':
-        body_data = json.loads(event.get('body', '{}'))
+            conn = get_db_connection()
+            cur = conn.cursor()
+            
+            try:
+                if activity_type == 'view':
+                    cur.execute(f"UPDATE t_p63326274_course_download_plat.works SET views = COALESCE(views, 0) + 1, downloads = COALESCE(downloads, 0) + 1 WHERE id = {int(work_id)}")
+                elif activity_type == 'download':
+                    cur.execute(f"UPDATE t_p63326274_course_download_plat.works SET downloads = COALESCE(downloads, 0) + 1, views = COALESCE(views, 0) + 1 WHERE id = {int(work_id)}")
+                elif activity_type == 'review':
+                    cur.execute(f"UPDATE t_p63326274_course_download_plat.works SET reviews_count = COALESCE(reviews_count, 0) + 1 WHERE id = {int(work_id)}")
+                
+                cur.execute(f"SELECT views, downloads, reviews_count FROM t_p63326274_course_download_plat.works WHERE id = {int(work_id)}")
+                stats = cur.fetchone()
+                
+                conn.commit()
+                
+                if not stats:
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Work not found'})
+                    }
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'success': True,
+                        'workId': work_id,
+                        'views': stats[0] if stats[0] else 0,
+                        'downloads': stats[1] if stats[1] else 0,
+                        'reviewsCount': stats[2] if stats[2] else 0
+                    })
+                }
+            finally:
+                cur.close()
+                conn.close()
+        
+        # Handle moderation (approve/reject)
         work_id = body_data.get('work_id')
         new_status = body_data.get('status')
         rejection_reason = body_data.get('rejection_reason')
@@ -688,18 +671,55 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur = conn.cursor()
         
         try:
+            # Get work details and author_id using Simple Query
+            cur.execute(f"SELECT author_id, title FROM t_p63326274_course_download_plat.works WHERE id = {int(work_id)}")
+            work_data = cur.fetchone()
+            
+            if not work_data:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Work not found'})
+                }
+            
+            author_id = work_data[0]
+            work_title = work_data[1]
+            
+            # Update work status using Simple Query
+            safe_status = new_status.replace("'", "''")
+            
             if rejection_reason:
-                cur.execute("""
+                safe_reason = rejection_reason.replace("'", "''")
+                cur.execute(f"""
                     UPDATE t_p63326274_course_download_plat.works 
-                    SET status = %s, moderation_comment = %s
-                    WHERE id = %s
-                """, (new_status, rejection_reason, work_id))
+                    SET status = '{safe_status}', moderation_comment = '{safe_reason}'
+                    WHERE id = {int(work_id)}
+                """)
             else:
-                cur.execute("""
+                cur.execute(f"""
                     UPDATE t_p63326274_course_download_plat.works 
-                    SET status = %s
-                    WHERE id = %s
-                """, (new_status, work_id))
+                    SET status = '{safe_status}'
+                    WHERE id = {int(work_id)}
+                """)
+            
+            # Send notification to author using Simple Query
+            if new_status == 'approved':
+                safe_title = f'Работа одобрена!'.replace("'", "''")
+                safe_message = f'Ваша работа "{work_title}" была одобрена и опубликована в каталоге. Пользователи теперь могут её покупать.'.replace("'", "''")
+                cur.execute(f"""
+                    INSERT INTO t_p63326274_course_download_plat.user_messages 
+                    (user_id, title, message, type, is_read, created_at)
+                    VALUES ({int(author_id)}, '{safe_title}', '{safe_message}', 'success', FALSE, NOW())
+                """)
+            elif new_status == 'rejected' and rejection_reason:
+                safe_title = f'Работа отклонена'.replace("'", "''")
+                safe_reason_msg = rejection_reason.replace("'", "''")
+                safe_message = f'Ваша работа "{work_title}" была отклонена. Причина: {safe_reason_msg}'.replace("'", "''")
+                cur.execute(f"""
+                    INSERT INTO t_p63326274_course_download_plat.user_messages 
+                    (user_id, title, message, type, is_read, created_at)
+                    VALUES ({int(author_id)}, '{safe_title}', '{safe_message}', 'error', FALSE, NOW())
+                """)
             
             conn.commit()
             

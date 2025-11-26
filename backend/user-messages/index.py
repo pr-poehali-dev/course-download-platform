@@ -49,12 +49,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     cur = conn.cursor()
     
     if method == 'GET' and action == 'get':
-        cur.execute("""
+        cur.execute(f"""
             SELECT id, title, message, type, is_read, created_at
             FROM t_p63326274_course_download_plat.user_messages
-            WHERE user_id = %s
+            WHERE user_id = {int(user_id)}
             ORDER BY created_at DESC
-        """, (user_id,))
+        """)
         
         messages = []
         for row in cur.fetchall():
@@ -91,11 +91,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        cur.execute("""
+        cur.execute(f"""
             UPDATE t_p63326274_course_download_plat.user_messages
             SET is_read = TRUE
-            WHERE id = %s AND user_id = %s
-        """, (message_id, user_id))
+            WHERE id = {int(message_id)} AND user_id = {int(user_id)}
+        """)
         
         conn.commit()
         cur.close()
@@ -124,12 +124,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        cur.execute("""
+        safe_title = title.replace("'", "''")
+        safe_message = message.replace("'", "''")
+        safe_type = msg_type.replace("'", "''")
+        
+        cur.execute(f"""
             INSERT INTO t_p63326274_course_download_plat.user_messages 
             (user_id, title, message, type, is_read, created_at)
-            VALUES (%s, %s, %s, %s, FALSE, NOW())
+            VALUES ({int(user_id)}, '{safe_title}', '{safe_message}', '{safe_type}', FALSE, NOW())
             RETURNING id
-        """, (user_id, title, message, msg_type))
+        """)
         
         message_id = cur.fetchone()[0]
         conn.commit()

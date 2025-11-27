@@ -56,4 +56,4 @@ User-agent: DotBot
 Disallow: /
 
 # Карта сайта
-Sitemap: https://techforma.ru/sitemap.xml
+Sitemap: https://techforma.pro/sitemap.xml

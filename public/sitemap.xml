@@ -4,7 +4,7 @@
   
   <!-- Главная страница -->
   <url>
-    <loc>https://techforma.ru/</loc>
+    <loc>https://techforma.pro/</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -12,7 +12,7 @@
   
   <!-- Каталог работ -->
   <url>
-    <loc>https://techforma.ru/catalog</loc>
+    <loc>https://techforma.pro/catalog</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
@@ -20,7 +20,7 @@
   
   <!-- Каталог: Курсовые работы -->
   <url>
-    <loc>https://techforma.ru/catalog?category=курсовая</loc>
+    <loc>https://techforma.pro/catalog?category=курсовая</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -28,7 +28,7 @@
   
   <!-- Каталог: Дипломные работы -->
   <url>
-    <loc>https://techforma.ru/catalog?category=диплом</loc>
+    <loc>https://techforma.pro/catalog?category=диплом</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -36,7 +36,7 @@
   
   <!-- Каталог: Рефераты -->
   <url>
-    <loc>https://techforma.ru/catalog?category=реферат</loc>
+    <loc>https://techforma.pro/catalog?category=реферат</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -44,7 +44,7 @@
   
   <!-- Каталог: Контрольные работы -->
   <url>
-    <loc>https://techforma.ru/catalog?category=контрольная</loc>
+    <loc>https://techforma.pro/catalog?category=контрольная</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -52,7 +52,7 @@
   
   <!-- Каталог: Эссе -->
   <url>
-    <loc>https://techforma.ru/catalog?category=эссе</loc>
+    <loc>https://techforma.pro/catalog?category=эссе</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -60,7 +60,7 @@
   
   <!-- Каталог: Отчеты -->
   <url>
-    <loc>https://techforma.ru/catalog?category=отчет</loc>
+    <loc>https://techforma.pro/catalog?category=отчет</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -68,7 +68,7 @@
   
   <!-- Блог -->
   <url>
-    <loc>https://techforma.ru/blog</loc>
+    <loc>https://techforma.pro/blog</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -76,7 +76,7 @@
   
   <!-- Маркетплейс для авторов -->
   <url>
-    <loc>https://techforma.ru/marketplace</loc>
+    <loc>https://techforma.pro/marketplace</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -84,7 +84,7 @@
   
   <!-- Генератор защитного набора -->
   <url>
-    <loc>https://techforma.ru/defense-kit</loc>
+    <loc>https://techforma.pro/defense-kit</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -92,7 +92,7 @@
   
   <!-- Покупка баллов -->
   <url>
-    <loc>https://techforma.ru/buy-points</loc>
+    <loc>https://techforma.pro/buy-points</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -100,7 +100,7 @@
   
   <!-- Загрузка работы -->
   <url>
-    <loc>https://techforma.ru/upload</loc>
+    <loc>https://techforma.pro/upload</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -108,7 +108,7 @@
   
   <!-- Регистрация -->
   <url>
-    <loc>https://techforma.ru/register</loc>
+    <loc>https://techforma.pro/register</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -116,7 +116,7 @@
   
   <!-- Вход -->
   <url>
-    <loc>https://techforma.ru/login</loc>
+    <loc>https://techforma.pro/login</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
@@ -124,7 +124,7 @@
   
   <!-- Оферта -->
   <url>
-    <loc>https://techforma.ru/offer</loc>
+    <loc>https://techforma.pro/offer</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -132,7 +132,7 @@
   
   <!-- Политика конфиденциальности -->
   <url>
-    <loc>https://techforma.ru/privacy-policy</loc>
+    <loc>https://techforma.pro/privacy-policy</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -140,7 +140,7 @@
   
   <!-- Условия использования -->
   <url>
-    <loc>https://techforma.ru/terms-of-service</loc>
+    <loc>https://techforma.pro/terms-of-service</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
@@ -148,7 +148,7 @@
   
   <!-- Правила использования -->
   <url>
-    <loc>https://techforma.ru/usage-rules</loc>
+    <loc>https://techforma.pro/usage-rules</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
@@ -156,7 +156,7 @@
   
   <!-- Реквизиты -->
   <url>
-    <loc>https://techforma.ru/requisites</loc>
+    <loc>https://techforma.pro/requisites</loc>
     <lastmod>2025-11-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>

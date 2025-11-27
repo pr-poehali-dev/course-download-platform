@@ -481,81 +481,13 @@ def get_security_question(event: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 def verify_security_answer(event: Dict[str, Any]) -> Dict[str, Any]:
-    '''Verify security answer only'''
+    '''Verify security answer and reset password with new one'''
     body_data = json.loads(event.get('body', '{}'))
     email = _norm_email(body_data.get('email', ''))
     security_answer = body_data.get('security_answer', '').strip()
-    
-    if not email or not security_answer:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Все поля обязательны'}),
-            'isBase64Encoded': False
-        }
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    try:
-        cur.execute(
-            "SELECT id, security_answer_hash FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
-            (email,)
-        )
-        user = cur.fetchone()
-        
-        if not user:
-            cur.close()
-            conn.close()
-            return {
-                'statusCode': 404,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Пользователь не найден'}),
-                'isBase64Encoded': False
-            }
-        
-        user_id, security_answer_hash = user
-        
-        answer_hash = hashlib.sha256(security_answer.lower().strip().encode()).hexdigest()
-        
-        if answer_hash != security_answer_hash:
-            cur.close()
-            conn.close()
-            return {
-                'statusCode': 403,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Неверный ответ на секретный вопрос'}),
-                'isBase64Encoded': False
-            }
-        
-        cur.close()
-        conn.close()
-        
-        return {
-            'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'message': 'Ответ верный'}),
-            'isBase64Encoded': False
-        }
-    except Exception as e:
-        conn.rollback()
-        cur.close()
-        conn.close()
-        print(f"Verify security answer error: {repr(e)}")
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Ошибка при проверке ответа'}),
-            'isBase64Encoded': False
-        }
-
-def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
-    '''Reset password after security answer verification'''
-    body_data = json.loads(event.get('body', '{}'))
-    email = _norm_email(body_data.get('email', ''))
     new_password = body_data.get('new_password', '')
     
-    if not email or not new_password:
+    if not email or not security_answer or not new_password:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -576,7 +508,7 @@ def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
     
     try:
         cur.execute(
-            "SELECT id, username FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
+            "SELECT id, username, security_answer_hash FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
             (email,)
         )
         user = cur.fetchone()
@@ -591,7 +523,20 @@ def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        user_id, username = user
+        user_id, username, security_answer_hash = user
+        
+        answer_hash = hashlib.sha256(security_answer.lower().strip().encode()).hexdigest()
+        
+        if answer_hash != security_answer_hash:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 403,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Неверный ответ на секретный вопрос'}),
+                'isBase64Encoded': False
+            }
+        
         new_password_hash = hash_password(new_password)
         
         cur.execute(
@@ -599,13 +544,78 @@ def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
             (new_password_hash, user_id)
         )
         conn.commit()
+        
+        token = generate_jwt_token(user_id, username)
+        
         cur.close()
         conn.close()
         
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'message': 'Пароль успешно изменен'}),
+            'body': json.dumps({
+                'message': 'Пароль успешно изменен',
+                'token': token
+            }),
+            'isBase64Encoded': False
+        }
+    except Exception as e:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        print(f"Verify security answer error: {repr(e)}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Ошибка при проверке ответа и смене пароля'}),
+            'isBase64Encoded': False
+        }
+
+def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
+    '''Get security question by email (step 1 of password reset)'''
+    body_data = json.loads(event.get('body', '{}'))
+    email = _norm_email(body_data.get('email', ''))
+    
+    if not email:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Email обязателен'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        cur.execute(
+            "SELECT id, security_question FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
+            (email,)
+        )
+        user = cur.fetchone()
+        
+        if not user:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Пользователь с таким email не найден'}),
+                'isBase64Encoded': False
+            }
+        
+        user_id, security_question = user
+        
+        cur.close()
+        conn.close()
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({
+                'security_question': security_question,
+                'message': 'Секретный вопрос получен'
+            }),
             'isBase64Encoded': False
         }
     except Exception as e:
@@ -616,6 +626,6 @@ def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Ошибка при смене пароля'}),
+            'body': json.dumps({'error': 'Ошибка при получении секретного вопроса'}),
             'isBase64Encoded': False
         }

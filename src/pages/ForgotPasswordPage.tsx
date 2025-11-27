@@ -92,6 +92,20 @@ export default function ForgotPasswordPage() {
 
       if (response.ok && data.token) {
         localStorage.setItem('auth_token', data.token);
+        
+        const verifyResponse = await fetch(`${func2url.auth}?action=verify`, {
+          headers: {
+            'X-Auth-Token': data.token
+          }
+        });
+        
+        if (verifyResponse.ok) {
+          const verifyData = await verifyResponse.json();
+          if (verifyData.user) {
+            localStorage.setItem('user', JSON.stringify(verifyData.user));
+          }
+        }
+        
         setStep('success');
         toast({
           title: 'Пароль изменен!',

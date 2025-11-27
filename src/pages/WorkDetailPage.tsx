@@ -11,6 +11,7 @@ import func2url from '../../backend/func2url.json';
 import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import { Helmet } from 'react-helmet-async';
 import { recentlyViewedStorage } from '@/utils/recentlyViewed';
 import { getFakeAuthor, incrementViewCount, getViewCount } from '@/utils/fakeAuthors';
 import ReviewsSection from '@/components/ReviewsSection';
@@ -1028,6 +1029,51 @@ export default function WorkDetailPage() {
         description={work ? `${work.workType} по предмету "${work.subject}". ${work.description.substring(0, 150)}` : 'Детальная информация о студенческой работе'}
         keywords={work ? `${work.workType}, ${work.subject}, курсовая, диплом, купить` : 'студенческие работы'}
       />
+      
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Product',
+            'name': work.title,
+            'description': work.description,
+            'category': work.workType,
+            'image': gallery.length > 0 ? gallery[0] : undefined,
+            'offers': {
+              '@type': 'Offer',
+              'price': work.price,
+              'priceCurrency': 'RUB',
+              'availability': 'https://schema.org/InStock',
+              'url': `https://techforma.pro/work/${actualWorkId}`
+            },
+            'aggregateRating': {
+              '@type': 'AggregateRating',
+              'ratingValue': work.rating,
+              'bestRating': 5,
+              'worstRating': 1,
+              'reviewCount': work.reviewsCount || 1
+            },
+            'brand': {
+              '@type': 'Brand',
+              'name': 'Tech Forma'
+            },
+            'sku': actualWorkId,
+            'additionalProperty': [
+              {
+                '@type': 'PropertyValue',
+                'name': 'Предмет',
+                'value': work.subject
+              },
+              {
+                '@type': 'PropertyValue',
+                'name': 'Тип работы',
+                'value': work.workType
+              }
+            ]
+          })}
+        </script>
+      </Helmet>
+      
       <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-4 md:py-6 mt-16 max-w-[1200px]">

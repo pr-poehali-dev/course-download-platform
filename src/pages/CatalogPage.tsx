@@ -407,44 +407,89 @@ export default function CatalogPage() {
 
   const subjects = Array.from(new Set(works.map(w => w.subject)));
 
+  const getCategoryTitle = () => {
+    if (filterSubject && filterSubject !== 'all') {
+      return `${filterSubject} — купить готовые работы от 200₽`;
+    }
+    if (searchQuery) {
+      return `Поиск: "${searchQuery}" — готовые работы от 200₽`;
+    }
+    return 'Каталог курсовых работ и дипломов от 200₽ — готовые работы';
+  };
+
+  const getCategoryDescription = () => {
+    if (filterSubject && filterSubject !== 'all') {
+      return `Готовые работы по предмету "${filterSubject}". Скачайте курсовые, дипломы, рефераты мгновенно после оплаты. Гарантия уникальности 95%.`;
+    }
+    if (searchQuery) {
+      return `Результаты поиска "${searchQuery}". ${filteredWorks.length} работ найдено. Мгновенное скачивание после оплаты.`;
+    }
+    return 'Купить курсовые работы и дипломы в каталоге. 500+ готовых студенческих работ по всем предметам от 200₽. Гарантия уникальности 95%, мгновенное скачивание после оплаты';
+  };
+
   const jsonLdSchema = {
     '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    'name': 'Каталог студенческих работ',
-    'description': 'Готовые курсовые, дипломы, рефераты, чертежи от 200₽',
-    'numberOfItems': filteredWorks.length,
-    'itemListElement': filteredWorks.slice(0, 20).map((work, index) => ({
-      '@type': 'ListItem',
-      'position': index + 1,
-      'item': {
-        '@type': 'Product',
-        'name': work.title,
-        'description': work.description,
-        'category': work.workType,
-        'offers': {
-          '@type': 'Offer',
-          'price': work.price,
-          'priceCurrency': 'RUB',
-          'availability': 'https://schema.org/InStock',
-          'seller': {
-            '@type': 'Organization',
-            'name': 'Tech Forma'
+    '@graph': [
+      {
+        '@type': 'BreadcrumbList',
+        'itemListElement': [
+          {
+            '@type': 'ListItem',
+            'position': 1,
+            'name': 'Главная',
+            'item': 'https://techforma.pro/'
+          },
+          {
+            '@type': 'ListItem',
+            'position': 2,
+            'name': 'Каталог работ',
+            'item': 'https://techforma.pro/catalog'
           }
-        },
-        'aggregateRating': work.rating > 0 ? {
-          '@type': 'AggregateRating',
-          'ratingValue': work.rating,
-          'ratingCount': work.purchaseCount || 1
-        } : undefined
+        ]
+      },
+      {
+        '@type': 'ItemList',
+        'name': 'Каталог студенческих работ',
+        'description': 'Готовые курсовые, дипломы, рефераты, чертежи от 200₽',
+        'numberOfItems': filteredWorks.length,
+        'itemListElement': filteredWorks.slice(0, 20).map((work, index) => ({
+          '@type': 'ListItem',
+          'position': index + 1,
+          'item': {
+            '@type': 'Product',
+            'name': work.title,
+            'description': work.description,
+            'category': work.workType,
+            'url': `https://techforma.pro/work/${work.id}`,
+            'image': work.previewUrl || undefined,
+            'offers': {
+              '@type': 'Offer',
+              'price': work.price,
+              'priceCurrency': 'RUB',
+              'availability': 'https://schema.org/InStock',
+              'seller': {
+                '@type': 'Organization',
+                'name': 'Tech Forma'
+              }
+            },
+            'aggregateRating': work.rating > 0 ? {
+              '@type': 'AggregateRating',
+              'ratingValue': work.rating,
+              'bestRating': 5,
+              'worstRating': 1,
+              'ratingCount': work.purchaseCount || 1
+            } : undefined
+          }
+        }))
       }
-    }))
+    ]
   };
 
   return (
     <>
       <SEO 
-        title="Каталог курсовых работ и дипломов от 200₽ — готовые работы"
-        description="Купить курсовые работы и дипломы в каталоге. 500+ готовых студенческих работ по всем предметам от 200₽. Гарантия уникальности 95%, мгновенное скачивание после оплаты"
+        title={getCategoryTitle()}
+        description={getCategoryDescription()}
         keywords="курсовые работы купить, дипломы купить, каталог курсовых работ, каталог дипломов, готовые курсовые, готовые дипломы, купить готовую курсовую, купить готовый диплом"
         canonical="https://techforma.pro/catalog"
       />

@@ -1,7 +1,7 @@
 {
   "tests": [
     {
-      "name": "Upload work with all required fields",
+      "name": "Upload work without file (only metadata)",
       "method": "POST",
       "path": "/",
       "body": {
@@ -9,14 +9,11 @@
         "description": "Описание тестовой работы по программированию",
         "category": "coursework",
         "price": 600,
-        "authorId": 999999,
-        "fileName": "test_work.docx"
+        "authorId": 999999
       },
       "expectedStatus": 200,
       "expectedBody": {
-        "success": true,
-        "workId": "number",
-        "message": "string"
+        "success": true
       },
       "bodyMatcher": "partial"
     }

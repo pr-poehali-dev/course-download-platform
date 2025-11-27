@@ -24,8 +24,16 @@ def get_db_connection():
 def upload_to_s3(file_data: str, file_name: str) -> str:
     """Upload file to Yandex S3 and return public URL"""
     try:
+        # Clean base64 string (remove whitespace and newlines)
+        clean_base64 = file_data.strip().replace('\n', '').replace('\r', '').replace(' ', '')
+        
+        # Add padding if needed
+        missing_padding = len(clean_base64) % 4
+        if missing_padding:
+            clean_base64 += '=' * (4 - missing_padding)
+        
         # Decode base64
-        file_bytes = base64.b64decode(file_data)
+        file_bytes = base64.b64decode(clean_base64)
         
         # Create S3 client
         s3_client = boto3.client(

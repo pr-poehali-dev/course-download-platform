@@ -106,53 +106,54 @@ const ResetPasswordPage = () => {
       <div className="w-full max-w-md">
         <Breadcrumbs className="mb-4" />
         <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-center mb-4">
-            <Icon name="KeyRound" size={48} className="text-primary" />
-          </div>
-          <CardTitle className="text-2xl text-center">Сброс пароля</CardTitle>
-          <CardDescription className="text-center">
-            Введите новый пароль для вашего аккаунта
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleResetPassword} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">Новый пароль</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Минимум 8 символов"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+          <CardHeader className="space-y-1">
+            <div className="flex items-center justify-center mb-4">
+              <Icon name="KeyRound" size={48} className="text-primary" />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Повторите пароль"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Обработка...' : 'Сменить пароль'}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full"
-              onClick={() => navigate('/login')}
-            >
-              Вернуться к входу
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+            <CardTitle className="text-2xl text-center">Сброс пароля</CardTitle>
+            <CardDescription className="text-center">
+              Введите новый пароль для вашего аккаунта
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleResetPassword} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="password">Новый пароль</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Минимум 8 символов"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Повторите пароль"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Обработка...' : 'Сменить пароль'}
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full"
+                onClick={() => navigate('/login')}
+              >
+                Вернуться к входу
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

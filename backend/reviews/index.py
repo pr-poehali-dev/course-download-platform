@@ -257,6 +257,19 @@ def create_review(event: Dict[str, Any]) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            # Проверка покупки работы
+            cur.execute(f"""
+                SELECT id FROM t_p63326274_course_download_plat.purchases 
+                WHERE work_id = {work_id_int} AND user_id = {user_id_int}
+            """)
+            if not cur.fetchone():
+                return {
+                    'statusCode': 403,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Купите работу чтобы оставить отзыв'}),
+                    'isBase64Encoded': False
+                }
+            
             # Проверка, не оставил ли пользователь уже отзыв
             cur.execute(f"""
                 SELECT id FROM t_p63326274_course_download_plat.reviews 
@@ -266,17 +279,17 @@ def create_review(event: Dict[str, Any]) -> Dict[str, Any]:
                 return {
                     'statusCode': 400,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'You have already reviewed this work'}),
+                    'body': json.dumps({'error': 'Вы уже оставили отзыв на эту работу'}),
                     'isBase64Encoded': False
                 }
             
-            # Создание отзыва
+            # Создание отзыва со статусом approved (без модерации)
             rating_int = int(rating)
             comment_escaped = escape_sql_string(comment)
             cur.execute(f"""
                 INSERT INTO t_p63326274_course_download_plat.reviews 
                 (work_id, user_id, rating, comment, status, created_at)
-                VALUES ({work_id_int}, {user_id_int}, {rating_int}, {comment_escaped}, 'pending', NOW())
+                VALUES ({work_id_int}, {user_id_int}, {rating_int}, {comment_escaped}, 'approved', NOW())
                 RETURNING id
             """)
             review_id = cur.fetchone()[0]
@@ -286,8 +299,9 @@ def create_review(event: Dict[str, Any]) -> Dict[str, Any]:
                 'statusCode': 201,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
-                    'message': 'Review created successfully (pending moderation)',
-                    'review_id': review_id
+                    'message': 'Отзыв успешно опубликован',
+                    'review_id': review_id,
+                    'success': True
                 }),
                 'isBase64Encoded': False
             }

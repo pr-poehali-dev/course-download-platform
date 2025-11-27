@@ -304,6 +304,8 @@ export default function ProfilePage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [referralDialogOpen, setReferralDialogOpen] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<UserMessage | null>(null);
+  const [messageModalOpen, setMessageModalOpen] = useState(false);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -341,7 +343,6 @@ export default function ProfilePage() {
       });
       
       if (response.ok) {
-        // Обновляем локальное состояние - отмечаем сообщение как прочитанное
         setMessages(prev => 
           prev.map(m => m.id === messageId ? { ...m, is_read: true } : m)
         );
@@ -349,6 +350,15 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error('Failed to mark message as read:', error);
+    }
+  };
+
+  const handleOpenMessage = async (message: UserMessage) => {
+    setSelectedMessage(message);
+    setMessageModalOpen(true);
+    
+    if (!message.is_read) {
+      await handleMarkMessageRead(message.id);
     }
   };
 

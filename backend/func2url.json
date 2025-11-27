@@ -6,7 +6,6 @@
   "update-work": "https://functions.poehali.dev/9d85e209-9c59-4f2b-8577-9abe1ee3c9bd",
   "upload-work-cover": "https://functions.poehali.dev/435eca6c-ff57-4132-97a9-f216ab253036",
   "user-messages": "https://functions.poehali.dev/c5630e6c-dcda-4e40-911c-f809b0116c9f",
-  "bulk-approve-works": "https://functions.poehali.dev/e0319554-86af-43b3-a2ad-d0662cf9593a",
   "upload-work": "https://functions.poehali.dev/fb387705-926b-436e-9d4f-4f064c4a4b3d",
   "upload-preview": "https://functions.poehali.dev/6bbd2ffd-478a-4e92-a0c5-8471afb6ee70",
   "generate-work-preview": "https://functions.poehali.dev/ce75cac5-db95-41b2-b846-fc429791dd1a",

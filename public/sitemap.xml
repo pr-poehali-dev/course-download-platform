@@ -4,160 +4,160 @@
   
   <!-- Главная страница -->
   <url>
-    <loc>https://techforma.pro/</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   
   <!-- Каталог работ -->
   <url>
-    <loc>https://techforma.pro/catalog</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/catalog</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
   </url>
   
   <!-- Каталог: Курсовые работы -->
   <url>
-    <loc>https://techforma.pro/catalog?category=курсовая</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/catalog?category=курсовая</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- Каталог: Дипломные работы -->
   <url>
-    <loc>https://techforma.pro/catalog?category=диплом</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/catalog?category=диплом</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- Каталог: Рефераты -->
   <url>
-    <loc>https://techforma.pro/catalog?category=реферат</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/catalog?category=реферат</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   
   <!-- Каталог: Контрольные работы -->
   <url>
-    <loc>https://techforma.pro/catalog?category=контрольная</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/catalog?category=контрольная</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   
   <!-- Каталог: Эссе -->
   <url>
-    <loc>https://techforma.pro/catalog?category=эссе</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/catalog?category=эссе</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   
   <!-- Каталог: Отчеты -->
   <url>
-    <loc>https://techforma.pro/catalog?category=отчет</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/catalog?category=отчет</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   
   <!-- Блог -->
   <url>
-    <loc>https://techforma.pro/blog</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/blog</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Подписка на бота -->
+  <!-- Маркетплейс для авторов -->
   <url>
-    <loc>https://techforma.pro/bot-subscription</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/marketplace</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   
-  <!-- Маркетплейс -->
+  <!-- Генератор защитного набора -->
   <url>
-    <loc>https://techforma.pro/marketplace</loc>
-    <lastmod>2025-11-26</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <loc>https://techforma.ru/defense-kit</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   
   <!-- Покупка баллов -->
   <url>
-    <loc>https://techforma.pro/buy-points</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/buy-points</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Загрузка работы -->
+  <url>
+    <loc>https://techforma.ru/upload</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <!-- Регистрация -->
   <url>
-    <loc>https://techforma.pro/register</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/register</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   
   <!-- Вход -->
   <url>
-    <loc>https://techforma.pro/login</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/login</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   
   <!-- Оферта -->
   <url>
-    <loc>https://techforma.pro/offer</loc>
-    <lastmod>2025-11-26</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://techforma.ru/offer</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <!-- Политика конфиденциальности -->
   <url>
-    <loc>https://techforma.pro/privacy-policy</loc>
-    <lastmod>2025-11-26</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://techforma.ru/privacy-policy</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <!-- Условия использования -->
   <url>
-    <loc>https://techforma.pro/terms-of-service</loc>
-    <lastmod>2025-11-26</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://techforma.ru/terms-of-service</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   
   <!-- Правила использования -->
   <url>
-    <loc>https://techforma.pro/usage-rules</loc>
-    <lastmod>2025-11-26</lastmod>
-    <changefreq>monthly</changefreq>
+    <loc>https://techforma.ru/usage-rules</loc>
+    <lastmod>2025-11-27</lastmod>
+    <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   
   <!-- Реквизиты -->
   <url>
-    <loc>https://techforma.pro/requisites</loc>
-    <lastmod>2025-11-26</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
-  
-  <!-- Гайд по Роскомнадзору -->
-  <url>
-    <loc>https://techforma.pro/roskomnadzor-guide</loc>
-    <lastmod>2025-11-26</lastmod>
+    <loc>https://techforma.ru/requisites</loc>
+    <lastmod>2025-11-27</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>

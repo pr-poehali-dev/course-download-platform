@@ -39,6 +39,7 @@ import PaymentSuccessPage from "./pages/PaymentSuccessPage";
 import PaymentFailedPage from "./pages/PaymentFailedPage";
 import PointsAuditPage from "./pages/PointsAuditPage";
 import GenerateReviewsPage from "./pages/GenerateReviewsPage";
+import SitemapViewPage from "./pages/SitemapViewPage";
 
 
 
@@ -87,6 +88,7 @@ const App = () => (
           <Route path="/payment/failed" element={<PaymentFailedPage />} />
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
           <Route path="/admin/generate-reviews" element={<GenerateReviewsPage />} />
+          <Route path="/admin/sitemap" element={<SitemapViewPage />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

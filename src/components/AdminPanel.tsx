@@ -181,6 +181,47 @@ export default function AdminPanel() {
           <BlogManagement />
         </TabsContent>
 
+        <TabsContent value="seo" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold">SEO & Индексация</h3>
+                  <p className="text-muted-foreground mt-1">Управление sitemap и SEO настройками</p>
+                </div>
+                <Icon name="Globe" size={32} className="text-blue-600" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                <a 
+                  href="/admin/sitemap" 
+                  target="_blank"
+                  className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                      <Icon name="FileText" size={24} className="text-blue-600 group-hover:text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-lg">Динамический Sitemap</h4>
+                      <p className="text-sm text-gray-600">508 URL (20 статических + 488 работ)</p>
+                    </div>
+                  </div>
+                  <Icon name="ExternalLink" size={20} className="text-gray-400 group-hover:text-blue-600" />
+                </a>
+                
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold mb-2">Ссылка для Яндекс.Вебмастер:</h4>
+                  <code className="text-sm bg-white px-3 py-2 rounded border block overflow-x-auto">
+                    {func2url['sitemap']}
+                  </code>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="support" className="space-y-6">
           <SupportAdmin />
         </TabsContent>

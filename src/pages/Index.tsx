@@ -22,6 +22,7 @@ import CartDialog from '@/components/CartDialog';
 import FavoritesDialog from '@/components/FavoritesDialog';
 import PromoCodeDialog from '@/components/PromoCodeDialog';
 import ReferralDialog from '@/components/ReferralDialog';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 
 import AboutSection from '@/components/AboutSection';

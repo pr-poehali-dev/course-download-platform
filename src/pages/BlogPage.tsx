@@ -9,7 +9,7 @@ import SEO from '@/components/SEO';
 import func2url from '../../backend/func2url.json';
 import ReactMarkdown from 'react-markdown';
 import { seoArticles, SEOArticle } from '@/data/seoArticles';
-import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 interface BlogPost {
   id: number;

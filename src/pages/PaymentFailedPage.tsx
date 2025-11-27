@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function PaymentFailedPage() {
   const [searchParams] = useSearchParams();
@@ -14,8 +15,10 @@ export default function PaymentFailedPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-50 to-white">
       <Navigation />
-      
-      <div className="container mx-auto px-4 py-20">
+      <div className="container mx-auto px-4 pt-20">
+        <Breadcrumbs />
+      </div>
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <Card className="border-red-200 shadow-xl">
             <CardHeader className="text-center pb-8">

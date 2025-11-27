@@ -18,6 +18,7 @@ import ReviewsSection from '@/components/ReviewsSection';
 import WorkActivityTracker from '@/components/WorkActivityTracker';
 import { toast } from '@/components/ui/use-toast';
 import { getUserDiscount } from '@/utils/discount';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 
 interface Work {
@@ -1030,6 +1031,11 @@ export default function WorkDetailPage() {
         keywords={work ? `${work.workType}, ${work.subject}, курсовая, диплом, купить` : 'студенческие работы'}
       />
       
+      <Navigation isLoggedIn={isLoggedIn} />
+      <div className="container max-w-7xl mx-auto px-4 mt-20">
+        <Breadcrumbs />
+      </div>
+
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({

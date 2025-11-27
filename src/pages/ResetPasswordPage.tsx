@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import Icon from '@/components/ui/icon';
 import func2url from '../../backend/func2url.json';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const ResetPasswordPage = () => {
   const [searchParams] = useSearchParams();
@@ -102,7 +103,9 @@ const ResetPasswordPage = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 p-4">
-      <Card className="w-full max-w-md">
+      <div className="w-full max-w-md">
+        <Breadcrumbs className="mb-4" />
+        <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <Icon name="KeyRound" size={48} className="text-primary" />

@@ -8,6 +8,7 @@ import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import { getTimeRemaining, formatTime } from '@/utils/urgencyTriggers';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 interface PointsPackage {
   id: number;
@@ -142,6 +143,7 @@ export default function BuyPointsPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16 max-w-6xl">
+        <Breadcrumbs />
         <div className="mb-8">
           <Button variant="ghost" className="mb-4" asChild>
             <Link to="/profile">

@@ -8,6 +8,7 @@ import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
 import SEO from '@/components/SEO';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -139,6 +140,7 @@ export default function ForgotPasswordPage() {
       />
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
+        <Breadcrumbs className="mb-4" />
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold mb-2">
             <Icon name="Cpu" size={32} className="text-primary" />

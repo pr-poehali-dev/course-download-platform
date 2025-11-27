@@ -5,6 +5,7 @@ import { authService } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function AuthorMarketplacePage() {
   const navigate = useNavigate();
@@ -87,6 +88,7 @@ export default function AuthorMarketplacePage() {
       <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-12 mt-16 max-w-7xl">
+        <Breadcrumbs />
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Делитесь работами и получайте баллы

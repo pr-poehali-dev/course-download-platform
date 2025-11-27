@@ -5,7 +5,7 @@ import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import QuickViewModal from '@/components/catalog/QuickViewModal';
-import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 import CatalogFilters from '@/components/catalog/CatalogFilters';
 import PreviewCarousel from '@/components/PreviewCarousel';

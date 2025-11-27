@@ -10,6 +10,7 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/lib/auth';
 import funcUrls from '../../backend/func2url.json';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function DefenseKitBuilder() {
   const [searchParams] = useSearchParams();
@@ -183,6 +184,7 @@ export default function DefenseKitBuilder() {
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-24 pb-12">
         <div className="container mx-auto px-4 max-w-4xl">
+          <Breadcrumbs />
           <div className="bg-white rounded-2xl shadow-xl p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="bg-blue-100 p-3 rounded-xl">

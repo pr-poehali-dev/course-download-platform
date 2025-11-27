@@ -16,6 +16,7 @@ import TransactionsTab from '@/components/profile/TransactionsTab';
 import ReferralDialog from '@/components/ReferralDialog';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 interface UserProfile {
   name: string;
@@ -445,6 +446,7 @@ export default function ProfilePage() {
       />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <div className="container mx-auto px-4 py-8 max-w-7xl">
+          <Breadcrumbs />
           <div className="mb-6">
             <Button variant="ghost" className="mb-4 hover:bg-white/50" asChild>
               <Link to="/">

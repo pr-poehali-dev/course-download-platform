@@ -3,12 +3,16 @@ import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import TermsOfService from '@/pages/TermsOfService';
 import Footer from '@/components/Footer';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function TermsOfServicePage() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 pt-4">
+        <Breadcrumbs />
+      </div>
       <header className="border-b sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">

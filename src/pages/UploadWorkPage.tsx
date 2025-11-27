@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
+import { optimizeAndEncodeImage, validateImage } from '@/utils/imageOptimization';
 import {
   Select,
   SelectContent,
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 export default function UploadWorkPage() {
   const navigate = useNavigate();
@@ -144,6 +146,7 @@ export default function UploadWorkPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-16 max-w-4xl">
+        <Breadcrumbs />
         <div className="mb-8">
           <Button variant="ghost" className="mb-4" asChild>
             <Link to="/profile">

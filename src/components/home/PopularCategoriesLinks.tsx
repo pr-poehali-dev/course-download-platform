@@ -6,7 +6,7 @@ export default function PopularCategoriesLinks() {
     { name: 'Курсовые по автоматизации', url: '/catalog?subject=Автоматизация', icon: 'Settings' },
     { name: 'Курсовые по программированию', url: '/catalog?subject=Программирование', icon: 'Code' },
     { name: 'Дипломы по строительству', url: '/catalog?subject=Строительство', icon: 'Building' },
-    { name: 'Курсовые по экономике', url: '/catalog?subject=Общая инженерия', icon: 'TrendingUp' },
+    { name: 'Курсовые по информатике', url: '/catalog?subject=Информатика', icon: 'Monitor' },
     { name: 'Дипломные работы', url: '/catalog?workType=Дипломная работа', icon: 'GraduationCap' },
     { name: 'Все курсовые работы', url: '/catalog?workType=Курсовая работа', icon: 'BookOpen' },
     { name: 'Рефераты и контрольные', url: '/catalog?workType=Реферат', icon: 'FileText' },

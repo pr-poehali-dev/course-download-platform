@@ -75,10 +75,10 @@ export default function CategoryLinksSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">
-            Категории материалов
+            Каталог инженерных материалов — чертежи, 3D-модели, расчёты от 200 баллов
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Найдите нужные чертежи, модели или расчёты по направлению
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            2000+ инженерных материалов по всем направлениям. Скачайте чертёж DWG, 3D-модель или расчёт мгновенно после оплаты
           </p>
         </div>
 

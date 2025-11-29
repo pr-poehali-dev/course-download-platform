@@ -10,7 +10,7 @@ export default function AboutSection() {
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">О платформе</h2>
             <p className="text-lg text-gray-600">
-              Техническая библиотека для инженеров и студентов
+              Инженерная платформа для студентов и специалистов
             </p>
           </div>
 

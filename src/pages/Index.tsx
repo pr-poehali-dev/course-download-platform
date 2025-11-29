@@ -468,9 +468,9 @@ export default function Index() {
   return (
     <>
       <SEO 
-        title="Tech Forma — Техническая библиотека | Чертежи, CAD, примеры расчётов"
-        description="Техническая библиотека для инженеров и студентов. Чертежи, 3D-модели, примеры технических расчётов, проектная документация. База справочных материалов для обучения."
-        keywords="чертежи dwg, cad проекты, 3d модели, технические расчёты, проектная документация, учебные материалы, техническая библиотека, примеры проектов"
+        title="Tech Forma — Инженерная платформа | Чертежи, CAD, примеры расчётов"
+        description="Инженерная платформа для студентов и специалистов. Чертежи, 3D-модели, примеры технических расчётов, проектная документация. База справочных материалов для обучения."
+        keywords="чертежи dwg, cad проекты, 3d модели, технические расчёты, проектная документация, учебные материалы, инженерная платформа, примеры проектов"
         canonical="https://techforma.pro/"
       />
       <Helmet>
@@ -481,7 +481,7 @@ export default function Index() {
             "name": "Tech Forma",
             "url": "https://techforma.pro",
             "logo": "https://techforma.pro/logo.png",
-            "description": "Техническая библиотека для инженеров и студентов. Чертежи, CAD-проекты, 3D-модели, примеры расчётов",
+            "description": "Инженерная платформа для студентов и специалистов. Чертежи, CAD-проекты, 3D-модели, примеры расчётов",
             "address": {
               "@type": "PostalAddress",
               "addressCountry": "RU"
@@ -513,7 +513,7 @@ export default function Index() {
                 "name": "Что такое Tech Forma?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Tech Forma — техническая библиотека для инженеров и студентов. База справочных материалов, чертежей, CAD-проектов и примеров технических расчётов для обучения."
+                  "text": "Tech Forma — инженерная платформа для студентов и специалистов. База справочных материалов, чертежей, CAD-проектов и примеров технических расчётов для обучения."
                 }
               },
               {
@@ -561,7 +561,7 @@ export default function Index() {
                 <Icon name="Layers" size={28} className="text-primary flex-shrink-0" />
                 <div className="flex flex-col min-w-0">
                   <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight text-gray-900">Tech Forma</h1>
-                  <p className="text-xs text-gray-500 truncate leading-tight">Техническая библиотека</p>
+                  <p className="text-xs text-gray-500 truncate leading-tight">Инженерная платформа</p>
                 </div>
               </div>
               
@@ -891,7 +891,7 @@ export default function Index() {
                     </div>
                     <h3 className="font-bold text-2xl mb-3 text-slate-900">Начни использовать платформу</h3>
                     <p className="text-slate-600 text-base max-w-xl mx-auto mb-6">
-                      Доступ к библиотеке технических материалов — справочные пособия для обучения
+                      Доступ к инженерным материалам — справочные пособия для обучения
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1597,7 +1597,7 @@ export default function Index() {
                     <h3 className="font-bold text-lg text-gray-900">Tech Forma</h3>
                   </div>
                   <p className="text-sm text-gray-600">
-                    Техническая библиотека
+                    Инженерная платформа
                   </p>
                 </div>
 

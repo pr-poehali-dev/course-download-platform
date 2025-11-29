@@ -67,7 +67,13 @@ export default function BlogPage() {
           createdAt: article.publishedAt,
           updatedAt: article.publishedAt
         }))];
-        setPosts(combinedPosts);
+        
+        // Удаляем дубликаты по slug
+        const uniquePosts = combinedPosts.filter((post, index, self) => 
+          index === self.findIndex((p) => p.slug === post.slug)
+        );
+        
+        setPosts(uniquePosts);
       }
     } catch (error) {
       console.error('Failed to load posts:', error);

@@ -290,8 +290,8 @@ export default function BlogPage() {
     <>
       <SEO
         title="Блог"
-        description="Новости платформы Tech Forma, полезные статьи и обновления"
-        keywords="блог, новости, обновления платформы, статьи для студентов"
+        description="Статьи об инженерных программах, обучение работе с чертежами, 3D-моделированию, CAD-системам"
+        keywords="блог, инженерные статьи, уроки cad, работа с чертежами, 3d моделирование, гайды для инженеров"
       />
       <div className="min-h-screen bg-white">
         <Navigation />
@@ -303,9 +303,9 @@ export default function BlogPage() {
           ]} />
           
           <div className="mb-12">
-            <h1 className="text-5xl font-bold mb-4">Блог Tech Forma — полезные статьи для студентов</h1>
+            <h1 className="text-5xl font-bold mb-4">Блог Tech Forma — полезные статьи для инженеров</h1>
             <p className="text-xl text-muted-foreground">
-              Гайды по покупке курсовых работ, сравнения цен, инструкции и актуальная информация 2025 года
+              Уроки по CAD-системам, работе с чертежами, 3D-моделированию, примеры оформления технической документации
             </p>
           </div>
 

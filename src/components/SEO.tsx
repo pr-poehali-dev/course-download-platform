@@ -12,9 +12,9 @@ interface SEOProps {
 }
 
 const DEFAULT_SEO = {
-  title: 'Купить курсовую работу от 200₽ — готовые курсовые и дипломы недорого | Tech Forma',
-  description: '⭐ Купить курсовую работу недорого от 200₽. 500+ готовых работ с гарантией уникальности 95%. Дипломы, рефераты, контрольные — мгновенное скачивание после оплаты. Где купить готовую курсовую? На Tech Forma!',
-  keywords: 'купить курсовую работу, купить курсовую недорого, готовые курсовые работы, курсовая работа цена, где купить курсовую, купить дипломную работу, готовые дипломы, купить диплом недорого, купить реферат, курсовые работы купить онлайн',
+  title: 'Tech Forma — Инженерная платформа | Чертежи DWG, 3D-модели, CAD проекты',
+  description: '⭐ Инженерная платформа для студентов и специалистов. 500+ чертежей DWG/DXF, 3D-модели STEP/STL, технические расчёты, проектная документация. База справочных материалов для обучения и практики.',
+  keywords: 'чертежи dwg скачать, cad проекты, 3d модели step, технические расчёты примеры, проектная документация, инженерная платформа, учебные материалы инженеров, чертежи для студентов, dxf файлы, solidworks модели, компас чертежи',
   ogImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e25efd0b-8d04-4b71-b6d0-2a3a0d0123a4.jpg',
   siteName: 'Tech Forma',
   baseUrl: 'https://techforma.pro'
@@ -158,25 +158,31 @@ export default function SEO({
         },
         {
           '@type': 'ItemList',
-          'name': 'Категории работ',
+          'name': 'Категории материалов',
           'itemListElement': [
             {
               '@type': 'ListItem',
               'position': 1,
-              'name': 'Курсовые работы',
-              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=course`
+              'name': 'Чертежи DWG/DXF',
+              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=drawings`
             },
             {
               '@type': 'ListItem',
               'position': 2,
-              'name': 'Дипломные работы',
-              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=diploma`
+              'name': '3D-модели STEP/STL',
+              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=3d-models`
             },
             {
               '@type': 'ListItem',
               'position': 3,
-              'name': 'Рефераты',
-              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=referat`
+              'name': 'Технические расчёты',
+              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=calculations`
+            },
+            {
+              '@type': 'ListItem',
+              'position': 4,
+              'name': 'Проектная документация',
+              'url': `${DEFAULT_SEO.baseUrl}/catalog?category=documentation`
             }
           ]
         }

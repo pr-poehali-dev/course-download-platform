@@ -449,8 +449,8 @@ export default function CatalogPage() {
       },
       {
         '@type': 'ItemList',
-        'name': 'Каталог студенческих работ',
-        'description': 'Готовые курсовые, дипломы, рефераты, чертежи от 200₽',
+        'name': 'Каталог инженерных материалов',
+        'description': 'Чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты и проектная документация от 200₽',
         'numberOfItems': filteredWorks.length,
         'itemListElement': filteredWorks.slice(0, 20).map((work, index) => ({
           '@type': 'ListItem',

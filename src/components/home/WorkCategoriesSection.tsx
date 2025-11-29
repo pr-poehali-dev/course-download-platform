@@ -10,35 +10,35 @@ export default function WorkCategoriesSection({ onCatalogClick }: WorkCategories
   const categories = [
     {
       id: 'coursework',
-      title: 'Курсовые работы',
-      description: 'Готовые курсовые работы по всем дисциплинам',
+      title: 'Примеры учебных проектов',
+      description: 'Образцы оформления и структуры проектов',
       icon: 'BookOpen',
-      stats: '250+ работ',
-      keywords: 'Купить курсовую работу недорого от 200₽. Готовые курсовые проекты с гарантией уникальности.'
+      stats: '250+ примеров',
+      keywords: 'Примеры учебных проектов для изучения. Образцы оформления и структурирования.'
     },
     {
       id: 'diploma',
-      title: 'Дипломные работы',
-      description: 'Дипломы и ВКР по всем специальностям',
+      title: 'Техническая документация',
+      description: 'Проектная документация и технические отчёты',
       icon: 'GraduationCap',
-      stats: '150+ работ',
-      keywords: 'Купить дипломную работу или ВКР. Готовые дипломные проекты с документами.'
+      stats: '150+ материалов',
+      keywords: 'Примеры проектной документации и технических отчётов для изучения.'
     },
     {
       id: 'referat',
-      title: 'Рефераты',
-      description: 'Рефераты и доклады быстро и недорого',
+      title: 'Чертежи и CAD',
+      description: 'Технические чертежи и CAD-проекты',
       icon: 'FileText',
-      stats: '100+ работ',
-      keywords: 'Скачать реферат по любому предмету. Готовые рефераты с оформлением по ГОСТ.'
+      stats: '100+ чертежей',
+      keywords: 'Чертежи DWG, DXF, CAD-проекты для изучения. Примеры оформления.'
     },
     {
       id: 'other',
-      title: 'Контрольные работы',
-      description: 'Контрольные, лабораторные, расчеты',
+      title: 'Технические расчёты',
+      description: 'Примеры расчётов и вычислений',
       icon: 'Calculator',
-      stats: '50+ работ',
-      keywords: 'Купить контрольную работу или лабораторную. Решенные задачи и расчеты.'
+      stats: '50+ примеров',
+      keywords: 'Примеры технических расчётов и вычислений. Образцы для изучения.'
     }
   ];
 
@@ -47,10 +47,10 @@ export default function WorkCategoriesSection({ onCatalogClick }: WorkCategories
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Готовые студенческие работы по всем предметам
+            База технических материалов для обучения
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Выберите нужный тип работы и найдите готовое решение за несколько минут
+            Справочные пособия, примеры проектов и техническая документация
           </p>
         </div>
 

@@ -468,20 +468,20 @@ export default function Index() {
   return (
     <>
       <SEO 
-        title="Курсовые работы и дипломы от 200₽ — купить готовую работу"
-        description="Купить курсовые работы и дипломы от 200₽. 500+ готовых студенческих работ по всем предметам. Мгновенное скачивание, гарантия уникальности 95%. Где купить курсовую работу недорого? У нас!"
-        keywords="курсовые работы купить, дипломы купить, купить курсовую работу недорого, купить дипломную работу, готовые курсовые работы, готовые дипломы, где купить курсовую, купить курсовую цена, дипломная работа купить"
+        title="Tech Forma — Техническая библиотека | Чертежи, CAD, примеры расчётов"
+        description="Техническая библиотека для инженеров и студентов. Чертежи, 3D-модели, примеры технических расчётов, проектная документация. База справочных материалов для обучения."
+        keywords="чертежи dwg, cad проекты, 3d модели, технические расчёты, проектная документация, учебные материалы, техническая библиотека, примеры проектов"
         canonical="https://techforma.pro/"
       />
       <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
-            "@type": "EducationalOrganization",
+            "@type": "WebSite",
             "name": "Tech Forma",
             "url": "https://techforma.pro",
             "logo": "https://techforma.pro/logo.png",
-            "description": "Платформа для покупки готовых курсовых работ и дипломов от 200₽. 500+ студенческих работ с гарантией качества",
+            "description": "Техническая библиотека для инженеров и студентов. Чертежи, CAD-проекты, 3D-модели, примеры расчётов",
             "address": {
               "@type": "PostalAddress",
               "addressCountry": "RU"
@@ -510,26 +510,26 @@ export default function Index() {
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "Где купить курсовую работу недорого?",
+                "name": "Что такое Tech Forma?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "На Tech Forma вы можете купить готовые курсовые работы от 200₽. Это самые низкие цены на рынке студенческих работ. У нас более 500 готовых курсовых по всем предметам с гарантией уникальности 95%."
+                  "text": "Tech Forma — техническая библиотека для инженеров и студентов. База справочных материалов, чертежей, CAD-проектов и примеров технических расчётов для обучения."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Сколько стоит купить курсовую работу?",
+                "name": "Какие материалы доступны?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Цены на готовые курсовые работы начинаются от 200₽ и зависят от предмета, объема и сложности. Средняя стоимость курсовой работы — 300-500₽."
+                  "text": "В библиотеке доступны чертежи, 3D-модели, примеры технических расчётов, проектная документация и учебные материалы для изучения."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Можно ли купить дипломную работу?",
+                "name": "Для чего предназначены материалы?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Да, в нашем каталоге есть готовые дипломные работы и ВКР по разным специальностям. Цены на дипломы начинаются от 500₽. Все дипломные работы проверены на уникальность."
+                  "text": "Все материалы предоставляются исключительно в образовательных целях как справочные пособия и примеры оформления. Требуют авторской переработки."
                 }
               }
             ]
@@ -561,7 +561,7 @@ export default function Index() {
                 <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
                 <div className="flex flex-col min-w-0">
                   <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Платформа для студентов</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Техническая библиотека</p>
                 </div>
               </div>
               
@@ -766,7 +766,7 @@ export default function Index() {
               </div>
               
               <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Покупай готовые курсовые и дипломы за баллы. Продавай свои работы и зарабатывай.
+                Техническая библиотека для инженеров и студентов. Чертежи, 3D-модели, примеры расчётов.
               </p>
               
               <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
@@ -825,7 +825,7 @@ export default function Index() {
                 Всё для успешной учёбы
               </h2>
               <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-                Современные инструменты для студентов
+                База технических знаний для обучения
               </p>
             </div>
 
@@ -840,13 +840,13 @@ export default function Index() {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <CardTitle className="text-2xl">Маркетплейс работ</CardTitle>
-                  <CardDescription className="text-base">Покупай за баллы от 100</CardDescription>
+                  <CardTitle className="text-2xl">Библиотека материалов</CardTitle>
+                  <CardDescription className="text-base">Получай доступ за баллы</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Курсовые, дипломы, чертежи</span>
+                    <span>Чертежи, CAD, учебные материалы</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Icon name="Check" size={16} className="text-green-600" />
@@ -982,7 +982,7 @@ export default function Index() {
                     </div>
                     <h3 className="font-bold text-2xl mb-3 text-slate-900">Начни использовать платформу</h3>
                     <p className="text-slate-600 text-base max-w-xl mx-auto mb-6">
-                      Доступ к каталогу из 500+ готовых работ — всё что нужно для успешной учёбы
+                      Доступ к библиотеке технических материалов — справочные пособия для обучения
                     </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -1675,7 +1675,7 @@ export default function Index() {
                   <h3 className="font-bold text-lg">Tech Forma</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Технологичная платформа для обмена студенческими работами
+                  Техническая библиотека материалов
                 </p>
               </div>
 
@@ -1702,7 +1702,7 @@ export default function Index() {
 
             <div className="border-t mt-8 pt-8">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-sm text-muted-foreground">
-                <p>© 2025 Tech Forma. Все материалы предоставлены в ознакомительных целях.</p>
+                <p>© 2025 Tech Forma. Техническая библиотека. Все материалы предоставляются только для изучения.</p>
               </div>
             </div>
           </div>

@@ -79,17 +79,19 @@ export default function AboutSection() {
           </Card>
         </div>
 
-        <div className="bg-primary/5 rounded-2xl p-8 max-w-4xl mx-auto border-2 border-primary/10">
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-2xl p-8 max-w-4xl mx-auto">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center flex-shrink-0">
-              <Icon name="Lightbulb" size={24} className="text-yellow-600" />
+              <Icon name="AlertTriangle" size={24} className="text-yellow-600" />
             </div>
             <div>
-              <h3 className="text-xl font-bold mb-2">Для чего это нужно?</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                Платформа создана как база референсных материалов для обучения. Здесь вы можете найти примеры оформления, 
-                структуры работ, подходы к решению задач. Все материалы предоставлены исключительно в ознакомительных целях 
-                и не должны использоваться как готовые решения без переработки.
+              <h3 className="text-xl font-bold mb-2 text-yellow-900">⚠️ Правовое уведомление</h3>
+              <p className="text-yellow-800 leading-relaxed">
+                Материалы платформы предназначены исключительно для образовательных целей как справочные пособия. 
+                Примеры учебных работ должны использоваться только для изучения подходов к решению задач, оформления 
+                и структурирования. <strong>Все материалы требуют обязательной авторской переработки перед использованием.</strong> 
+                Прямое копирование запрещено. Администрация не несёт ответственности за использование материалов 
+                в нарушение их назначения.
               </p>
             </div>
           </div>

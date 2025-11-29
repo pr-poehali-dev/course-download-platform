@@ -37,7 +37,7 @@ import { Helmet } from 'react-helmet-async';
 import HomeHeader from '@/components/home/HomeHeader';
 import RotatingText from '@/components/home/RotatingText';
 import NewsSection from '@/components/NewsSection';
-import PurchaseNotifications from '@/components/PurchaseNotifications';
+
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
 import SEOHeroSection from '@/components/home/SEOHeroSection';
@@ -551,7 +551,7 @@ export default function Index() {
           })}
         </script>
       </Helmet>
-      <PurchaseNotifications />
+
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-background">

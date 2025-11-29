@@ -98,7 +98,7 @@ export default function PopularSearches() {
               <Icon name="Database" size={24} className="text-secondary" />
             </div>
             <h4 className="font-bold text-sm mb-1 text-foreground">Весь каталог</h4>
-            <p className="text-xs text-muted-foreground">2000+ материалов</p>
+            <p className="text-xs text-muted-foreground">500+ материалов</p>
           </div>
         </div>
       </div>

@@ -55,7 +55,7 @@ export default function AuthorMarketplacePage() {
   ];
 
   const stats = [
-    { value: '2000+', label: 'Материалов в каталоге' },
+    { value: '500+', label: 'Материалов в каталоге' },
     { value: '90%', label: 'Баллов автору' },
     { value: '1000+', label: 'Пользователей' }
   ];

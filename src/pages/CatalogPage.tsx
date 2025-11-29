@@ -16,7 +16,7 @@ import TrustRating from '@/components/TrustRating';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
-import PurchaseNotifications from '@/components/PurchaseNotifications';
+
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
 import { getUserDiscount } from '@/utils/discount';
@@ -498,7 +498,7 @@ export default function CatalogPage() {
           {JSON.stringify(jsonLdSchema)}
         </script>
       </Helmet>
-      <PurchaseNotifications />
+
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
@@ -516,7 +516,7 @@ export default function CatalogPage() {
               Каталог инженерных материалов — чертежи DWG, 3D-модели, расчёты от 200₽
             </h1>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
-              2000+ инженерных материалов по всем направлениям. Скачайте чертёж DWG, 3D-модель или расчёт мгновенно после оплаты
+              500+ инженерных материалов по всем направлениям. Скачайте чертёж DWG, 3D-модель или расчёт мгновенно после оплаты
             </p>
             <Badge className="glass-card border-blue-200 text-sm">
               <Icon name="FileText" size={14} className="mr-1" />

@@ -22,7 +22,7 @@ export default function SEOContentSection() {
             <ul className="space-y-3 text-muted-foreground">
               <li className="flex items-start gap-3">
                 <span className="text-primary font-bold text-xl">✓</span>
-                <span><strong className="text-foreground">2000+ материалов</strong> — чертежи, модели, расчёты по всем инженерным направлениям</span>
+                <span><strong className="text-foreground">500+ материалов</strong> — чертежи, модели, расчёты по всем инженерным направлениям</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-primary font-bold text-xl">✓</span>

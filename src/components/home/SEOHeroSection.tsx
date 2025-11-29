@@ -64,7 +64,7 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
             </div>
             <div className="text-center">
               <div className="text-3xl sm:text-4xl font-bold text-primary">24/7</div>
-              <div className="text-sm text-muted-foreground mt-1">Доступ
+              <div className="text-sm text-muted-foreground mt-1">Доступ</div>
             </div>
           </div>
         </div>

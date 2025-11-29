@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,35 +6,35 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --background: 222 47% 8%;
+    --foreground: 180 100% 90%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 222 40% 10%;
+    --card-foreground: 180 100% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 222 40% 10%;
+    --popover-foreground: 180 100% 90%;
 
-    --primary: 210 100% 45%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 180 100% 50%;
+    --primary-foreground: 222 47% 8%;
 
-    --secondary: 210 16% 93%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 280 100% 60%;
+    --secondary-foreground: 180 100% 90%;
 
-    --muted: 210 16% 96%;
-    --muted-foreground: 215 16% 50%;
+    --muted: 222 30% 15%;
+    --muted-foreground: 180 20% 60%;
 
-    --accent: 262 83% 58%;
+    --accent: 320 100% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 100% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 16% 90%;
-    --input: 210 16% 90%;
-    --ring: 210 100% 45%;
+    --border: 180 100% 30%;
+    --input: 222 30% 15%;
+    --ring: 180 100% 50%;
 
-    --radius: 0.5rem;
+    --radius: 0.25rem;
 
     --sidebar-background: 0 0% 100%;
 
@@ -100,6 +100,7 @@
   body {
     @apply bg-background text-foreground;
     font-family:
+      "Rajdhani",
       "Inter",
       -apple-system,
       BlinkMacSystemFont,
@@ -108,6 +109,22 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 255, 0.03) 0px,
+        transparent 1px,
+        transparent 2px,
+        rgba(0, 255, 255, 0.03) 3px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgba(0, 255, 255, 0.03) 0px,
+        transparent 1px,
+        transparent 2px,
+        rgba(0, 255, 255, 0.03) 3px
+      );
+    background-size: 50px 50px;
   }
 
   html {
@@ -125,9 +142,11 @@
   h4,
   h5,
   h6 {
-    font-family: "Space Grotesk", "Inter", sans-serif;
+    font-family: "Orbitron", "Rajdhani", sans-serif;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
   }
 }
 
@@ -147,37 +166,79 @@
     }
   }
 
-  .gradient-purple-pink {
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  .gradient-cyber-cyan {
+    background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
   }
 
-  .gradient-purple-blue {
-    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  .gradient-cyber-pink {
+    background: linear-gradient(135deg, #ff00ff 0%, #ff0080 100%);
   }
 
-  .gradient-premium {
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 50%, #8b5cf6 100%);
+  .gradient-cyber-premium {
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 50%, #ff0080 100%);
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(8px) saturate(100%);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: rgba(20, 25, 40, 0.8);
+    backdrop-filter: blur(12px) saturate(150%);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow:
+      0 0 20px rgba(0, 255, 255, 0.2),
+      inset 0 0 20px rgba(0, 255, 255, 0.05);
   }
 
   .tech-border {
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    box-shadow:
+      0 0 15px rgba(0, 255, 255, 0.3),
+      inset 0 0 10px rgba(0, 255, 255, 0.1);
+    position: relative;
+  }
+
+  .tech-border::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #00ffff, #ff00ff, #00ffff);
+    border-radius: inherit;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s;
+  }
+
+  .tech-border:hover::before {
+    opacity: 0.3;
   }
 
   .hero-title {
-    font-family: "Space Grotesk", sans-serif;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    background: linear-gradient(135deg, #1e293b 0%, #3b82f6 50%, #8b5cf6 100%);
+    font-family: "Orbitron", sans-serif;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 50%, #00ffff 100%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+    animation: glitch 3s infinite;
+  }
+
+  @keyframes glitch {
+    0%,
+    100% {
+      text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+    }
+    25% {
+      text-shadow: -2px 0 30px rgba(255, 0, 255, 0.8);
+    }
+    50% {
+      text-shadow: 2px 0 30px rgba(0, 255, 255, 0.8);
+    }
+    75% {
+      text-shadow: 0 2px 30px rgba(255, 0, 255, 0.8);
+    }
   }
 
   @keyframes shimmer {
@@ -193,11 +254,30 @@
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(59, 130, 246, 0.1) 50%,
+      rgba(0, 255, 255, 0.3) 50%,
       transparent 100%
     );
     background-size: 200% 100%;
-    animation: shimmer 3s ease-in-out infinite;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+
+  @keyframes neon-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 5px rgba(0, 255, 255, 0.5),
+        0 0 10px rgba(0, 255, 255, 0.3);
+    }
+    50% {
+      box-shadow:
+        0 0 20px rgba(0, 255, 255, 0.8),
+        0 0 30px rgba(0, 255, 255, 0.5);
+    }
+  }
+
+  .neon-border {
+    border: 1px solid rgba(0, 255, 255, 0.6);
+    animation: neon-pulse 2s ease-in-out infinite;
   }
 
   .hero-glow {
@@ -207,27 +287,51 @@
   .hero-glow::before {
     content: "";
     position: absolute;
-    inset: -20px;
+    inset: -30px;
     background: radial-gradient(
       circle,
-      rgba(59, 130, 246, 0.3) 0%,
+      rgba(0, 255, 255, 0.4) 0%,
+      rgba(255, 0, 255, 0.2) 50%,
       transparent 70%
     );
     opacity: 0;
-    animation: pulse-glow 3s ease-in-out infinite;
+    animation: pulse-glow 2s ease-in-out infinite;
     pointer-events: none;
     z-index: -1;
+    filter: blur(20px);
   }
 
   @keyframes pulse-glow {
     0%,
     100% {
-      opacity: 0;
-      transform: scale(0.95);
+      opacity: 0.3;
+      transform: scale(0.9);
     }
     50% {
-      opacity: 1;
-      transform: scale(1.05);
+      opacity: 0.8;
+      transform: scale(1.1);
     }
+  }
+
+  .cyber-card {
+    background: linear-gradient(
+      145deg,
+      rgba(20, 25, 40, 0.9),
+      rgba(30, 35, 50, 0.9)
+    );
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    box-shadow:
+      0 0 20px rgba(0, 255, 255, 0.2),
+      inset 0 0 20px rgba(0, 255, 255, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .cyber-card:hover {
+    border-color: rgba(0, 255, 255, 0.8);
+    box-shadow:
+      0 0 30px rgba(0, 255, 255, 0.4),
+      0 0 60px rgba(255, 0, 255, 0.2),
+      inset 0 0 30px rgba(0, 255, 255, 0.1);
+    transform: translateY(-2px);
   }
 }

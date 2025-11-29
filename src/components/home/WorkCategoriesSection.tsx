@@ -43,32 +43,39 @@ export default function WorkCategoriesSection({ onCatalogClick }: WorkCategories
   ];
 
   return (
-    <section className="w-full py-16 sm:py-20 bg-gray-50" id="categories">
+    <section className="w-full py-20 bg-background border-b border-primary/20" id="categories">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">
-            Категории материалов
+        <div className="text-center mb-16">
+          <div className="inline-block px-4 py-2 cyber-card rounded-full text-xs uppercase tracking-widest text-primary mb-4">
+            <Icon name="Grid3x3" size={14} className="inline mr-2" />
+            База материалов
+          </div>
+          <h2 className="text-3xl sm:text-5xl font-black mb-4 text-primary" style={{fontFamily: 'Orbitron'}}>
+            КАТЕГОРИИ
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base text-cyan-300 max-w-2xl mx-auto tracking-wide">
             Справочные пособия для обучения
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
             <div 
               key={category.id} 
               onClick={() => onCatalogClick(category.id)}
-              className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary hover:shadow-md transition-all cursor-pointer group"
+              className="cyber-card rounded-lg p-6 hover:scale-105 transition-all cursor-pointer group relative overflow-hidden"
             >
-              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
-                <Icon name={category.icon as any} size={24} className="text-primary" />
-              </div>
-              <h3 className="text-lg font-semibold mb-2 text-gray-900">{category.title}</h3>
-              <p className="text-sm text-gray-500 mb-3">{category.description}</p>
-              <div className="text-xs text-gray-400 flex items-center gap-1">
-                <Icon name="FileText" size={14} />
-                <span>{category.stats}</span>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl group-hover:bg-primary/20 transition-all"></div>
+              <div className="relative z-10">
+                <div className="w-14 h-14 bg-gradient-cyber-cyan rounded-lg flex items-center justify-center mb-4 group-hover:shadow-lg group-hover:shadow-primary/50 transition-all">
+                  <Icon name={category.icon as any} size={28} className="text-background" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-foreground uppercase tracking-wide">{category.title}</h3>
+                <p className="text-sm text-cyan-400 mb-4 leading-relaxed">{category.description}</p>
+                <div className="text-xs text-primary/70 flex items-center gap-2 font-mono">
+                  <Icon name="Database" size={14} />
+                  <span>{category.stats}</span>
+                </div>
               </div>
             </div>
           ))}

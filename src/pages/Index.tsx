@@ -553,22 +553,24 @@ export default function Index() {
       <PurchaseNotifications />
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
-      <div className="min-h-screen w-full overflow-x-hidden bg-white">
-        <header className="bg-white border-b border-gray-200 sticky top-0 z-50 w-full shadow-sm">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-3">
+      <div className="min-h-screen w-full overflow-x-hidden bg-background">
+        <header className="glass-card border-b border-primary/30 sticky top-0 z-50 w-full backdrop-blur-md">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0 flex-shrink">
-                <Icon name="Layers" size={28} className="text-primary flex-shrink-0" />
+                <div className="w-10 h-10 rounded-lg bg-gradient-cyber-cyan flex items-center justify-center neon-border">
+                  <Icon name="Cpu" size={24} className="text-background" />
+                </div>
                 <div className="flex flex-col min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight text-gray-900">Tech Forma</h1>
-                  <p className="text-xs text-gray-500 truncate leading-tight">Инженерная платформа</p>
+                  <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight text-primary" style={{fontFamily: 'Orbitron'}}>TECH FORMA</h1>
+                  <p className="text-xs text-cyan-400 truncate leading-tight tracking-wider">ИНЖЕНЕРНАЯ ПЛАТФОРМА</p>
                 </div>
               </div>
               
-              <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
-                <a href="/" className="hover:text-primary transition-colors text-sm">Главная</a>
-                <a href="/catalog" className="hover:text-primary transition-colors text-sm">Каталог</a>
-                <a href="/blog" className="hover:text-primary transition-colors text-sm">Блог</a>
+              <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
+                <a href="/" className="hover:text-primary transition-all text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-primary">Главная</a>
+                <a href="/catalog" className="hover:text-primary transition-all text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-primary">Каталог</a>
+                <a href="/blog" className="hover:text-primary transition-all text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-primary">Блог</a>
               </nav>
               
               <Button 
@@ -599,18 +601,18 @@ export default function Index() {
                     </Button>
                     
                     <div className="flex items-center gap-1">
-                      <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1 sm:py-2 bg-primary/10 rounded-full">
-                        <Icon name="Coins" size={16} className="text-primary sm:w-5 sm:h-5" />
-                        <span className="font-semibold text-sm sm:text-base">{userBalance}</span>
+                      <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-1 sm:py-2 cyber-card rounded-md neon-border">
+                        <Icon name="Zap" size={16} className="text-primary sm:w-5 sm:h-5" />
+                        <span className="font-bold text-sm sm:text-base text-primary">{userBalance}</span>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={refreshBalance}
-                        className="h-8 w-8"
+                        className="h-8 w-8 hover:bg-primary/20"
                         title="Обновить баланс"
                       >
-                        <Icon name="RefreshCw" size={16} />
+                        <Icon name="RefreshCw" size={16} className="text-cyan-400" />
                       </Button>
                     </div>
                     
@@ -675,25 +677,25 @@ export default function Index() {
             </div>
             
             {mobileMenuOpen && (
-              <div className="lg:hidden border-t bg-white/95 backdrop-blur-md">
+              <div className="lg:hidden border-t border-primary/30 cyber-card backdrop-blur-md">
                 <nav className="flex flex-col py-4 px-4 gap-2">
                   <a 
                     href="/" 
-                    className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
+                    className="py-3 px-4 hover:bg-primary/20 rounded border border-transparent hover:border-primary/50 transition-all text-base font-medium uppercase tracking-wide"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Главная
                   </a>
                   <a 
                     href="/catalog" 
-                    className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
+                    className="py-3 px-4 hover:bg-primary/20 rounded border border-transparent hover:border-primary/50 transition-all text-base font-medium uppercase tracking-wide"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Каталог
                   </a>
                   <a 
                     href="#blog" 
-                    className="py-3 px-4 hover:bg-primary/10 rounded-lg transition-colors text-base font-medium"
+                    className="py-3 px-4 hover:bg-primary/20 rounded border border-transparent hover:border-primary/50 transition-all text-base font-medium uppercase tracking-wide"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Блог
@@ -740,40 +742,47 @@ export default function Index() {
           }
         }} />
 
-        <section className="relative py-16 sm:py-24 bg-white border-b border-gray-100">
+        <section className="relative py-20 bg-background border-b border-primary/20">
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-900">
-                Как работает платформа
+            <div className="text-center mb-16">
+              <div className="inline-block px-4 py-2 cyber-card rounded-full text-xs uppercase tracking-widest text-primary mb-4">
+                <Icon name="Workflow" size={14} className="inline mr-2" />
+                Процесс
+              </div>
+              <h2 className="text-3xl sm:text-5xl font-black mb-4 text-primary" style={{fontFamily: 'Orbitron'}}>
+                КАК ЭТО РАБОТАЕТ
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-base text-cyan-300">
                 Простой процесс получения доступа к материалам
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-              <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-primary">1</span>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+              <div className="cyber-card rounded-lg p-8 text-center hover:scale-105 transition-all relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-cyber-cyan"></div>
+                <div className="w-16 h-16 bg-gradient-cyber-cyan rounded-full flex items-center justify-center mx-auto mb-6 neon-border">
+                  <span className="text-3xl font-black text-background" style={{fontFamily: 'Orbitron'}}>1</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">Регистрация</h3>
-                <p className="text-sm text-gray-600">Создайте аккаунт и получите приветственные баллы</p>
+                <h3 className="text-xl font-bold mb-3 text-foreground uppercase tracking-wide">Регистрация</h3>
+                <p className="text-sm text-cyan-400 leading-relaxed">Создайте аккаунт и получите приветственные баллы</p>
               </div>
 
-              <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-primary">2</span>
+              <div className="cyber-card rounded-lg p-8 text-center hover:scale-105 transition-all relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-cyber-pink"></div>
+                <div className="w-16 h-16 bg-gradient-cyber-pink rounded-full flex items-center justify-center mx-auto mb-6 neon-border">
+                  <span className="text-3xl font-black text-background" style={{fontFamily: 'Orbitron'}}>2</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">Выбор материала</h3>
-                <p className="text-sm text-gray-600">Найдите нужный чертёж или проект в каталоге</p>
+                <h3 className="text-xl font-bold mb-3 text-foreground uppercase tracking-wide">Выбор</h3>
+                <p className="text-sm text-cyan-400 leading-relaxed">Найдите нужный чертёж или проект в каталоге</p>
               </div>
 
-              <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
-                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl font-bold text-primary">3</span>
+              <div className="cyber-card rounded-lg p-8 text-center hover:scale-105 transition-all relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-cyber-cyan"></div>
+                <div className="w-16 h-16 bg-gradient-cyber-cyan rounded-full flex items-center justify-center mx-auto mb-6 neon-border">
+                  <span className="text-3xl font-black text-background" style={{fontFamily: 'Orbitron'}}>3</span>
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-gray-900">Скачивание</h3>
-                <p className="text-sm text-gray-600">Мгновенный доступ к файлам после оплаты</p>
+                <h3 className="text-xl font-bold mb-3 text-foreground uppercase tracking-wide">Скачивание</h3>
+                <p className="text-sm text-cyan-400 leading-relaxed">Мгновенный доступ к файлам после оплаты</p>
               </div>
             </div>
           </div>
@@ -1587,48 +1596,50 @@ export default function Index() {
         
         <SEOFAQSection />
 
-        <footer className="bg-gray-50 border-t border-gray-200 py-12">
+        <footer className="cyber-card border-t border-primary/30 py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                 <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <Icon name="Layers" size={24} className="text-primary" />
-                    <h3 className="font-bold text-lg text-gray-900">Tech Forma</h3>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-cyber-cyan flex items-center justify-center neon-border">
+                      <Icon name="Cpu" size={20} className="text-background" />
+                    </div>
+                    <h3 className="font-black text-xl text-primary" style={{fontFamily: 'Orbitron'}}>TECH FORMA</h3>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-cyan-400 uppercase tracking-wide">
                     Инженерная платформа
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-3 text-gray-900 text-sm">Информация</h4>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li><a href="#about" className="hover:text-primary transition-colors">О платформе</a></li>
-                    <li><a href="#categories" className="hover:text-primary transition-colors">Категории</a></li>
-                    <li><a href="/catalog" className="hover:text-primary transition-colors">Каталог</a></li>
+                  <h4 className="font-bold mb-4 text-foreground text-sm uppercase tracking-wider">Информация</h4>
+                  <ul className="space-y-2 text-sm text-cyan-400">
+                    <li><a href="#about" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">О платформе</a></li>
+                    <li><a href="#categories" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Категории</a></li>
+                    <li><a href="/catalog" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Каталог</a></li>
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-3 text-gray-900 text-sm">Документы</h4>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li><a href="/privacy-policy" className="hover:text-primary transition-colors">Конфиденциальность</a></li>
-                    <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Соглашение</a></li>
-                    <li><a href="/offer" className="hover:text-primary transition-colors">Оферта</a></li>
+                  <h4 className="font-bold mb-4 text-foreground text-sm uppercase tracking-wider">Документы</h4>
+                  <ul className="space-y-2 text-sm text-cyan-400">
+                    <li><a href="/privacy-policy" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Конфиденциальность</a></li>
+                    <li><a href="/terms-of-service" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Соглашение</a></li>
+                    <li><a href="/offer" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Оферта</a></li>
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className="font-semibold mb-3 text-gray-900 text-sm">Контакты</h4>
-                  <ul className="space-y-2 text-sm text-gray-600">
-                    <li><a href="mailto:tech.forma@yandex.ru" className="hover:text-primary transition-colors">tech.forma@yandex.ru</a></li>
+                  <h4 className="font-bold mb-4 text-foreground text-sm uppercase tracking-wider">Контакты</h4>
+                  <ul className="space-y-2 text-sm text-cyan-400">
+                    <li><a href="mailto:tech.forma@yandex.ru" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">tech.forma@yandex.ru</a></li>
                   </ul>
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-6">
-                <p className="text-center text-sm text-gray-500">
+              <div className="border-t border-primary/30 pt-8">
+                <p className="text-center text-sm text-cyan-500/60 uppercase tracking-wider">
                   © 2025 Tech Forma. Все материалы предоставляются только для изучения.
                 </p>
               </div>

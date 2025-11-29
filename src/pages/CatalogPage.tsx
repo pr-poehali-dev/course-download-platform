@@ -513,10 +513,10 @@ export default function CatalogPage() {
         <div className="mb-8">
           <div className="mb-8 text-center">
             <h1 className="text-3xl md:text-4xl font-bold mb-3">
-              Каталог курсовых работ и дипломов — купить готовые работы от 200₽
+              Каталог инженерных материалов — чертежи DWG, 3D-модели, расчёты от 200₽
             </h1>
             <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
-              500+ готовых студенческих работ по всем предметам. Скачайте курсовую или диплом мгновенно после оплаты
+              2000+ инженерных материалов по всем направлениям. Скачайте чертёж DWG, 3D-модель или расчёт мгновенно после оплаты
             </p>
             <Badge className="glass-card border-blue-200 text-sm">
               <Icon name="FileText" size={14} className="mr-1" />

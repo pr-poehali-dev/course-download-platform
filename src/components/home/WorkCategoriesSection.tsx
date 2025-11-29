@@ -43,45 +43,34 @@ export default function WorkCategoriesSection({ onCatalogClick }: WorkCategories
   ];
 
   return (
-    <section className="w-full py-12 sm:py-16 bg-white" id="categories">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section className="w-full py-16 sm:py-20 bg-gray-50" id="categories">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            База технических материалов для обучения
+          <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">
+            Категории материалов
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Справочные пособия, примеры проектов и техническая документация
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Справочные пособия для обучения
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {categories.map((category) => (
-            <Card key={category.id} className="hover:shadow-lg transition-all hover:border-primary cursor-pointer group">
-              <CardHeader>
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <Icon name={category.icon as any} size={24} className="text-primary" />
-                </div>
-                <CardTitle className="text-xl">{category.title}</CardTitle>
-                <CardDescription>{category.description}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Icon name="CheckCircle2" size={16} className="text-green-600" />
-                  <span>{category.stats}</span>
-                </div>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {category.keywords}
-                </p>
-                <Button 
-                  variant="outline" 
-                  className="w-full group-hover:bg-primary group-hover:text-white transition-colors"
-                  onClick={() => onCatalogClick(category.id)}
-                >
-                  Смотреть работы
-                  <Icon name="ArrowRight" size={16} className="ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
+            <div 
+              key={category.id} 
+              onClick={() => onCatalogClick(category.id)}
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
+                <Icon name={category.icon as any} size={24} className="text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">{category.title}</h3>
+              <p className="text-sm text-gray-500 mb-3">{category.description}</p>
+              <div className="text-xs text-gray-400 flex items-center gap-1">
+                <Icon name="FileText" size={14} />
+                <span>{category.stats}</span>
+              </div>
+            </div>
           ))}
         </div>
       </div>

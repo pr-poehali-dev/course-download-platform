@@ -83,35 +83,30 @@ export default function FAQSection() {
         </script>
       </Helmet>
 
-      <section className="py-16 bg-gradient-to-b from-slate-50 to-white">
+      <section className="py-16 bg-white border-b border-gray-100">
         <div className="container max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Часто задаваемые вопросы</h2>
-            <p className="text-lg text-muted-foreground">
-              Ответы на популярные вопросы о технической библиотеке Tech Forma
+            <h2 className="text-3xl md:text-4xl font-bold mb-3 text-gray-900">Часто задаваемые вопросы</h2>
+            <p className="text-lg text-gray-600">
+              Ответы на популярные вопросы о платформе
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {faqData.map((item, index) => (
-              <Card 
+              <div 
                 key={index} 
-                className="cursor-pointer transition-all hover:shadow-md"
+                className="bg-gray-50 border border-gray-200 rounded-lg cursor-pointer hover:border-primary transition-all"
                 onClick={() => toggleFAQ(index)}
               >
-                <CardContent className="p-6">
+                <div className="p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-                        <Icon 
-                          name="HelpCircle" 
-                          size={20} 
-                          className="text-primary flex-shrink-0" 
-                        />
+                      <h3 className="text-base font-semibold mb-1 text-gray-900">
                         {item.question}
                       </h3>
                       {openIndex === index && (
-                        <p className="text-muted-foreground mt-3 ml-7 leading-relaxed">
+                        <p className="text-sm text-gray-600 mt-3 leading-relaxed">
                           {item.answer}
                         </p>
                       )}
@@ -119,24 +114,24 @@ export default function FAQSection() {
                     <Icon 
                       name={openIndex === index ? "ChevronUp" : "ChevronDown"} 
                       size={20} 
-                      className="text-muted-foreground flex-shrink-0 mt-1" 
+                      className="text-gray-400 flex-shrink-0 mt-1" 
                     />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             ))}
           </div>
 
-          <div className="mt-12 p-6 bg-primary/5 rounded-lg text-center">
-            <h3 className="text-xl font-semibold mb-2">Не нашли ответ?</h3>
-            <p className="text-muted-foreground mb-4">
-              Напишите нам в поддержку — ответим в течение 5 минут!
+          <div className="mt-8 bg-blue-50 border border-blue-100 rounded-lg p-6 text-center">
+            <h3 className="text-lg font-semibold mb-2 text-gray-900">Не нашли ответ?</h3>
+            <p className="text-sm text-gray-600 mb-3">
+              Напишите нам в поддержку
             </p>
             <a 
               href="mailto:tech.forma@yandex.ru" 
-              className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
+              className="inline-flex items-center gap-2 text-primary font-medium hover:underline text-sm"
             >
-              <Icon name="Mail" size={18} />
+              <Icon name="Mail" size={16} />
               tech.forma@yandex.ru
             </a>
           </div>

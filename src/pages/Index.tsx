@@ -554,14 +554,14 @@ export default function Index() {
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-white">
-        <header className="glass-card tech-border sticky top-0 z-50 w-full shadow-sm">
-          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-4">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-shrink">
-                <Icon name="Cpu" size={24} className="text-primary flex-shrink-0 sm:w-8 sm:h-8" />
+        <header className="bg-white border-b border-gray-200 sticky top-0 z-50 w-full shadow-sm">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-3">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3 min-w-0 flex-shrink">
+                <Icon name="Layers" size={28} className="text-primary flex-shrink-0" />
                 <div className="flex flex-col min-w-0">
-                  <h1 className="text-lg sm:text-2xl font-bold truncate leading-tight">Tech Forma</h1>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground truncate leading-tight">Техническая библиотека</p>
+                  <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight text-gray-900">Tech Forma</h1>
+                  <p className="text-xs text-gray-500 truncate leading-tight">Техническая библиотека</p>
                 </div>
               </div>
               
@@ -740,196 +740,105 @@ export default function Index() {
           }
         }} />
 
-        <section className="relative py-12 sm:py-20 lg:py-32 overflow-hidden bg-gradient-to-b from-white via-blue-50/30 to-white">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiMzYjgyZjYiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
-          
-          <div className="absolute top-40 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-          
-          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 relative z-10">
-            <div className="max-w-5xl mx-auto text-center mb-8 sm:mb-16">
-              <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 glass-card rounded-full mb-4 sm:mb-8 animate-fade-in border border-blue-500/20">
-                <Icon name="Sparkles" size={18} className="text-blue-600 sm:w-5 sm:h-5" />
-                <span className="text-xs sm:text-sm font-semibold text-slate-700">
-                  Профессиональная платформа для студентов
-                </span>
-              </div>
-              
-              <div className="hero-glow mb-4 sm:mb-8">
-                <h2 className="hero-title text-5xl sm:text-7xl md:text-8xl lg:text-9xl leading-tight px-2">
-                  Tech Forma
-                </h2>
-              </div>
-              
-              <div className="mb-6 sm:mb-8">
-                <RotatingText />
-              </div>
-              
-              <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-12 max-w-3xl mx-auto animate-fade-in leading-relaxed px-4">
-                Техническая библиотека для инженеров и студентов. Чертежи, 3D-модели, примеры расчётов.
+        <section className="relative py-16 sm:py-24 bg-white border-b border-gray-100">
+          <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-gray-900">
+                Как работает платформа
+              </h2>
+              <p className="text-lg text-gray-600">
+                Простой процесс получения доступа к материалам
               </p>
-              
-              <div className="flex gap-2 sm:gap-4 justify-center mb-6 sm:mb-12 flex-wrap animate-fade-in px-2">
-                <Button size="lg" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-sm sm:text-base lg:text-lg shadow-xl" asChild>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
+                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">1</span>
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">Регистрация</h3>
+                <p className="text-sm text-gray-600">Создайте аккаунт и получите приветственные баллы</p>
+              </div>
+
+              <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
+                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">2</span>
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">Выбор материала</h3>
+                <p className="text-sm text-gray-600">Найдите нужный чертёж или проект в каталоге</p>
+              </div>
+
+              <div className="bg-white border border-gray-200 rounded-lg p-6 text-center">
+                <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">3</span>
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-gray-900">Скачивание</h3>
+                <p className="text-sm text-gray-600">Мгновенный доступ к файлам после оплаты</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-16 sm:py-20 bg-white border-b border-gray-100">
+          <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">
+                Возможности платформы
+              </h2>
+              <p className="text-lg text-gray-600">
+                Всё необходимое для работы с материалами
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 hover:border-primary transition-all">
+                <div className="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="Database" size={28} className="text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3 text-gray-900">Библиотека материалов</h3>
+                <p className="text-gray-600 mb-4 leading-relaxed">
+                  Чертежи, CAD-проекты, 3D-модели и техническая документация. Мгновенный доступ после оплаты.
+                </p>
+                <Button variant="outline" className="w-full" asChild>
                   <a href="/catalog">
-                    <Icon name="BookOpen" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
                     Смотреть каталог
                   </a>
                 </Button>
-                <Button size="lg" variant="outline" className="h-10 sm:h-12 lg:h-14 px-4 sm:px-6 lg:px-8 text-sm sm:text-base lg:text-lg shadow-xl border-2" onClick={() => !isLoggedIn ? setAuthDialogOpen(true) : setProfileDialogOpen(true)}>
-                  <Icon name="Upload" size={18} className="mr-1 sm:mr-2 sm:w-5 sm:h-5" />
+              </div>
+
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 hover:border-primary transition-all">
+                <div className="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="Upload" size={28} className="text-primary" />
+                </div>
+                <h3 className="text-2xl font-bold mb-3 text-gray-900">Стань автором</h3>
+                <p className="text-gray-600 mb-4 leading-relaxed">
+                  Публикуй свои материалы, помогай другим и получай баллы за каждое скачивание.
+                </p>
+                <Button 
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    if (!isLoggedIn) {
+                      toast({
+                        title: 'Требуется авторизация',
+                        description: 'Войдите в аккаунт для загрузки работ',
+                        variant: 'destructive'
+                      });
+                      setAuthDialogOpen(true);
+                      return;
+                    }
+                    setProfileDialogOpen(true);
+                  }}
+                >
                   Загрузить работу
                 </Button>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-6 max-w-4xl mx-auto px-2">
-                <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
-                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-blue-600 to-blue-400 bg-clip-text text-transparent mb-2">500+</div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-600">Готовых работ</p>
-                </div>
-                <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
-                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-purple-600 to-purple-400 bg-clip-text text-transparent mb-2">
-                    <div className="flex items-center justify-center gap-2">
-                      <Icon name="TrendingUp" size={28} />
-                    </div>
-                    <div>ХИТ</div>
-                  </div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-600">Рейтинг 4.8+</p>
-                </div>
-                <div className="glass-card rounded-2xl p-4 sm:p-8 text-center tech-border hover:shadow-xl transition-all group">
-                  <div className="text-2xl sm:text-4xl font-bold bg-gradient-to-br from-green-600 to-green-400 bg-clip-text text-transparent mb-2">
-                    <div className="flex items-center justify-center gap-2">
-                      <Icon name="Users" size={28} />
-                    </div>
-                    <div>Много авторов</div>
-                  </div>
-                  <p className="text-xs sm:text-sm font-medium text-slate-600">Активных авторов</p>
-                </div>
-              </div>
             </div>
           </div>
         </section>
 
-        <section className="py-12 sm:py-16 lg:py-24 bg-gradient-to-br from-slate-50 to-blue-50/50 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEiIGZpbGw9IiMzYjgyZjYiIG9wYWNpdHk9IjAuMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-40"></div>
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-          
-          <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 relative z-10">
-            <div className="text-center mb-16">
-              <Badge className="mb-4 glass-card border-blue-200">
-                <Icon name="Layers" size={14} className="mr-1" />
-                Возможности платформы
-              </Badge>
-              <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">
-                Всё для успешной учёбы
-              </h2>
-              <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-                База технических знаний для обучения
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto">
-              <Card className="relative overflow-hidden glass-card tech-border hover:shadow-2xl transition-all group hover:scale-[1.02]">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-500/10 transition-all"></div>
-                <CardHeader>
-                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
-                    <img 
-                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cf4ec9f2-8937-4cdc-8478-e9adb8e7c1e3.jpg" 
-                      alt="Облачный каталог" 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <CardTitle className="text-2xl">Библиотека материалов</CardTitle>
-                  <CardDescription className="text-base">Получай доступ за баллы</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Чертежи, CAD, учебные материалы</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Мгновенный доступ</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Обмен знаниями</span>
-                  </div>
-                  <Button className="w-full mt-4" variant="outline" asChild>
-                    <a href="/catalog">
-                      <Icon name="ArrowRight" size={16} className="mr-2" />
-                      Смотреть каталог
-                    </a>
-                  </Button>
-                </CardContent>
-              </Card>
-
-              <Card className="relative overflow-hidden glass-card tech-border hover:shadow-2xl transition-all group hover:scale-[1.02]">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-3xl group-hover:bg-green-500/10 transition-all"></div>
-                <CardHeader>
-                  <div className="w-full h-48 mb-4 rounded-xl overflow-hidden">
-                    <img 
-                      src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/816465f3-69d3-4606-aed2-50f897edcaa9.jpg" 
-                      alt="Стань автором" 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <CardTitle className="text-2xl">Стань автором</CardTitle>
-                  <CardDescription className="text-base">Делись знаниями с сообществом</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Публикуй свои работы</span>
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Статистика скачиваний</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Icon name="Check" size={16} className="text-green-600" />
-                    <span>Обмен знаниями</span>
-                  </div>
-                  <Button 
-                    className="w-full mt-4" 
-                    variant="outline"
-                    onClick={() => {
-                      if (!isLoggedIn) {
-                        toast({
-                          title: 'Требуется авторизация',
-                          description: 'Войдите в аккаунт для загрузки работ',
-                          variant: 'destructive'
-                        });
-                        setAuthDialogOpen(true);
-                        return;
-                      }
-                      if (!currentUser?.email) {
-                        toast({
-                          title: 'Требуется подтверждение почты',
-                          description: 'Подтвердите почту для загрузки работ',
-                          variant: 'destructive'
-                        });
-                        return;
-                      }
-                      setProfileDialogOpen(true);
-                    }}
-                  >
-                    <Icon name="Upload" size={16} className="mr-2" />
-                    Загрузить работу
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 bg-white relative overflow-hidden">
-          <div className="absolute top-10 left-10 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-10 right-10 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
-          
-          <div className="container mx-auto px-4 relative z-10">
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
               <div className="text-center mb-12">
                 <Badge className="glass-card mb-4 border-blue-200">
@@ -1438,61 +1347,73 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="py-20 bg-gradient-to-b from-white to-slate-50">
+        <section className="py-16 bg-gray-50 border-b border-gray-100">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-16">
-                <Badge className="mb-4 glass-card border-blue-200">
-                  <Icon name="Award" size={14} className="mr-1" />
-                  Преимущества
-                </Badge>
-                <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">
-                  Почему выбирают нас
+            <div className="max-w-5xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">
+                  Преимущества платформы
                 </h2>
-                <p className="text-lg sm:text-xl text-slate-600">
-                  Тысячи студентов доверяют нам
+                <p className="text-lg text-gray-600">
+                  Надёжный сервис для работы с материалами
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="glass-card tech-border p-8 rounded-2xl hover:shadow-xl transition-all group hover:scale-[1.02]">
-                  <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-shadow">
-                    <Icon name="Shield" size={28} className="text-white" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary transition-all">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name="Shield" size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2 text-gray-900">Модерация</h3>
+                      <p className="text-sm text-gray-600">
+                        Все материалы проверяются перед публикацией
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-slate-900">Проверенные работы</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Все материалы проходят модерацию перед публикацией. Гарантия качества и актуальности.
-                  </p>
                 </div>
 
-                <div className="glass-card tech-border p-8 rounded-2xl hover:shadow-xl transition-all group hover:scale-[1.02]">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-shadow">
-                    <Icon name="Zap" size={28} className="text-white" />
+                <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary transition-all">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name="Zap" size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2 text-gray-900">Быстрый доступ</h3>
+                      <p className="text-sm text-gray-600">
+                        Мгновенное скачивание после оплаты
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-slate-900">Быстрый доступ</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Мгновенное скачивание после покупки. Все файлы доступны 24/7 в личном кабинете.
-                  </p>
                 </div>
 
-                <div className="glass-card tech-border p-8 rounded-2xl hover:shadow-xl transition-all group hover:scale-[1.02]">
-                  <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-shadow">
-                    <Icon name="TrendingUp" size={28} className="text-white" />
+                <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary transition-all">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name="TrendingUp" size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2 text-gray-900">Зарабатывай</h3>
+                      <p className="text-sm text-gray-600">
+                        Получай баллы за загруженные материалы
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-slate-900">Зарабатывай на работах</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Получай баллы за каждую загруженную работу. Помогай другим и получай доступ к материалам.
-                  </p>
                 </div>
 
-                <div className="glass-card tech-border p-8 rounded-2xl hover:shadow-xl transition-all group hover:scale-[1.02]">
-                  <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg group-hover:shadow-xl transition-shadow">
-                    <Icon name="Users" size={28} className="text-white" />
+                <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary transition-all">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Icon name="Users" size={20} className="text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold mb-2 text-gray-900">Сообщество</h3>
+                      <p className="text-sm text-gray-600">
+                        Тысячи студентов и инженеров используют платформу
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold mb-3 text-slate-900">Сообщество студентов</h3>
-                  <p className="text-slate-600 leading-relaxed">
-                    Растущее сообщество студентов и авторов. Обменивайся знаниями с коллегами по всей стране.
-                  </p>
                 </div>
               </div>
             </div>
@@ -1666,43 +1587,50 @@ export default function Index() {
         
         <SEOFAQSection />
 
-        <footer className="bg-muted/50 py-8 border-t">
+        <footer className="bg-gray-50 border-t border-gray-200 py-12">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div>
-                <div className="flex items-center gap-2 mb-4">
-                  <Icon name="Cpu" size={28} className="text-primary" />
-                  <h3 className="font-bold text-lg">Tech Forma</h3>
+            <div className="max-w-6xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Icon name="Layers" size={24} className="text-primary" />
+                    <h3 className="font-bold text-lg text-gray-900">Tech Forma</h3>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Техническая библиотека
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Техническая библиотека материалов
+
+                <div>
+                  <h4 className="font-semibold mb-3 text-gray-900 text-sm">Информация</h4>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li><a href="#about" className="hover:text-primary transition-colors">О платформе</a></li>
+                    <li><a href="#categories" className="hover:text-primary transition-colors">Категории</a></li>
+                    <li><a href="/catalog" className="hover:text-primary transition-colors">Каталог</a></li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-3 text-gray-900 text-sm">Документы</h4>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li><a href="/privacy-policy" className="hover:text-primary transition-colors">Конфиденциальность</a></li>
+                    <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Соглашение</a></li>
+                    <li><a href="/offer" className="hover:text-primary transition-colors">Оферта</a></li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h4 className="font-semibold mb-3 text-gray-900 text-sm">Контакты</h4>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li><a href="mailto:tech.forma@yandex.ru" className="hover:text-primary transition-colors">tech.forma@yandex.ru</a></li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-6">
+                <p className="text-center text-sm text-gray-500">
+                  © 2025 Tech Forma. Все материалы предоставляются только для изучения.
                 </p>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-4">Информация</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#about" className="hover:text-primary transition-colors">О платформе</a></li>
-                  <li><a href="#faq" className="hover:text-primary transition-colors">Вопросы и ответы</a></li>
-                  <li><a href="/usage-rules" className="hover:text-primary transition-colors">Правила использования</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="font-semibold mb-4">Документы</h4>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="/privacy-policy" className="hover:text-primary transition-colors">Политика конфиденциальности</a></li>
-                  <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Пользовательское соглашение</a></li>
-                  <li><a href="/offer" className="hover:text-primary transition-colors">Договор-оферта</a></li>
-                  <li><a href="/requisites" className="hover:text-primary transition-colors">Реквизиты</a></li>
-                  <li><a href="/admin" className="hover:text-primary transition-colors">Админ-панель</a></li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="border-t mt-8 pt-8">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 text-center text-sm text-muted-foreground">
-                <p>© 2025 Tech Forma. Техническая библиотека. Все материалы предоставляются только для изучения.</p>
               </div>
             </div>
           </div>

@@ -15,14 +15,14 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 221 83% 53%;
+    --primary: 210 100% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 214 32% 91%;
+    --secondary: 210 16% 93%;
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 16% 96%;
+    --muted-foreground: 215 16% 50%;
 
     --accent: 262 83% 58%;
     --accent-foreground: 0 0% 100%;
@@ -30,11 +30,11 @@
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 221 83% 53%;
+    --border: 210 16% 90%;
+    --input: 210 16% 90%;
+    --ring: 210 100% 45%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 100%;
 
@@ -160,14 +160,14 @@
   }
 
   .glass-card {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px) saturate(100%);
+    border: 1px solid rgba(0, 0, 0, 0.08);
   }
 
   .tech-border {
-    border: 1px solid rgba(59, 130, 246, 0.1);
-    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
   }
 
   .hero-title {

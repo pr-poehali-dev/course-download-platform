@@ -6,35 +6,35 @@
 
 @layer base {
   :root {
-    --background: 222 47% 8%;
-    --foreground: 180 100% 90%;
+    --background: 240 20% 4%;
+    --foreground: 0 0% 100%;
 
-    --card: 222 40% 10%;
-    --card-foreground: 180 100% 90%;
+    --card: 240 15% 11%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 222 40% 10%;
-    --popover-foreground: 180 100% 90%;
+    --popover: 240 15% 11%;
+    --popover-foreground: 0 0% 100%;
 
     --primary: 180 100% 50%;
-    --primary-foreground: 222 47% 8%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 280 100% 60%;
-    --secondary-foreground: 180 100% 90%;
+    --secondary: 270 100% 68%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 222 30% 15%;
-    --muted-foreground: 180 20% 60%;
+    --muted: 240 10% 15%;
+    --muted-foreground: 220 10% 63%;
 
-    --accent: 320 100% 50%;
+    --accent: 160 100% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 100% 50%;
+    --destructive: 350 100% 56%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 180 100% 30%;
-    --input: 222 30% 15%;
+    --border: 240 10% 17%;
+    --input: 240 10% 15%;
     --ring: 180 100% 50%;
 
-    --radius: 0.25rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 100%;
 
@@ -99,32 +99,23 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family:
-      "Rajdhani",
-      "Inter",
-      -apple-system,
-      BlinkMacSystemFont,
-      sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    background-image:
-      repeating-linear-gradient(
-        0deg,
-        rgba(0, 255, 255, 0.03) 0px,
-        transparent 1px,
-        transparent 2px,
-        rgba(0, 255, 255, 0.03) 3px
+    background:
+      radial-gradient(
+        circle at 10% 20%,
+        rgba(25, 25, 60, 0.5) 0%,
+        transparent 20%
       ),
-      repeating-linear-gradient(
-        90deg,
-        rgba(0, 255, 255, 0.03) 0px,
-        transparent 1px,
-        transparent 2px,
-        rgba(0, 255, 255, 0.03) 3px
-      );
-    background-size: 50px 50px;
+      radial-gradient(
+        circle at 90% 80%,
+        rgba(80, 10, 120, 0.3) 0%,
+        transparent 20%
+      ),
+      hsl(var(--background));
   }
 
   html {
@@ -142,11 +133,9 @@
   h4,
   h5,
   h6 {
-    font-family: "Orbitron", "Rajdhani", sans-serif;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    letter-spacing: normal;
   }
 }
 
@@ -179,66 +168,34 @@
   }
 
   .glass-card {
-    background: rgba(20, 25, 40, 0.8);
-    backdrop-filter: blur(12px) saturate(150%);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    box-shadow:
-      0 0 20px rgba(0, 255, 255, 0.2),
-      inset 0 0 20px rgba(0, 255, 255, 0.05);
+    background: rgba(10, 10, 20, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid hsl(var(--border));
   }
 
   .tech-border {
-    border: 1px solid rgba(0, 255, 255, 0.5);
-    box-shadow:
-      0 0 15px rgba(0, 255, 255, 0.3),
-      inset 0 0 10px rgba(0, 255, 255, 0.1);
+    border: 1px solid hsl(var(--border));
     position: relative;
+    transition: all 0.3s;
   }
 
-  .tech-border::before {
-    content: "";
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: linear-gradient(45deg, #00ffff, #ff00ff, #00ffff);
-    border-radius: inherit;
-    opacity: 0;
-    z-index: -1;
-    transition: opacity 0.3s;
-  }
-
-  .tech-border:hover::before {
-    opacity: 0.3;
+  .tech-border:hover {
+    border-color: hsl(var(--primary));
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
   }
 
   .hero-title {
-    font-family: "Orbitron", sans-serif;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    background: linear-gradient(135deg, #00ffff 0%, #ff00ff 50%, #00ffff 100%);
-    background-clip: text;
+    font-weight: 700;
+    background: linear-gradient(
+      90deg,
+      hsl(var(--primary)),
+      hsl(var(--secondary)),
+      hsl(var(--destructive))
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
-    animation: glitch 3s infinite;
-  }
-
-  @keyframes glitch {
-    0%,
-    100% {
-      text-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
-    }
-    25% {
-      text-shadow: -2px 0 30px rgba(255, 0, 255, 0.8);
-    }
-    50% {
-      text-shadow: 2px 0 30px rgba(0, 255, 255, 0.8);
-    }
-    75% {
-      text-shadow: 0 2px 30px rgba(255, 0, 255, 0.8);
-    }
+    background-clip: text;
   }
 
   @keyframes shimmer {
@@ -314,24 +271,31 @@
   }
 
   .cyber-card {
-    background: linear-gradient(
-      145deg,
-      rgba(20, 25, 40, 0.9),
-      rgba(30, 35, 50, 0.9)
-    );
-    border: 1px solid rgba(0, 255, 255, 0.4);
-    box-shadow:
-      0 0 20px rgba(0, 255, 255, 0.2),
-      inset 0 0 20px rgba(0, 255, 255, 0.05);
-    transition: all 0.3s ease;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    transition: all 0.3s;
   }
 
   .cyber-card:hover {
-    border-color: rgba(0, 255, 255, 0.8);
-    box-shadow:
-      0 0 30px rgba(0, 255, 255, 0.4),
-      0 0 60px rgba(255, 0, 255, 0.2),
-      inset 0 0 30px rgba(0, 255, 255, 0.1);
-    transform: translateY(-2px);
+    border-color: hsl(var(--primary));
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .section-title-line {
+    position: relative;
+    display: inline-block;
+  }
+
+  .section-title-line::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: hsl(var(--primary));
+    box-shadow: 0 0 8px hsl(var(--primary));
   }
 }

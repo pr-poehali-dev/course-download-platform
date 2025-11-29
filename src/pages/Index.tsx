@@ -554,23 +554,22 @@ export default function Index() {
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-background">
-        <header className="glass-card border-b border-primary/30 sticky top-0 z-50 w-full backdrop-blur-md">
+        <header className="glass-card border-b border-border sticky top-0 z-50 w-full backdrop-blur-md">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0 flex-shrink">
-                <div className="w-10 h-10 rounded-lg bg-gradient-cyber-cyan flex items-center justify-center neon-border">
-                  <Icon name="Cpu" size={24} className="text-background" />
-                </div>
+                <Icon name="Cpu" size={32} className="text-primary" />
                 <div className="flex flex-col min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight text-primary" style={{fontFamily: 'Orbitron'}}>TECH FORMA</h1>
-                  <p className="text-xs text-cyan-400 truncate leading-tight tracking-wider">ИНЖЕНЕРНАЯ ПЛАТФОРМА</p>
+                  <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">TechForma</h1>
                 </div>
               </div>
               
-              <nav className="hidden lg:flex items-center gap-6 xl:gap-8">
-                <a href="/" className="hover:text-primary transition-all text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-primary">Главная</a>
-                <a href="/catalog" className="hover:text-primary transition-all text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-primary">Каталог</a>
-                <a href="/blog" className="hover:text-primary transition-all text-sm uppercase tracking-wider border-b-2 border-transparent hover:border-primary">Блог</a>
+              <nav className="hidden lg:flex items-center gap-8">
+                <a href="/" className="text-foreground hover:text-primary transition-colors font-medium">Главная</a>
+                <a href="/catalog" className="text-muted-foreground hover:text-primary transition-colors font-medium">Каталог</a>
+                <a href="#authors" className="text-muted-foreground hover:text-primary transition-colors font-medium">Авторы</a>
+                <a href="#ratings" className="text-muted-foreground hover:text-primary transition-colors font-medium">Рейтинги</a>
+                <a href="#about" className="text-muted-foreground hover:text-primary transition-colors font-medium">О нас</a>
               </nav>
               
               <Button 
@@ -669,9 +668,23 @@ export default function Index() {
                     </DropdownMenu>
                   </>
                 ) : (
-                  <Button onClick={() => setAuthDialogOpen(true)} size="sm" className="text-xs sm:text-sm px-3 sm:px-4">
-                    Войти
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => setAuthDialogOpen(true)} 
+                      variant="outline"
+                      size="sm" 
+                      className="text-sm px-4 border-primary text-primary hover:bg-primary/10"
+                    >
+                      Вход
+                    </Button>
+                    <Button 
+                      onClick={() => setAuthDialogOpen(true)} 
+                      size="sm" 
+                      className="text-sm px-4 bg-secondary hover:bg-secondary/90"
+                    >
+                      Регистрация
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>

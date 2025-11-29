@@ -21,6 +21,8 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
           src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
           alt="Превью документа"
           className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
@@ -39,6 +41,8 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
           src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
           alt="Превью документа"
           className="w-full h-full object-cover"
+          loading="lazy"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
@@ -52,6 +56,7 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
         alt={title}
         className={`object-cover ${className}`}
         loading="lazy"
+        decoding="async"
         onError={handleImageError}
       />
     );
@@ -76,6 +81,7 @@ export default function PreviewCarousel({ images, previews, title = '', classNam
         alt={`${title} - ${currentIndex + 1}`}
         className="w-full h-full object-cover"
         loading="lazy"
+        decoding="async"
         onError={handleImageError}
       />
 

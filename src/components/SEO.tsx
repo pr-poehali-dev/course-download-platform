@@ -122,6 +122,25 @@ export default function SEO({
             'contactType': 'customer support',
             'areaServed': 'RU',
             'availableLanguage': 'Russian'
+          },
+          'address': {
+            '@type': 'PostalAddress',
+            'streetAddress': 'пр-кт Богатырский, д. 18, корп. 1, кв. 95',
+            'addressLocality': 'Санкт-Петербург',
+            'postalCode': '197198',
+            'addressCountry': 'RU'
+          },
+          'geo': {
+            '@type': 'GeoCoordinates',
+            'latitude': '59.938955',
+            'longitude': '30.315644'
+          },
+          'aggregateRating': {
+            '@type': 'AggregateRating',
+            'ratingValue': '4.8',
+            'reviewCount': '150',
+            'bestRating': '5',
+            'worstRating': '1'
           }
         },
         {

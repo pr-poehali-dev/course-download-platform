@@ -719,7 +719,7 @@ export default function Index() {
                     Каталог
                   </a>
                   <a 
-                    href="#blog" 
+                    href="/blog" 
                     className="py-3 px-4 hover:bg-primary/20 rounded border border-transparent hover:border-primary/50 transition-all text-base font-medium uppercase tracking-wide"
                     onClick={() => setMobileMenuOpen(false)}
                   >

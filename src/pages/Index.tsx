@@ -15,6 +15,7 @@ import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import AuthDialog from '@/components/AuthDialog';
 import ProfileDialog from '@/components/ProfileDialog';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import SupportPage from '@/components/SupportPage';
 import AdminPanel from '@/components/AdminPanel';
 import PaymentDialog from '@/components/PaymentDialog';
@@ -577,6 +578,8 @@ export default function Index() {
                 <a href="#about" className="text-muted-foreground hover:text-primary transition-colors font-medium">О нас</a>
               </nav>
               
+              <ThemeToggle />
+              
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -673,23 +676,26 @@ export default function Index() {
                     </DropdownMenu>
                   </>
                 ) : (
-                  <div className="flex gap-2">
-                    <Button 
-                      onClick={() => setAuthDialogOpen(true)} 
-                      variant="ghost"
-                      size="sm" 
-                      className="text-sm px-4 hover:bg-muted"
-                    >
-                      Вход
-                    </Button>
-                    <Button 
-                      onClick={() => setAuthDialogOpen(true)} 
-                      size="sm" 
-                      className="text-sm px-4 bg-primary hover:bg-primary/90 text-white shadow-md"
-                    >
-                      Регистрация
-                    </Button>
-                  </div>
+                  <>
+                    <ThemeToggle />
+                    <div className="flex gap-2">
+                      <Button 
+                        onClick={() => setAuthDialogOpen(true)} 
+                        variant="ghost"
+                        size="sm" 
+                        className="text-sm px-4 hover:bg-muted"
+                      >
+                        Вход
+                      </Button>
+                      <Button 
+                        onClick={() => setAuthDialogOpen(true)} 
+                        size="sm" 
+                        className="text-sm px-4 bg-primary hover:bg-primary/90 text-white shadow-md"
+                      >
+                        Регистрация
+                      </Button>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -818,9 +824,9 @@ export default function Index() {
                 <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
                   <Icon name="Database" size={32} className="text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-foreground">Библиотека материалов</h3>
+                <h3 className="text-2xl font-bold mb-3 text-foreground">Библиотека чертежей</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
-                  Чертежи, CAD-проекты, 3D-модели и техническая документация. Мгновенный доступ после оплаты.
+                  Чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты и проектная документация.
                 </p>
                 <Button className="w-full bg-primary hover:bg-primary/90 text-white shadow-md" asChild>
                   <a href="/catalog">
@@ -834,9 +840,9 @@ export default function Index() {
                 <div className="w-16 h-16 bg-secondary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
                   <Icon name="Upload" size={32} className="text-white" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-foreground">Стань автором</h3>
+                <h3 className="text-2xl font-bold mb-3 text-foreground">Загрузка материалов</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
-                  Публикуй свои материалы, помогай другим и получай баллы за каждое скачивание.
+                  Делитесь своими разработками, помогайте коллегам и зарабатывайте баллы.
                 </p>
                 <Button 
                   className="w-full bg-secondary hover:bg-secondary/90 text-white shadow-md"
@@ -863,9 +869,7 @@ export default function Index() {
 
 
 
-        <RecentlyViewed />
-
-        <section className="py-20 bg-slate-50">
+        <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
             <Tabs defaultValue="catalog" className="w-full">
               <TabsList className="grid w-full max-w-md mx-auto grid-cols-1 mb-8">
@@ -1306,14 +1310,11 @@ export default function Index() {
 
         <NewsSection isAdmin={currentUser?.role === 'admin'} />
 
-        <section id="faq" className="py-16 bg-white">
+        <section id="faq" className="py-16 bg-background">
           <div className="container mx-auto px-4 max-w-3xl">
             <div className="text-center mb-12">
-              <Badge className="mb-4 glass-card border-blue-200">
-                <Icon name="MessageCircle" size={14} className="mr-1" />
-                FAQ
-              </Badge>
-              <h2 className="text-4xl font-bold bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">Вопросы и ответы</h2>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">Частые вопросы</h2>
+              <p className="text-lg text-muted-foreground">Ответы на популярные вопросы</p>
             </div>
             <div className="space-y-4">
               <Card>

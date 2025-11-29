@@ -10,39 +10,39 @@ export default function WorkCategoriesSection({ onCatalogClick }: WorkCategories
   const categories = [
     {
       id: 'coursework',
-      title: 'Примеры учебных проектов',
-      description: 'Образцы оформления и структуры проектов',
-      icon: 'BookOpen',
-      stats: '250+ примеров',
+      title: 'Проектная документация',
+      description: 'Технические задания, пояснительные записки, отчёты',
+      icon: 'FileText',
+      stats: '250+ документов',
       color: 'primary',
-      keywords: 'Примеры учебных проектов для изучения. Образцы оформления и структурирования.'
+      keywords: 'Проектная документация, техническое задание'
     },
     {
       id: 'diploma',
-      title: 'Техническая документация',
-      description: 'Проектная документация и технические отчёты',
-      icon: 'FileCheck',
-      stats: '150+ материалов',
+      title: 'Чертежи DWG/DXF',
+      description: 'AutoCAD, KOMPAS-3D, SolidWorks чертежи и схемы',
+      icon: 'PenTool',
+      stats: '150+ чертежей',
       color: 'secondary',
-      keywords: 'Примеры проектной документации и технических отчётов для изучения.'
+      keywords: 'Чертежи DWG DXF AutoCAD KOMPAS SolidWorks'
     },
     {
       id: 'referat',
-      title: 'Чертежи и CAD',
-      description: 'Технические чертежи и CAD-проекты',
-      icon: 'PenTool',
-      stats: '100+ чертежей',
+      title: '3D-модели и сборки',
+      description: 'Модели деталей, узлов, сборочные чертежи',
+      icon: 'Box',
+      stats: '100+ моделей',
       color: 'primary',
-      keywords: 'Чертежи DWG, DXF, CAD-проекты для изучения. Примеры оформления.'
+      keywords: '3D модели сборки детали'
     },
     {
       id: 'other',
-      title: 'Технические расчёты',
-      description: 'Примеры расчётов и вычислений',
+      title: 'Расчёты и анализ',
+      description: 'Прочностные, тепловые, гидравлические расчёты',
       icon: 'Calculator',
-      stats: '50+ примеров',
+      stats: '50+ расчётов',
       color: 'secondary',
-      keywords: 'Примеры технических расчётов и вычислений. Образцы для изучения.'
+      keywords: 'Расчёты прочность анализ'
     }
   ];
 
@@ -54,7 +54,7 @@ export default function WorkCategoriesSection({ onCatalogClick }: WorkCategories
             Категории материалов
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Справочные пособия для обучения и работы
+            Основные направления инженерных материалов
           </p>
         </div>
 

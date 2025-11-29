@@ -10,7 +10,7 @@ export default function AboutSection() {
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">О платформе</h2>
             <p className="text-lg text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-              TechForma — это современная инженерная платформа для студентов и специалистов. Мы предоставляем доступ к справочным материалам для обучения и профессионального развития.
+              TechForma — инженерная платформа для обмена техническими материалами. Чертежи, 3D-модели, расчёты и проектная документация для инженеров и студентов технических специальностей.
             </p>
           </div>
 
@@ -19,9 +19,9 @@ export default function AboutSection() {
               <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
                 <Icon name="Target" size={28} className="text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2 text-foreground">Наша миссия</h3>
+              <h3 className="text-lg font-bold mb-2 text-foreground">Обмен опытом</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Помогать учиться эффективнее через обмен материалами
+                Делитесь своими разработками и учитесь на примерах коллег
               </p>
             </div>
 
@@ -29,9 +29,9 @@ export default function AboutSection() {
               <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
                 <Icon name="Shield" size={28} className="text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2 text-foreground">Безопасность</h3>
+              <h3 className="text-lg font-bold mb-2 text-foreground">Технические форматы</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Безопасное хранение и модерация всех файлов
+                DWG, DXF, STEP, STL, PDF и другие CAD-форматы
               </p>
             </div>
 
@@ -39,9 +39,9 @@ export default function AboutSection() {
               <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
                 <Icon name="Users" size={28} className="text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2 text-foreground">Сообщество</h3>
+              <h3 className="text-lg font-bold mb-2 text-foreground">Профессионалы</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Студенты и инженеры обмениваются знаниями
+                Сообщество инженеров, конструкторов и проектировщиков
               </p>
             </div>
 
@@ -49,9 +49,9 @@ export default function AboutSection() {
               <div className="w-14 h-14 bg-secondary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
                 <Icon name="Coins" size={28} className="text-white" />
               </div>
-              <h3 className="text-lg font-bold mb-2 text-foreground">Балльная система</h3>
+              <h3 className="text-lg font-bold mb-2 text-foreground">Система баллов</h3>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Делись материалами и получай баллы
+                Зарабатывайте баллы за загрузку материалов
               </p>
             </div>
           </div>
@@ -62,11 +62,10 @@ export default function AboutSection() {
                 <Icon name="AlertTriangle" size={24} className="text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-bold mb-2 text-foreground">Правовое уведомление</h3>
+                <h3 className="text-lg font-bold mb-2 text-foreground">Важно знать</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Материалы предназначены для образовательных целей как справочные пособия. 
-                  <strong className="text-foreground"> Все материалы требуют обязательной авторской переработки.</strong> 
-                  Прямое копирование запрещено.
+                  Материалы предназначены для обучения и справки. 
+                  <strong className="text-foreground">Используйте как основу для своих разработок</strong> с обязательной адаптацией под ваши задачи.
                 </p>
               </div>
             </div>

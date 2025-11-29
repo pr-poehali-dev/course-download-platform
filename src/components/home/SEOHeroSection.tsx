@@ -13,17 +13,17 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
       
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">
-          <Icon name="Ruler" size={16} className="text-primary" />
-          <span className="text-sm font-semibold text-primary">Инженерная платформа №1</span>
+          <Icon name="Wrench" size={16} className="text-primary" />
+          <span className="text-sm font-semibold text-primary">Для инженеров и студентов</span>
         </div>
         
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight hero-title">
-          Техническая документация
+          Инженерная платформа
           <br />
-          <span className="text-primary">для инженеров</span>
+          <span className="text-primary">технических знаний</span>
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-          Чертежи, CAD-проекты, расчёты и справочные материалы. Всё необходимое для учёбы и работы в одном месте.
+          Чертежи DWG/DXF, 3D-модели, технические расчёты и проектная документация. Обменивайтесь опытом и развивайте навыки.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -51,15 +51,15 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16">
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
             <div className="text-5xl font-bold text-primary mb-2">2,458</div>
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Технических работ</div>
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Инженерных материалов</div>
           </div>
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
             <div className="text-5xl font-bold text-primary mb-2">1,203</div>
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Авторов</div>
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Инженеров</div>
           </div>
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
             <div className="text-5xl font-bold text-primary mb-2">45,871</div>
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Загрузок</div>
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Скачиваний</div>
           </div>
         </div>
       </div>

@@ -50,16 +50,16 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16">
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
-            <div className="text-5xl font-bold text-primary mb-2">2,458</div>
+            <div className="text-5xl font-bold text-primary mb-2">500+</div>
             <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Инженерных материалов</div>
           </div>
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
-            <div className="text-5xl font-bold text-primary mb-2">1,203</div>
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Инженеров</div>
+            <div className="text-5xl font-bold text-primary mb-2">150+</div>
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Скачиваний</div>
           </div>
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
-            <div className="text-5xl font-bold text-primary mb-2">45,871</div>
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Скачиваний</div>
+            <div className="text-5xl font-bold text-primary mb-2">24/7</div>
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Поддержка</div>
           </div>
         </div>
       </div>

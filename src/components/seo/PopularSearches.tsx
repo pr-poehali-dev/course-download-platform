@@ -4,50 +4,50 @@ import Icon from '@/components/ui/icon';
 export default function PopularSearches() {
   const popularSearches = [
     {
-      category: 'Курсовые работы',
+      category: 'CAD-форматы',
       queries: [
-        { text: 'купить курсовую работу недорого', url: '/catalog?search=курсовая' },
-        { text: 'готовые курсовые работы', url: '/catalog?search=курсовая' },
-        { text: 'курсовая работа цена', url: '/catalog?search=курсовая' },
-        { text: 'где купить курсовую', url: '/catalog?search=курсовая' }
+        { text: 'чертежи DWG скачать', url: '/catalog?search=dwg' },
+        { text: 'модели STEP', url: '/catalog?search=step' },
+        { text: 'файлы STL для печати', url: '/catalog?search=stl' },
+        { text: 'проекты KOMPAS-3D', url: '/catalog?search=kompas' }
       ]
     },
     {
-      category: 'Дипломные работы',
+      category: 'Расчёты',
       queries: [
-        { text: 'купить дипломную работу', url: '/catalog?search=дипломная' },
-        { text: 'готовые дипломы', url: '/catalog?search=диплом' },
-        { text: 'диплом купить недорого', url: '/catalog?search=диплом' },
-        { text: 'вкр купить', url: '/catalog?search=вкр' }
+        { text: 'расчёт прочности', url: '/catalog?search=прочность' },
+        { text: 'гидравлические расчёты', url: '/catalog?search=гидравлика' },
+        { text: 'тепловые расчёты', url: '/catalog?search=тепло' },
+        { text: 'расчёт деформаций', url: '/catalog?search=деформация' }
       ]
     },
     {
-      category: 'Другие работы',
+      category: 'Системы проектирования',
       queries: [
-        { text: 'купить реферат', url: '/catalog?search=реферат' },
-        { text: 'отчет по практике купить', url: '/catalog?search=практика' },
-        { text: 'контрольная работа купить', url: '/catalog?search=контрольная' },
-        { text: 'лабораторная работа купить', url: '/catalog?search=лабораторная' }
+        { text: 'AutoCAD проекты', url: '/catalog?search=autocad' },
+        { text: 'SolidWorks сборки', url: '/catalog?search=solidworks' },
+        { text: 'Inventor модели', url: '/catalog?search=inventor' },
+        { text: 'КОМПАС чертежи', url: '/catalog?search=компас' }
       ]
     }
   ];
 
   return (
-    <section className="w-full py-16 bg-gradient-to-b from-white to-gray-50">
+    <section className="w-full py-20 bg-background border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Популярные запросы студентов
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">
+            Популярные запросы
           </h2>
           <p className="text-lg text-muted-foreground">
-            Что чаще всего ищут студенты в 2025 году
+            Что чаще всего ищут инженеры на платформе
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {popularSearches.map((section, index) => (
-            <Card key={index} className="p-6 hover:shadow-xl transition-shadow">
-              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+            <div key={index} className="cyber-card rounded-xl p-6">
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2 text-foreground">
                 <Icon name="Search" size={20} className="text-primary" />
                 {section.category}
               </h3>
@@ -58,67 +58,47 @@ export default function PopularSearches() {
                       href={query.url}
                       className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-2 group"
                     >
-                      <Icon name="TrendingUp" size={14} className="text-gray-400 group-hover:text-primary" />
+                      <Icon name="TrendingUp" size={14} className="text-muted-foreground group-hover:text-primary" />
                       <span className="group-hover:underline">{query.text}</span>
                     </a>
                   </li>
                 ))}
               </ul>
-            </Card>
+            </div>
           ))}
         </div>
 
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="p-4 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/blog/gde-kupit-kursovuyu-rabotu-nedorogo-2025'}>
-            <Icon name="BookOpen" size={32} className="mx-auto mb-2 text-primary" />
-            <h4 className="font-bold text-sm mb-1">Где купить курсовую?</h4>
-            <p className="text-xs text-muted-foreground">Топ-5 сервисов 2025</p>
-          </Card>
-
-          <Card className="p-4 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/blog/kak-kupit-kursovuyu-rabotu-bezopasno-instrukciya'}>
-            <Icon name="Shield" size={32} className="mx-auto mb-2 text-green-600" />
-            <h4 className="font-bold text-sm mb-1">Безопасная покупка</h4>
-            <p className="text-xs text-muted-foreground">Пошаговая инструкция</p>
-          </Card>
-
-          <Card className="p-4 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/blog/skolko-stoit-kupit-kursovuyu-rabotu-2025-ceny'}>
-            <Icon name="DollarSign" size={32} className="mx-auto mb-2 text-orange-600" />
-            <h4 className="font-bold text-sm mb-1">Актуальные цены</h4>
-            <p className="text-xs text-muted-foreground">Сколько стоит в 2025?</p>
-          </Card>
-
-          <Card className="p-4 text-center hover:shadow-lg transition-shadow cursor-pointer" onClick={() => window.location.href = '/catalog'}>
-            <Icon name="Package" size={32} className="mx-auto mb-2 text-purple-600" />
-            <h4 className="font-bold text-sm mb-1">500+ работ</h4>
-            <p className="text-xs text-muted-foreground">Полный каталог</p>
-          </Card>
-        </div>
-
-        <div className="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-2xl border border-primary/20">
-          <div className="text-center max-w-2xl mx-auto">
-            <Icon name="Lightbulb" size={48} className="mx-auto mb-4 text-primary" />
-            <h3 className="text-2xl font-bold mb-3">
-              Не нашли нужный запрос?
-            </h3>
-            <p className="text-muted-foreground mb-6">
-              Используйте расширенный поиск в каталоге или напишите нам — мы поможем найти именно то, что вам нужно
-            </p>
-            <div className="flex gap-4 justify-center flex-wrap">
-              <a
-                href="/catalog"
-                className="inline-flex items-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-semibold"
-              >
-                <Icon name="Search" size={18} className="mr-2" />
-                Открыть каталог
-              </a>
-              <a
-                href="mailto:tech.forma@yandex.ru"
-                className="inline-flex items-center px-6 py-3 bg-white text-primary rounded-lg hover:bg-gray-50 transition-colors font-semibold border-2 border-primary"
-              >
-                <Icon name="Mail" size={18} className="mr-2" />
-                Написать нам
-              </a>
+        <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="cyber-card rounded-xl p-6 text-center hover:shadow-lg transition-all cursor-pointer group" onClick={() => window.location.href = '/catalog?format=dwg'}>
+            <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/30 transition-colors">
+              <Icon name="FileText" size={24} className="text-primary" />
             </div>
+            <h4 className="font-bold text-sm mb-1 text-foreground">Формат DWG</h4>
+            <p className="text-xs text-muted-foreground">250+ чертежей</p>
+          </div>
+
+          <div className="cyber-card rounded-xl p-6 text-center hover:shadow-lg transition-all cursor-pointer group" onClick={() => window.location.href = '/catalog?format=step'}>
+            <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-secondary/30 transition-colors">
+              <Icon name="Box" size={24} className="text-secondary" />
+            </div>
+            <h4 className="font-bold text-sm mb-1 text-foreground">3D-модели</h4>
+            <p className="text-xs text-muted-foreground">180+ файлов</p>
+          </div>
+
+          <div className="cyber-card rounded-xl p-6 text-center hover:shadow-lg transition-all cursor-pointer group" onClick={() => window.location.href = '/catalog?type=calculations'}>
+            <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/30 transition-colors">
+              <Icon name="Calculator" size={24} className="text-primary" />
+            </div>
+            <h4 className="font-bold text-sm mb-1 text-foreground">Расчёты</h4>
+            <p className="text-xs text-muted-foreground">95+ примеров</p>
+          </div>
+
+          <div className="cyber-card rounded-xl p-6 text-center hover:shadow-lg transition-all cursor-pointer group" onClick={() => window.location.href = '/catalog'}>
+            <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mx-auto mb-3 group-hover:bg-secondary/30 transition-colors">
+              <Icon name="Database" size={24} className="text-secondary" />
+            </div>
+            <h4 className="font-bold text-sm mb-1 text-foreground">Весь каталог</h4>
+            <p className="text-xs text-muted-foreground">2000+ материалов</p>
           </div>
         </div>
       </div>

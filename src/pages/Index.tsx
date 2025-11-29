@@ -1310,152 +1310,72 @@ export default function Index() {
 
         <NewsSection isAdmin={currentUser?.role === 'admin'} />
 
-        <section id="faq" className="py-16 bg-background">
-          <div className="container mx-auto px-4 max-w-3xl">
-            <div className="text-center mb-12">
+        <section id="faq" className="py-20 bg-background border-b border-border">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">Частые вопросы</h2>
-              <p className="text-lg text-muted-foreground">Ответы на популярные вопросы</p>
+              <p className="text-lg text-muted-foreground">Всё об инженерной платформе TechForma</p>
             </div>
-            <div className="space-y-4">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="HelpCircle" size={20} className="text-primary" />
-                    Как купить работу на платформе?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Зарегистрируйтесь на платформе и получите 1000 приветственных баллов. Выберите работу в каталоге, оплатите баллами или картой, и мгновенно скачайте файл.
-                  </p>
-                </CardContent>
-              </Card>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="cyber-card rounded-xl p-6">
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="FileText" size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-foreground">Какие форматы поддерживаются?</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  DWG, DXF, STEP, STL, PDF, KOMPAS, SolidWorks и другие CAD-форматы. Все материалы проверены и открываются стандартным ПО.
+                </p>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="Shield" size={20} className="text-primary" />
-                    Какая уникальность готовых работ?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Уникальность готовых работ составляет от 95%.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="cyber-card rounded-xl p-6">
+                <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="Download" size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-foreground">Как скачать чертежи?</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Зарегистрируйтесь, пополните баланс баллами, выберите материал и мгновенно скачивайте файлы. Без ожидания и модерации.
+                </p>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="DollarSign" size={20} className="text-primary" />
-                    Сколько стоят работы?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Цены начинаются от 500₽ за реферат, 2250-3000₽ за курсовую работу и от 7000₽ за дипломную работу. Это в 10 раз дешевле, чем заказывать работу с нуля на других платформах и не факт, что будет правильная.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="cyber-card rounded-xl p-6">
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="Coins" size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-foreground">Система баллов</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  1 балл = 5₽. Загружайте свои разработки и зарабатывайте 90% от каждой продажи. Баллы можно пополнить картой.
+                </p>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="Coins" size={20} className="text-primary" />
-                    Что такое баллы и как их получить?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    При регистрации вы получаете 1000 баллов бесплатно. 1 балл = 5 рублей. Баллы можно пополнить картой, заработать за загрузку своих работ или получить по реферальной программе.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="cyber-card rounded-xl p-6">
+                <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="Shield" size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-foreground">Безопасность и качество</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Все файлы проверяются на вирусы. Материалы модерируются. Гарантия возврата баллов при несоответствии описанию.
+                </p>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="RotateCcw" size={20} className="text-primary" />
-                    Можно ли вернуть деньги?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Да, если работа не соответствует описанию, обратитесь в поддержку в течение 24 часов. Мы начислим баллы или подберем альтернативную работу.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="cyber-card rounded-xl p-6">
+                <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="Users" size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-foreground">Для кого платформа?</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Студенты технических вузов, инженеры-конструкторы, проектировщики и все, кто работает с CAD-системами.
+                </p>
+              </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="Database" size={20} className="text-primary" />
-                    Сколько работ в каталоге?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    В каталоге 500+ работ по техническим дисциплинам. База пополняется ежедневно.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="Zap" size={20} className="text-primary" />
-                    Как быстро я получу работу после оплаты?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Мгновенно! После оплаты вы сразу получаете ссылку на скачивание архива. Никаких ожиданий и задержек.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="Upload" size={20} className="text-primary" />
-                    Могу ли я продавать свои работы?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Да! Загружайте свои курсовые, дипломы и рефераты. За каждую загруженную работу вы получаете баллы, а за каждую покупку — 90% от стоимости. Это отличный способ заработать на старых работах.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="CheckCircle" size={20} className="text-primary" />
-                    Это легально?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Да, покупка готовых работ как образцов для изучения абсолютно легальна. Это аналогично покупке учебника или методического пособия. Важно использовать материал этично: дорабатывать, перефразировать и добавлять авторские идеи.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Icon name="Mail" size={20} className="text-primary" />
-                    Как связаться с поддержкой?
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">
-                    Напишите нам на tech.forma@yandex.ru — мы отвечаем в течение 24 часов.
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="cyber-card rounded-xl p-6">
+                <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="Mail" size={24} className="text-white" />
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-foreground">Поддержка 24/7</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Напишите на tech.forma@yandex.ru — отвечаем в течение 24 часов. Помощь по файлам, балансу и загрузке.
+                </p>
+              </div>
             </div>
           </div>
         </section>
@@ -1465,10 +1385,6 @@ export default function Index() {
         <PopularSearches />
         
         <SEOContentSection />
-        
-        <PopularCategoriesLinks />
-        
-        <SEOFAQSection />
 
         <footer className="bg-muted/50 border-t border-border py-16">
           <div className="container mx-auto px-4">

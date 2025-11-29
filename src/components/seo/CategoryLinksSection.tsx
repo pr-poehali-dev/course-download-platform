@@ -8,169 +8,131 @@ interface Category {
   description: string;
   icon: string;
   count: number;
-  keywords: string[];
 }
 
 export default function CategoryLinksSection() {
   const categories: Category[] = [
     {
-      name: 'Курсовые работы',
-      slug: 'kursovye-raboty',
-      description: 'Готовые курсовые работы по всем предметам от 200₽',
-      icon: 'FileText',
-      count: 350,
-      keywords: ['курсовая работа купить', 'готовые курсовые', 'курсовая недорого']
+      name: 'Чертежи DWG',
+      slug: 'dwg',
+      description: 'AutoCAD чертежи деталей, узлов, сборок',
+      icon: 'PenTool',
+      count: 250,
     },
     {
-      name: 'Дипломные работы',
-      slug: 'diplomnye-raboty',
-      description: 'ВКР и дипломные проекты с гарантией качества от 500₽',
-      icon: 'GraduationCap',
-      count: 120,
-      keywords: ['диплом купить', 'готовые дипломы', 'дипломная работа']
+      name: 'Модели STEP/STL',
+      slug: '3d-models',
+      description: '3D-модели для печати и обработки',
+      icon: 'Box',
+      count: 180,
     },
     {
-      name: 'Рефераты',
-      slug: 'referaty',
-      description: 'Рефераты по всем дисциплинам от 100₽',
+      name: 'Проекты KOMPAS',
+      slug: 'kompas',
+      description: 'Чертежи и спецификации KOMPAS-3D',
       icon: 'FileCheck',
-      count: 80,
-      keywords: ['реферат купить', 'готовые рефераты', 'скачать реферат']
+      count: 120,
     },
     {
-      name: 'Контрольные работы',
-      slug: 'kontrolnye-raboty',
-      description: 'Готовые контрольные работы от 150₽',
-      icon: 'ClipboardCheck',
+      name: 'Расчёты прочности',
+      slug: 'strength',
+      description: 'Прочностные и деформационные расчёты',
+      icon: 'Calculator',
+      count: 95,
+    },
+    {
+      name: 'SolidWorks проекты',
+      slug: 'solidworks',
+      description: 'Модели и сборки SolidWorks',
+      icon: 'Wrench',
+      count: 140,
+    },
+    {
+      name: 'Гидравлика',
+      slug: 'hydraulics',
+      description: 'Гидравлические схемы и расчёты',
+      icon: 'Droplet',
       count: 60,
-      keywords: ['контрольная купить', 'готовые контрольные', 'контрольная работа']
     },
     {
-      name: 'Отчеты по практике',
-      slug: 'otchety-po-praktike',
-      description: 'Отчеты по практике с дневниками от 200₽',
-      icon: 'Briefcase',
-      count: 45,
-      keywords: ['отчет по практике купить', 'готовый отчет практика']
+      name: 'Электротехника',
+      slug: 'electrical',
+      description: 'Электрические схемы и проекты',
+      icon: 'Zap',
+      count: 85,
     },
     {
-      name: 'Лабораторные работы',
-      slug: 'laboratornye-raboty',
-      description: 'Лабораторные работы с расчетами от 100₽',
-      icon: 'FlaskConical',
-      count: 70,
-      keywords: ['лабораторная работа купить', 'готовые лабораторные']
-    },
-    {
-      name: 'Чертежи',
-      slug: 'chertezhi',
-      description: 'Технические чертежи в AutoCAD от 250₽',
-      icon: 'Ruler',
-      count: 55,
-      keywords: ['чертежи купить', 'чертежи AutoCAD', 'технические чертежи']
-    },
-    {
-      name: 'Диссертации',
-      slug: 'dissertacii',
-      description: 'Магистерские и кандидатские диссертации от 1000₽',
-      icon: 'BookOpen',
-      count: 25,
-      keywords: ['диссертация купить', 'магистерская диссертация']
+      name: 'Техдокументация',
+      slug: 'docs',
+      description: 'ТЗ, пояснительные записки, отчёты',
+      icon: 'FileText',
+      count: 110,
     }
   ];
 
   return (
-    <section className="w-full py-16 bg-white">
+    <section className="w-full py-20 bg-muted/30 border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Категории студенческих работ
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">
+            Категории материалов
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Выберите нужный тип работы и найдите готовое решение за минуты
+            Найдите нужные чертежи, модели или расчёты по направлению
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
-            <Card
+            <div
               key={category.slug}
-              className="p-6 hover:shadow-xl transition-all duration-300 hover:scale-105 cursor-pointer group"
+              className="cyber-card rounded-xl p-6 hover:shadow-lg transition-all cursor-pointer group"
+              onClick={() => window.location.href = `/catalog?category=${category.slug}`}
             >
               <div className="flex flex-col h-full">
-                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors">
-                  <Icon name={category.icon as any} size={24} className="text-primary" />
+                <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors border-2 border-primary/20">
+                  <Icon name={category.icon as any} size={28} className="text-primary" />
                 </div>
                 
-                <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
+                <h3 className="text-lg font-bold mb-2 text-foreground group-hover:text-primary transition-colors">
                   {category.name}
                 </h3>
                 
-                <p className="text-sm text-muted-foreground mb-4 flex-grow">
+                <p className="text-sm text-muted-foreground mb-4 flex-grow leading-relaxed">
                   {category.description}
                 </p>
                 
-                <div className="flex items-center justify-between pt-4 border-t">
-                  <span className="text-sm font-semibold text-primary">
-                    {category.count}+ работ
+                <div className="flex items-center justify-between pt-4 border-t border-border">
+                  <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1">
+                    <Icon name="Database" size={14} />
+                    {category.count}+ файлов
                   </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="group-hover:bg-primary/10"
-                    onClick={() => window.location.href = `/catalog?category=${category.slug}`}
-                  >
-                    Смотреть
-                    <Icon name="ArrowRight" size={16} className="ml-1" />
-                  </Button>
+                  <Icon name="ArrowRight" size={16} className="text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>
-            </Card>
+            </div>
           ))}
         </div>
 
-        <div className="mt-12 p-8 bg-gradient-to-r from-primary/5 to-purple-500/5 rounded-2xl border border-primary/20">
+        <div className="mt-16 cyber-card rounded-2xl p-8 border-2 border-primary/30">
           <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-2xl font-bold mb-3">
+            <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+              <Icon name="Search" size={32} className="text-white" />
+            </div>
+            <h3 className="text-2xl font-bold mb-3 text-foreground">
               Не нашли нужную категорию?
             </h3>
-            <p className="text-muted-foreground mb-6">
-              В каталоге более 500 работ по всем дисциплинам. Используйте поиск или фильтры для точного результата
+            <p className="text-muted-foreground mb-6 leading-relaxed">
+              В каталоге 2000+ инженерных материалов. Используйте расширенный поиск по форматам, типам и дисциплинам
             </p>
             <Button
               size="lg"
-              className="bg-primary hover:bg-primary/90"
+              className="bg-primary hover:bg-primary/90 text-white shadow-md"
               onClick={() => window.location.href = '/catalog'}
             >
-              <Icon name="Search" size={18} className="mr-2" />
+              <Icon name="Filter" size={18} className="mr-2" />
               Открыть полный каталог
             </Button>
-          </div>
-        </div>
-
-        <div className="mt-12 bg-blue-50 p-6 rounded-lg border-l-4 border-primary">
-          <h4 className="text-lg font-bold mb-3 text-primary">
-            💡 Популярные запросы студентов
-          </h4>
-          <div className="flex flex-wrap gap-2">
-            {[
-              'купить курсовую работу недорого',
-              'готовые дипломы',
-              'где купить курсовую',
-              'скачать реферат',
-              'купить отчет по практике',
-              'готовые контрольные работы',
-              'чертежи AutoCAD купить',
-              'купить лабораторную работу'
-            ].map((keyword, index) => (
-              <span
-                key={index}
-                className="px-3 py-1 bg-white rounded-full text-sm text-gray-700 border border-gray-200 hover:border-primary hover:text-primary transition-colors cursor-pointer"
-                onClick={() => window.location.href = `/catalog?search=${encodeURIComponent(keyword)}`}
-              >
-                {keyword}
-              </span>
-            ))}
           </div>
         </div>
       </div>

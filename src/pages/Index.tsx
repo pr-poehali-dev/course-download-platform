@@ -568,28 +568,32 @@ export default function Index() {
                 </div>
               </div>
               
-              <nav className="hidden lg:flex items-center gap-6">
-                <a href="/" className="text-foreground hover:text-primary transition-colors font-semibold relative group">
-                  Главная
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
-                </a>
-                <a href="/catalog" className="text-muted-foreground hover:text-primary transition-colors font-medium">Каталог</a>
-                <a href="#categories" className="text-muted-foreground hover:text-primary transition-colors font-medium">Категории</a>
-                <a href="#about" className="text-muted-foreground hover:text-primary transition-colors font-medium">О нас</a>
-              </nav>
-              
-              <ThemeToggle />
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="lg:hidden h-8 w-8 sm:h-10 sm:w-10"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
-              </Button>
+              <div className="flex items-center gap-3 flex-1 justify-end">
+                <nav className="hidden lg:flex items-center gap-6">
+                  <a href="/" className="text-foreground hover:text-primary transition-colors font-medium relative group">
+                    Главная
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
+                  </a>
+                  <a href="/catalog" className="text-muted-foreground hover:text-primary transition-colors font-medium">Каталог</a>
+                  <a href="#categories" className="text-muted-foreground hover:text-primary transition-colors font-medium">Категории</a>
+                  <a href="#about" className="text-muted-foreground hover:text-primary transition-colors font-medium">О нас</a>
+                </nav>
+                
+                <div className="flex items-center gap-2">
+                  <ThemeToggle />
+                  
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="lg:hidden h-10 w-10"
+                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  >
+                    <Icon name={mobileMenuOpen ? "X" : "Menu"} size={24} />
+                  </Button>
+                </div>
+              </div>
 
-              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+              <div className="flex items-center gap-2 flex-shrink-0">
                 {isLoggedIn ? (
                   <>
 
@@ -676,26 +680,23 @@ export default function Index() {
                     </DropdownMenu>
                   </>
                 ) : (
-                  <>
-                    <ThemeToggle />
-                    <div className="flex gap-2">
-                      <Button 
-                        onClick={() => setAuthDialogOpen(true)} 
-                        variant="ghost"
-                        size="sm" 
-                        className="text-sm px-4 hover:bg-muted"
-                      >
-                        Вход
-                      </Button>
-                      <Button 
-                        onClick={() => setAuthDialogOpen(true)} 
-                        size="sm" 
-                        className="text-sm px-4 bg-primary hover:bg-primary/90 text-white shadow-md"
-                      >
-                        Регистрация
-                      </Button>
-                    </div>
-                  </>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => setAuthDialogOpen(true)} 
+                      variant="ghost"
+                      size="sm" 
+                      className="text-sm px-4 hover:bg-muted"
+                    >
+                      Вход
+                    </Button>
+                    <Button 
+                      onClick={() => setAuthDialogOpen(true)} 
+                      size="sm" 
+                      className="text-sm px-4 bg-primary hover:bg-primary/90 text-white shadow-md"
+                    >
+                      Регистрация
+                    </Button>
+                  </div>
                 )}
               </div>
             </div>

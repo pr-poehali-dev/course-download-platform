@@ -6,33 +6,33 @@
 
 @layer base {
   :root {
-    --background: 240 20% 4%;
-    --foreground: 0 0% 100%;
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
-    --card: 240 15% 11%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 15%;
 
-    --popover: 240 15% 11%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 180 100% 50%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 270 100% 68%;
+    --secondary: 25 95% 53%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 10% 15%;
-    --muted-foreground: 220 10% 63%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 160 100% 50%;
+    --accent: 25 95% 53%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 350 100% 56%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 240 10% 17%;
-    --input: 240 10% 15%;
-    --ring: 180 100% 50%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 217 91% 60%;
 
     --radius: 0.5rem;
 
@@ -99,23 +99,17 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
-    background:
-      radial-gradient(
-        circle at 10% 20%,
-        rgba(25, 25, 60, 0.5) 0%,
-        transparent 20%
-      ),
-      radial-gradient(
-        circle at 90% 80%,
-        rgba(80, 10, 120, 0.3) 0%,
-        transparent 20%
-      ),
-      hsl(var(--background));
+    background: hsl(var(--background));
   }
 
   html {
@@ -133,9 +127,14 @@
   h4,
   h5,
   h6 {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    font-family:
+      "Inter",
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      sans-serif;
     font-weight: 700;
-    letter-spacing: normal;
+    letter-spacing: -0.02em;
   }
 }
 
@@ -168,34 +167,28 @@
   }
 
   .glass-card {
-    background: rgba(10, 10, 20, 0.9);
+    background: rgba(255, 255, 255, 0.9);
     backdrop-filter: blur(10px);
     border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .tech-border {
-    border: 1px solid hsl(var(--border));
+    border: 2px dashed hsl(var(--border));
     position: relative;
     transition: all 0.3s;
   }
 
   .tech-border:hover {
     border-color: hsl(var(--primary));
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    border-style: solid;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
   }
 
   .hero-title {
-    font-weight: 700;
-    background: linear-gradient(
-      90deg,
-      hsl(var(--primary)),
-      hsl(var(--secondary)),
-      hsl(var(--destructive))
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    font-weight: 800;
+    color: hsl(var(--foreground));
+    letter-spacing: -0.03em;
   }
 
   @keyframes shimmer {
@@ -272,14 +265,15 @@
 
   .cyber-card {
     background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
+    border: 2px solid hsl(var(--border));
     transition: all 0.3s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .cyber-card:hover {
     border-color: hsl(var(--primary));
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
   }
 
   .section-title-line {
@@ -293,9 +287,37 @@
     bottom: -10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
+    width: 60px;
+    height: 4px;
     background: hsl(var(--primary));
-    box-shadow: 0 0 8px hsl(var(--primary));
+    border-radius: 2px;
+  }
+
+  .blueprint-grid {
+    background-image:
+      linear-gradient(hsl(var(--border)) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.5;
+  }
+
+  .technical-line {
+    position: relative;
+  }
+
+  .technical-line::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 2px;
+    background: repeating-linear-gradient(
+      90deg,
+      hsl(var(--primary)),
+      hsl(var(--primary)) 10px,
+      transparent 10px,
+      transparent 20px
+    );
   }
 }

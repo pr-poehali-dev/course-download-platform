@@ -554,21 +554,26 @@ export default function Index() {
       <ExitIntentModal />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-background">
-        <header className="glass-card border-b border-border sticky top-0 z-50 w-full backdrop-blur-md">
+        <header className="glass-card border-b border-border sticky top-0 z-50 w-full backdrop-blur-md shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0 flex-shrink">
-                <Icon name="Cpu" size={32} className="text-primary" />
+                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                  <Icon name="Ruler" size={24} className="text-white" />
+                </div>
                 <div className="flex flex-col min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">TechForma</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight text-foreground">TechForma</h1>
+                  <p className="text-xs text-muted-foreground hidden sm:block">Инженерная платформа</p>
                 </div>
               </div>
               
-              <nav className="hidden lg:flex items-center gap-8">
-                <a href="/" className="text-foreground hover:text-primary transition-colors font-medium">Главная</a>
+              <nav className="hidden lg:flex items-center gap-6">
+                <a href="/" className="text-foreground hover:text-primary transition-colors font-semibold relative group">
+                  Главная
+                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all"></span>
+                </a>
                 <a href="/catalog" className="text-muted-foreground hover:text-primary transition-colors font-medium">Каталог</a>
-                <a href="#authors" className="text-muted-foreground hover:text-primary transition-colors font-medium">Авторы</a>
-                <a href="#ratings" className="text-muted-foreground hover:text-primary transition-colors font-medium">Рейтинги</a>
+                <a href="#categories" className="text-muted-foreground hover:text-primary transition-colors font-medium">Категории</a>
                 <a href="#about" className="text-muted-foreground hover:text-primary transition-colors font-medium">О нас</a>
               </nav>
               
@@ -600,18 +605,18 @@ export default function Index() {
                     </Button>
                     
                     <div className="flex items-center gap-1">
-                      <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-1 sm:py-2 cyber-card rounded-md neon-border">
-                        <Icon name="Zap" size={16} className="text-primary sm:w-5 sm:h-5" />
+                      <div className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-1 sm:py-2 bg-primary/10 border-2 border-primary rounded-lg">
+                        <Icon name="Coins" size={16} className="text-primary sm:w-5 sm:h-5" />
                         <span className="font-bold text-sm sm:text-base text-primary">{userBalance}</span>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         onClick={refreshBalance}
-                        className="h-8 w-8 hover:bg-primary/20"
+                        className="h-8 w-8 hover:bg-primary/10"
                         title="Обновить баланс"
                       >
-                        <Icon name="RefreshCw" size={16} className="text-cyan-400" />
+                        <Icon name="RefreshCw" size={16} className="text-primary" />
                       </Button>
                     </div>
                     
@@ -629,7 +634,7 @@ export default function Index() {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-8 w-8 sm:h-10 sm:w-10 rounded-full p-0">
-                          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white font-semibold flex items-center justify-center text-sm sm:text-lg">
+                          <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-primary text-white font-bold flex items-center justify-center text-sm sm:text-lg shadow-md">
                             {username ? username[0].toUpperCase() : 'U'}
                           </div>
                         </Button>
@@ -671,16 +676,16 @@ export default function Index() {
                   <div className="flex gap-2">
                     <Button 
                       onClick={() => setAuthDialogOpen(true)} 
-                      variant="outline"
+                      variant="ghost"
                       size="sm" 
-                      className="text-sm px-4 border-primary text-primary hover:bg-primary/10"
+                      className="text-sm px-4 hover:bg-muted"
                     >
                       Вход
                     </Button>
                     <Button 
                       onClick={() => setAuthDialogOpen(true)} 
                       size="sm" 
-                      className="text-sm px-4 bg-secondary hover:bg-secondary/90"
+                      className="text-sm px-4 bg-primary hover:bg-primary/90 text-white shadow-md"
                     >
                       Регистрация
                     </Button>
@@ -767,34 +772,37 @@ export default function Index() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div className="cyber-card rounded-lg p-8 text-center">
-                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl font-bold text-primary">1</span>
+              <div className="cyber-card rounded-xl p-8 text-center relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+                <div className="w-16 h-16 bg-primary text-white rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-bold">1</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">Регистрация</h3>
+                <h3 className="text-xl font-bold mb-3 text-foreground">Регистрация</h3>
                 <p className="text-base text-muted-foreground leading-relaxed">Создайте аккаунт и получите приветственные баллы</p>
               </div>
 
-              <div className="cyber-card rounded-lg p-8 text-center">
-                <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl font-bold text-secondary">2</span>
+              <div className="cyber-card rounded-xl p-8 text-center relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-secondary"></div>
+                <div className="w-16 h-16 bg-secondary text-white rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-bold">2</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">Выбор материала</h3>
+                <h3 className="text-xl font-bold mb-3 text-foreground">Выбор материала</h3>
                 <p className="text-base text-muted-foreground leading-relaxed">Найдите нужный чертёж или проект в каталоге</p>
               </div>
 
-              <div className="cyber-card rounded-lg p-8 text-center">
-                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <span className="text-3xl font-bold text-accent">3</span>
+              <div className="cyber-card rounded-xl p-8 text-center relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-primary"></div>
+                <div className="w-16 h-16 bg-primary text-white rounded-xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
+                  <span className="text-3xl font-bold">3</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-foreground">Скачивание</h3>
+                <h3 className="text-xl font-bold mb-3 text-foreground">Скачивание</h3>
                 <p className="text-base text-muted-foreground leading-relaxed">Мгновенный доступ к файлам после оплаты</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-20 bg-background border-b border-border">
+        <section className="py-20 bg-muted/30 border-b border-border">
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">
@@ -806,32 +814,32 @@ export default function Index() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-              <div className="cyber-card rounded-lg p-8">
-                <div className="w-14 h-14 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
-                  <Icon name="Database" size={28} className="text-primary" />
+              <div className="cyber-card rounded-xl p-8 group hover:shadow-lg transition-shadow">
+                <div className="w-16 h-16 bg-primary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
+                  <Icon name="Database" size={32} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3 text-foreground">Библиотека материалов</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
                   Чертежи, CAD-проекты, 3D-модели и техническая документация. Мгновенный доступ после оплаты.
                 </p>
-                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10" asChild>
+                <Button className="w-full bg-primary hover:bg-primary/90 text-white shadow-md" asChild>
                   <a href="/catalog">
+                    <Icon name="Search" size={18} className="mr-2" />
                     Смотреть каталог
                   </a>
                 </Button>
               </div>
 
-              <div className="cyber-card rounded-lg p-8">
-                <div className="w-14 h-14 bg-secondary/20 rounded-lg flex items-center justify-center mb-4">
-                  <Icon name="Upload" size={28} className="text-secondary" />
+              <div className="cyber-card rounded-xl p-8 group hover:shadow-lg transition-shadow">
+                <div className="w-16 h-16 bg-secondary rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
+                  <Icon name="Upload" size={32} className="text-white" />
                 </div>
                 <h3 className="text-2xl font-bold mb-3 text-foreground">Стань автором</h3>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
                   Публикуй свои материалы, помогай другим и получай баллы за каждое скачивание.
                 </p>
                 <Button 
-                  variant="outline"
-                  className="w-full border-secondary text-secondary hover:bg-secondary/10"
+                  className="w-full bg-secondary hover:bg-secondary/90 text-white shadow-md"
                   onClick={() => {
                     if (!isLoggedIn) {
                       toast({
@@ -845,6 +853,7 @@ export default function Index() {
                     setProfileDialogOpen(true);
                   }}
                 >
+                  <Icon name="Plus" size={18} className="mr-2" />
                   Загрузить работу
                 </Button>
               </div>
@@ -1460,51 +1469,54 @@ export default function Index() {
         
         <SEOFAQSection />
 
-        <footer className="cyber-card border-t border-primary/30 py-16">
+        <footer className="bg-muted/50 border-t border-border py-16">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-cyber-cyan flex items-center justify-center neon-border">
-                      <Icon name="Cpu" size={20} className="text-background" />
+                    <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-md">
+                      <Icon name="Ruler" size={20} className="text-white" />
                     </div>
-                    <h3 className="font-black text-xl text-primary" style={{fontFamily: 'Orbitron'}}>TECH FORMA</h3>
+                    <h3 className="font-bold text-xl text-foreground">TechForma</h3>
                   </div>
-                  <p className="text-sm text-cyan-400 uppercase tracking-wide">
-                    Инженерная платформа
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Инженерная платформа для студентов и специалистов
                   </p>
                 </div>
 
                 <div>
-                  <h4 className="font-bold mb-4 text-foreground text-sm uppercase tracking-wider">Информация</h4>
-                  <ul className="space-y-2 text-sm text-cyan-400">
-                    <li><a href="#about" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">О платформе</a></li>
-                    <li><a href="#categories" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Категории</a></li>
-                    <li><a href="/catalog" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Каталог</a></li>
+                  <h4 className="font-bold mb-4 text-foreground text-sm">Информация</h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li><a href="#about" className="hover:text-primary transition-colors">О платформе</a></li>
+                    <li><a href="#categories" className="hover:text-primary transition-colors">Категории</a></li>
+                    <li><a href="/catalog" className="hover:text-primary transition-colors">Каталог</a></li>
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className="font-bold mb-4 text-foreground text-sm uppercase tracking-wider">Документы</h4>
-                  <ul className="space-y-2 text-sm text-cyan-400">
-                    <li><a href="/privacy-policy" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Конфиденциальность</a></li>
-                    <li><a href="/terms-of-service" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Соглашение</a></li>
-                    <li><a href="/offer" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">Оферта</a></li>
+                  <h4 className="font-bold mb-4 text-foreground text-sm">Документы</h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li><a href="/privacy-policy" className="hover:text-primary transition-colors">Конфиденциальность</a></li>
+                    <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Соглашение</a></li>
+                    <li><a href="/offer" className="hover:text-primary transition-colors">Оферта</a></li>
                   </ul>
                 </div>
 
                 <div>
-                  <h4 className="font-bold mb-4 text-foreground text-sm uppercase tracking-wider">Контакты</h4>
-                  <ul className="space-y-2 text-sm text-cyan-400">
-                    <li><a href="mailto:tech.forma@yandex.ru" className="hover:text-primary transition-colors border-b border-transparent hover:border-primary">tech.forma@yandex.ru</a></li>
+                  <h4 className="font-bold mb-4 text-foreground text-sm">Контакты</h4>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li className="flex items-center gap-2">
+                      <Icon name="Mail" size={16} className="text-primary" />
+                      <a href="mailto:tech.forma@yandex.ru" className="hover:text-primary transition-colors">tech.forma@yandex.ru</a>
+                    </li>
                   </ul>
                 </div>
               </div>
 
-              <div className="border-t border-primary/30 pt-8">
-                <p className="text-center text-sm text-cyan-500/60 uppercase tracking-wider">
-                  © 2025 Tech Forma. Все материалы предоставляются только для изучения.
+              <div className="border-t border-border pt-8">
+                <p className="text-center text-sm text-muted-foreground">
+                  © 2025 TechForma. Все материалы предоставляются только для изучения.
                 </p>
               </div>
             </div>

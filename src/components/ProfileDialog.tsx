@@ -280,7 +280,7 @@ export default function ProfileDialog({
           </TabsContent>
 
           <TabsContent value="support">
-            <SupportTab />
+            <SupportTab userEmail={email} />
           </TabsContent>
         </Tabs>
       </DialogContent>

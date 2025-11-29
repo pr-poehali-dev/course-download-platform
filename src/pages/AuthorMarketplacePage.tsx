@@ -35,29 +35,29 @@ export default function AuthorMarketplacePage() {
     {
       icon: 'Zap',
       title: 'Обмен баллами',
-      description: 'Используйте заработанные баллы для покупки работ других студентов'
+      description: 'Используйте заработанные баллы для покупки материалов других авторов'
     },
     {
       icon: 'Users',
       title: 'Большая аудитория',
-      description: 'Тысячи студентов ищут готовые работы каждый день'
+      description: 'Тысячи инженеров и студентов ищут материалы каждый день'
     },
     {
       icon: 'FileCheck',
       title: 'Легкая загрузка',
-      description: 'Загружайте работы за пару минут через простую форму'
+      description: 'Загружайте материалы за пару минут через простую форму'
     },
     {
       icon: 'RefreshCw',
       title: 'Постоянный доход баллов',
-      description: 'Получайте баллы каждый раз, когда вашу работу скачивают'
+      description: 'Получайте баллы каждый раз, когда ваш материал скачивают'
     }
   ];
 
   const stats = [
-    { value: '500+', label: 'Работ в каталоге' },
+    { value: '2000+', label: 'Материалов в каталоге' },
     { value: '90%', label: 'Баллов автору' },
-    { value: '1000+', label: 'Студентов' }
+    { value: '1000+', label: 'Пользователей' }
   ];
 
   const howItWorks = [
@@ -68,18 +68,18 @@ export default function AuthorMarketplacePage() {
     },
     {
       step: 2,
-      title: 'Загрузите работу',
-      description: 'Заполните описание и загрузите файлы (PDF, DOCX, чертежи)'
+      title: 'Загрузите материал',
+      description: 'Заполните описание и загрузите файлы (DWG, STEP, PDF, расчёты)'
     },
     {
       step: 3,
       title: 'Модерация',
-      description: 'Мы проверим работу на качество и уникальность (1-2 дня)'
+      description: 'Мы проверим материал на качество и корректность (1-2 дня)'
     },
     {
       step: 4,
       title: 'Получайте баллы',
-      description: 'Работа появится в каталоге, вы получаете 90% баллов с каждого скачивания'
+      description: 'Материал появится в каталоге, вы получаете 90% баллов с каждого скачивания'
     }
   ];
 
@@ -91,11 +91,11 @@ export default function AuthorMarketplacePage() {
         <Breadcrumbs />
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            Делитесь работами и получайте баллы
+            Делитесь материалами и получайте баллы
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Загружайте готовые курсовые, дипломы и контрольные — получайте баллы за каждое скачивание. 
-            90% баллов остаются у вас, используй их для покупки других работ!
+            Загружайте чертежи DWG, 3D-модели, расчёты — получайте баллы за каждое скачивание. 
+            90% баллов остаются у вас, используйте их для покупки других материалов!
           </p>
           <div className="flex gap-4 justify-center">
             <Button 
@@ -104,7 +104,7 @@ export default function AuthorMarketplacePage() {
               onClick={() => user ? navigate('/upload') : navigate('/')}
             >
               <Icon name="Upload" size={20} className="mr-2" />
-              {user ? 'Загрузить работу' : 'Начать обмен'}
+              {user ? 'Загрузить материал' : 'Начать обмен'}
             </Button>
             <Button 
               size="lg"
@@ -176,10 +176,10 @@ export default function AuthorMarketplacePage() {
 
         <Card className="p-12 text-center bg-gradient-to-r from-blue-50 to-indigo-50 border-2">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Готовы начать обмен работами?
+            Готовы начать обмен материалами?
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Загрузите свою работу прямо сейчас — получайте баллы и покупайте работы других студентов!
+            Загрузите свой материал прямо сейчас — получайте баллы и покупайте материалы других авторов!
           </p>
           <Button 
             size="lg"
@@ -187,7 +187,7 @@ export default function AuthorMarketplacePage() {
             onClick={() => user ? navigate('/upload') : navigate('/')}
           >
             <Icon name="Rocket" size={20} className="mr-2" />
-            {user ? 'Загрузить работу' : 'Зарегистрироваться'}
+            {user ? 'Загрузить материал' : 'Зарегистрироваться'}
           </Button>
         </Card>
       </main>

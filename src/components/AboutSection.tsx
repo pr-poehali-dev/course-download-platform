@@ -71,6 +71,7 @@ export default function AboutSection() {
               </div>
             </div>
           </div>
+        </div>
       </div>
     </section>
   );

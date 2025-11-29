@@ -172,6 +172,72 @@ export default function ModerationPanel() {
     });
   };
 
+  const handleDownloadWork = async (work: UploadedWork) => {
+    try {
+      const adminUser = localStorage.getItem('user');
+      if (!adminUser) {
+        toast({
+          title: '❌ Ошибка',
+          description: 'Необходима авторизация администратора',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      const adminData = JSON.parse(adminUser);
+      const adminUserId = adminData.id;
+
+      toast({
+        title: 'Скачивание...',
+        description: 'Загружаем файл для проверки'
+      });
+
+      const response = await fetch(
+        `${func2url['download-work']}?workId=${work.id}`,
+        {
+          headers: {
+            'X-User-Id': String(adminUserId)
+          }
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Не удалось получить ссылку на скачивание');
+      }
+
+      const data = await response.json();
+
+      if (!data.download_url) {
+        throw new Error('Файл не найден');
+      }
+
+      const fileResponse = await fetch(data.download_url);
+      const blob = await fileResponse.blob();
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = data.filename || work.file_name || `${work.title}.rar`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: '✅ Файл скачан',
+        description: `${data.filename || work.file_name} сохранён в папку "Загрузки"`
+      });
+    } catch (error: any) {
+      console.error('Download error:', error);
+      toast({
+        title: '❌ Ошибка скачивания',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  };
+
   const handleGenerateReviews = async () => {
     if (!confirm('Сгенерировать 2-3 отзыва для всех работ без отзывов?')) return;
     
@@ -387,18 +453,14 @@ export default function ModerationPanel() {
                   </CardDescription>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {work.file_name && (
-                    <Button 
-                      size="sm" 
-                      variant="outline"
-                      asChild
-                    >
-                      <a href={`${func2url['download-work']}?workId=${work.id}`} download target="_blank" rel="noopener noreferrer">
-                        <Icon name="Download" size={14} className="mr-2" />
-                        Скачать файлы
-                      </a>
-                    </Button>
-                  )}
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => handleDownloadWork(work)}
+                  >
+                    <Icon name="Download" size={14} className="mr-2" />
+                    Скачать файл
+                  </Button>
                   <Button 
                     size="sm" 
                     variant="default"

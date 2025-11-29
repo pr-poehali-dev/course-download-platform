@@ -54,9 +54,19 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-border pt-8">
-          <p className="text-center text-sm text-muted-foreground">
-            © 2025 TechForma. Все материалы предоставляются только для изучения.
-          </p>
+          <div className="text-center space-y-3">
+            <p className="text-sm text-muted-foreground">
+              © 2025 TechForma. Все материалы предоставляются только для изучения.
+            </p>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>ИП Гагарская Елизавета Александровна</p>
+              <p>ИНН: 290540407146 | ОГРНИП: 325290000045931</p>
+              <p>ОКВЭД: 47.91.2 — Торговля розничная через интернет</p>
+            </div>
+            <div className="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg font-bold text-sm">
+              18+
+            </div>
+          </div>
         </div>
       </div>
     </footer>

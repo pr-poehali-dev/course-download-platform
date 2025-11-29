@@ -4,68 +4,68 @@ import Icon from '@/components/ui/icon';
 
 export default function AboutSection() {
   return (
-    <section id="about" className="py-16 bg-white border-b border-gray-100">
+    <section id="about" className="py-20 bg-background border-b border-border">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">О платформе</h2>
-            <p className="text-lg text-gray-600">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">О платформе</h2>
+            <p className="text-lg text-muted-foreground">
               Инженерная платформа для студентов и специалистов
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
+            <div className="cyber-card rounded-lg p-6">
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
                 <Icon name="Target" size={24} className="text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">Наша миссия</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
+              <h3 className="text-xl font-semibold mb-2 text-foreground">Наша миссия</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Помогать учиться эффективнее через обмен материалами. База справочных работ для обучения.
               </p>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
+            <div className="cyber-card rounded-lg p-6">
+              <div className="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
                 <Icon name="Shield" size={24} className="text-primary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">Безопасность</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
+              <h3 className="text-xl font-semibold mb-2 text-foreground">Безопасность</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Безопасное хранение материалов. Модерация всех загружаемых файлов.
               </p>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
-                <Icon name="Users" size={24} className="text-primary" />
+            <div className="cyber-card rounded-lg p-6">
+              <div className="w-12 h-12 bg-secondary/20 rounded-lg flex items-center justify-center mb-4">
+                <Icon name="Users" size={24} className="text-secondary" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">Сообщество</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
+              <h3 className="text-xl font-semibold mb-2 text-foreground">Сообщество</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Растущее сообщество студентов и инженеров, обменивающихся знаниями.
               </p>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-              <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
-                <Icon name="Coins" size={24} className="text-primary" />
+            <div className="cyber-card rounded-lg p-6">
+              <div className="w-12 h-12 bg-accent/20 rounded-lg flex items-center justify-center mb-4">
+                <Icon name="Coins" size={24} className="text-accent" />
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-900">Балльная система</h3>
-              <p className="text-gray-600 leading-relaxed text-sm">
+              <h3 className="text-xl font-semibold mb-2 text-foreground">Балльная система</h3>
+              <p className="text-muted-foreground leading-relaxed">
                 Делись материалами — получай баллы. Используй баллы для доступа к работам других.
               </p>
             </div>
           </div>
 
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Icon name="AlertTriangle" size={20} className="text-yellow-600" />
+          <div className="cyber-card rounded-lg p-6 border-destructive/50">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 bg-destructive/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Icon name="AlertTriangle" size={20} className="text-destructive" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-yellow-900">Правовое уведомление</h3>
-                <p className="text-sm text-yellow-800 leading-relaxed">
+                <h3 className="text-lg font-semibold mb-2 text-foreground">Правовое уведомление</h3>
+                <p className="text-muted-foreground leading-relaxed">
                   Материалы предназначены для образовательных целей как справочные пособия. 
-                  <strong> Все материалы требуют обязательной авторской переработки.</strong> 
+                  <strong className="text-foreground"> Все материалы требуют обязательной авторской переработки.</strong> 
                   Прямое копирование запрещено.
                 </p>
               </div>

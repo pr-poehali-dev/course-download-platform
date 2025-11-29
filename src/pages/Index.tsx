@@ -755,90 +755,83 @@ export default function Index() {
           }
         }} />
 
-        <section className="relative py-20 bg-background border-b border-primary/20">
+        <section className="relative py-20 bg-background border-b border-border">
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">
-              <div className="inline-block px-4 py-2 cyber-card rounded-full text-xs uppercase tracking-widest text-primary mb-4">
-                <Icon name="Workflow" size={14} className="inline mr-2" />
-                Процесс
-              </div>
-              <h2 className="text-3xl sm:text-5xl font-black mb-4 text-primary" style={{fontFamily: 'Orbitron'}}>
-                КАК ЭТО РАБОТАЕТ
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">
+                Как это работает
               </h2>
-              <p className="text-base text-cyan-300">
+              <p className="text-lg text-muted-foreground">
                 Простой процесс получения доступа к материалам
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              <div className="cyber-card rounded-lg p-8 text-center hover:scale-105 transition-all relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-cyber-cyan"></div>
-                <div className="w-16 h-16 bg-gradient-cyber-cyan rounded-full flex items-center justify-center mx-auto mb-6 neon-border">
-                  <span className="text-3xl font-black text-background" style={{fontFamily: 'Orbitron'}}>1</span>
+              <div className="cyber-card rounded-lg p-8 text-center">
+                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl font-bold text-primary">1</span>
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-foreground uppercase tracking-wide">Регистрация</h3>
-                <p className="text-sm text-cyan-400 leading-relaxed">Создайте аккаунт и получите приветственные баллы</p>
+                <h3 className="text-xl font-semibold mb-3 text-foreground">Регистрация</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">Создайте аккаунт и получите приветственные баллы</p>
               </div>
 
-              <div className="cyber-card rounded-lg p-8 text-center hover:scale-105 transition-all relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-cyber-pink"></div>
-                <div className="w-16 h-16 bg-gradient-cyber-pink rounded-full flex items-center justify-center mx-auto mb-6 neon-border">
-                  <span className="text-3xl font-black text-background" style={{fontFamily: 'Orbitron'}}>2</span>
+              <div className="cyber-card rounded-lg p-8 text-center">
+                <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl font-bold text-secondary">2</span>
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-foreground uppercase tracking-wide">Выбор</h3>
-                <p className="text-sm text-cyan-400 leading-relaxed">Найдите нужный чертёж или проект в каталоге</p>
+                <h3 className="text-xl font-semibold mb-3 text-foreground">Выбор материала</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">Найдите нужный чертёж или проект в каталоге</p>
               </div>
 
-              <div className="cyber-card rounded-lg p-8 text-center hover:scale-105 transition-all relative overflow-hidden group">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-cyber-cyan"></div>
-                <div className="w-16 h-16 bg-gradient-cyber-cyan rounded-full flex items-center justify-center mx-auto mb-6 neon-border">
-                  <span className="text-3xl font-black text-background" style={{fontFamily: 'Orbitron'}}>3</span>
+              <div className="cyber-card rounded-lg p-8 text-center">
+                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-3xl font-bold text-accent">3</span>
                 </div>
-                <h3 className="text-xl font-bold mb-3 text-foreground uppercase tracking-wide">Скачивание</h3>
-                <p className="text-sm text-cyan-400 leading-relaxed">Мгновенный доступ к файлам после оплаты</p>
+                <h3 className="text-xl font-semibold mb-3 text-foreground">Скачивание</h3>
+                <p className="text-base text-muted-foreground leading-relaxed">Мгновенный доступ к файлам после оплаты</p>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="py-16 sm:py-20 bg-white border-b border-gray-100">
+        <section className="py-20 bg-background border-b border-border">
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">
+            <div className="text-center mb-16">
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">
                 Возможности платформы
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-muted-foreground">
                 Всё необходимое для работы с материалами
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 hover:border-primary transition-all">
-                <div className="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
+              <div className="cyber-card rounded-lg p-8">
+                <div className="w-14 h-14 bg-primary/20 rounded-lg flex items-center justify-center mb-4">
                   <Icon name="Database" size={28} className="text-primary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-gray-900">Библиотека материалов</h3>
-                <p className="text-gray-600 mb-4 leading-relaxed">
+                <h3 className="text-2xl font-bold mb-3 text-foreground">Библиотека материалов</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   Чертежи, CAD-проекты, 3D-модели и техническая документация. Мгновенный доступ после оплаты.
                 </p>
-                <Button variant="outline" className="w-full" asChild>
+                <Button variant="outline" className="w-full border-primary text-primary hover:bg-primary/10" asChild>
                   <a href="/catalog">
                     Смотреть каталог
                   </a>
                 </Button>
               </div>
 
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 hover:border-primary transition-all">
-                <div className="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center mb-4">
-                  <Icon name="Upload" size={28} className="text-primary" />
+              <div className="cyber-card rounded-lg p-8">
+                <div className="w-14 h-14 bg-secondary/20 rounded-lg flex items-center justify-center mb-4">
+                  <Icon name="Upload" size={28} className="text-secondary" />
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-gray-900">Стань автором</h3>
-                <p className="text-gray-600 mb-4 leading-relaxed">
+                <h3 className="text-2xl font-bold mb-3 text-foreground">Стань автором</h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   Публикуй свои материалы, помогай другим и получай баллы за каждое скачивание.
                 </p>
                 <Button 
                   variant="outline"
-                  className="w-full"
+                  className="w-full border-secondary text-secondary hover:bg-secondary/10"
                   onClick={() => {
                     if (!isLoggedIn) {
                       toast({
@@ -859,78 +852,7 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <div className="text-center mb-12">
-                <Badge className="glass-card mb-4 border-blue-200">
-                  <Icon name="Zap" size={14} className="mr-1" />
-                  Профессиональные инструменты
-                </Badge>
-                <h2 className="text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent">
-                  Технологичная платформа для студентов
-                </h2>
-                <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto">
-                  Всё необходимое для успешной учёбы в одном месте
-                </p>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-3xl mx-auto">
-                <Card className="glass-card tech-border hover:shadow-xl transition-all group hover:scale-[1.02]">
-                  <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-                      <Icon name="BookOpen" size={32} className="text-white" />
-                    </div>
-                    <CardTitle className="text-xl">Каталог работ</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-600 text-center">
-                      Более 500 готовых курсовых, дипломов, диссертаций и рефератов по разным дисциплинам
-                    </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="glass-card tech-border hover:shadow-xl transition-all group hover:scale-[1.02]">
-                  <CardHeader className="text-center">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-                      <Icon name="Upload" size={32} className="text-white" />
-                    </div>
-                    <CardTitle className="text-xl">Публикация работ</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-slate-600 text-center">
-                      Делись своими работами с сообществом и помогай другим студентам
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <Card className="glass-card tech-border mb-8 hover:shadow-xl transition-all group">
-                <CardContent className="p-8 text-center">
-                  <div className="mb-6">
-                    <div className="w-20 h-20 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
-                      <Icon name="BookOpen" size={40} className="text-white" />
-                    </div>
-                    <h3 className="font-bold text-2xl mb-3 text-slate-900">Начни использовать платформу</h3>
-                    <p className="text-slate-600 text-base max-w-xl mx-auto mb-6">
-                      Доступ к инженерным материалам — справочные пособия для обучения
-                    </p>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button size="lg" className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 h-14 px-8 text-lg shadow-lg hover:shadow-xl transition-all" onClick={() => window.location.href = '/catalog'}>
-                      <Icon name="BookOpen" size={20} className="mr-2" />
-                      Смотреть каталог
-                    </Button>
-                    <Button size="lg" variant="outline" className="h-14 px-8 text-lg tech-border hover:shadow-lg transition-all" onClick={() => !isLoggedIn ? setAuthDialogOpen(true) : setProfileDialogOpen(true)}>
-                      <Icon name="Upload" size={20} className="mr-2" />
-                      Загрузить работу
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
 
         <RecentlyViewed />
 
@@ -1369,78 +1291,7 @@ export default function Index() {
           </div>
         </section>
 
-        <section className="py-16 bg-gray-50 border-b border-gray-100">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl sm:text-4xl font-bold mb-3 text-gray-900">
-                  Преимущества платформы
-                </h2>
-                <p className="text-lg text-gray-600">
-                  Надёжный сервис для работы с материалами
-                </p>
-              </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary transition-all">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Icon name="Shield" size={20} className="text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2 text-gray-900">Модерация</h3>
-                      <p className="text-sm text-gray-600">
-                        Все материалы проверяются перед публикацией
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary transition-all">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Icon name="Zap" size={20} className="text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2 text-gray-900">Быстрый доступ</h3>
-                      <p className="text-sm text-gray-600">
-                        Мгновенное скачивание после оплаты
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary transition-all">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Icon name="TrendingUp" size={20} className="text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2 text-gray-900">Зарабатывай</h3>
-                      <p className="text-sm text-gray-600">
-                        Получай баллы за загруженные материалы
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-gray-200 rounded-lg p-6 hover:border-primary transition-all">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Icon name="Users" size={20} className="text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2 text-gray-900">Сообщество</h3>
-                      <p className="text-sm text-gray-600">
-                        Тысячи студентов и инженеров используют платформу
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         <AboutSection />
 

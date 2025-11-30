@@ -239,7 +239,7 @@ export default function ModerationPanel() {
   };
 
   const handleGenerateReviews = async () => {
-    if (!confirm('Автоматически сгенерировать 3 отзыва для ВСЕХ 490 работ? Это займет ~20-30 секунд.')) return;
+    if (!confirm('Автоматически сгенерировать 3 отзыва для ВСЕХ 490 работ? Это займет ~1 секунду.')) return;
     
     setGeneratingReviews(true);
     setReviewsResult(null);
@@ -252,6 +252,7 @@ export default function ModerationPanel() {
           'X-Admin-Token': 'admin_secret_token_2024'
         },
         body: JSON.stringify({
+          action: 'generate',
           reviews_per_work: 3
         })
       });
@@ -266,6 +267,50 @@ export default function ModerationPanel() {
       toast({
         title: '✅ Генерация завершена!',
         description: `Создано ${data.total_reviews_created} отзывов для ${data.processed_works} работ (пропущено ${data.skipped_works})`
+      });
+    } catch (err: any) {
+      toast({
+        title: '❌ Ошибка',
+        description: err.message,
+        variant: 'destructive'
+      });
+    } finally {
+      setGeneratingReviews(false);
+    }
+  };
+
+  const handleCleanupDuplicates = async () => {
+    if (!confirm('Удалить все дублирующиеся отзывы (одинаковые комментарии на одной работе)?')) return;
+    
+    setGeneratingReviews(true);
+    setReviewsResult(null);
+
+    try {
+      const response = await fetch(func2url['auto-generate-reviews'], {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Token': 'admin_secret_token_2024'
+        },
+        body: JSON.stringify({
+          action: 'cleanup'
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP ${response.status}`);
+      }
+
+      toast({
+        title: '✅ Дубликаты удалены!',
+        description: `Удалено ${data.total_deleted} дублирующихся отзывов`
+      });
+      
+      setReviewsResult({
+        ...data,
+        message: `Удалено ${data.total_deleted} дубликатов`
       });
     } catch (err: any) {
       toast({
@@ -363,6 +408,24 @@ export default function ModerationPanel() {
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <Button
+            onClick={handleCleanupDuplicates}
+            disabled={generatingReviews}
+            variant="outline"
+            size="sm"
+          >
+            {generatingReviews ? (
+              <>
+                <Icon name="Loader2" className="mr-2 animate-spin" size={16} />
+                Очистка...
+              </>
+            ) : (
+              <>
+                <Icon name="Trash2" className="mr-2" size={16} />
+                Удалить дубликаты
+              </>
+            )}
+          </Button>
           <Button
             onClick={handleGenerateReviews}
             disabled={generatingReviews}

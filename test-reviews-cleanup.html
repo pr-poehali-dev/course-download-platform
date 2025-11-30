@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Тест очистки и генерации отзывов</title>
+</head>
+<body>
+    <h1>Управление отзывами</h1>
+    
+    <button onclick="cleanupDuplicates()">1. Удалить дубликаты</button>
+    <button onclick="generateReviews()">2. Сгенерировать новые</button>
+    
+    <pre id="result"></pre>
+    
+    <script>
+        const API_URL = 'https://functions.poehali.dev/d9886c33-1db5-46c5-bbbb-fb69e13ad178';
+        const TOKEN = 'admin_secret_token_2024';
+        
+        async function cleanupDuplicates() {
+            document.getElementById('result').innerText = 'Удаление дубликатов...';
+            
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Token': TOKEN
+                },
+                body: JSON.stringify({ action: 'cleanup' })
+            });
+            
+            const data = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+        }
+        
+        async function generateReviews() {
+            document.getElementById('result').innerText = 'Генерация отзывов...';
+            
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Admin-Token': TOKEN
+                },
+                body: JSON.stringify({ 
+                    action: 'generate',
+                    reviews_per_work: 3 
+                })
+            });
+            
+            const data = await response.json();
+            document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+        }
+    </script>
+</body>
+</html>

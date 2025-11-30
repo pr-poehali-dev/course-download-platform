@@ -89,6 +89,33 @@ def escape_sql_string(s):
         return 'NULL'
     return "'" + str(s).replace("'", "''") + "'"
 
+def cleanup_duplicates(cur, conn):
+    """Удаляет дубликаты отзывов (одинаковые комментарии на одной работе)"""
+    cur.execute("""
+        SELECT work_id, comment, array_agg(id ORDER BY id) as review_ids
+        FROM t_p63326274_course_download_plat.reviews
+        GROUP BY work_id, comment
+        HAVING COUNT(*) > 1
+    """)
+    duplicates = cur.fetchall()
+    
+    total_deleted = 0
+    
+    for dup in duplicates:
+        review_ids = dup[2]
+        ids_to_delete = review_ids[1:]
+        
+        if ids_to_delete:
+            ids_str = ','.join(str(id) for id in ids_to_delete)
+            cur.execute(f"""
+                DELETE FROM t_p63326274_course_download_plat.reviews
+                WHERE id IN ({ids_str})
+            """)
+            total_deleted += len(ids_to_delete)
+    
+    conn.commit()
+    return total_deleted
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'POST')
     
@@ -118,10 +145,39 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         body = json.loads(event.get('body', '{}'))
-        reviews_per_work = min(body.get('reviews_per_work', 3), 5)
+        action = body.get('action', 'generate')
         
         conn = get_db_connection()
         cur = conn.cursor()
+        
+        # Если запрошена очистка дубликатов
+        if action == 'cleanup':
+            try:
+                deleted = cleanup_duplicates(cur, conn)
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'success': True,
+                        'message': 'Дубликаты удалены',
+                        'total_deleted': deleted
+                    }),
+                    'isBase64Encoded': False
+                }
+            except Exception as e:
+                conn.rollback()
+                return {
+                    'statusCode': 500,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': str(e)}),
+                    'isBase64Encoded': False
+                }
+            finally:
+                cur.close()
+                conn.close()
+        
+        # Генерация отзывов
+        reviews_per_work = min(body.get('reviews_per_work', 3), 5)
         
         try:
             # Получаем все работы
@@ -143,17 +199,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
-            # Загружаем ВСЕ существующие отзывы одним запросом
+            # Загружаем ВСЕ существующие отзывы одним запросом (user_id + comment)
             cur.execute("""
-                SELECT work_id, user_id FROM t_p63326274_course_download_plat.reviews
+                SELECT work_id, user_id, comment FROM t_p63326274_course_download_plat.reviews
             """)
             existing_reviews = {}
+            existing_comments = {}
             for row in cur.fetchall():
                 work_id = row[0]
                 user_id = row[1]
+                comment = row[2]
                 if work_id not in existing_reviews:
                     existing_reviews[work_id] = set()
+                    existing_comments[work_id] = set()
                 existing_reviews[work_id].add(user_id)
+                existing_comments[work_id].add(comment)
             
             total_created = 0
             processed_works = 0
@@ -168,22 +228,29 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 # Получаем существующих рецензентов для этой работы
                 existing_reviewers = existing_reviews.get(work_id_val, set())
+                used_comments = existing_comments.get(work_id_val, set())
                 
                 # Доступные пользователи для новых отзывов
                 available_users = [u for u in all_users if u not in existing_reviewers]
                 
-                # Если недостаточно пользователей, пропускаем работу
-                if len(available_users) < reviews_per_work:
+                # Доступные комментарии (еще не использованные на этой работе)
+                available_comments = [c for c in REVIEW_TEMPLATES[work_type] if c not in used_comments]
+                
+                # Если недостаточно пользователей или комментариев, пропускаем работу
+                if len(available_users) < reviews_per_work or len(available_comments) < reviews_per_work:
                     skipped_works += 1
                     continue
                 
                 # Выбираем случайных пользователей
                 selected_users = random.sample(available_users, reviews_per_work)
                 
+                # Выбираем случайные уникальные комментарии
+                selected_comments = random.sample(available_comments, reviews_per_work)
+                
                 # Создаем отзывы
-                for user_id_val in selected_users:
+                for i, user_id_val in enumerate(selected_users):
                     rating = random.choices([4, 5], weights=[30, 70])[0]
-                    comment = random.choice(REVIEW_TEMPLATES[work_type])
+                    comment = selected_comments[i]  # Уникальный комментарий для каждого отзыва
                     days_ago = random.randint(1, 90)
                     created_at = datetime.now() - timedelta(days=days_ago)
                     created_at_str = created_at.strftime('%Y-%m-%d %H:%M:%S')

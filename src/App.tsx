@@ -42,6 +42,7 @@ import GenerateReviewsPage from "./pages/GenerateReviewsPage";
 import SitemapViewPage from "./pages/SitemapViewPage";
 import YandexVerification from "./pages/YandexVerification";
 import AdminBlogPage from "./pages/AdminBlogPage";
+import BulkGenerateReviewsPage from "./pages/BulkGenerateReviewsPage";
 
 
 
@@ -90,6 +91,7 @@ const App = () => (
           <Route path="/payment/failed" element={<PaymentFailedPage />} />
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
           <Route path="/admin/generate-reviews" element={<GenerateReviewsPage />} />
+          <Route path="/admin/bulk-reviews" element={<BulkGenerateReviewsPage />} />
           <Route path="/admin/sitemap" element={<SitemapViewPage />} />
           <Route path="/admin/blog" element={<AdminBlogPage />} />
           <Route path="/yandex_c7507f203e2091ee.html" element={<YandexVerification />} />

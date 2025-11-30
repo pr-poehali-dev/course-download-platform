@@ -100,6 +100,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return create_review(event)
     elif method == 'POST' and action == 'generate_fake':
         return generate_fake_reviews(event)
+    elif method == 'POST' and action == 'bulk_generate':
+        return bulk_generate_reviews(event)
     elif method == 'PUT' and action == 'moderate':
         return moderate_review(event)
     elif method == 'DELETE' and action == 'delete':
@@ -586,3 +588,116 @@ def delete_review(event: Dict[str, Any]) -> Dict[str, Any]:
     finally:
         cur.close()
         conn.close()
+
+def bulk_generate_reviews(event: Dict[str, Any]) -> Dict[str, Any]:
+    '''Массовая генерация отзывов для всех работ'''
+    headers = event.get('headers') or {}
+    admin_token = headers.get('x-admin-token') or headers.get('X-Admin-Token')
+    
+    if admin_token != 'admin_secret_token_2024':
+        return {
+            'statusCode': 403,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Admin access required'}),
+            'isBase64Encoded': False
+        }
+    
+    try:
+        body = json.loads(event.get('body', '{}'))
+        reviews_per_work = min(body.get('reviews_per_work', 2), 5)
+        limit_works = body.get('limit_works', 490)
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            cur.execute(f"""
+                SELECT id, work_type FROM t_p63326274_course_download_plat.works 
+                ORDER BY id
+                LIMIT {int(limit_works)}
+            """)
+            works = cur.fetchall()
+            
+            cur.execute("SELECT id FROM t_p63326274_course_download_plat.users")
+            all_users = [row[0] for row in cur.fetchall()]
+            
+            if not all_users:
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'No users available'}),
+                    'isBase64Encoded': False
+                }
+            
+            total_created = 0
+            processed_works = 0
+            
+            for work_row in works:
+                work_id_val = work_row[0]
+                work_type = work_row[1] if work_row[1] in REVIEW_TEMPLATES else 'другое'
+                
+                cur.execute(f"""
+                    SELECT user_id FROM t_p63326274_course_download_plat.reviews
+                    WHERE work_id = {int(work_id_val)}
+                """)
+                existing_reviewers = {row[0] for row in cur.fetchall()}
+                
+                available_users = [u for u in all_users if u not in existing_reviewers]
+                
+                if len(available_users) < reviews_per_work:
+                    continue
+                
+                selected_users = random.sample(available_users, reviews_per_work)
+                
+                for user_id_val in selected_users:
+                    rating = random.choices([4, 5], weights=[30, 70])[0]
+                    comment = random.choice(REVIEW_TEMPLATES[work_type])
+                    days_ago = random.randint(1, 90)
+                    created_at = datetime.now() - timedelta(days=days_ago)
+                    created_at_str = created_at.strftime('%Y-%m-%d %H:%M:%S')
+                    
+                    comment_escaped = escape_sql_string(comment)
+                    
+                    cur.execute(f"""
+                        INSERT INTO t_p63326274_course_download_plat.reviews 
+                        (work_id, user_id, rating, comment, status, created_at)
+                        VALUES ({int(work_id_val)}, {int(user_id_val)}, {int(rating)}, {comment_escaped}, 'approved', '{created_at_str}')
+                    """)
+                    total_created += 1
+                
+                processed_works += 1
+                
+                if processed_works % 50 == 0:
+                    conn.commit()
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 201,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'message': f'Bulk generation completed',
+                    'processed_works': processed_works,
+                    'total_reviews_created': total_created
+                }),
+                'isBase64Encoded': False
+            }
+        except Exception as e:
+            conn.rollback()
+            print(f"Bulk generate error: {repr(e)}")
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': f'Failed to bulk generate: {str(e)}'}),
+                'isBase64Encoded': False
+            }
+        finally:
+            cur.close()
+            conn.close()
+    except json.JSONDecodeError:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Invalid JSON'}),
+            'isBase64Encoded': False
+        }

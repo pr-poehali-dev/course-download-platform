@@ -1578,8 +1578,6 @@ export default function WorkDetailPage() {
           </div>
         </div>
 
-        <ReviewsSection workId={actualWorkId} isPurchased={isPurchased} />
-
         {similarWorks.length > 0 && (
           <div className="mt-12 pb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Похожие работы</h2>

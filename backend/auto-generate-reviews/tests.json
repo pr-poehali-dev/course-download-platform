@@ -1,0 +1,22 @@
+{
+  "tests": [
+    {
+      "name": "Test auto-generate reviews",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-Admin-Token": "admin_secret_token_2024"
+      },
+      "body": {
+        "reviews_per_work": 3
+      },
+      "expectedStatus": 201,
+      "expectedBody": {
+        "success": true,
+        "message": "string",
+        "total_reviews_created": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

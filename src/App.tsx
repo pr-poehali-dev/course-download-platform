@@ -43,6 +43,7 @@ import SitemapViewPage from "./pages/SitemapViewPage";
 import YandexVerification from "./pages/YandexVerification";
 import AdminBlogPage from "./pages/AdminBlogPage";
 import BulkGenerateReviewsPage from "./pages/BulkGenerateReviewsPage";
+import AutoGenerateReviewsPage from "./pages/AutoGenerateReviewsPage";
 
 
 
@@ -92,6 +93,7 @@ const App = () => (
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
           <Route path="/admin/generate-reviews" element={<GenerateReviewsPage />} />
           <Route path="/admin/bulk-reviews" element={<BulkGenerateReviewsPage />} />
+          <Route path="/admin/auto-reviews" element={<AutoGenerateReviewsPage />} />
           <Route path="/admin/sitemap" element={<SitemapViewPage />} />
           <Route path="/admin/blog" element={<AdminBlogPage />} />
           <Route path="/yandex_c7507f203e2091ee.html" element={<YandexVerification />} />

@@ -1032,9 +1032,6 @@ export default function WorkDetailPage() {
       />
       
       <Navigation isLoggedIn={isLoggedIn} />
-      <div className="container max-w-7xl mx-auto px-4 mt-20">
-        <Breadcrumbs />
-      </div>
 
       <Helmet>
         <script type="application/ld+json">
@@ -1080,9 +1077,13 @@ export default function WorkDetailPage() {
         </script>
       </Helmet>
       
-      <Navigation isLoggedIn={isLoggedIn} />
-      
       <main className="container mx-auto px-4 py-4 md:py-6 mt-16 max-w-[1200px]">
+        <Breadcrumbs items={[
+          { label: 'Главная', href: '/' },
+          { label: 'Каталог работ', href: '/catalog' },
+          { label: 'Работа' }
+        ]} />
+        
         <Button 
           variant="ghost" 
           className="mb-4 md:mb-6 text-gray-600 hover:text-gray-900 text-sm md:text-base"

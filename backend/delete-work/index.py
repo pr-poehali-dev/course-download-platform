@@ -63,12 +63,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         work_id_int = int(work_id)
         
+        # Удаляем все связанные записи в правильном порядке
         cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.purchases WHERE work_id = {work_id_int}"
+            f"DELETE FROM t_p63326274_course_download_plat.defense_kits WHERE work_id = {work_id_int}"
+        )
+        
+        cursor.execute(
+            f"DELETE FROM t_p63326274_course_download_plat.favorites WHERE work_id = {work_id_int}"
         )
         
         cursor.execute(
             f"DELETE FROM t_p63326274_course_download_plat.reviews WHERE work_id = {work_id_int}"
+        )
+        
+        cursor.execute(
+            f"DELETE FROM t_p63326274_course_download_plat.work_comments WHERE work_id = {work_id_int}"
+        )
+        
+        cursor.execute(
+            f"DELETE FROM t_p63326274_course_download_plat.work_ratings WHERE work_id = {work_id_int}"
         )
         
         cursor.execute(
@@ -83,6 +96,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             f"DELETE FROM t_p63326274_course_download_plat.download_tokens WHERE work_id = {work_id_int}"
         )
         
+        cursor.execute(
+            f"DELETE FROM t_p63326274_course_download_plat.purchases WHERE work_id = {work_id_int}"
+        )
+        
+        # Наконец удаляем саму работу
         cursor.execute(
             f"DELETE FROM t_p63326274_course_download_plat.works WHERE id = {work_id_int}"
         )

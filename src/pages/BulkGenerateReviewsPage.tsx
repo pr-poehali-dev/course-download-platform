@@ -11,7 +11,7 @@ export default function BulkGenerateReviewsPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [reviewsPerWork, setReviewsPerWork] = useState(2);
-  const [limitWorks, setLimitWorks] = useState(490);
+  const [limitWorks, setLimitWorks] = useState(50);
   const navigate = useNavigate();
 
   const REVIEWS_API = func2url.reviews;
@@ -25,6 +25,12 @@ export default function BulkGenerateReviewsPage() {
     setResult(null);
 
     try {
+      console.log('📤 Отправка запроса:', {
+        url: `${REVIEWS_API}?action=bulk_generate`,
+        reviewsPerWork,
+        limitWorks
+      });
+
       const response = await fetch(`${REVIEWS_API}?action=bulk_generate`, {
         method: 'POST',
         headers: {
@@ -37,24 +43,26 @@ export default function BulkGenerateReviewsPage() {
         })
       });
 
-      const data = await response.json();
+      console.log('📥 Получен ответ:', response.status, response.statusText);
 
-      if (response.ok) {
-        setResult({
-          success: true,
-          ...data
-        });
-      } else {
-        setResult({
-          success: false,
-          error: data.error || 'Неизвестная ошибка'
-        });
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ Ответ с ошибкой:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
+
+      const data = await response.json();
+      console.log('✅ Данные:', data);
+
+      setResult({
+        success: true,
+        ...data
+      });
     } catch (error) {
-      console.error('Generation error:', error);
+      console.error('❌ Ошибка генерации:', error);
       setResult({
         success: false,
-        error: 'Ошибка сети'
+        error: error instanceof Error ? error.message : 'Ошибка сети. Проверьте консоль браузера (F12)'
       });
     } finally {
       setLoading(false);
@@ -94,15 +102,18 @@ export default function BulkGenerateReviewsPage() {
 
             <div>
               <label className="block text-sm font-medium mb-2">
-                Количество работ для обработки
+                Количество работ для обработки (рекомендуется 50-100 за раз)
               </label>
               <Input
                 type="number"
                 min={1}
-                max={490}
+                max={100}
                 value={limitWorks}
-                onChange={(e) => setLimitWorks(Math.min(490, Math.max(1, parseInt(e.target.value) || 490)))}
+                onChange={(e) => setLimitWorks(Math.min(100, Math.max(1, parseInt(e.target.value) || 50)))}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                ⚡ Для больших объёмов запускайте несколько раз по 100 работ
+              </p>
             </div>
 
             <Button 
@@ -167,6 +178,8 @@ export default function BulkGenerateReviewsPage() {
                   <li>Рейтинг 4-5 звезд (70% пятерок, 30% четверок)</li>
                   <li>Автоматически одобрены (status = approved)</li>
                   <li>Работы без достаточного количества пользователей будут пропущены</li>
+                  <li>⚡ Генерация ~100 работ занимает 10-20 секунд</li>
+                  <li>📊 Для всех 490 работ запустите 5 раз по 100 работ</li>
                 </ul>
               </div>
             </div>

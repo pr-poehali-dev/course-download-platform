@@ -28,7 +28,7 @@ export default function Navigation({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="glass-card tech-border fixed top-0 left-0 right-0 z-50 shadow-sm">
+    <header className="bg-white/95 backdrop-blur-md tech-border fixed top-0 left-0 right-0 z-50 shadow-sm" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
       <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
         <div className="flex items-center justify-between">
           <a href="/" className="flex items-center gap-2 md:gap-3">

@@ -40,6 +40,7 @@ import PaymentFailedPage from "./pages/PaymentFailedPage";
 import PointsAuditPage from "./pages/PointsAuditPage";
 import GenerateReviewsPage from "./pages/GenerateReviewsPage";
 import SitemapViewPage from "./pages/SitemapViewPage";
+import YandexVerification from "./pages/YandexVerification";
 
 
 
@@ -89,6 +90,7 @@ const App = () => (
           <Route path="/defense-kit" element={<DefenseKitBuilder />} />
           <Route path="/admin/generate-reviews" element={<GenerateReviewsPage />} />
           <Route path="/admin/sitemap" element={<SitemapViewPage />} />
+          <Route path="/yandex_c7507f203e2091ee.html" element={<YandexVerification />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

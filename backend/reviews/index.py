@@ -104,6 +104,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return bulk_generate_reviews(event)
     elif method == 'PUT' and action == 'moderate':
         return moderate_review(event)
+    elif method == 'PUT' and action == 'update':
+        return update_review(event)
     elif method == 'DELETE' and action == 'delete':
         return delete_review(event)
     
@@ -532,6 +534,72 @@ def moderate_review(event: Dict[str, Any]) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
 
+def update_review(event: Dict[str, Any]) -> Dict[str, Any]:
+    '''Обновить отзыв (только админ)'''
+    body = json.loads(event.get('body', '{}'))
+    review_id = body.get('review_id')
+    rating = body.get('rating')
+    comment = body.get('comment')
+    
+    headers = event.get('headers') or {}
+    admin_token = headers.get('x-admin-token') or headers.get('X-Admin-Token')
+    
+    if admin_token != 'admin_secret_token_2024':
+        return {
+            'statusCode': 403,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Admin access required'}),
+            'isBase64Encoded': False
+        }
+    
+    if not review_id or rating is None or not comment:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'review_id, rating, and comment required'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        comment_escaped = escape_sql_string(comment.strip())
+        
+        cur.execute(f"""
+            UPDATE t_p63326274_course_download_plat.reviews
+            SET rating = {int(rating)}, comment = {comment_escaped}
+            WHERE id = {int(review_id)}
+        """)
+        conn.commit()
+        
+        if cur.rowcount == 0:
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Review not found'}),
+                'isBase64Encoded': False
+            }
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'success': True}),
+            'isBase64Encoded': False
+        }
+    except Exception as e:
+        conn.rollback()
+        print(f"Update review error: {repr(e)}")
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': f'Failed to update: {str(e)}'}),
+            'isBase64Encoded': False
+        }
+    finally:
+        cur.close()
+        conn.close()
+
 def delete_review(event: Dict[str, Any]) -> Dict[str, Any]:
     '''Удаление отзыва'''
     headers = event.get('headers') or {}
@@ -546,8 +614,8 @@ def delete_review(event: Dict[str, Any]) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    params = event.get('queryStringParameters') or {}
-    review_id = params.get('review_id')
+    body = json.loads(event.get('body', '{}'))
+    review_id = body.get('review_id')
     
     if not review_id:
         return {

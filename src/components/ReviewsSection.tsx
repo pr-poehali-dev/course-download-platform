@@ -34,6 +34,9 @@ export default function ReviewsSection({ workId, isPurchased: initialIsPurchased
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [isPurchased, setIsPurchased] = useState(initialIsPurchased);
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
+  const [editRating, setEditRating] = useState(5);
+  const [editComment, setEditComment] = useState('');
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -173,7 +176,7 @@ export default function ReviewsSection({ workId, isPurchased: initialIsPurchased
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'X-User-Id': String(currentUserId),
+          'X-Admin-Token': 'admin_secret_token_2024',
         },
         body: JSON.stringify({ review_id: reviewId }),
       });
@@ -189,6 +192,64 @@ export default function ReviewsSection({ workId, isPurchased: initialIsPurchased
         description: 'Отзыв успешно удален',
       });
 
+      await loadReviews();
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const startEditReview = (review: Review) => {
+    setEditingReviewId(review.id);
+    setEditRating(review.rating);
+    setEditComment(review.comment);
+  };
+
+  const cancelEdit = () => {
+    setEditingReviewId(null);
+    setEditRating(5);
+    setEditComment('');
+  };
+
+  const handleUpdateReview = async (reviewId: number) => {
+    if (editComment.trim().length < 10) {
+      toast({
+        title: 'Ошибка',
+        description: 'Отзыв должен содержать минимум 10 символов',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${func2url.reviews}?action=update`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Token': 'admin_secret_token_2024',
+        },
+        body: JSON.stringify({
+          review_id: reviewId,
+          rating: editRating,
+          comment: editComment.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Ошибка обновления отзыва');
+      }
+
+      toast({
+        title: 'Отзыв обновлен',
+        description: 'Изменения успешно сохранены',
+      });
+
+      setEditingReviewId(null);
       await loadReviews();
     } catch (error: any) {
       toast({
@@ -316,47 +377,121 @@ export default function ReviewsSection({ workId, isPurchased: initialIsPurchased
           {reviews.map((review) => (
             <Card key={review.id}>
               <CardContent className="pt-6">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Icon name="User" size={20} className="text-primary" />
+                {editingReviewId === review.id ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon name="User" size={20} className="text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{review.username}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(review.created_at).toLocaleDateString('ru-RU')}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant="outline">Редактирование</Badge>
                     </div>
+                    
                     <div>
-                      <p className="font-semibold">{review.username}</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(review.created_at).toLocaleDateString('ru-RU')}
-                      </p>
+                      <label className="block text-sm font-medium mb-2">Оценка</label>
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            onClick={() => setEditRating(star)}
+                            className="transition-all"
+                          >
+                            <Icon
+                              name="Star"
+                              size={32}
+                              className={
+                                star <= editRating
+                                  ? 'text-yellow-500 fill-yellow-500'
+                                  : 'text-gray-300'
+                              }
+                            />
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <Icon
-                          key={star}
-                          name="Star"
-                          size={16}
-                          className={`${
-                            star <= review.rating
-                              ? 'text-yellow-500 fill-yellow-500'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
+
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Комментарий</label>
+                      <Textarea
+                        value={editComment}
+                        onChange={(e) => setEditComment(e.target.value)}
+                        className="min-h-[120px]"
+                      />
                     </div>
-                    {isAdmin && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                        onClick={() => handleDeleteReview(review.id)}
-                        title="Удалить отзыв"
-                      >
-                        <Icon name="Trash2" size={16} />
+
+                    <div className="flex gap-2">
+                      <Button onClick={() => handleUpdateReview(review.id)}>
+                        <Icon name="Check" size={18} className="mr-2" />
+                        Сохранить
                       </Button>
-                    )}
+                      <Button variant="outline" onClick={cancelEdit}>
+                        Отмена
+                      </Button>
+                    </div>
                   </div>
-                </div>
-                <p className="text-gray-700 whitespace-pre-wrap">{review.comment}</p>
+                ) : (
+                  <>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon name="User" size={20} className="text-primary" />
+                        </div>
+                        <div>
+                          <p className="font-semibold">{review.username}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(review.created_at).toLocaleDateString('ru-RU')}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Icon
+                              key={star}
+                              name="Star"
+                              size={16}
+                              className={`${
+                                star <= review.rating
+                                  ? 'text-yellow-500 fill-yellow-500'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        {isAdmin && (
+                          <div className="flex gap-1 ml-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              onClick={() => startEditReview(review)}
+                              title="Редактировать отзыв"
+                            >
+                              <Icon name="Edit" size={16} />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              onClick={() => handleDeleteReview(review.id)}
+                              title="Удалить отзыв"
+                            >
+                              <Icon name="Trash2" size={16} />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-gray-700 whitespace-pre-wrap">{review.comment}</p>
+                  </>
+                )}
               </CardContent>
             </Card>
           ))}

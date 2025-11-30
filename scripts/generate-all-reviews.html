@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генерация отзывов для всех работ</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .controls {
+            margin-bottom: 30px;
+        }
+        input, button {
+            padding: 12px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-right: 10px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .progress {
+            margin: 20px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .log-info { color: #0066cc; }
+        .log-success { color: #28a745; font-weight: bold; }
+        .log-error { color: #dc3545; font-weight: bold; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Массовая генерация отзывов</h1>
+        
+        <div class="controls">
+            <label>
+                Отзывов на работу: 
+                <input type="number" id="reviewsPerWork" value="3" min="1" max="5">
+            </label>
+            <label>
+                Работ за раз: 
+                <input type="number" id="batchSize" value="100" min="10" max="100">
+            </label>
+            <button id="startBtn" onclick="startGeneration()">Запустить генерацию</button>
+            <button id="stopBtn" onclick="stopGeneration()" style="display:none; background:#dc3545;">Остановить</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalBatches">0</div>
+                <div class="stat-label">Запусков</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalWorks">0</div>
+                <div class="stat-label">Работ обработано</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalReviews">0</div>
+                <div class="stat-label">Отзывов создано</div>
+            </div>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%">0%</div>
+            </div>
+        </div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://functions.poehali.dev/9a0fbcbb-2123-4282-9dd4-7ccfbf787be9';
+        const ADMIN_TOKEN = 'admin_secret_token_2024';
+        
+        let isRunning = false;
+        let totalBatches = 0;
+        let totalWorksProcessed = 0;
+        let totalReviewsCreated = 0;
+        let currentBatch = 0;
+        let maxBatches = 5; // 5 батчей по 100 работ = 500 работ
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry log-${type}`;
+            const timestamp = new Date().toLocaleTimeString('ru-RU');
+            entry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function updateStats() {
+            document.getElementById('totalBatches').textContent = totalBatches;
+            document.getElementById('totalWorks').textContent = totalWorksProcessed;
+            document.getElementById('totalReviews').textContent = totalReviewsCreated;
+            
+            const progress = Math.round((currentBatch / maxBatches) * 100);
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = progress + '%';
+            progressFill.textContent = progress + '%';
+        }
+
+        async function generateBatch(reviewsPerWork, batchSize) {
+            try {
+                log(`📤 Запуск батча ${currentBatch + 1}/${maxBatches} (${batchSize} работ, ${reviewsPerWork} отзывов/работа)...`, 'info');
+                
+                const response = await fetch(`${API_URL}?action=bulk_generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Admin-Token': ADMIN_TOKEN
+                    },
+                    body: JSON.stringify({
+                        reviews_per_work: reviewsPerWork,
+                        limit_works: batchSize
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                
+                totalBatches++;
+                totalWorksProcessed += data.processed_works || 0;
+                totalReviewsCreated += data.total_reviews_created || 0;
+                
+                log(`✅ Батч ${currentBatch + 1} завершен: обработано ${data.processed_works} работ, создано ${data.total_reviews_created} отзывов`, 'success');
+                
+                updateStats();
+                return true;
+            } catch (error) {
+                log(`❌ Ошибка в батче ${currentBatch + 1}: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function startGeneration() {
+            if (isRunning) return;
+            
+            const reviewsPerWork = parseInt(document.getElementById('reviewsPerWork').value);
+            const batchSize = parseInt(document.getElementById('batchSize').value);
+            
+            if (reviewsPerWork < 1 || reviewsPerWork > 5) {
+                alert('Количество отзывов должно быть от 1 до 5');
+                return;
+            }
+            
+            if (batchSize < 10 || batchSize > 100) {
+                alert('Размер батча должен быть от 10 до 100');
+                return;
+            }
+            
+            isRunning = true;
+            currentBatch = 0;
+            totalBatches = 0;
+            totalWorksProcessed = 0;
+            totalReviewsCreated = 0;
+            
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('stopBtn').style.display = 'inline-block';
+            document.getElementById('log').innerHTML = '';
+            
+            log(`🚀 Старт генерации отзывов: ${reviewsPerWork} отзывов на работу, ${maxBatches} батчей по ${batchSize} работ`, 'success');
+            
+            for (let i = 0; i < maxBatches && isRunning; i++) {
+                currentBatch = i;
+                updateStats();
+                
+                const success = await generateBatch(reviewsPerWork, batchSize);
+                
+                if (!success) {
+                    log(`⚠️ Батч ${i + 1} завершился с ошибкой, продолжаем...`, 'error');
+                }
+                
+                // Пауза 2 секунды между батчами
+                if (i < maxBatches - 1 && isRunning) {
+                    log(`⏳ Пауза 2 секунды перед следующим батчем...`, 'info');
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+            
+            currentBatch = maxBatches;
+            updateStats();
+            
+            if (isRunning) {
+                log(`🎉 Генерация завершена! Всего создано ${totalReviewsCreated} отзывов для ${totalWorksProcessed} работ`, 'success');
+            } else {
+                log(`⛔ Генерация остановлена пользователем`, 'error');
+            }
+            
+            isRunning = false;
+            document.getElementById('startBtn').style.display = 'inline-block';
+            document.getElementById('stopBtn').style.display = 'none';
+        }
+
+        function stopGeneration() {
+            isRunning = false;
+            log(`⛔ Остановка генерации...`, 'error');
+        }
+    </script>
+</body>
+</html>

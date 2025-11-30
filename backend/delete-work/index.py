@@ -63,42 +63,25 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         work_id_int = int(work_id)
         
-        # Удаляем все связанные записи в правильном порядке
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.defense_kits WHERE work_id = {work_id_int}"
-        )
+        # Удаляем все связанные записи (игнорируем ошибки для несуществующих записей)
+        tables_to_clean = [
+            'defense_kits',
+            'favorites', 
+            'reviews',
+            'user_downloads',
+            'work_stats',
+            'download_tokens',
+            'purchases'
+        ]
         
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.favorites WHERE work_id = {work_id_int}"
-        )
-        
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.reviews WHERE work_id = {work_id_int}"
-        )
-        
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.work_comments WHERE work_id = {work_id_int}"
-        )
-        
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.work_ratings WHERE work_id = {work_id_int}"
-        )
-        
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.user_downloads WHERE work_id = {work_id_int}"
-        )
-        
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.work_stats WHERE work_id = {work_id_int}"
-        )
-        
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.download_tokens WHERE work_id = {work_id_int}"
-        )
-        
-        cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.purchases WHERE work_id = {work_id_int}"
-        )
+        for table in tables_to_clean:
+            try:
+                cursor.execute(
+                    f"DELETE FROM t_p63326274_course_download_plat.{table} WHERE work_id = {work_id_int}"
+                )
+            except Exception as table_error:
+                # Игнорируем ошибки для таблиц без данных
+                print(f"Warning: Could not delete from {table}: {table_error}")
         
         # Наконец удаляем саму работу
         cursor.execute(

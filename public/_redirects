@@ -6,14 +6,5 @@ http://www.techforma.ru/* https://techforma.pro/:splat 301!
 https://www.techforma.pro/* https://techforma.pro/:splat 301!
 http://www.techforma.pro/* https://techforma.pro/:splat 301!
 
-# Удаление мультислэша (trailing slash)
-/*/  /:splat  301
-
-# Static files должны отдаваться как есть
-/yandex_*.html  200
-/google_verification.html  200
-/robots.txt  200
-/sitemap.xml  200
-
-# SPA routing (только для остальных путей)
+# SPA routing для всех остальных путей
 /*    /index.html   200

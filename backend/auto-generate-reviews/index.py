@@ -118,6 +118,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            # Загружаем ВСЕ существующие отзывы одним запросом
+            cur.execute("""
+                SELECT work_id, user_id FROM t_p63326274_course_download_plat.reviews
+            """)
+            existing_reviews = {}
+            for row in cur.fetchall():
+                work_id = row[0]
+                user_id = row[1]
+                if work_id not in existing_reviews:
+                    existing_reviews[work_id] = set()
+                existing_reviews[work_id].add(user_id)
+            
             total_created = 0
             processed_works = 0
             skipped_works = 0
@@ -126,12 +138,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 work_id_val = work_row[0]
                 work_type = work_row[1] if work_row[1] in REVIEW_TEMPLATES else 'другое'
                 
-                # Проверяем, кто уже оставил отзывы
-                cur.execute(f"""
-                    SELECT user_id FROM t_p63326274_course_download_plat.reviews
-                    WHERE work_id = {int(work_id_val)}
-                """)
-                existing_reviewers = {row[0] for row in cur.fetchall()}
+                # Получаем существующих рецензентов для этой работы
+                existing_reviewers = existing_reviews.get(work_id_val, set())
                 
                 # Доступные пользователи для новых отзывов
                 available_users = [u for u in all_users if u not in existing_reviewers]
@@ -146,7 +154,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 # Создаем отзывы
                 for user_id_val in selected_users:
-                    rating = random.choices([4, 5], weights=[30, 70])[0]  # 70% пятерок, 30% четверок
+                    rating = random.choices([4, 5], weights=[30, 70])[0]
                     comment = random.choice(REVIEW_TEMPLATES[work_type])
                     days_ago = random.randint(1, 90)
                     created_at = datetime.now() - timedelta(days=days_ago)
@@ -163,8 +171,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 processed_works += 1
                 
-                # Коммитим каждые 50 работ для стабильности
-                if processed_works % 50 == 0:
+                # Коммитим каждые 100 работ для стабильности
+                if processed_works % 100 == 0:
                     conn.commit()
             
             # Финальный коммит

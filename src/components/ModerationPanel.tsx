@@ -239,22 +239,20 @@ export default function ModerationPanel() {
   };
 
   const handleGenerateReviews = async () => {
-    if (!confirm('Сгенерировать 2-3 отзыва для всех работ без отзывов?')) return;
+    if (!confirm('Автоматически сгенерировать 3 отзыва для ВСЕХ 490 работ? Это займет ~20-30 секунд.')) return;
     
     setGeneratingReviews(true);
     setReviewsResult(null);
 
     try {
-      const response = await fetch(func2url.reviews, {
+      const response = await fetch(func2url['auto-generate-reviews'], {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Admin-Email': 'rekrutiw@yandex.ru'
+          'X-Admin-Token': 'admin_secret_token_2024'
         },
         body: JSON.stringify({
-          action: 'generate_fake',
-          work_ids: 'all',
-          reviews_per_work: 2
+          reviews_per_work: 3
         })
       });
 
@@ -266,8 +264,8 @@ export default function ModerationPanel() {
 
       setReviewsResult(data);
       toast({
-        title: '✅ Отзывы сгенерированы!',
-        description: `Создано ${data.reviews_created} отзывов для ${data.total_works - data.works_skipped} работ`
+        title: '✅ Генерация завершена!',
+        description: `Создано ${data.total_reviews_created} отзывов для ${data.processed_works} работ (пропущено ${data.skipped_works})`
       });
     } catch (err: any) {
       toast({
@@ -394,9 +392,9 @@ export default function ModerationPanel() {
               <Icon name="CheckCircle" className="text-green-600 flex-shrink-0 mt-0.5" size={20} />
               <div className="text-sm space-y-1">
                 <p className="font-semibold text-green-900">Отзывы успешно сгенерированы!</p>
-                <p className="text-green-800">✅ Создано отзывов: {reviewsResult.reviews_created}</p>
-                <p className="text-green-800">✅ Обработано работ: {reviewsResult.total_works - reviewsResult.works_skipped}</p>
-                <p className="text-green-700">ℹ️ Пропущено (уже есть отзывы): {reviewsResult.works_skipped}</p>
+                <p className="text-green-800">✅ Создано отзывов: {reviewsResult.total_reviews_created}</p>
+                <p className="text-green-800">✅ Обработано работ: {reviewsResult.processed_works}</p>
+                <p className="text-green-700">ℹ️ Пропущено: {reviewsResult.skipped_works}</p>
               </div>
             </div>
           </CardContent>

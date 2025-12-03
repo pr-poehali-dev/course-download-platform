@@ -74,23 +74,24 @@ export default function Breadcrumbs({ items, className = '' }: BreadcrumbsProps)
       aria-label="Breadcrumb"
     >
       {breadcrumbs.map((crumb, index) => (
-        <div key={crumb.path} className="flex items-center gap-2">
+        <>
           {index > 0 && (
-            <Icon name="ChevronRight" size={14} className="text-muted-foreground/50" />
+            <Icon key={`separator-${index}`} name="ChevronRight" size={14} className="text-muted-foreground/50" />
           )}
           {index === breadcrumbs.length - 1 ? (
-            <span className="text-foreground font-medium" aria-current="page">
+            <span key={crumb.path} className="text-foreground font-medium" aria-current="page">
               {crumb.label}
             </span>
           ) : (
             <Link
+              key={crumb.path}
               to={crumb.path}
               className="hover:text-foreground transition-colors"
             >
               {crumb.label}
             </Link>
           )}
-        </div>
+        </>
       ))}
     </nav>
   );

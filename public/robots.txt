@@ -55,5 +55,6 @@ Disallow: /
 User-agent: DotBot
 Disallow: /
 
-# Карта сайта (динамическая - включает все 488 работ из каталога)
+# Карты сайта
+Sitemap: https://techforma.pro/sitemap.xml
 Sitemap: https://functions.poehali.dev/e0e04210-74c2-4c83-8e1b-1d8541942972

@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { Fragment } from 'react';
 import Icon from '@/components/ui/icon';
 
 interface BreadcrumbItem {
@@ -74,24 +75,23 @@ export default function Breadcrumbs({ items, className = '' }: BreadcrumbsProps)
       aria-label="Breadcrumb"
     >
       {breadcrumbs.map((crumb, index) => (
-        <>
+        <Fragment key={crumb.path}>
           {index > 0 && (
-            <Icon key={`separator-${index}`} name="ChevronRight" size={14} className="text-muted-foreground/50" />
+            <Icon name="ChevronRight" size={14} className="text-muted-foreground/50" />
           )}
           {index === breadcrumbs.length - 1 ? (
-            <span key={crumb.path} className="text-foreground font-medium" aria-current="page">
+            <span className="text-foreground font-medium" aria-current="page">
               {crumb.label}
             </span>
           ) : (
             <Link
-              key={crumb.path}
               to={crumb.path}
               className="hover:text-foreground transition-colors"
             >
               {crumb.label}
             </Link>
           )}
-        </>
+        </Fragment>
       ))}
     </nav>
   );

@@ -54,7 +54,7 @@ export default function BlogPage() {
       const response = await fetch(`${BLOG_API}?action=list&status=published`);
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && Array.isArray(data.posts)) {
         const combinedPosts = [...data.posts, ...seoArticles.map(article => ({
           id: parseInt(article.id),
           title: article.title,
@@ -68,12 +68,24 @@ export default function BlogPage() {
           updatedAt: article.publishedAt
         }))];
         
-        // Удаляем дубликаты по slug
         const uniquePosts = combinedPosts.filter((post, index, self) => 
           index === self.findIndex((p) => p.slug === post.slug)
         );
         
         setPosts(uniquePosts);
+      } else {
+        setPosts(seoArticles.map(article => ({
+          id: parseInt(article.id),
+          title: article.title,
+          slug: article.slug,
+          excerpt: article.excerpt,
+          coverImageUrl: article.coverImage,
+          status: 'published',
+          viewsCount: 0,
+          publishedAt: article.publishedAt,
+          createdAt: article.publishedAt,
+          updatedAt: article.publishedAt
+        })));
       }
     } catch (error) {
       console.error('Failed to load posts:', error);
@@ -298,8 +310,8 @@ export default function BlogPage() {
 
         <div className="container max-w-7xl mx-auto px-4 py-12 mt-16">
           <Breadcrumbs items={[
-            { label: 'Главная', href: '/' },
-            { label: 'Блог' }
+            { label: 'Главная', path: '/' },
+            { label: 'Блог', path: '/blog' }
           ]} />
           
           <div className="mb-12">

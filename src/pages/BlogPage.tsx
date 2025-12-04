@@ -173,9 +173,9 @@ export default function BlogPage() {
           
           <article className="container max-w-4xl mx-auto px-4 py-12 mt-16">
             <Breadcrumbs items={[
-              { label: 'Главная', href: '/' },
-              { label: 'Блог', href: '/blog' },
-              { label: currentSEOArticle.title }
+              { label: 'Главная', path: '/' },
+              { label: 'Блог', path: '/blog' },
+              { label: currentSEOArticle.title, path: `/blog/${currentSEOArticle.slug}` }
             ]} />
             
             <Link to="/blog" className="inline-flex items-center text-primary hover:underline mb-8">
@@ -241,9 +241,9 @@ export default function BlogPage() {
           
           <article className="container max-w-4xl mx-auto px-4 py-12 mt-16">
             <Breadcrumbs items={[
-              { label: 'Главная', href: '/' },
-              { label: 'Блог', href: '/blog' },
-              { label: currentPost.title }
+              { label: 'Главная', path: '/' },
+              { label: 'Блог', path: '/blog' },
+              { label: currentPost.title, path: `/blog/${currentPost.slug}` }
             ]} />
             
             <Link to="/blog" className="inline-flex items-center text-primary hover:underline mb-8">

@@ -6,11 +6,13 @@ http://www.techforma.ru/* https://techforma.pro/:splat 301!
 https://www.techforma.pro/* https://techforma.pro/:splat 301!
 http://www.techforma.pro/* https://techforma.pro/:splat 301!
 
+# Sitemap redirect to dynamic backend
+/sitemap.xml https://functions.poehali.dev/e0e04210-74c2-4c83-8e1b-1d8541942972 200
+
 # Verification files должны отдаваться как есть
 /yandex_*.html 200
 /google_verification.html 200
 /robots.txt 200
-/sitemap.xml 200
 
 # SPA routing для всех остальных путей
 /* /index.html 200

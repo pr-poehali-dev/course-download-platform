@@ -4,12 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import UsageRules from '@/components/UsageRules';
 import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import SEO from '@/components/SEO';
 
 export default function UsageRulesPage() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Правила использования"
+        description="Правила использования платформы Tech Forma. Требования к материалам, запреты и ограничения."
+        canonical="https://techforma.pro/usage-rules"
+      />
       <div className="container mx-auto px-4 pt-4">
         <Breadcrumbs />
       </div>

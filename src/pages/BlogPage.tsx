@@ -165,6 +165,7 @@ export default function BlogPage() {
           title={currentSEOArticle.title}
           description={currentSEOArticle.excerpt}
           keywords={currentSEOArticle.keywords.join(', ')}
+          canonical={`https://techforma.pro/blog/${currentSEOArticle.slug}`}
         />
         <script
           type="application/ld+json"
@@ -237,6 +238,7 @@ export default function BlogPage() {
           title={currentPost.title}
           description={currentPost.excerpt}
           keywords="блог, новости, обновления платформы, статьи"
+          canonical={`https://techforma.pro/blog/${currentPost.slug}`}
         />
         <div className="min-h-screen bg-white">
           <Navigation />
@@ -294,6 +296,7 @@ export default function BlogPage() {
         title="Блог"
         description="Статьи об инженерных программах, обучение работе с чертежами, 3D-моделированию, CAD-системам"
         keywords="блог, инженерные статьи, уроки cad, работа с чертежами, 3d моделирование, гайды для инженеров"
+        canonical="https://techforma.pro/blog"
       />
       <div className="min-h-screen bg-white">
         <Navigation />

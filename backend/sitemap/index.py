@@ -95,6 +95,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'priority': '0.8'
             })
         
+        # SEO статьи блога (хардкод)
+        blog_articles = [
+            {'slug': 'kak-skachat-kursovuyu-rabotu-besplatno', 'date': '2025-12-03'},
+            {'slug': 'gotovye-kursovye-raboty-po-inzhenernym-spetsialnostyam', 'date': '2025-12-03'},
+            {'slug': 'kursovye-raboty-po-stroitelstvu-i-mashinostroeniyu', 'date': '2025-12-03'},
+            {'slug': 'kak-vybrat-kursovuyu-rabotu', 'date': '2025-11-30'},
+            {'slug': 'inzhenernye-chertezhi-dlya-studentov', 'date': '2025-11-29'},
+            {'slug': 'kursovaya-rabota-po-elektrotekhnike', 'date': '2025-11-28'}
+        ]
+        
+        for article in blog_articles:
+            static_urls.append({
+                'loc': f'{base_url}/blog/{article["slug"]}',
+                'lastmod': article['date'],
+                'changefreq': 'monthly',
+                'priority': '0.8'
+            })
+        
         # Добавляем URL работ
         work_urls = []
         for work_id, title, updated_at, created_at in works:

@@ -4,12 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import PrivacyPolicy from '@/pages/PrivacyPolicy';
 import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import SEO from '@/components/SEO';
 
 export default function PrivacyPolicyPage() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Политика конфиденциальности"
+        description="Политика конфиденциальности Tech Forma. Информация о сборе, использовании и защите персональных данных пользователей."
+        canonical="https://techforma.pro/privacy-policy"
+      />
       <div className="container mx-auto px-4 pt-4">
         <Breadcrumbs />
       </div>

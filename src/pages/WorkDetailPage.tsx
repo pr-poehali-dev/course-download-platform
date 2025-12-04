@@ -1029,6 +1029,7 @@ export default function WorkDetailPage() {
         title={work ? `${work.title} — купить за ${work.price} баллов` : 'Просмотр работы'}
         description={work ? `${work.workType} по предмету "${work.subject}". ${work.description.substring(0, 150)}` : 'Детальная информация о студенческой работе'}
         keywords={work ? `${work.workType}, ${work.subject}, курсовая, диплом, купить` : 'студенческие работы'}
+        canonical={`https://techforma.pro/work/${actualWorkId}`}
       />
       
       <Navigation isLoggedIn={isLoggedIn} />

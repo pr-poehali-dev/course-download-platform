@@ -4,12 +4,18 @@ import { useNavigate } from 'react-router-dom';
 import TermsOfService from '@/pages/TermsOfService';
 import Footer from '@/components/Footer';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import SEO from '@/components/SEO';
 
 export default function TermsOfServicePage() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="Условия использования"
+        description="Условия использования сервиса Tech Forma. Правила пользования платформой, права и обязанности пользователей."
+        canonical="https://techforma.pro/terms-of-service"
+      />
       <div className="container mx-auto px-4 pt-4">
         <Breadcrumbs />
       </div>

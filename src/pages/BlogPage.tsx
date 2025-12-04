@@ -64,22 +64,17 @@ export default function BlogPage() {
       updatedAt: article.publishedAt
     }));
     
-    console.log('SEO Articles loaded:', seoPostsMapped.length);
-    
     try {
       const response = await fetch(`${BLOG_API}?action=list&status=published`);
       const data = await response.json();
-      console.log('API Response:', data);
 
       if (data.success && Array.isArray(data.posts)) {
-        const combinedPosts = [...data.posts, ...seoPostsMapped];
+        const combinedPosts = [...seoPostsMapped, ...data.posts];
         const uniquePosts = combinedPosts.filter((post, index, self) => 
           index === self.findIndex((p) => p.slug === post.slug)
         );
-        console.log('Final posts count:', uniquePosts.length);
         setPosts(uniquePosts);
       } else {
-        console.log('Using only SEO posts');
         setPosts(seoPostsMapped);
       }
     } catch (error) {

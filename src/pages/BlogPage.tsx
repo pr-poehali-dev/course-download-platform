@@ -50,57 +50,36 @@ export default function BlogPage() {
 
   const loadPosts = async () => {
     setLoading(true);
+    
+    const seoPostsMapped = seoArticles.map(article => ({
+      id: parseInt(article.id),
+      title: article.title,
+      slug: article.slug,
+      excerpt: article.excerpt,
+      coverImageUrl: article.coverImage,
+      status: 'published',
+      viewsCount: 0,
+      publishedAt: article.publishedAt,
+      createdAt: article.publishedAt,
+      updatedAt: article.publishedAt
+    }));
+    
     try {
       const response = await fetch(`${BLOG_API}?action=list&status=published`);
       const data = await response.json();
 
       if (data.success && Array.isArray(data.posts)) {
-        const combinedPosts = [...data.posts, ...seoArticles.map(article => ({
-          id: parseInt(article.id),
-          title: article.title,
-          slug: article.slug,
-          excerpt: article.excerpt,
-          coverImageUrl: article.coverImage,
-          status: 'published',
-          viewsCount: 0,
-          publishedAt: article.publishedAt,
-          createdAt: article.publishedAt,
-          updatedAt: article.publishedAt
-        }))];
-        
+        const combinedPosts = [...data.posts, ...seoPostsMapped];
         const uniquePosts = combinedPosts.filter((post, index, self) => 
           index === self.findIndex((p) => p.slug === post.slug)
         );
-        
         setPosts(uniquePosts);
       } else {
-        setPosts(seoArticles.map(article => ({
-          id: parseInt(article.id),
-          title: article.title,
-          slug: article.slug,
-          excerpt: article.excerpt,
-          coverImageUrl: article.coverImage,
-          status: 'published',
-          viewsCount: 0,
-          publishedAt: article.publishedAt,
-          createdAt: article.publishedAt,
-          updatedAt: article.publishedAt
-        })));
+        setPosts(seoPostsMapped);
       }
     } catch (error) {
       console.error('Failed to load posts:', error);
-      setPosts(seoArticles.map(article => ({
-        id: parseInt(article.id),
-        title: article.title,
-        slug: article.slug,
-        excerpt: article.excerpt,
-        coverImageUrl: article.coverImage,
-        status: 'published',
-        viewsCount: 0,
-        publishedAt: article.publishedAt,
-        createdAt: article.publishedAt,
-        updatedAt: article.publishedAt
-      })));
+      setPosts(seoPostsMapped);
     } finally {
       setLoading(false);
     }

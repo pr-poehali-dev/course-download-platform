@@ -74,7 +74,6 @@ const App = () => (
           <Route path="/buy-points" element={<BuyPointsPage />} />
           <Route path="/upload" element={<UploadWorkPage />} />
           <Route path="/work/:id" element={<WorkDetailPage />} />
-          <Route path="/work-detail/:workId" element={<WorkDetailPage />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/marketplace" element={<AuthorMarketplacePage />} />
           <Route path="/sync-previews" element={<SyncPreviewsPage />} />

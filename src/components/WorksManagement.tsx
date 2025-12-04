@@ -219,6 +219,41 @@ export default function WorksManagement() {
     }
   };
 
+  const handleRemoveDuplicates = async () => {
+    if (!confirm('Удалить все дубликаты работ? Будут удалены повторяющиеся записи с одинаковым yandex_disk_link.')) return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(func2url.works, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        },
+        body: JSON.stringify({ action: 'remove_duplicates' })
+      });
+      
+      if (!response.ok) throw new Error('Failed to remove duplicates');
+      
+      const data = await response.json();
+      
+      toast({
+        title: 'Успешно!',
+        description: data.message || `Удалено дубликатов: ${data.deleted}`
+      });
+      
+      await loadWorks();
+    } catch (error) {
+      toast({
+        title: 'Ошибка',
+        description: 'Не удалось удалить дубликаты',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -228,14 +263,24 @@ export default function WorksManagement() {
               <CardTitle>Фильтры и поиск</CardTitle>
               <CardDescription>Найдите нужную работу для редактирования</CardDescription>
             </div>
-            <Button 
-              onClick={handleBulkApprove}
-              disabled={loading}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              <Icon name="CheckCheck" size={18} className="mr-2" />
-              Одобрить 100 работ
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleRemoveDuplicates}
+                disabled={loading}
+                variant="destructive"
+              >
+                <Icon name="Copy" size={18} className="mr-2" />
+                Удалить дубликаты
+              </Button>
+              <Button 
+                onClick={handleBulkApprove}
+                disabled={loading}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                <Icon name="CheckCheck" size={18} className="mr-2" />
+                Одобрить 100 работ
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>

@@ -437,19 +437,19 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur = conn.cursor()
             
             try:
-                # Найти и удалить дубликаты, оставив только самые ранние записи
+                # Найти и удалить дубликаты по yandex_disk_link (более точный способ)
                 cur.execute("""
                     DELETE FROM t_p63326274_course_download_plat.works
                     WHERE id NOT IN (
                         SELECT MIN(id)
                         FROM t_p63326274_course_download_plat.works
-                        GROUP BY title
+                        GROUP BY COALESCE(yandex_disk_link, title)
                     )
                 """)
                 deleted_count = cur.rowcount
                 conn.commit()
                 
-                print(f"🗑️ Удалено дубликатов: {deleted_count}")
+                print(f"🗑️ Удалено дубликатов по yandex_disk_link: {deleted_count}")
                 
                 return {
                     'statusCode': 200,
@@ -512,6 +512,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         safe_desc = description.replace("'", "''")
                         safe_comp = composition.replace("'", "''")
                         safe_link = yandex_disk_link.replace("'", "''")
+                        
+                        # Проверка на дубликат по yandex_disk_link
+                        cur.execute(f"""
+                            SELECT id FROM t_p63326274_course_download_plat.works 
+                            WHERE yandex_disk_link = '{safe_link}'
+                        """)
+                        existing = cur.fetchone()
+                        
+                        if existing:
+                            print(f"⏭️ Пропускаю дубликат: {title} (ID={existing[0]})")
+                            continue
                         
                         cur.execute(f"""
                             INSERT INTO t_p63326274_course_download_plat.works (title, work_type, subject, description, composition, price_points, yandex_disk_link)

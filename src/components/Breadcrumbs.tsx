@@ -75,7 +75,7 @@ export default function Breadcrumbs({ items, className = '' }: BreadcrumbsProps)
       aria-label="Breadcrumb"
     >
       {breadcrumbs.map((crumb, index) => (
-        <Fragment key={crumb.path}>
+        <Fragment key={`breadcrumb-${index}`}>
           {index > 0 && (
             <Icon name="ChevronRight" size={14} className="text-muted-foreground/50" />
           )}

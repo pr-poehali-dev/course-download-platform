@@ -64,21 +64,32 @@ export default function BlogPage() {
       updatedAt: article.publishedAt
     }));
     
+    console.log('[BLOG DEBUG] 1. SEO Articles:', seoPostsMapped.length, seoPostsMapped);
+    
     try {
       const response = await fetch(`${BLOG_API}?action=list&status=published`);
       const data = await response.json();
+      
+      console.log('[BLOG DEBUG] 2. API Response:', data);
 
       if (data.success && Array.isArray(data.posts)) {
         const combinedPosts = [...seoPostsMapped, ...data.posts];
+        console.log('[BLOG DEBUG] 3. Combined posts:', combinedPosts.length, combinedPosts);
+        
         const uniquePosts = combinedPosts.filter((post, index, self) => 
           index === self.findIndex((p) => p.slug === post.slug)
         );
+        
+        console.log('[BLOG DEBUG] 4. Unique posts:', uniquePosts.length, uniquePosts);
+        console.log('[BLOG DEBUG] 5. Calling setPosts with:', uniquePosts);
         setPosts(uniquePosts);
+        console.log('[BLOG DEBUG] 6. setPosts called');
       } else {
+        console.log('[BLOG DEBUG] 3. Using only SEO posts (API failed)');
         setPosts(seoPostsMapped);
       }
     } catch (error) {
-      console.error('Failed to load posts:', error);
+      console.error('[BLOG DEBUG] ERROR:', error);
       setPosts(seoPostsMapped);
     } finally {
       setLoading(false);
@@ -300,16 +311,18 @@ export default function BlogPage() {
             </p>
           </div>
 
-          {posts.length === 0 ? (
-            <Card>
-              <CardContent className="py-24 text-center">
-                <Icon name="FileText" size={48} className="mx-auto text-muted-foreground mb-4" />
-                <p className="text-muted-foreground">Пока нет опубликованных постов</p>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => (
+          {(() => {
+            console.log('[BLOG DEBUG] 7. Render phase - posts.length:', posts.length, 'posts:', posts);
+            return posts.length === 0 ? (
+              <Card>
+                <CardContent className="py-24 text-center">
+                  <Icon name="FileText" size={48} className="mx-auto text-muted-foreground mb-4" />
+                  <p className="text-muted-foreground">Пока нет опубликованных постов</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {posts.map((post) => (
                 <Link key={post.id} to={`/blog/${post.slug}`}>
                   <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
                     {post.coverImageUrl && (
@@ -342,7 +355,8 @@ export default function BlogPage() {
                 </Link>
               ))}
             </div>
-          )}
+            );
+          })()}
         </div>
 
         <Footer />

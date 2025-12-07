@@ -47,6 +47,7 @@ import SEOFAQSection from '@/components/home/SEOFAQSection';
 import PopularCategoriesLinks from '@/components/home/PopularCategoriesLinks';
 import CategoryLinksSection from '@/components/seo/CategoryLinksSection';
 import PopularSearches from '@/components/seo/PopularSearches';
+import BlogSection from '@/components/home/BlogSection';
 
 
 
@@ -718,13 +719,6 @@ export default function Index() {
                   >
                     Каталог
                   </a>
-                  <a 
-                    href="/blog" 
-                    className="py-3 px-4 hover:bg-primary/20 rounded border border-transparent hover:border-primary/50 transition-all text-base font-medium uppercase tracking-wide"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Блог
-                  </a>
                   {isLoggedIn && (
                     <>
                       <div className="border-t my-2"></div>
@@ -1382,6 +1376,8 @@ export default function Index() {
         </section>
 
         <CategoryLinksSection />
+        
+        <BlogSection />
         
         <PopularSearches />
         

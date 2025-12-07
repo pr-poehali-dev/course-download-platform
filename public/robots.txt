@@ -4,7 +4,6 @@
 User-agent: *
 Allow: /
 Allow: /catalog
-Allow: /blog
 Allow: /marketplace
 Allow: /bot-subscription
 Allow: /*.css$

@@ -2,7 +2,7 @@ import { useParams, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import ReactMarkdown from 'react-markdown';
 import { seoArticles } from '@/data/seoArticles';
-import Navbar from '@/components/Navbar';
+import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Icon from '@/components/ui/icon';
 
@@ -36,7 +36,7 @@ export default function BlogPost() {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">
-        <Navbar />
+        <Navigation />
         
         <main className="container mx-auto px-4 py-12 max-w-4xl">
           <a 

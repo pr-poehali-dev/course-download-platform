@@ -1,68 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
-
-const BLOG_POSTS = [
-  {
-    id: 1,
-    title: 'Как написать идеальную курсовую работу',
-    excerpt: 'Пошаговое руководство: от выбора темы до защиты. Структура, оформление, типичные ошибки и советы.',
-    category: 'Советы',
-    readTime: '8 мин',
-    date: '20.10.2025',
-    icon: 'BookOpen'
-  },
-  {
-    id: 2,
-    title: '10 способов сдать сессию без стресса',
-    excerpt: 'Эффективные методики подготовки, тайм-менеджмент для студентов и психологические лайфхаки.',
-    category: 'Обучение',
-    readTime: '6 мин',
-    date: '18.10.2025',
-    icon: 'GraduationCap'
-  },
-  {
-    id: 3,
-    title: 'ГОСТ 2025: новые требования к оформлению',
-    excerpt: 'Актуальные стандарты оформления студенческих работ, шрифты, отступы, список литературы.',
-    category: 'Оформление',
-    readTime: '10 мин',
-    date: '15.10.2025',
-    icon: 'FileText'
-  },
-  {
-    id: 4,
-    title: 'Как найти научные источники для диплома',
-    excerpt: 'Лучшие базы данных, библиотеки, журналы. Критерии отбора литературы и правильное цитирование.',
-    category: 'Исследования',
-    readTime: '7 мин',
-    date: '12.10.2025',
-    icon: 'Search'
-  },
-  {
-    id: 5,
-    title: 'Антиплагиат: как повысить уникальность текста',
-    excerpt: 'Легальные способы повышения оригинальности работы без потери смысла и качества.',
-    category: 'Советы',
-    readTime: '5 мин',
-    date: '10.10.2025',
-    icon: 'Shield'
-  },
-  {
-    id: 6,
-    title: 'Презентация к диплому: что важно знать',
-    excerpt: 'Структура, дизайн, количество слайдов. Как подготовиться к защите и ответить на вопросы комиссии.',
-    category: 'Защита',
-    readTime: '9 мин',
-    date: '08.10.2025',
-    icon: 'Presentation'
-  }
-];
+import { seoArticles } from '@/data/seoArticles';
 
 export default function BlogSection() {
   const navigate = useNavigate();
+  
+  const latestArticles = seoArticles
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .slice(0, 3);
 
   return (
     <section id="blog" className="py-16">
@@ -75,55 +22,50 @@ export default function BlogSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {BLOG_POSTS.map((post) => (
-            <Card 
-              key={post.id} 
-              className="hover:shadow-lg transition-shadow cursor-pointer"
-              onClick={() => navigate(`/blog/${post.id}`)}
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                    <Icon name={post.icon as any} size={24} className="text-primary" />
+          {latestArticles.map((article) => {
+            const formattedDate = new Date(article.publishedAt).toLocaleDateString('ru-RU', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric'
+            });
+            
+            return (
+              <Card 
+                key={article.id} 
+                className="hover:shadow-lg transition-all hover:scale-[1.02] cursor-pointer overflow-hidden group"
+                onClick={() => navigate(`/blog/${article.slug}`)}
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <img 
+                    src={article.coverImage} 
+                    alt={article.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div className="absolute top-3 right-3">
+                    <Badge variant="secondary" className="bg-white/90 backdrop-blur-sm">
+                      {article.category}
+                    </Badge>
                   </div>
-                  <Badge variant="secondary">{post.category}</Badge>
                 </div>
-                <CardTitle className="text-xl">{post.title}</CardTitle>
-                <CardDescription className="line-clamp-2">{post.excerpt}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center gap-4">
+                <CardHeader>
+                  <CardTitle className="text-xl line-clamp-2">{article.title}</CardTitle>
+                  <CardDescription className="line-clamp-2">{article.excerpt}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Icon name="Calendar" size={14} />
-                      {post.date}
+                      {formattedDate}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Icon name="Clock" size={14} />
-                      {post.readTime}
+                    <span className="text-primary font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                      Читать
+                      <Icon name="ArrowRight" size={16} />
                     </span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigate(`/blog/${post.id}`);
-                    }}
-                  >
-                    <Icon name="ArrowRight" size={16} />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        <div className="text-center mt-8">
-          <Button variant="outline" size="lg">
-            <Icon name="BookOpen" size={18} className="mr-2" />
-            Все статьи блога
-          </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -35,7 +35,8 @@ Disallow: /extract-previews
 User-agent: Yandex
 Allow: /
 Crawl-delay: 0.5
-Clean-param: utm_source&utm_medium&utm_campaign
+Clean-param: utm_source&utm_medium&utm_campaign&fbclid&gclid&_ym_uid&_ym_d /
+Clean-param: search&category&subject&sort /catalog
 
 # Специальные правила для Google
 User-agent: Googlebot

@@ -490,7 +490,7 @@ export default function CatalogPage() {
       <SEO 
         title={getCategoryTitle()}
         description={getCategoryDescription()}
-        keywords="курсовые работы купить, дипломы купить, каталог курсовых работ, каталог дипломов, готовые курсовые, готовые дипломы, купить готовую курсовую, купить готовый диплом"
+        keywords="чертежи dwg купить, 3d модели step, технические расчёты, каталог чертежей, каталог 3д моделей, готовые чертежи, купить чертёж dwg, скачать 3d модель"
         canonical="https://techforma.pro/catalog"
       />
       <Helmet>

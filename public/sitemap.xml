@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Главная страница -->
+  <url>
+    <loc>https://techforma.pro/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  
+  <!-- Каталог -->
+  <url>
+    <loc>https://techforma.pro/catalog</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Блог -->
+  <url>
+    <loc>https://techforma.pro/blog</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Маркетплейс -->
+  <url>
+    <loc>https://techforma.pro/marketplace</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- Статические страницы -->
+  <url>
+    <loc>https://techforma.pro/privacy-policy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <url>
+    <loc>https://techforma.pro/terms-of-service</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <url>
+    <loc>https://techforma.pro/usage-rules</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <url>
+    <loc>https://techforma.pro/offer</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.3</priority>
+  </url>
+  
+  <url>
+    <loc>https://techforma.pro/requisites</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <!-- Покупка баллов -->
+  <url>
+    <loc>https://techforma.pro/buy-points</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <!-- Конструктор пакета защиты -->
+  <url>
+    <loc>https://techforma.pro/defense-kit</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <!-- ПРИМЕЧАНИЕ: 
+       Страницы отдельных работ (/work/4740, /work/4741 и т.д.) 
+       составляют 485+ URL. Они индексируются через internal links
+       из каталога. Яндекс автоматически находит их через навигацию.
+  -->
+  
+</urlset>

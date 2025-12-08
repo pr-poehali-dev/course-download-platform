@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import ReviewsModeration from '@/components/ReviewsModeration';
-import func2url from '../../backend/func2url.json';
+import WorkCard from '@/components/moderation/WorkCard';
+import RejectionDialog from '@/components/moderation/RejectionDialog';
+import ReviewsManagement from '@/components/moderation/ReviewsManagement';
+import func2url from '../backend/func2url.json';
 
 interface UploadedWork {
   id: number;
@@ -293,7 +293,7 @@ export default function ModerationPanel() {
           'X-Admin-Token': 'admin_secret_token_2024'
         },
         body: JSON.stringify({
-          action: 'cleanup'
+          action: 'cleanup_duplicates'
         })
       });
 
@@ -303,14 +303,10 @@ export default function ModerationPanel() {
         throw new Error(data.error || `HTTP ${response.status}`);
       }
 
+      setReviewsResult(data);
       toast({
-        title: '✅ Дубликаты удалены!',
-        description: `Удалено ${data.total_deleted} дублирующихся отзывов`
-      });
-      
-      setReviewsResult({
-        ...data,
-        message: `Удалено ${data.total_deleted} дубликатов`
+        title: '✅ Очистка завершена!',
+        description: `Удалено ${data.deleted_duplicates} дублирующихся отзывов`
       });
     } catch (err: any) {
       toast({
@@ -323,233 +319,76 @@ export default function ModerationPanel() {
     }
   };
 
-  if (loading) {
-    return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center py-12">
-            <Icon name="Loader2" size={48} className="mx-auto text-muted-foreground mb-4 animate-spin" />
-            <p className="text-muted-foreground">Загрузка работ...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (selectedWork) {
-    return (
+  return (
+    <div className="space-y-6">
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Отклонение работы</CardTitle>
-              <CardDescription>{selectedWork.title}</CardDescription>
-            </div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => {
-                setSelectedWork(null);
-                setRejectionComment('');
-              }}
-            >
-              <Icon name="X" size={18} className="mr-2" />
-              Отмена
-            </Button>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <Icon name="ShieldCheck" size={24} />
+            Панель модерации работ
+          </CardTitle>
+          <CardDescription>
+            Проверка и одобрение загруженных пользователями работ
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="rejection-comment">Причина отклонения <span className="text-red-500">*</span></Label>
-            <Textarea 
-              id="rejection-comment"
-              placeholder="Опишите причину отклонения работы. Это сообщение будет отправлено автору на email."
-              rows={6}
-              value={rejectionComment}
-              onChange={(e) => setRejectionComment(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              Email автора будет отправлен автоматически с указанной причиной
-            </p>
-          </div>
+        <CardContent>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Icon name="Loader2" size={32} className="animate-spin text-muted-foreground" />
+            </div>
+          ) : works.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <Icon name="CheckCircle" size={48} className="mx-auto mb-4 text-green-500" />
+              <p className="text-lg font-semibold">Нет работ на модерации</p>
+              <p className="text-sm mt-2">Все загруженные работы проверены</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-4">
+                <Badge variant="secondary">
+                  {works.length} {works.length === 1 ? 'работа' : 'работ'} на проверке
+                </Badge>
+              </div>
 
-          <div className="flex gap-2">
-            <Button 
-              variant="destructive" 
-              className="flex-1"
-              disabled={processing || !rejectionComment.trim()}
-              onClick={handleReject}
-            >
-              {processing ? (
-                <>
-                  <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                  Отправка...
-                </>
-              ) : (
-                <>
-                  <Icon name="XCircle" size={18} className="mr-2" />
-                  Отклонить и отправить уведомление
-                </>
+              {selectedWork && (
+                <RejectionDialog
+                  work={selectedWork}
+                  comment={rejectionComment}
+                  processing={processing}
+                  onCommentChange={setRejectionComment}
+                  onSubmit={handleReject}
+                  onCancel={() => {
+                    setSelectedWork(null);
+                    setRejectionComment('');
+                  }}
+                />
               )}
-            </Button>
-          </div>
+
+              {works.map((work) => (
+                <WorkCard
+                  key={work.id}
+                  work={work}
+                  processing={processing}
+                  onApprove={() => handleApprove(work)}
+                  onReject={() => setSelectedWork(work)}
+                  onDownload={() => handleDownloadWork(work)}
+                  formatDate={formatDate}
+                  formatFileSize={formatFileSize}
+                />
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
-    );
-  }
 
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <div>
-          <h3 className="text-lg font-semibold">Работы на модерации</h3>
-          <p className="text-sm text-muted-foreground">
-            Проверьте и одобрите или отклоните загруженные работы
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button
-            onClick={handleCleanupDuplicates}
-            disabled={generatingReviews}
-            variant="outline"
-            size="sm"
-          >
-            {generatingReviews ? (
-              <>
-                <Icon name="Loader2" className="mr-2 animate-spin" size={16} />
-                Очистка...
-              </>
-            ) : (
-              <>
-                <Icon name="Trash2" className="mr-2" size={16} />
-                Удалить дубликаты
-              </>
-            )}
-          </Button>
-          <Button
-            onClick={handleGenerateReviews}
-            disabled={generatingReviews}
-            variant="outline"
-            size="sm"
-          >
-            {generatingReviews ? (
-              <>
-                <Icon name="Loader2" className="mr-2 animate-spin" size={16} />
-                Генерация...
-              </>
-            ) : (
-              <>
-                <Icon name="MessageSquare" className="mr-2" size={16} />
-                Сгенерировать отзывы
-              </>
-            )}
-          </Button>
-          <Badge variant="secondary">{works.length} работ</Badge>
-        </div>
-      </div>
+      <ReviewsManagement
+        generatingReviews={generatingReviews}
+        reviewsResult={reviewsResult}
+        onGenerateReviews={handleGenerateReviews}
+        onCleanupDuplicates={handleCleanupDuplicates}
+      />
 
-      {reviewsResult && (
-        <Card className="bg-green-50 border-green-200">
-          <CardContent className="pt-4">
-            <div className="flex items-start gap-3">
-              <Icon name="CheckCircle" className="text-green-600 flex-shrink-0 mt-0.5" size={20} />
-              <div className="text-sm space-y-1">
-                <p className="font-semibold text-green-900">Отзывы успешно сгенерированы!</p>
-                <p className="text-green-800">✅ Создано отзывов: {reviewsResult.total_reviews_created}</p>
-                <p className="text-green-800">✅ Обработано работ: {reviewsResult.processed_works}</p>
-                <p className="text-green-700">ℹ️ Пропущено: {reviewsResult.skipped_works}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {works.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-12">
-              <Icon name="CheckCircle" size={48} className="mx-auto text-green-600 mb-4" />
-              <p className="text-muted-foreground">Нет работ, ожидающих модерации</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        works.map((work) => (
-          <Card key={work.id}>
-            <CardHeader>
-              <div className="flex justify-between items-start gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CardTitle className="text-base">{work.title}</CardTitle>
-                    <Badge>На модерации</Badge>
-                  </div>
-                  <CardDescription className="space-y-2">
-                    <div className="flex items-center gap-4 flex-wrap">
-                      <span className="flex items-center gap-1">
-                        <Icon name="BookOpen" size={14} />
-                        {work.work_type}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Icon name="GraduationCap" size={14} />
-                        {work.subject}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Icon name="Coins" size={14} />
-                        {work.price_points} баллов
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Icon name="FileText" size={14} />
-                        {work.file_name}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Icon name="HardDrive" size={14} />
-                        {formatFileSize(work.file_size)}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs">
-                      <Icon name="Clock" size={12} />
-                      Загружено: {formatDate(work.created_at)}
-                    </div>
-                    <p className="text-sm mt-2">{work.description}</p>
-                  </CardDescription>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => handleDownloadWork(work)}
-                  >
-                    <Icon name="Download" size={14} className="mr-2" />
-                    Скачать файл
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="default"
-                    disabled={processing}
-                    onClick={() => handleApprove(work)}
-                  >
-                    <Icon name="CheckCircle" size={14} className="mr-2" />
-                    Одобрить
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="destructive"
-                    disabled={processing}
-                    onClick={() => setSelectedWork(work)}
-                  >
-                    <Icon name="XCircle" size={14} className="mr-2" />
-                    Отклонить
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
-        ))
-      )}
-      
-      <div className="mt-8">
-        <ReviewsModeration />
-      </div>
+      <ReviewsModeration />
     </div>
   );
 }

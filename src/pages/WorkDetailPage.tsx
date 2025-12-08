@@ -98,7 +98,7 @@ export default function WorkDetailPage() {
           console.log('Purchases data:', data);
           console.log('Current work ID:', actualWorkId);
           if (data.purchases) {
-            const purchased = data.purchases.some((p: any) => String(p.work_id) === String(actualWorkId));
+            const purchased = data.purchases.some((p: any) => String(p.id) === String(actualWorkId));
             console.log('Is purchased:', purchased);
             setIsPurchased(purchased);
           }
@@ -628,7 +628,7 @@ export default function WorkDetailPage() {
         const checkResponse = await fetch(`${func2url['user-data']}?user_id=${userId}&action=purchases`);
         const checkData = await checkResponse.json();
         if (checkData.purchases) {
-          isAlreadyPurchased = checkData.purchases.some((p: any) => String(p.work_id) === String(actualWorkId));
+          isAlreadyPurchased = checkData.purchases.some((p: any) => String(p.id) === String(actualWorkId));
           console.log('Double-check: Is purchased?', isAlreadyPurchased);
           setIsPurchased(isAlreadyPurchased);
         }

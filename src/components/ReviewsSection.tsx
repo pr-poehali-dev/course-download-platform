@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
-import func2url from '../../backend/func2url.json';
+import func2url from '../backend/func2url.json';
+import ReviewForm from './reviews/ReviewForm';
+import ReviewCard from './reviews/ReviewCard';
 
 interface Review {
   id: number;
@@ -146,7 +145,6 @@ export default function ReviewsSection({ workId, isPurchased: initialIsPurchased
         description: 'Ваш отзыв успешно добавлен',
       });
 
-      // Отслеживаем добавление отзыва
       fetch(func2url['work-stats'], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -286,214 +284,45 @@ export default function ReviewsSection({ workId, isPurchased: initialIsPurchased
       </div>
 
       {showForm && (
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">Напишите отзыв</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {!isPurchased && (
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
-                <Icon name="Info" size={20} className="text-amber-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-medium text-amber-900">Для отзыва нужно купить работу</p>
-                  <p className="text-xs text-amber-700 mt-1">Отзывы могут оставлять только покупатели. Это гарантирует честность отзывов.</p>
-                </div>
-              </div>
-            )}
-            
-            <div>
-              <label className="block text-sm font-medium mb-2">Оценка</label>
-              <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => setRating(star)}
-                    className="transition-all"
-                    disabled={!isPurchased}
-                  >
-                    <Icon
-                      name="Star"
-                      size={32}
-                      className={`${
-                        star <= rating
-                          ? 'text-yellow-500 fill-yellow-500'
-                          : 'text-gray-300'
-                      } ${!isPurchased ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-2">Комментарий</label>
-              <Textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Расскажите о вашем опыте с этой работой..."
-                className="min-h-[120px]"
-                disabled={!isPurchased}
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button onClick={handleSubmitReview} disabled={submitting || !isPurchased}>
-                {submitting ? (
-                  <>
-                    <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
-                    Отправка...
-                  </>
-                ) : (
-                  <>
-                    <Icon name="Send" size={18} className="mr-2" />
-                    Отправить отзыв
-                  </>
-                )}
-              </Button>
-              <Button variant="outline" onClick={() => setShowForm(false)}>
-                Отмена
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <ReviewForm
+          rating={rating}
+          comment={comment}
+          submitting={submitting}
+          onRatingChange={setRating}
+          onCommentChange={setComment}
+          onSubmit={handleSubmitReview}
+          onCancel={() => {
+            setShowForm(false);
+            setComment('');
+            setRating(5);
+          }}
+        />
       )}
 
       {loading ? (
-        <div className="text-center py-8">
-          <Icon name="Loader2" size={32} className="animate-spin text-primary mx-auto" />
-        </div>
+        <div className="text-center py-8 text-gray-500">Загрузка отзывов...</div>
       ) : reviews.length === 0 ? (
-        <Card>
-          <CardContent className="py-8 text-center">
-            <Icon name="MessageSquare" size={48} className="mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-600">Пока нет отзывов на эту работу</p>
-            {currentUserId && (
-              <p className="text-sm text-gray-500 mt-2">Будьте первым!</p>
-            )}
-          </CardContent>
-        </Card>
+        <div className="text-center py-8 text-gray-500">
+          Пока нет отзывов. {isPurchased && 'Будьте первым!'}
+        </div>
       ) : (
         <div className="space-y-4">
           {reviews.map((review) => (
-            <Card key={review.id}>
-              <CardContent className="pt-6">
-                {editingReviewId === review.id ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon name="User" size={20} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">{review.username}</p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(review.created_at).toLocaleDateString('ru-RU')}
-                          </p>
-                        </div>
-                      </div>
-                      <Badge variant="outline">Редактирование</Badge>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Оценка</label>
-                      <div className="flex gap-2">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <button
-                            key={star}
-                            onClick={() => setEditRating(star)}
-                            className="transition-all"
-                          >
-                            <Icon
-                              name="Star"
-                              size={32}
-                              className={
-                                star <= editRating
-                                  ? 'text-yellow-500 fill-yellow-500'
-                                  : 'text-gray-300'
-                              }
-                            />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Комментарий</label>
-                      <Textarea
-                        value={editComment}
-                        onChange={(e) => setEditComment(e.target.value)}
-                        className="min-h-[120px]"
-                      />
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button onClick={() => handleUpdateReview(review.id)}>
-                        <Icon name="Check" size={18} className="mr-2" />
-                        Сохранить
-                      </Button>
-                      <Button variant="outline" onClick={cancelEdit}>
-                        Отмена
-                      </Button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon name="User" size={20} className="text-primary" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">{review.username}</p>
-                          <p className="text-xs text-gray-500">
-                            {new Date(review.created_at).toLocaleDateString('ru-RU')}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Icon
-                              key={star}
-                              name="Star"
-                              size={16}
-                              className={`${
-                                star <= review.rating
-                                  ? 'text-yellow-500 fill-yellow-500'
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        {isAdmin && (
-                          <div className="flex gap-1 ml-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                              onClick={() => startEditReview(review)}
-                              title="Редактировать отзыв"
-                            >
-                              <Icon name="Edit" size={16} />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                              onClick={() => handleDeleteReview(review.id)}
-                              title="Удалить отзыв"
-                            >
-                              <Icon name="Trash2" size={16} />
-                            </Button>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-gray-700 whitespace-pre-wrap">{review.comment}</p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
+            <ReviewCard
+              key={review.id}
+              review={review}
+              isCurrentUser={review.user_id === currentUserId}
+              isAdmin={isAdmin}
+              isEditing={editingReviewId === review.id}
+              editRating={editRating}
+              editComment={editComment}
+              onEdit={() => startEditReview(review)}
+              onDelete={() => handleDeleteReview(review.id)}
+              onCancelEdit={cancelEdit}
+              onUpdateReview={() => handleUpdateReview(review.id)}
+              onEditRatingChange={setEditRating}
+              onEditCommentChange={setEditComment}
+            />
           ))}
         </div>
       )}

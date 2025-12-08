@@ -71,7 +71,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         static_urls = [
             {'loc': f'{base_url}/', 'lastmod': today, 'changefreq': 'daily', 'priority': '1.0'},
             {'loc': f'{base_url}/catalog', 'lastmod': today, 'changefreq': 'hourly', 'priority': '0.9'},
-            {'loc': f'{base_url}/blog', 'lastmod': today, 'changefreq': 'weekly', 'priority': '0.8'},
             {'loc': f'{base_url}/marketplace', 'lastmod': today, 'changefreq': 'weekly', 'priority': '0.8'},
             {'loc': f'{base_url}/defense-kit', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.7'},
             {'loc': f'{base_url}/buy-points', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.6'},
@@ -95,14 +94,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'priority': '0.8'
             })
         
-        # SEO статьи блога (хардкод)
+        # SEO статьи блога (актуальные из seoArticles.ts)
         blog_articles = [
-            {'slug': 'kak-skachat-kursovuyu-rabotu-besplatno', 'date': '2025-12-03'},
-            {'slug': 'gotovye-kursovye-raboty-po-inzhenernym-spetsialnostyam', 'date': '2025-12-03'},
-            {'slug': 'kursovye-raboty-po-stroitelstvu-i-mashinostroeniyu', 'date': '2025-12-03'},
             {'slug': 'kak-vybrat-kursovuyu-rabotu', 'date': '2025-11-30'},
             {'slug': 'inzhenernye-chertezhi-dlya-studentov', 'date': '2025-11-29'},
-            {'slug': 'kursovaya-rabota-po-elektrotekhnike', 'date': '2025-11-28'}
+            {'slug': 'gde-kupit-kursovuyu-rabotu', 'date': '2025-11-28'},
+            {'slug': 'ai-v-proektirovanii-2025', 'date': '2025-12-07'},
+            {'slug': 'bim-tekhnologii-2025', 'date': '2025-12-06'},
+            {'slug': '3d-pechat-v-inzhenerii-2025', 'date': '2025-12-05'}
         ]
         
         for article in blog_articles:

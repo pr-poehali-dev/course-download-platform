@@ -26,7 +26,7 @@ export const seoArticles: SEOArticle[] = [
       'скачать курсовую'
     ],
     publishedAt: '2025-11-30',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/f1a7e15a-5d90-4d51-a152-295c427b610f.jpg',
+    coverImage: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=600&fit=crop',
     content: `# Как выбрать готовую курсовую работу: 7 критериев качества
 
 ## Введение
@@ -270,7 +270,7 @@ export const seoArticles: SEOArticle[] = [
       'компас чертежи'
     ],
     publishedAt: '2025-11-29',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/c225d319-6a22-49c0-879e-03c5c45690a2.jpg',
+    coverImage: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&h=600&fit=crop',
     content: `# Инженерные чертежи для студентов: где скачать, как использовать
 
 ## Введение
@@ -1103,7 +1103,7 @@ export const seoArticles: SEOArticle[] = [
       'машинное обучение в CAD'
     ],
     publishedAt: '2025-12-07',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/8c2d1f4e-9a45-4c21-8f56-2e3d1a9f8b41.jpg',
+    coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop',
     content: `# Искусственный интеллект в проектировании 2025: революция в инженерии
 
 ## Введение

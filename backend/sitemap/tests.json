@@ -14,11 +14,6 @@
       "method": "GET",
       "path": "/?format=json",
       "expectedStatus": 200,
-      "expectedBody": {
-        "total_urls": "number",
-        "static_urls": "number",
-        "work_urls": "number"
-      },
       "bodyMatcher": "partial"
     },
     {

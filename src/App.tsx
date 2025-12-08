@@ -45,6 +45,7 @@ import BulkGenerateReviewsPage from "./pages/BulkGenerateReviewsPage";
 import AutoGenerateReviewsPage from "./pages/AutoGenerateReviewsPage";
 import ReviewsCleanupPage from "./pages/ReviewsCleanupPage";
 import BlogPost from "./pages/BlogPost";
+import BlogListPage from "./pages/BlogListPage";
 
 
 
@@ -97,6 +98,7 @@ const App = () => (
           <Route path="/admin/sitemap" element={<SitemapViewPage />} />
           <Route path="/admin/blog" element={<AdminBlogPage />} />
           <Route path="/yandex_c7507f203e2091ee.html" element={<YandexVerification />} />
+          <Route path="/blog" element={<BlogListPage />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

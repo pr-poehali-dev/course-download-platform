@@ -71,6 +71,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         static_urls = [
             {'loc': f'{base_url}/', 'lastmod': today, 'changefreq': 'daily', 'priority': '1.0'},
             {'loc': f'{base_url}/catalog', 'lastmod': today, 'changefreq': 'hourly', 'priority': '0.9'},
+            {'loc': f'{base_url}/blog', 'lastmod': today, 'changefreq': 'weekly', 'priority': '0.9'},
             {'loc': f'{base_url}/marketplace', 'lastmod': today, 'changefreq': 'weekly', 'priority': '0.8'},
             {'loc': f'{base_url}/defense-kit', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.7'},
             {'loc': f'{base_url}/buy-points', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.6'},

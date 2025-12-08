@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
 import { seoArticles } from '@/data/seoArticles';
@@ -66,6 +67,18 @@ export default function BlogSection() {
               </Card>
             );
           })}
+        </div>
+
+        <div className="text-center mt-12">
+          <Button 
+            size="lg" 
+            variant="outline"
+            onClick={() => navigate('/blog')}
+            className="px-8 py-6 text-lg font-semibold border-2 hover:bg-muted/50"
+          >
+            <Icon name="BookOpen" size={20} className="mr-2" />
+            Все статьи блога
+          </Button>
         </div>
       </div>
     </section>

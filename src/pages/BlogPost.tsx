@@ -12,7 +12,7 @@ export default function BlogPost() {
   const article = seoArticles.find(a => a.slug === slug);
   
   if (!article) {
-    return <Navigate to="/404" replace />;
+    return <Navigate to="/" replace />;
   }
 
   const formattedDate = new Date(article.publishedAt).toLocaleDateString('ru-RU', {

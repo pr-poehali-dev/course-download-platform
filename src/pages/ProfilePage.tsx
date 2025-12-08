@@ -17,6 +17,7 @@ import ReferralDialog from '@/components/ReferralDialog';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface UserProfile {
   name: string;
@@ -540,7 +541,7 @@ export default function ProfilePage() {
             </Card>
           </div>
 
-          <Tabs defaultValue="overview" className="space-y-6">
+          <Tabs defaultValue="overview" className="space-y-6" onValueChange={(value) => trackEvent(metrikaEvents.PROFILE_TAB, { tab: value })}>
             <TabsList className="bg-white shadow-md p-1 h-auto flex-wrap justify-start">
               <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-purple-500 data-[state=active]:text-white">
                 <Icon name="LayoutDashboard" size={16} className="mr-2" />

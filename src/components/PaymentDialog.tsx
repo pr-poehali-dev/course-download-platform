@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface PaymentDialogProps {
   open: boolean;
@@ -37,6 +38,12 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
   const [paymentUrl, setPaymentUrl] = useState('');
 
   useEffect(() => {
+    if (open) {
+      trackEvent(metrikaEvents.PAYMENT_OPEN);
+    }
+  }, [open]);
+
+  useEffect(() => {
     const loadConfig = async () => {
       try {
         const funcUrls = await import('../../backend/func2url.json');
@@ -54,6 +61,11 @@ export default function PaymentDialog({ open, onOpenChange, onSuccess, userEmail
   }, []);
 
   const handlePayment = async (pkg: PaymentPackage) => {
+    trackEvent(metrikaEvents.PAYMENT_OPEN, { 
+      package: pkg.points, 
+      price: pkg.price 
+    });
+    
     try {
       const funcUrls = await import('../../backend/func2url.json');
       const { authService } = await import('@/lib/auth');

@@ -19,6 +19,7 @@ import WorkActivityTracker from '@/components/WorkActivityTracker';
 import { toast } from '@/components/ui/use-toast';
 import { getUserDiscount } from '@/utils/discount';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 
 interface Work {
@@ -544,6 +545,13 @@ export default function WorkDetailPage() {
   };
 
   const handlePurchaseAndDownload = async () => {
+    trackEvent(metrikaEvents.WORK_BUY_CLICK, { 
+      work_id: actualWorkId, 
+      work_title: work?.title,
+      work_type: work?.workType,
+      price: work?.price 
+    });
+    
     // Показываем сразу уведомление о начале
     toast({
       title: '🔵 Кнопка нажата!',
@@ -753,6 +761,11 @@ export default function WorkDetailPage() {
         URL.revokeObjectURL(url);
         
         // Отслеживаем скачивание
+        trackEvent(metrikaEvents.WORK_DOWNLOAD, { 
+          work_id: actualWorkId, 
+          work_title: work?.title,
+          price: work?.price 
+        });
         fetch(func2url['work-stats'], {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -763,6 +776,11 @@ export default function WorkDetailPage() {
         window.location.href = downloadData.download_url;
         
         // Отслеживаем скачивание
+        trackEvent(metrikaEvents.WORK_DOWNLOAD, { 
+          work_id: actualWorkId, 
+          work_title: work?.title,
+          price: work?.price 
+        });
         fetch(func2url['work-stats'], {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

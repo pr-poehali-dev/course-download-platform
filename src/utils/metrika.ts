@@ -29,8 +29,13 @@ export const trackScroll = (depth: number) => {
 
 export const metrikaEvents = {
   CATALOG_OPEN: 'catalog_open',
+  CATALOG_SEARCH: 'catalog_search',
+  CATALOG_FILTER: 'catalog_filter',
   WORK_VIEW: 'work_view',
   WORK_DOWNLOAD: 'work_download',
+  WORK_QUICKVIEW: 'work_quickview',
+  WORK_BUY_CLICK: 'work_buy_click',
+  WORK_FAVORITE: 'work_favorite',
   BUTTON_CLICK: 'button_click',
   SCROLL_25: 'scroll_25',
   SCROLL_50: 'scroll_50',
@@ -42,8 +47,13 @@ export const metrikaEvents = {
   SEARCH: 'search',
   FILTER_APPLY: 'filter_apply',
   AUTH_OPEN: 'auth_open',
+  AUTH_CLOSE: 'auth_close',
   REGISTER_SUCCESS: 'register_success',
   LOGIN_SUCCESS: 'login_success',
   CONTACT_CLICK: 'contact_click',
-  FAQ_OPEN: 'faq_open'
+  FAQ_OPEN: 'faq_open',
+  PAYMENT_OPEN: 'payment_open',
+  PAYMENT_SUCCESS: 'payment_success',
+  REFERRAL_COPY: 'referral_copy',
+  PROFILE_TAB: 'profile_tab'
 };

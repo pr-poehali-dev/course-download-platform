@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterForm from '@/components/auth/RegisterForm';
 import PasswordResetFlow from '@/components/auth/PasswordResetFlow';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface AuthDialogProps {
   open: boolean;
@@ -15,6 +16,14 @@ interface AuthDialogProps {
 
 export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: AuthDialogProps) {
   const [isResetMode, setIsResetMode] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      trackEvent(metrikaEvents.AUTH_OPEN);
+    } else {
+      trackEvent(metrikaEvents.AUTH_CLOSE);
+    }
+  }, [open]);
 
   const handleForgotPassword = () => {
     setIsResetMode(true);

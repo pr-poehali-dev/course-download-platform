@@ -3,6 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface CatalogFiltersProps {
   searchQuery: string;
@@ -49,7 +50,10 @@ export default function CatalogFilters({
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={onResetFilters}
+            onClick={() => {
+              onResetFilters();
+              trackEvent(metrikaEvents.CATALOG_FILTER, { type: 'reset' });
+            }}
             className="text-blue-600 hover:text-blue-700"
           >
             <Icon name="X" size={16} className="mr-1" />
@@ -65,7 +69,12 @@ export default function CatalogFilters({
             type="text"
             placeholder="Поиск по названию, предмету..."
             value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={(e) => {
+              onSearchChange(e.target.value);
+              if (e.target.value.length > 2) {
+                trackEvent(metrikaEvents.CATALOG_SEARCH, { query: e.target.value });
+              }
+            }}
             className="pl-10"
           />
         </div>
@@ -76,7 +85,10 @@ export default function CatalogFilters({
               <Icon name="BookOpen" size={14} className="inline mr-1" />
               Предметная область
             </label>
-            <Select value={filterSubject} onValueChange={onFilterSubjectChange}>
+            <Select value={filterSubject} onValueChange={(value) => {
+              onFilterSubjectChange(value);
+              trackEvent(metrikaEvents.CATALOG_FILTER, { type: 'subject', value });
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Все предметы" />
               </SelectTrigger>
@@ -96,7 +108,10 @@ export default function CatalogFilters({
               <Icon name="Coins" size={14} className="inline mr-1" />
               Баллы
             </label>
-            <Select value={priceRange} onValueChange={onPriceRangeChange}>
+            <Select value={priceRange} onValueChange={(value) => {
+              onPriceRangeChange(value);
+              trackEvent(metrikaEvents.CATALOG_FILTER, { type: 'price', value });
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="Любые баллы" />
               </SelectTrigger>
@@ -115,7 +130,10 @@ export default function CatalogFilters({
               <Icon name="ArrowUpDown" size={14} className="inline mr-1" />
               Сортировка
             </label>
-            <Select value={sortBy} onValueChange={onSortByChange}>
+            <Select value={sortBy} onValueChange={(value) => {
+              onSortByChange(value);
+              trackEvent(metrikaEvents.CATALOG_FILTER, { type: 'sort', value });
+            }}>
               <SelectTrigger>
                 <SelectValue placeholder="По умолчанию" />
               </SelectTrigger>

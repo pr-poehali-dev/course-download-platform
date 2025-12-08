@@ -6,6 +6,7 @@ import PreviewCarousel from '@/components/PreviewCarousel';
 import { getFakeAuthor, getViewCount, incrementViewCount } from '@/utils/fakeAuthors';
 import { getRemainingCopies, shouldShowUrgency, pointsToRubles, formatPrice, getCurrentViewers, getLastPurchaseTime } from '@/utils/urgencyTriggers';
 import LastPurchaseBadge from '@/components/LastPurchaseBadge';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface Work {
   id: string;
@@ -63,6 +64,12 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
   }, [work.id]);
 
   const handleBuyClick = () => {
+    trackEvent(metrikaEvents.WORK_BUY_CLICK, { 
+      work_id: work.id, 
+      work_title: work.title,
+      work_type: work.workType,
+      price: finalPrice 
+    });
     window.location.href = `/work/${work.id}`;
   };
 
@@ -130,7 +137,15 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
         )}
         
         <button
-          onClick={() => onQuickView(work)}
+          onClick={() => {
+            onQuickView(work);
+            trackEvent(metrikaEvents.WORK_QUICKVIEW, { 
+              work_id: work.id, 
+              work_title: work.title, 
+              work_type: work.workType,
+              price: work.price 
+            });
+          }}
           className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
         >
           <div className="text-white text-center">

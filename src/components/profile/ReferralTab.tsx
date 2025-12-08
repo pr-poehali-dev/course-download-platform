@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface ReferralTabProps {
   onOpenReferral: () => void;
@@ -23,7 +24,10 @@ export default function ReferralTab({ onOpenReferral }: ReferralTabProps) {
             <p className="text-muted-foreground mb-6">
               Получайте баллы за каждого приглашённого пользователя
             </p>
-            <Button onClick={onOpenReferral}>
+            <Button onClick={() => {
+              trackEvent(metrikaEvents.REFERRAL_COPY);
+              onOpenReferral();
+            }}>
               <Icon name="Share2" size={16} className="mr-2" />
               Открыть реферальную ссылку
             </Button>

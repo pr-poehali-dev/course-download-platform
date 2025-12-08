@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import { authService } from '@/lib/auth';
 import funcUrls from '../../backend/func2url.json';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 export default function PaymentSuccessPage() {
   const [searchParams] = useSearchParams();
@@ -19,6 +20,8 @@ export default function PaymentSuccessPage() {
   const [isLoadingBalance, setIsLoadingBalance] = useState(true);
   
   useEffect(() => {
+    trackEvent(metrikaEvents.PAYMENT_SUCCESS);
+    
     const workId = localStorage.getItem('pendingWorkPurchase');
     setPendingWorkId(workId);
     

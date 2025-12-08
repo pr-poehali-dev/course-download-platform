@@ -65,7 +65,7 @@ export default function ReviewsSection({ workId, isPurchased: initialIsPurchased
       const response = await fetch(`${func2url['user-data']}?user_id=${currentUserId}&action=purchases`);
       const data = await response.json();
       if (data.purchases) {
-        const purchased = data.purchases.some((p: any) => String(p.work_id) === String(workId));
+        const purchased = data.purchases.some((p: any) => String(p.id) === String(workId));
         setIsPurchased(purchased);
         return purchased;
       }

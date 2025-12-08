@@ -18,12 +18,12 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
         </div>
         
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight hero-title">
-          Готовые работы для студентов
+          Инженерная платформа
           <br />
-          <span className="text-primary">от 200₽ за 3 минуты</span>
+          <span className="text-primary">технических знаний</span>
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-          500+ курсовых, дипломов и отчётов с чертежами DWG, 3D-моделями и расчётами. Скачивайте мгновенно после оплаты.
+          Чертежи DWG/DXF, 3D-модели, технические расчёты и проектная документация. Обменивайтесь опытом и развивайте навыки.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -32,8 +32,8 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
             className="px-8 py-6 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25"
             onClick={onCatalogClick}
           >
-            <Icon name="Download" size={20} className="mr-2" />
-            Выбрать работу
+            <Icon name="Search" size={20} className="mr-2" />
+            Найти материалы
           </Button>
           <Button 
             size="lg" 
@@ -51,15 +51,15 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-16">
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
             <div className="text-5xl font-bold text-primary mb-2">500+</div>
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Готовых работ</div>
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Инженерных материалов</div>
           </div>
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
-            <div className="text-5xl font-bold text-primary mb-2">от 200₽</div>
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Минимальная цена</div>
+            <div className="text-5xl font-bold text-primary mb-2">150+</div>
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Скачиваний</div>
           </div>
           <div className="cyber-card rounded-xl p-6 text-center hover:scale-105 transition-transform">
-            <div className="text-5xl font-bold text-primary mb-2">3 мин</div>
-            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">До скачивания</div>
+            <div className="text-5xl font-bold text-primary mb-2">24/7</div>
+            <div className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Поддержка</div>
           </div>
         </div>
       </div>

@@ -48,11 +48,14 @@ import PopularCategoriesLinks from '@/components/home/PopularCategoriesLinks';
 import CategoryLinksSection from '@/components/seo/CategoryLinksSection';
 import PopularSearches from '@/components/seo/PopularSearches';
 import BlogSection from '@/components/home/BlogSection';
+import { useScrollTracking } from '@/hooks/useScrollTracking';
 
 
 
 
 export default function Index() {
+  useScrollTracking();
+  
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const isLoggedIn = !!currentUser;
   const username = currentUser?.username || '';

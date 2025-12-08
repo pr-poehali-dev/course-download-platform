@@ -5,11 +5,26 @@ import { seoArticles } from '@/data/seoArticles';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Icon from '@/components/ui/icon';
+import { useEffect } from 'react';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
+import { useScrollTracking } from '@/hooks/useScrollTracking';
 
 export default function BlogPost() {
+  useScrollTracking();
+  
   const { slug } = useParams<{ slug: string }>();
   
   const article = seoArticles.find(a => a.slug === slug);
+  
+  useEffect(() => {
+    if (article) {
+      trackEvent(metrikaEvents.BLOG_ARTICLE_VIEW, { 
+        slug: article.slug, 
+        title: article.title,
+        category: article.category 
+      });
+    }
+  }, [article]);
   
   if (!article) {
     return <Navigate to="/" replace />;

@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface SEOHeroSectionProps {
   onCatalogClick: () => void;
@@ -30,7 +31,10 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
           <Button 
             size="lg" 
             className="px-8 py-6 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/25"
-            onClick={onCatalogClick}
+            onClick={() => {
+              trackEvent(metrikaEvents.CTA_CLICK, { button: 'hero_catalog' });
+              onCatalogClick();
+            }}
           >
             <Icon name="Search" size={20} className="mr-2" />
             Найти материалы
@@ -41,7 +45,10 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
             className="px-8 py-6 text-lg font-semibold border-2 hover:bg-muted/50"
             asChild
           >
-            <a href="#about">
+            <a 
+              href="#about"
+              onClick={() => trackEvent(metrikaEvents.CTA_CLICK, { button: 'hero_about' })}
+            >
               <Icon name="Info" size={20} className="mr-2" />
               О платформе
             </a>

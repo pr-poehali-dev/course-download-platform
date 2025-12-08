@@ -20,6 +20,8 @@ import { Helmet } from 'react-helmet-async';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
 import { getUserDiscount } from '@/utils/discount';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
+import { useScrollTracking } from '@/hooks/useScrollTracking';
 
 interface Work {
   id: string;
@@ -54,6 +56,8 @@ interface Category {
 }
 
 export default function CatalogPage() {
+  useScrollTracking();
+  
   const [works, setWorks] = useState<Work[]>([]);
   const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
@@ -71,6 +75,9 @@ export default function CatalogPage() {
   const [userBalance, setUserBalance] = useState(0);
   const userDiscount = getUserDiscount(userBalance);
 
+  useEffect(() => {
+    trackEvent(metrikaEvents.CATALOG_OPEN);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {

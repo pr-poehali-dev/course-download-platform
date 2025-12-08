@@ -6,9 +6,18 @@ import Footer from '@/components/Footer';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
+import { useEffect } from 'react';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
+import { useScrollTracking } from '@/hooks/useScrollTracking';
 
 export default function BlogListPage() {
+  useScrollTracking();
+  
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    trackEvent(metrikaEvents.BLOG_LIST_VIEW);
+  }, []);
   
   const sortedArticles = seoArticles
     .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());

@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { seoArticles } from '@/data/seoArticles';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 export default function BlogSection() {
   const latestArticles = seoArticles.slice(0, 3);
@@ -82,6 +83,7 @@ export default function BlogSection() {
           <Link
             to="/blog"
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-semibold shadow-lg"
+            onClick={() => trackEvent(metrikaEvents.CTA_CLICK, { button: 'blog_all_articles' })}
           >
             <Icon name="BookOpen" size={20} />
             Все статьи блога

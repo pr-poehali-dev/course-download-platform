@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { Helmet } from 'react-helmet-async';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface FAQItem {
   question: string;
@@ -59,7 +60,12 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFAQ = (index: number) => {
+    const isOpening = openIndex !== index;
     setOpenIndex(openIndex === index ? null : index);
+    
+    if (isOpening) {
+      trackEvent(metrikaEvents.FAQ_OPEN, { question: faqData[index].question });
+    }
   };
 
   const faqSchema = {

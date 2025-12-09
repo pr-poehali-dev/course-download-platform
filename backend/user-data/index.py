@@ -5,9 +5,9 @@ from typing import Dict, Any
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: Get user's favorites, purchases, referral stats
+    Business: Get user's favorites, purchases, referral stats, admin users management
     Args: event with httpMethod, queryStringParameters {user_id, action}
-    Returns: User data (favorites, purchases, referrals)
+    Returns: User data (favorites, purchases, referrals) or all users for admin
     '''
     method: str = event.get('httpMethod', 'GET')
     
@@ -16,8 +16,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'statusCode': 200,
             'headers': {
                 'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id',
+                'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+                'Access-Control-Allow-Headers': 'Content-Type, X-User-Id, X-Admin-Email',
                 'Access-Control-Max-Age': '86400'
             },
             'body': ''
@@ -27,6 +27,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
     }
+    
+    # Проверка админ-доступа
+    admin_email = event.get('headers', {}).get('X-Admin-Email') or event.get('headers', {}).get('x-admin-email')
+    is_admin = (admin_email == 'rekrutiw@yandex.ru')
+    
+    # Админ может запросить список всех пользователей
+    if method == 'GET' and is_admin:
+        params = event.get('queryStringParameters', {}) or {}
+        if params.get('action') == 'all_users':
+            return get_all_users(headers)
+    
+    # Админ может обновлять баланс
+    if method == 'PUT' and is_admin:
+        return update_user_balance(event, headers)
     
     dsn = os.environ.get('DATABASE_URL')
     conn = psycopg2.connect(dsn)
@@ -185,6 +199,114 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps(result)
         }
         
+    finally:
+        cur.close()
+        conn.close()
+
+def get_all_users(headers: Dict[str, str]) -> Dict[str, Any]:
+    '''Получить список всех пользователей для админа'''
+    dsn = os.environ.get('DATABASE_URL')
+    conn = psycopg2.connect(dsn)
+    cur = conn.cursor()
+    
+    try:
+        cur.execute("""
+            SELECT 
+                u.id,
+                u.username,
+                u.email,
+                u.balance,
+                u.created_at,
+                u.registration_ip,
+                u.referral_code,
+                u.referred_by,
+                COUNT(DISTINCT w.id) as total_uploads,
+                COUNT(DISTINCT p.id) as total_purchases,
+                COALESCE(SUM(CASE WHEN p2.work_id IN (SELECT id FROM t_p63326274_course_download_plat.works WHERE author_id = u.id) THEN p2.price_paid ELSE 0 END), 0) as total_earned
+            FROM t_p63326274_course_download_plat.users u
+            LEFT JOIN t_p63326274_course_download_plat.works w ON w.author_id = u.id
+            LEFT JOIN t_p63326274_course_download_plat.purchases p ON p.buyer_id = u.id
+            LEFT JOIN t_p63326274_course_download_plat.purchases p2 ON p2.work_id IN (SELECT id FROM t_p63326274_course_download_plat.works WHERE author_id = u.id)
+            WHERE u.id < 1000000
+            GROUP BY u.id, u.username, u.email, u.balance, u.created_at, u.registration_ip, u.referral_code, u.referred_by
+            ORDER BY u.created_at DESC
+        """)
+        
+        users = []
+        for row in cur.fetchall():
+            users.append({
+                'id': row[0],
+                'name': row[1],
+                'email': row[2],
+                'balance': row[3],
+                'registrationDate': row[4].isoformat() if row[4] else None,
+                'registrationIp': row[5],
+                'referralCode': row[6],
+                'referredBy': row[7],
+                'totalUploads': row[8],
+                'totalPurchases': row[9],
+                'totalEarned': int(row[10]),
+                'status': 'active',
+                'lastActivity': row[4].isoformat() if row[4] else None
+            })
+        
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps({'users': users})
+        }
+    finally:
+        cur.close()
+        conn.close()
+
+def update_user_balance(event: Dict[str, Any], headers: Dict[str, str]) -> Dict[str, Any]:
+    '''Обновить баланс пользователя (только для админа)'''
+    body_data = json.loads(event.get('body', '{}'))
+    user_id = body_data.get('user_id')
+    amount = body_data.get('amount', 0)
+    
+    if not user_id:
+        return {
+            'statusCode': 400,
+            'headers': headers,
+            'body': json.dumps({'error': 'user_id required'})
+        }
+    
+    dsn = os.environ.get('DATABASE_URL')
+    conn = psycopg2.connect(dsn)
+    conn.autocommit = False
+    cur = conn.cursor()
+    
+    try:
+        # Обновляем баланс
+        cur.execute(
+            "UPDATE t_p63326274_course_download_plat.users SET balance = balance + %s WHERE id = %s",
+            (amount, user_id)
+        )
+        
+        # Добавляем транзакцию
+        description = f'Корректировка баланса администратором ({amount:+d} баллов)'
+        cur.execute(
+            """INSERT INTO t_p63326274_course_download_plat.transactions 
+            (user_id, type, amount, description) 
+            VALUES (%s, %s, %s, %s)""",
+            (user_id, 'admin_adjustment', abs(amount), description)
+        )
+        
+        conn.commit()
+        
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps({'success': True, 'message': 'Баланс обновлен'})
+        }
+    except Exception as e:
+        conn.rollback()
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({'error': str(e)})
+        }
     finally:
         cur.close()
         conn.close()

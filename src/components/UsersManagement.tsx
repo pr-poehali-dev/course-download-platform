@@ -50,13 +50,30 @@ export default function UsersManagement() {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      toast({
-        title: 'Функция в разработке',
-        description: 'Управление пользователями будет доступно в следующей версии'
+      const response = await fetch(`${func2url['user-data']}?action=all_users`, {
+        headers: {
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        }
       });
-      setUsers([]);
-    } catch (error) {
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setUsers(data.users || []);
+      
+      toast({
+        title: 'Пользователи загружены',
+        description: `Найдено ${data.users?.length || 0} пользователей`
+      });
+    } catch (error: any) {
       console.error('Failed to load users:', error);
+      toast({
+        title: 'Ошибка загрузки',
+        description: error.message,
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
@@ -80,16 +97,44 @@ export default function UsersManagement() {
     });
   };
 
-  const handleBalanceAdjustment = (userId: number, amount: number) => {
-    const updatedUsers = users.map(user =>
-      user.id === userId ? { ...user, balance: user.balance + amount } : user
-    );
-    setUsers(updatedUsers);
-
-    toast({
-      title: 'Баланс обновлен',
-      description: `${amount > 0 ? 'Начислено' : 'Списано'} ${Math.abs(amount)} баллов`
-    });
+  const handleBalanceAdjustment = async (userId: number, amount: number) => {
+    try {
+      const response = await fetch(func2url['user-data'], {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        },
+        body: JSON.stringify({
+          user_id: userId,
+          amount: amount
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        const updatedUsers = users.map(user =>
+          user.id === userId ? { ...user, balance: user.balance + amount } : user
+        );
+        setUsers(updatedUsers);
+        
+        toast({
+          title: 'Баланс обновлен',
+          description: `${amount > 0 ? 'Начислено' : 'Списано'} ${Math.abs(amount)} баллов`
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Ошибка',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
   };
 
   const filteredUsers = users.filter(user => {

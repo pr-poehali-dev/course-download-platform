@@ -48,6 +48,7 @@ import PopularCategoriesLinks from '@/components/home/PopularCategoriesLinks';
 import CategoryLinksSection from '@/components/seo/CategoryLinksSection';
 import PopularSearches from '@/components/seo/PopularSearches';
 import BlogSection from '@/components/home/BlogSection';
+import Footer from '@/components/Footer';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
 
 
@@ -1509,6 +1510,7 @@ export default function Index() {
         userId={currentUser?.id}
       />
 
+      <Footer />
       <CookieBanner />
     </>
   );

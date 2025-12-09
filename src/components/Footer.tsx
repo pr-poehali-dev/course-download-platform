@@ -3,11 +3,11 @@ import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 
 export default function Footer() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    const adminAuth = localStorage.getItem('admin_authenticated');
-    setIsAdmin(adminAuth === 'true');
+    const user = localStorage.getItem('user');
+    setIsLoggedIn(!!user);
   }, []);
 
   return (
@@ -41,7 +41,7 @@ export default function Footer() {
               <li><Link to="/privacy-policy" className="hover:text-primary transition-colors">Конфиденциальность</Link></li>
               <li><Link to="/terms-of-service" className="hover:text-primary transition-colors">Соглашение</Link></li>
               <li><Link to="/offer" className="hover:text-primary transition-colors">Оферта</Link></li>
-              {isAdmin && (
+              {isLoggedIn && (
                 <li><Link to="/admin" className="hover:text-primary transition-colors">Админ панель</Link></li>
               )}
             </ul>

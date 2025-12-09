@@ -1,15 +1,7 @@
 import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
 import Icon from '@/components/ui/icon';
 
 export default function Footer() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const user = localStorage.getItem('user');
-    setIsLoggedIn(!!user);
-  }, []);
-
   return (
     <footer className="bg-muted/30 border-t border-border py-16">
       <div className="container mx-auto px-4 max-w-7xl">
@@ -41,9 +33,7 @@ export default function Footer() {
               <li><Link to="/privacy-policy" className="hover:text-primary transition-colors">Конфиденциальность</Link></li>
               <li><Link to="/terms-of-service" className="hover:text-primary transition-colors">Соглашение</Link></li>
               <li><Link to="/offer" className="hover:text-primary transition-colors">Оферта</Link></li>
-              {isLoggedIn && (
-                <li><Link to="/admin" className="hover:text-primary transition-colors">Админ панель</Link></li>
-              )}
+              <li><Link to="/admin" className="hover:text-primary transition-colors">Админ панель</Link></li>
             </ul>
           </div>
 

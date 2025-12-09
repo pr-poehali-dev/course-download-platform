@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import { authService } from '@/lib/auth';
-import func2url from '../backend/func2url.json';
+import func2url from '../../backend/func2url.json';
 import ReviewForm from './reviews/ReviewForm';
 import ReviewCard from './reviews/ReviewCard';
 

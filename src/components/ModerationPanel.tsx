@@ -7,7 +7,7 @@ import ReviewsModeration from '@/components/ReviewsModeration';
 import WorkCard from '@/components/moderation/WorkCard';
 import RejectionDialog from '@/components/moderation/RejectionDialog';
 import ReviewsManagement from '@/components/moderation/ReviewsManagement';
-import func2url from '../backend/func2url.json';
+import func2url from '../../backend/func2url.json';
 
 interface UploadedWork {
   id: number;

@@ -137,6 +137,12 @@ export default function HomeHeader({
                       <Icon name="Users" size={16} className="mr-2" />
                       Реферальная программа
                     </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <a href="/admin">
+                        <Icon name="Settings" size={16} className="mr-2" />
+                        Админ-панель
+                      </a>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={onLogout} className="text-red-600">
                       <Icon name="LogOut" size={16} className="mr-2" />

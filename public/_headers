@@ -1,3 +1,72 @@
+# Главная и каталог - индексировать
+/
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
+
+/catalog
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=1800
+
+/work/*
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
+
+/blog
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
+
+/blog/*
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
+
+# Служебные страницы - индексировать с follow для передачи веса
+/privacy-policy
+  X-Robots-Tag: index, follow
+  
+/terms-of-service
+  X-Robots-Tag: index, follow
+
+/usage-rules
+  X-Robots-Tag: index, follow
+
+/offer
+  X-Robots-Tag: index, follow
+
+/requisites
+  X-Robots-Tag: index, follow
+
+# Административные страницы
+/admin/*
+  X-Robots-Tag: noindex, nofollow
+
+/login
+  X-Robots-Tag: noindex, nofollow
+
+/register
+  X-Robots-Tag: noindex, nofollow
+
+/profile
+  X-Robots-Tag: noindex, nofollow
+
+/upload
+  X-Robots-Tag: noindex, nofollow
+
+/payment
+  X-Robots-Tag: noindex, nofollow
+
+/payment/*
+  X-Robots-Tag: noindex, nofollow
+
+/buy-points
+  X-Robots-Tag: noindex, nofollow
+
+/marketplace
+  X-Robots-Tag: noindex, nofollow
+
+/defense-kit
+  X-Robots-Tag: noindex, nofollow
+
+# Служебные файлы
 /yandex_*.html
   Content-Type: text/html; charset=utf-8
   X-Robots-Tag: noindex

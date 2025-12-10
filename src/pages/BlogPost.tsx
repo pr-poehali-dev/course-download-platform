@@ -5,14 +5,17 @@ import { seoArticles } from '@/data/seoArticles';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Icon from '@/components/ui/icon';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { trackEvent, metrikaEvents } from '@/utils/metrika';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
+
+const FALLBACK_IMAGE = 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/fdbb85f7-a4f9-4892-8be2-64334820b0f3.jpg';
 
 export default function BlogPost() {
   useScrollTracking();
   
   const { slug } = useParams<{ slug: string }>();
+  const [imageError, setImageError] = useState(false);
   
   const article = seoArticles.find(a => a.slug === slug);
   
@@ -25,6 +28,10 @@ export default function BlogPost() {
       });
     }
   }, [article]);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
   
   if (!article) {
     return <Navigate to="/404" replace />;
@@ -63,11 +70,13 @@ export default function BlogPost() {
           </a>
 
           <article className="bg-card rounded-xl shadow-lg overflow-hidden">
-            <div className="relative h-64 md:h-96 overflow-hidden">
+            <div className="relative h-64 md:h-96 overflow-hidden bg-muted">
               <img 
-                src={article.coverImage} 
+                src={imageError ? FALLBACK_IMAGE : article.coverImage} 
                 alt={article.title}
                 className="w-full h-full object-cover"
+                onError={handleImageError}
+                loading="eager"
               />
               <div className="absolute top-4 left-4">
                 <span className="bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">

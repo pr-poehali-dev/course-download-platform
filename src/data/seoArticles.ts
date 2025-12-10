@@ -26,7 +26,7 @@ export const seoArticles: SEOArticle[] = [
       'скачать курсовую'
     ],
     publishedAt: '2025-11-30',
-    coverImage: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&h=600&fit=crop',
+    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/fdbb85f7-a4f9-4892-8be2-64334820b0f3.jpg',
     content: `# Как выбрать готовую курсовую работу: 7 критериев качества
 
 ## Введение
@@ -270,7 +270,7 @@ export const seoArticles: SEOArticle[] = [
       'компас чертежи'
     ],
     publishedAt: '2025-11-29',
-    coverImage: 'https://images.unsplash.com/photo-1581094271901-8022df4466f9?w=800&h=600&fit=crop',
+    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/b54afe07-211c-4527-b511-5ff13807143d.jpg',
     content: `# Инженерные чертежи для студентов: где скачать, как использовать
 
 ## Введение
@@ -641,7 +641,7 @@ export const seoArticles: SEOArticle[] = [
       'компас 3d модели'
     ],
     publishedAt: '2025-11-28',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/d096882c-ede1-4566-9cb6-5834e77d4558.jpg',
+    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/2fa688a8-6891-41f3-8e69-6cb44b5a254e.jpg',
     content: `# 3D-модели для студентов: STEP, STL, SolidWorks — полный гид
 
 ## Введение
@@ -1103,7 +1103,7 @@ export const seoArticles: SEOArticle[] = [
       'машинное обучение в CAD'
     ],
     publishedAt: '2025-12-07',
-    coverImage: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=600&fit=crop',
+    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/6a6befc0-acfa-42c7-bc01-069bc6c8d4b2.jpg',
     content: `# Искусственный интеллект в проектировании 2025: революция в инженерии
 
 ## Введение
@@ -1318,7 +1318,7 @@ export const seoArticles: SEOArticle[] = [
       'обучение BIM'
     ],
     publishedAt: '2025-12-06',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/7d4f5a3b-2e14-4f91-9c45-8a2e1f6d9c32.jpg',
+    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/d2cba890-1387-42b7-bab9-a6b3290d6f3a.jpg',
     content: `# BIM-технологии для студентов 2025: полное руководство
 
 ## Что такое BIM и почему это важно

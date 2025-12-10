@@ -208,7 +208,8 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 print(f"⚠️ Invalid referral code: {referred_by_code}")
         
         password_hash = hash_password(password)
-        security_answer_hash = hashlib.sha256(security_answer.lower().strip().encode()).hexdigest()
+        # КРИТИЧНО: security_answer уже хеширован на клиенте, не хешируем повторно
+        security_answer_hash = security_answer  # Уже SHA256 хеш с клиента
         referral_code = generate_referral_code(username)
         
         # ✅ Сохраняем referred_by при регистрации
@@ -525,9 +526,8 @@ def verify_security_answer(event: Dict[str, Any]) -> Dict[str, Any]:
         
         user_id, username, security_answer_hash = user
         
-        answer_hash = hashlib.sha256(security_answer.lower().strip().encode()).hexdigest()
-        
-        if answer_hash != security_answer_hash:
+        # КРИТИЧНО: security_answer уже хеширован на клиенте
+        if security_answer != security_answer_hash:
             cur.close()
             conn.close()
             return {

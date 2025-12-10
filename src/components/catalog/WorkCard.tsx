@@ -7,6 +7,8 @@ import { getFakeAuthor, getViewCount, incrementViewCount } from '@/utils/fakeAut
 import { getRemainingCopies, shouldShowUrgency, pointsToRubles, formatPrice, getCurrentViewers, getLastPurchaseTime } from '@/utils/urgencyTriggers';
 import LastPurchaseBadge from '@/components/LastPurchaseBadge';
 import { trackEvent, metrikaEvents } from '@/utils/metrika';
+import { getUserDiscount } from '@/utils/discount';
+import { authService } from '@/lib/auth';
 
 interface Work {
   id: string;
@@ -43,14 +45,32 @@ interface WorkCardProps {
 export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite, onPreview, isAdmin = false }: WorkCardProps) {
   const [imageError, setImageError] = useState(false);
   const [viewCount, setViewCount] = useState(0);
+  const [userDiscount, setUserDiscount] = useState(0);
   const coverImages = work.cover_images && work.cover_images.length > 0 ? work.cover_images : work.previewUrls;
   const hasPreview = coverImages && coverImages.length > 0 && !imageError;
   
-  const finalPrice = work.discount 
-    ? work.price * (1 - work.discount / 100) 
-    : work.price;
+  // Рассчитываем финальную скидку: скидка работы + персональная скидка пользователя
+  const workDiscount = work.discount || 0;
+  const totalDiscount = workDiscount + userDiscount - (workDiscount * userDiscount / 100);
+  
+  const finalPrice = work.price * (1 - totalDiscount / 100);
 
   const author = getFakeAuthor(work.id);
+  
+  useEffect(() => {
+    const loadUserDiscount = async () => {
+      try {
+        const user = await authService.verify();
+        if (user) {
+          const discount = getUserDiscount(user.balance || 0);
+          setUserDiscount(discount);
+        }
+      } catch {
+        setUserDiscount(0);
+      }
+    };
+    loadUserDiscount();
+  }, []);
   
   // Триггеры срочности для повышения конверсии
   const showUrgency = shouldShowUrgency(work.id, work.rating);
@@ -75,9 +95,9 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
 
   return (
     <div className="group relative bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-2xl hover:border-blue-300 transition-all duration-300">
-      {work.discount && (
+      {totalDiscount > 0 && (
         <div className="absolute top-3 left-3 z-10 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-          −{work.discount}%
+          −{Math.round(totalDiscount)}%
         </div>
       )}
       
@@ -246,7 +266,7 @@ export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorit
 
         <div className="flex items-center justify-between pt-3 border-t">
           <div>
-            {work.discount ? (
+            {totalDiscount > 0 ? (
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400 line-through">{formatPrice(pointsToRubles(work.price))}₽</span>
                 <span className="text-2xl font-bold text-green-600">{formatPrice(priceInRubles)}₽</span>

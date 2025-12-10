@@ -10,6 +10,7 @@ import Icon from '@/components/ui/icon';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
 import { optimizeAndEncodeImage, validateImage } from '@/utils/imageOptimization';
+import { validateFile, sanitizeFilename, validateFileMagicBytes } from '@/utils/fileValidation';
 import {
   Select,
   SelectContent,
@@ -42,17 +43,31 @@ export default function UploadWorkPage() {
     { value: 'other', label: 'Другое', price: 600 }
   ];
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      if (file.size > 50 * 1024 * 1024) {
+      const validation = validateFile(file);
+      if (!validation.valid) {
         toast({
           title: 'Ошибка',
-          description: 'Файл слишком большой. Максимальный размер 50 МБ',
+          description: validation.error,
           variant: 'destructive'
         });
+        e.target.value = '';
         return;
       }
+
+      const magicBytesValid = await validateFileMagicBytes(file);
+      if (!magicBytesValid) {
+        toast({
+          title: 'Ошибка',
+          description: 'Файл поврежден или имеет неверный формат',
+          variant: 'destructive'
+        });
+        e.target.value = '';
+        return;
+      }
+
       setFormData({ ...formData, file });
     }
   };
@@ -102,6 +117,7 @@ export default function UploadWorkPage() {
       }
 
       const uploadUrl = func2url['upload-work'];
+      const safeFileName = sanitizeFilename(formData.file?.name || 'work.docx');
       
       const response = await fetch(uploadUrl, {
         method: 'POST',
@@ -115,7 +131,7 @@ export default function UploadWorkPage() {
           category: formData.category,
           price: parseInt(formData.price),
           authorId: user.id,
-          fileName: formData.file?.name || 'work.docx',
+          fileName: safeFileName,
           file: fileBase64
         })
       });

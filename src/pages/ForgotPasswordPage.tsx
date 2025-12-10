@@ -9,6 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
 import SEO from '@/components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { hashSecurityAnswer } from '@/utils/securityUtils';
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate();
@@ -79,12 +80,14 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
+      const hashedAnswer = await hashSecurityAnswer(securityAnswer);
+      
       const response = await fetch(`${func2url.auth}?action=verify-security-answer`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          security_answer: securityAnswer,
+          security_answer: hashedAnswer,
           new_password: newPassword
         })
       });

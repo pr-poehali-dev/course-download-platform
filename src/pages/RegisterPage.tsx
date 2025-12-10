@@ -9,6 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
 import SEO from '@/components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { hashSecurityAnswer } from '@/utils/securityUtils';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -84,6 +85,8 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      const hashedAnswer = await hashSecurityAnswer(formData.security_answer);
+      
       const response = await fetch(`${func2url.auth}?action=register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,7 +95,7 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
           security_question: formData.security_question,
-          security_answer: formData.security_answer,
+          security_answer: hashedAnswer,
           referral_code: referralCode  // ✅ Передаем реферальный код
         })
       });

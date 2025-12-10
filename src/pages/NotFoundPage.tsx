@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Helmet } from "react-helmet-async";
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import Icon from "@/components/ui/icon";
 
@@ -23,7 +23,7 @@ const NotFoundPage = () => {
       </Helmet>
       
       <div className="min-h-screen flex flex-col bg-background">
-        <Navbar />
+        <Navigation isLoggedIn={false} />
         
         <main className="flex-grow flex items-center justify-center px-4 py-16">
           <div className="text-center max-w-2xl">

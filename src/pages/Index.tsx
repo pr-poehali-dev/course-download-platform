@@ -1386,66 +1386,6 @@ export default function Index() {
         <PopularSearches />
         
         <SEOContentSection />
-
-        <footer className="bg-muted/50 border-t border-border py-16">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center shadow-md">
-                      <Icon name="Ruler" size={20} className="text-white" />
-                    </div>
-                    <h3 className="font-bold text-xl text-foreground">TechForma</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Инженерная платформа для студентов и специалистов
-                  </p>
-                </div>
-
-                <div>
-                  <h4 className="font-bold mb-4 text-foreground text-sm">Информация</h4>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li><a href="#about" className="hover:text-primary transition-colors">О платформе</a></li>
-                    <li><a href="#categories" className="hover:text-primary transition-colors">Категории</a></li>
-                    <li><a href="/catalog" className="hover:text-primary transition-colors">Каталог</a></li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-bold mb-4 text-foreground text-sm">Документы</h4>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li><a href="/privacy-policy" className="hover:text-primary transition-colors">Конфиденциальность</a></li>
-                    <li><a href="/terms-of-service" className="hover:text-primary transition-colors">Соглашение</a></li>
-                    <li><a href="/offer" className="hover:text-primary transition-colors">Оферта</a></li>
-                  </ul>
-                </div>
-
-                <div>
-                  <h4 className="font-bold mb-4 text-foreground text-sm">Контакты</h4>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-2">
-                      <Icon name="Mail" size={16} className="text-primary" />
-                      <a href="mailto:tech.forma@yandex.ru" className="hover:text-primary transition-colors">tech.forma@yandex.ru</a>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14c5.6 0 6.93-1.33 6.93-6.93V8.93C22 3.33 20.67 2 15.07 2zm1.46 13.31c-.76 1.17-2.07 1.94-3.53 1.94-1.46 0-2.77-.77-3.53-1.94-.37-.57-.37-1.31 0-1.88.76-1.17 2.07-1.94 3.53-1.94s2.77.77 3.53 1.94c.37.57.37 1.31 0 1.88z"/>
-                      </svg>
-                      <a href="https://vk.com/club234274626" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Группа ВКонтакте</a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="border-t border-border pt-8">
-                <p className="text-center text-sm text-muted-foreground">
-                  © 2025 TechForma. Все материалы предоставляются только для изучения.
-                </p>
-              </div>
-            </div>
-          </div>
-        </footer>
       </div>
 
       <AuthDialog 

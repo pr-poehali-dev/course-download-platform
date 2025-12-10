@@ -12,6 +12,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import SEO from '@/components/SEO';
 import { authService, User } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
+import Footer from '@/components/Footer';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -745,14 +746,8 @@ export default function MentorPage() {
           )}
         </div>
 
-        {/* Footer */}
-        <footer className="border-t mt-12 py-8 bg-muted/30">
-          <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-            <p>TechMentor — часть платформы TechForma</p>
-            <p className="mt-2">Помогаем учиться эффективно, а не делаем работу за вас</p>
-          </div>
-        </footer>
       </div>
+      <Footer />
     </>
   );
 }

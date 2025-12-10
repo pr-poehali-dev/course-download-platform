@@ -70,7 +70,9 @@ export default function PopularSearches() {
         { text: 'контрольная работа ТММ', url: '/catalog?search=тмм' },
         { text: 'лабораторные работы', url: '/catalog?search=лабораторные' },
         { text: 'практические задания', url: '/catalog?search=практические' },
-        { text: 'курсовик с чертежами', url: '/catalog?search=чертежи' }
+        { text: 'курсовик с чертежами', url: '/catalog?search=чертежи' },
+        { text: 'готовые проекты студентам', url: '/catalog?search=проекты' },
+        { text: 'технические чертежи скачать', url: '/catalog?search=технические+чертежи' }
       ]
     }
   ];

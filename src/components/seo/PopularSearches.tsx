@@ -13,7 +13,9 @@ export default function PopularSearches() {
         { text: 'чертежи AutoCAD бесплатно', url: '/catalog?search=autocad' },
         { text: 'файлы DXF скачать', url: '/catalog?search=dxf' },
         { text: 'чертежи CDW КОМПАС', url: '/catalog?search=cdw' },
-        { text: 'модели IGS скачать', url: '/catalog?search=igs' }
+        { text: 'модели IGS скачать', url: '/catalog?search=igs' },
+        { text: 'модели PARASOLID X_T', url: '/catalog?search=parasolid' },
+        { text: 'чертежи DWF формат', url: '/catalog?search=dwf' }
       ]
     },
     {
@@ -26,7 +28,9 @@ export default function PopularSearches() {
         { text: 'расчёт электрических нагрузок', url: '/catalog?search=электрические+нагрузки' },
         { text: 'расчёт освещения', url: '/catalog?search=освещение' },
         { text: 'прочностной анализ', url: '/catalog?search=прочностной+анализ' },
-        { text: 'расчёт на изгиб', url: '/catalog?search=изгиб' }
+        { text: 'расчёт на изгиб', url: '/catalog?search=изгиб' },
+        { text: 'расчёт вала на кручение', url: '/catalog?search=вал+кручение' },
+        { text: 'расчёт редуктора', url: '/catalog?search=редуктор' }
       ]
     },
     {
@@ -38,7 +42,9 @@ export default function PopularSearches() {
         { text: 'КОМПАС чертежи', url: '/catalog?search=компас' },
         { text: 'CATIA модели', url: '/catalog?search=catia' },
         { text: 'Revit проекты', url: '/catalog?search=revit' },
-        { text: 'NX Siemens', url: '/catalog?search=nx+siemens' }
+        { text: 'NX Siemens', url: '/catalog?search=nx+siemens' },
+        { text: 'Creo Parametric', url: '/catalog?search=creo' },
+        { text: 'Fusion 360 проекты', url: '/catalog?search=fusion360' }
       ]
     },
     {
@@ -50,7 +56,9 @@ export default function PopularSearches() {
         { text: 'РГР по сопромату', url: '/catalog?search=сопромат' },
         { text: 'курсовая электропривод', url: '/catalog?search=электропривод' },
         { text: 'готовая курсовая работа', url: '/catalog?search=курсовая' },
-        { text: 'диплом энергетика', url: '/catalog?search=энергетика' }
+        { text: 'диплом энергетика', url: '/catalog?search=энергетика' },
+        { text: 'курсовая теплотехника', url: '/catalog?search=теплотехника' },
+        { text: 'дипломная работа ТММ', url: '/catalog?search=диплом+тмм' }
       ]
     },
     {
@@ -62,7 +70,9 @@ export default function PopularSearches() {
         { text: 'строительство проекты', url: '/catalog?search=строительство' },
         { text: 'автоматизация производства', url: '/catalog?search=автоматизация' },
         { text: 'нефтегаз проекты', url: '/catalog?search=нефтегаз' },
-        { text: 'металлургия расчёты', url: '/catalog?search=металлургия' }
+        { text: 'металлургия расчёты', url: '/catalog?search=металлургия' },
+        { text: 'приборостроение проекты', url: '/catalog?search=приборостроение' },
+        { text: 'робототехника расчёты', url: '/catalog?search=робототехника' }
       ]
     },
     {
@@ -77,7 +87,8 @@ export default function PopularSearches() {
         { text: 'готовые проекты студентам', url: '/catalog?search=проекты' },
         { text: 'технические чертежи скачать', url: '/catalog?search=технические+чертежи' },
         { text: 'чертежи деталей машин', url: '/catalog?search=детали+машин' },
-        { text: 'готовые расчёты бесплатно', url: '/catalog?search=готовые+расчёты' }
+        { text: 'готовые расчёты бесплатно', url: '/catalog?search=готовые+расчёты' },
+        { text: 'сборочные чертежи скачать', url: '/catalog?search=сборочные+чертежи' }
       ]
     }
   ];

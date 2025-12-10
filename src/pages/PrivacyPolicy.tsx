@@ -3,7 +3,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { Link } from 'react-router-dom';
-import Footer from '@/components/Footer';
 
 export default function PrivacyPolicy() {
   return (
@@ -334,7 +333,6 @@ export default function PrivacyPolicy() {
           </Card>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

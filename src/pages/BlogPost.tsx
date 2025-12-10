@@ -27,7 +27,7 @@ export default function BlogPost() {
   }, [article]);
   
   if (!article) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/404" replace />;
   }
 
   const formattedDate = new Date(article.publishedAt).toLocaleDateString('ru-RU', {

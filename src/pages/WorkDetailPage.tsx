@@ -324,7 +324,12 @@ export default function WorkDetailPage() {
   useEffect(() => {
     const fetchWork = async () => {
       if (!actualWorkId) {
-        navigate('/catalog');
+        toast({
+          title: 'Ошибка',
+          description: 'ID работы не указан',
+          variant: 'destructive'
+        });
+        navigate('/404');
         return;
       }
 
@@ -332,6 +337,20 @@ export default function WorkDetailPage() {
         const response = await fetch(
           `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?id=${actualWorkId}`
         );
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            toast({
+              title: 'Работа не найдена',
+              description: `Работа #${actualWorkId} не существует или была удалена`,
+              variant: 'destructive'
+            });
+            navigate('/404');
+            return;
+          }
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
         const data = await response.json();
 
         if (data && data.id) {
@@ -415,11 +434,21 @@ export default function WorkDetailPage() {
           
           setLoading(false);
         } else {
-          navigate('/catalog');
+          toast({
+            title: 'Работа не найдена',
+            description: `Работа #${actualWorkId} отсутствует в базе данных`,
+            variant: 'destructive'
+          });
+          navigate('/404');
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching work:', error);
-        navigate('/catalog');
+        toast({
+          title: 'Ошибка загрузки',
+          description: error.message || 'Не удалось загрузить информацию о работе',
+          variant: 'destructive'
+        });
+        navigate('/404');
       } finally {
         setLoading(false);
       }

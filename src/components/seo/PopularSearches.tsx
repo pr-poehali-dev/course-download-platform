@@ -12,7 +12,8 @@ export default function PopularSearches() {
         { text: 'проекты KOMPAS-3D', url: '/catalog?search=kompas' },
         { text: 'чертежи AutoCAD бесплатно', url: '/catalog?search=autocad' },
         { text: 'файлы DXF скачать', url: '/catalog?search=dxf' },
-        { text: 'чертежи CDW КОМПАС', url: '/catalog?search=cdw' }
+        { text: 'чертежи CDW КОМПАС', url: '/catalog?search=cdw' },
+        { text: 'модели IGS скачать', url: '/catalog?search=igs' }
       ]
     },
     {
@@ -24,7 +25,8 @@ export default function PopularSearches() {
         { text: 'расчёт деформаций', url: '/catalog?search=деформация' },
         { text: 'расчёт электрических нагрузок', url: '/catalog?search=электрические+нагрузки' },
         { text: 'расчёт освещения', url: '/catalog?search=освещение' },
-        { text: 'прочностной анализ', url: '/catalog?search=прочностной+анализ' }
+        { text: 'прочностной анализ', url: '/catalog?search=прочностной+анализ' },
+        { text: 'расчёт на изгиб', url: '/catalog?search=изгиб' }
       ]
     },
     {
@@ -59,7 +61,8 @@ export default function PopularSearches() {
         { text: 'машиностроение чертежи', url: '/catalog?search=машиностроение' },
         { text: 'строительство проекты', url: '/catalog?search=строительство' },
         { text: 'автоматизация производства', url: '/catalog?search=автоматизация' },
-        { text: 'нефтегаз проекты', url: '/catalog?search=нефтегаз' }
+        { text: 'нефтегаз проекты', url: '/catalog?search=нефтегаз' },
+        { text: 'металлургия расчёты', url: '/catalog?search=металлургия' }
       ]
     },
     {
@@ -72,7 +75,9 @@ export default function PopularSearches() {
         { text: 'практические задания', url: '/catalog?search=практические' },
         { text: 'курсовик с чертежами', url: '/catalog?search=чертежи' },
         { text: 'готовые проекты студентам', url: '/catalog?search=проекты' },
-        { text: 'технические чертежи скачать', url: '/catalog?search=технические+чертежи' }
+        { text: 'технические чертежи скачать', url: '/catalog?search=технические+чертежи' },
+        { text: 'чертежи деталей машин', url: '/catalog?search=детали+машин' },
+        { text: 'готовые расчёты бесплатно', url: '/catalog?search=готовые+расчёты' }
       ]
     }
   ];

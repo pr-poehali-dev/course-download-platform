@@ -59,24 +59,6 @@ export const authService = {
   },
 
   async verify(): Promise<User | null> {
-    // Сначала проверяем, есть ли админ в localStorage
-    const isAdminAuthenticated = localStorage.getItem('admin_authenticated') === 'true';
-    if (isAdminAuthenticated) {
-      const adminUser = localStorage.getItem('user');
-      if (adminUser) {
-        try {
-          const user = JSON.parse(adminUser);
-          if (user.role === 'admin') {
-            return user;
-          }
-        } catch (e) {
-          // Игнорируем ошибку парсинга
-        }
-      }
-    }
-
-    // Если не админ, проверяем обычный токен
-    // Проверяем сначала localStorage (если "Запомнить меня"), затем sessionStorage
     const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
 
     if (!token) {
@@ -94,15 +76,13 @@ export const authService = {
       const data = await response.json();
 
       if (!response.ok) {
-        localStorage.removeItem(TOKEN_KEY);
-        sessionStorage.removeItem(TOKEN_KEY);
+        this.logout();
         return null;
       }
 
       return data.user;
     } catch (error) {
-      localStorage.removeItem(TOKEN_KEY);
-      sessionStorage.removeItem(TOKEN_KEY);
+      this.logout();
       return null;
     }
   },

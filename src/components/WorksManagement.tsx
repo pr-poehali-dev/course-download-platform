@@ -15,6 +15,7 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -39,6 +40,7 @@ interface Work {
   author?: string;
   downloads?: number;
   status?: 'active' | 'moderation' | 'blocked';
+  yandex_disk_link?: string;
 }
 
 export default function WorksManagement() {
@@ -97,7 +99,11 @@ export default function WorksManagement() {
           description: editingWork.description,
           composition: editingWork.composition,
           coverImages: editingWork.cover_images || [],
-          previewImageUrl: editingWork.preview_image_url || ''
+          previewImageUrl: editingWork.preview_image_url || '',
+          yandex_disk_link: editingWork.yandex_disk_link || '',
+          category: editingWork.category,
+          price_points: editingWork.price_points,
+          status: editingWork.status
         })
       });
 

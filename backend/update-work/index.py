@@ -43,6 +43,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     author_name = body_data.get('authorName')
     cover_images = body_data.get('coverImages')
     preview_image_url = body_data.get('previewImageUrl')
+    yandex_disk_link = body_data.get('yandex_disk_link')
+    category = body_data.get('category')
+    price_points = body_data.get('price_points')
+    status = body_data.get('status')
     
     if not work_id:
         return {
@@ -108,6 +112,24 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         else:
             escaped_preview = preview_image_url.replace("'", "''")
             updates.append(f"preview_image_url = '{escaped_preview}'")
+    
+    if yandex_disk_link is not None:
+        if yandex_disk_link == '':
+            updates.append("yandex_disk_link = NULL")
+        else:
+            escaped_link = yandex_disk_link.replace("'", "''")
+            updates.append(f"yandex_disk_link = '{escaped_link}'")
+    
+    if category is not None:
+        escaped_category = category.replace("'", "''")
+        updates.append(f"category = '{escaped_category}'")
+    
+    if price_points is not None:
+        updates.append(f"price_points = {int(price_points)}")
+    
+    if status is not None:
+        escaped_status = status.replace("'", "''")
+        updates.append(f"status = '{escaped_status}'")
     
     if not updates:
         cursor.close()

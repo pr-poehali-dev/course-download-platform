@@ -1,27 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
-import Icon from '@/components/ui/icon';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import QuickViewModal from '@/components/catalog/QuickViewModal';
 import Breadcrumbs from '@/components/Breadcrumbs';
-
 import CatalogFilters from '@/components/catalog/CatalogFilters';
-import PreviewCarousel from '@/components/PreviewCarousel';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import TrustRating from '@/components/TrustRating';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import Footer from '@/components/Footer';
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
-
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
 import { getUserDiscount } from '@/utils/discount';
 import { trackEvent, metrikaEvents } from '@/utils/metrika';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
+import CatalogHeader from '@/components/catalog/CatalogHeader';
+import CatalogLoadingState from '@/components/catalog/CatalogLoadingState';
+import CatalogWorkCard from '@/components/catalog/CatalogWorkCard';
 
 interface Work {
   id: string;
@@ -47,12 +43,6 @@ interface Work {
   views?: number;
   downloads?: number;
   reviewsCount?: number;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  slug: string;
 }
 
 export default function CatalogPage() {
@@ -191,8 +181,6 @@ export default function CatalogPage() {
     return 'Общая инженерия';
   };
 
-
-
   const determineRating = (workType: string): number => {
     const wt = workType.toLowerCase();
     
@@ -226,175 +214,121 @@ export default function CatalogPage() {
       if (hasRealCover || /газопровод|электро|система|модернизация/.test(t)) {
         return 'ПЗ, графика, чертежи';
       }
-      return 'ПЗ, графика';
+      return 'ПЗ, презентация';
     }
     if (/курсовая/.test(wt)) {
-      if (hasRealCover || /проектирование|расчет|схема/.test(t)) {
+      if (hasRealCover || /расчет|проект|модернизация/.test(t)) {
         return 'ПЗ, чертежи';
       }
-      return 'ПЗ, расчеты';
+      return 'Пояснительная записка';
     }
-    if (/отчет/.test(wt)) {
-      return 'Отчёт, дневник';
+    if (/отчет.*практ|практическая/.test(wt)) {
+      return 'Отчёт, дневник, характеристика';
+    }
+    if (/реферат/.test(wt)) {
+      return 'Реферат';
+    }
+    if (/контрольная/.test(wt)) {
+      return 'Решение задач';
     }
     
-    return hasRealCover ? 'Пояснительная записка, чертежи' : 'Пояснительная записка';
+    return 'Документация, материалы';
   };
 
-
+  const determinePrice = (workType: string): number => {
+    const wt = workType.toLowerCase();
+    
+    if (/диссертация/.test(wt)) return 400;
+    if (/дипломная|диплом/.test(wt)) return 350;
+    if (/курсовая|курсовой/.test(wt)) return 280;
+    if (/отчет.*практ/.test(wt)) return 200;
+    if (/практическая|практика/.test(wt)) return 180;
+    if (/контрольная/.test(wt)) return 150;
+    if (/реферат/.test(wt)) return 120;
+    if (/вкр/.test(wt)) return 350;
+    
+    return 250;
+  };
 
   useEffect(() => {
-    const CACHE_KEY = 'catalog_works_cache_v9';
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; 
-    
-    localStorage.removeItem('catalog_works_cache');
-    localStorage.removeItem('catalog_works_cache_v2');
-    localStorage.removeItem('catalog_works_cache_v3');
-    localStorage.removeItem('catalog_works_cache_v4');
-    localStorage.removeItem('catalog_works_cache_v5');
-    localStorage.removeItem('catalog_works_cache_v6');
-    localStorage.removeItem('catalog_works_cache_v7');
-    localStorage.removeItem('catalog_works_cache_v8');
-
-    const loadFromCache = (): Work[] | null => {
-      try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-          const { data, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < CACHE_DURATION) {
-            return data;
-          }
-        }
-      } catch (error) {
-        console.error('Cache load error:', error);
-      }
-      return null;
-    };
-
-    const saveToCache = (data: Work[]) => {
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify({
-          data,
-          timestamp: Date.now()
-        }));
-      } catch (error) {
-        console.error('Cache save error:', error);
-      }
-    };
-
-    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-    const fetchWorks = async () => {
+    const loadWorks = async () => {
       setLoading(true);
-      setLoadingProgress(20);
+      setLoadingProgress(10);
       
       try {
         const response = await fetch(func2url.works);
-        setLoadingProgress(60);
+        setLoadingProgress(40);
         
         const data = await response.json();
-        setLoadingProgress(80);
+        setLoadingProgress(60);
         
-        if (data.works && Array.isArray(data.works)) {
-          const transformedWorks: Work[] = data.works.map((work: any) => {
-            let previewUrls = [];
-            if (work.preview_urls) {
-              try {
-                previewUrls = JSON.parse(work.preview_urls);
-              } catch (e) {
-                previewUrls = [];
-              }
-            }
-            
-            const isNew = Math.random() > 0.85;
-            const discount = Math.random() > 0.75 ? [10, 15, 20, 25][Math.floor(Math.random() * 4)] : 0;
-            
-            const workInfo = extractWorkInfo(work.title);
-            const workType = work.work_type ? normalizeWorkType(work.work_type, work.title) : workInfo.workType;
-            const rating = work.rating && work.rating > 0 ? parseFloat(String(work.rating)) : determineRating(workType);
-            const finalRating = rating < 4.7 ? 4.7 : rating;
-            
-            const isHit = finalRating >= 4.8;
-            
-            const hasRealCover = work.preview_image_url && 
-              work.preview_image_url.includes('cdn.poehali.dev') && 
-              !work.preview_image_url.includes('e0139de0-3660-402a-8d29-d07f5dac95b3.jpg');
+        if (data.works) {
+          const processedWorks: Work[] = data.works.map((work: any) => {
+            const { title, workType } = extractWorkInfo(work.title || work.folder_name);
+            const hasRealCover = work.preview_image_url && !work.preview_image_url.includes('e0139de0-3660-402a-8d29-d07f5dac95b3.jpg');
             
             return {
               id: String(work.id),
-              folderName: work.title,
-              title: work.title,
+              folderName: work.folder_name || work.title,
+              title: title,
               workType: workType,
-              subject: determineSubject(work.title, work.subject),
-              description: work.preview || `Готовая работа по теме "${work.title}". Включает теоретическую часть, практические расчеты и выводы.`,
-              composition: determineComposition(workType, work.title, hasRealCover),
-              universities: extractUniversity(work.title),
-              price: work.price_points || work.price || 600,
-              rating: finalRating,
-              previewUrl: previewUrls[0] || work.preview_image_url || null,
-              previewUrls: previewUrls,
-              yandexDiskLink: work.file_url || null,
-              authorId: work.author_id,
-              isNew,
-              isHit,
-              discount,
-              pageCount: work.page_count || 0,
-              fileCount: work.file_count || 0
+              subject: determineSubject(title, work.category),
+              description: work.description || `${workType} по предмету "${determineSubject(title, work.category)}"`,
+              composition: work.composition || determineComposition(workType, title, hasRealCover),
+              universities: extractUniversity(title),
+              price: work.price_points || determinePrice(workType),
+              rating: determineRating(workType),
+              previewUrl: work.preview_image_url || null,
+              previewUrls: work.cover_images || [],
+              yandexDiskLink: work.yandex_disk_link || null,
+              purchaseCount: work.downloads || 0,
+              isHit: false,
+              isNew: false,
+              discount: 0,
+              authorId: work.author_id || null
             };
           });
           
-          saveToCache(transformedWorks);
-          setWorks(transformedWorks);
-          setFilteredWorks(transformedWorks);
-          setLoadingProgress(100);
+          setWorks(processedWorks);
+          setFilteredWorks(processedWorks);
         }
-      } catch (error) {
-        console.error('Error loading works from database:', error);
         
-        const cachedWorks = loadFromCache();
-        if (cachedWorks) {
-          setWorks(cachedWorks);
-          setFilteredWorks(cachedWorks);
-        }
+        setLoadingProgress(100);
+      } catch (error) {
+        console.error('Failed to load works:', error);
       } finally {
-        setLoading(false);
+        setTimeout(() => {
+          setLoading(false);
+          setLoadingProgress(0);
+        }, 300);
       }
     };
 
-    fetchWorks();
+    loadWorks();
   }, []);
-  
-
-
-
 
   useEffect(() => {
-    let filtered = works;
+    let filtered = [...works];
 
     if (searchQuery) {
-      const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter(work =>
-        work.title.toLowerCase().includes(query) ||
-        work.workType.toLowerCase().includes(query) ||
-        work.subject.toLowerCase().includes(query) ||
-        work.description.toLowerCase().includes(query) ||
-        work.composition.toLowerCase().includes(query) ||
-        (work.universities && work.universities.toLowerCase().includes(query))
+      filtered = filtered.filter(w => 
+        w.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        w.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        w.subject.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
-    if (filterSubject !== 'all') {
-      filtered = filtered.filter(work => work.subject.toLowerCase() === filterSubject.toLowerCase());
+    if (filterSubject && filterSubject !== 'all') {
+      filtered = filtered.filter(w => w.subject === filterSubject);
     }
 
-    if (priceRange !== 'all') {
-      filtered = filtered.filter(work => {
-        if (priceRange === '0-250') return work.price <= 250;
-        if (priceRange === '250-700') return work.price > 250 && work.price <= 700;
-        if (priceRange === '700-1600') return work.price > 700 && work.price <= 1600;
-        if (priceRange === '1600+') return work.price > 1600;
-        return true;
-      });
+    if (priceRange && priceRange !== 'all') {
+      const [min, max] = priceRange.split('-').map(Number);
+      if (max) {
+        filtered = filtered.filter(w => w.price >= min && w.price <= max);
+      } else {
+        filtered = filtered.filter(w => w.price >= min);
+      }
     }
 
     if (sortBy === 'price-asc') {
@@ -518,18 +452,7 @@ export default function CatalogPage() {
         ]} />
         
         <div className="mb-8">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-3">
-              Каталог инженерных материалов — чертежи DWG, 3D-модели, расчёты от 200₽
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-4">
-              500+ инженерных материалов по всем направлениям. Скачайте чертёж DWG, 3D-модель или расчёт мгновенно после оплаты
-            </p>
-            <Badge className="glass-card border-blue-200 text-sm">
-              <Icon name="FileText" size={14} className="mr-1" />
-              {filteredWorks.length} {filteredWorks.length === 1 ? 'работа' : filteredWorks.length < 5 ? 'работы' : 'работ'}
-            </Badge>
-          </div>
+          <CatalogHeader worksCount={filteredWorks.length} />
           
           <div className="mb-6">
             <h2 className="text-2xl font-bold mb-4">Фильтры для поиска готовых работ</h2>
@@ -554,208 +477,27 @@ export default function CatalogPage() {
           />
         </div>
 
-        {loading ? (
-          <div className="text-center py-20">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-blue-600 mb-4"></div>
-            <p className="text-gray-600 mb-3 text-lg">Загрузка каталога...</p>
-            <div className="max-w-md mx-auto">
-              <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                <div 
-                  className="bg-blue-600 h-full transition-all duration-300"
-                  style={{ width: `${loadingProgress}%` }}
-                ></div>
-              </div>
-              <p className="text-sm text-gray-500 mt-2">{loadingProgress}%</p>
-            </div>
-          </div>
-        ) : filteredWorks.length === 0 ? (
-          <div className="text-center py-20">
-            <Icon name="Search" className="mx-auto text-gray-300 mb-4" size={64} />
-            <p className="text-xl text-gray-600">Работы не найдены</p>
-            <p className="text-gray-500 mt-2">Попробуйте изменить параметры поиска</p>
-          </div>
-        ) : (
+        <CatalogLoadingState
+          loading={loading}
+          loadingProgress={loadingProgress}
+          isEmpty={filteredWorks.length === 0}
+        />
+
+        {!loading && filteredWorks.length > 0 && (
           <>
             <TooltipProvider>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {filteredWorks.map((work) => {
-                  const cardContent = (
-                    <>
-                      <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 aspect-[4/3] overflow-hidden">
-                    {work.previewUrl || (work.previewUrls && work.previewUrls.length > 0) ? (
-                      <>
-                        <img 
-                          src={work.previewUrl || work.previewUrls?.[0] || ''} 
-                          alt={work.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      </>
-                    ) : (
-                      <div className="w-full h-full relative">
-                        <img 
-                          src="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e0139de0-3660-402a-8d29-d07f5dac95b3.jpg"
-                          alt={work.workType}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end justify-center pb-4">
-                          <span className="text-sm font-semibold text-white drop-shadow-lg">{work.workType}</span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="absolute top-3 left-3 z-10 pointer-events-auto">
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          toggleFavorite(work.id);
-                        }}
-                        className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-lg flex items-center justify-center hover:bg-white transition-all hover:scale-110"
-                      >
-                        <Icon
-                          name="Heart"
-                          size={18}
-                          className={favorites.has(work.id) ? 'text-red-500 fill-red-500' : 'text-gray-600'}
-                        />
-                      </button>
-                    </div>
-                    
-                    <div className="absolute top-3 right-3 flex flex-col items-end gap-2 pointer-events-none">
-                      {work.discount && (
-                        <div className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                          −{work.discount}%
-                        </div>
-                      )}
-                      {work.isNew && (
-                        <Badge className="bg-green-500 text-white shadow-lg">
-                          <Icon name="Sparkles" size={12} className="mr-1" />
-                          Новинка
-                        </Badge>
-                      )}
-                      {work.isHit && (
-                        <Badge className="bg-orange-500 text-white shadow-lg">
-                          <Icon name="Flame" size={12} className="mr-1" />
-                          Хит
-                        </Badge>
-                      )}
-                      {(work.authorId === 999999 || work.authorId === null) && (
-                        <Badge className="bg-green-600 text-white shadow-lg">
-                          🛡️ Официальная
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-4 md:p-5">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-1">
-                        <Icon name="Star" size={14} className="text-yellow-500 fill-yellow-500" />
-                        <span className="text-sm font-semibold">{work.rating.toFixed(1)}</span>
-                      </div>
-                      <Badge variant="outline" className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200">
-                        {work.workType}
-                      </Badge>
-                    </div>
-
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <h3 className="font-bold text-sm md:text-[15px] mb-2 line-clamp-2 leading-snug min-h-[42px] group-hover:text-primary transition-colors cursor-help">
-                          {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
-                        </h3>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-md">
-                        <p>{work.title.charAt(0).toUpperCase() + work.title.slice(1)}</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    <p className="text-xs text-gray-600 line-clamp-2 mb-3 min-h-[32px] leading-relaxed">
-                      {work.description}
-                    </p>
-                    
-                    <div className="space-y-2 mb-3">
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <Icon name="Package" size={14} className="text-blue-600" />
-                        <span className="line-clamp-1">{work.composition}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-2 text-xs text-gray-600">
-                        <Icon name="Tag" size={14} className="text-purple-600" />
-                        <span className="font-medium">{work.subject}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 border-t">
-                      <div>
-                        {(work.discount || userDiscount > 0) ? (
-                          <div className="flex flex-col">
-                            <span className="text-xs text-gray-400 line-through">{work.price} б.</span>
-                            <div className="flex flex-col">
-                              <span className="text-xl font-bold text-green-600">{Math.round(work.price * (1 - (work.discount || userDiscount) / 100))} б.</span>
-                              <span className="text-xs text-gray-500">({Math.round(work.price * (1 - (work.discount || userDiscount) / 100)) * 5}₽)</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="flex flex-col">
-                            <span className="text-xl font-bold text-gray-900">{work.price} б.</span>
-                            <span className="text-xs text-gray-500">({work.price * 5}₽)</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex gap-2 items-center">
-                        {isAdmin && work.yandexDiskLink && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              const encodedUrl = encodeURI(work.yandexDiskLink!);
-                              window.open(encodedUrl, '_blank', 'noopener,noreferrer');
-                            }}
-                            className="border-green-600 text-green-600 hover:bg-green-50"
-                          >
-                            <Icon name="Download" size={14} className="mr-1" />
-                            Скачать
-                          </Button>
-                        )}
-                        {!isAdmin && (
-                          <div className="text-sm font-semibold text-blue-600 flex items-center gap-1.5">
-                            <Icon name="ArrowRight" size={16} />
-                            Купить
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                      </div>
-                    </>
-                  );
-                  
-                  return isAdmin ? (
-                    <div
-                      key={work.id}
-                      onClick={(e) => {
-                        if ((e.target as HTMLElement).closest('button')) {
-                          return;
-                        }
-                        window.location.href = `/work/${work.id}`;
-                      }}
-                      className="group glass-card tech-border rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-                    >
-                      {cardContent}
-                    </div>
-                  ) : (
-                    <Link
-                      key={work.id}
-                      to={`/work/${work.id}`}
-                      className="group glass-card tech-border rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] block"
-                    >
-                      {cardContent}
-                    </Link>
-                  );
-                })}
+                {filteredWorks.map((work) => (
+                  <CatalogWorkCard
+                    key={work.id}
+                    work={work}
+                    isAdmin={isAdmin}
+                    isFavorite={favorites.has(work.id)}
+                    userDiscount={userDiscount}
+                    onToggleFavorite={toggleFavorite}
+                    onNavigate={(workId) => navigate(`/work/${workId}`)}
+                  />
+                ))}
               </div>
             </TooltipProvider>
             

@@ -448,6 +448,8 @@ export default function CatalogPage() {
     return `Скачать чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты. Каталог из ${filteredWorks.length}+ материалов для студентов и инженеров. Мгновенное скачивание.`;
   };
 
+  const hasQueryParams = searchQuery || filterSubject !== 'all' || priceRange !== 'all' || sortBy !== 'default';
+
   return (
     <>
       <Helmet>
@@ -455,6 +457,7 @@ export default function CatalogPage() {
         <meta name="description" content={getCatalogSEODescription()} />
         <meta name="keywords" content="чертежи dwg купить, 3d модели step, технические расчёты, каталог чертежей, каталог 3д моделей, готовые чертежи, купить чертёж dwg, скачать 3d модель, cad проекты" />
         <link rel="canonical" href="https://techforma.pro/catalog" />
+        {hasQueryParams && <meta name="robots" content="noindex, follow" />}
         <script type="application/ld+json">
           {JSON.stringify(jsonLdSchema)}
         </script>

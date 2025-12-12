@@ -47,8 +47,8 @@ interface Work {
 }
 
 export default function WorkDetailPage() {
-  const { id, workId } = useParams();
-  const actualWorkId = id || workId;
+  const { id } = useParams();
+  const actualWorkId = id;
   const navigate = useNavigate();
   const [work, setWork] = useState<Work | null>(null);
   const [loading, setLoading] = useState(true);

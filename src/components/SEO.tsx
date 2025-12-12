@@ -36,7 +36,13 @@ export default function SEO({
     const metaDescription = description || DEFAULT_SEO.description;
     const metaKeywords = keywords || DEFAULT_SEO.keywords;
     const metaImage = ogImage || DEFAULT_SEO.ogImage;
-    const canonicalUrl = canonical || `${DEFAULT_SEO.baseUrl}${location.pathname}`;
+    
+    const normalizeUrl = (url: string) => {
+      if (url === DEFAULT_SEO.baseUrl || url === `${DEFAULT_SEO.baseUrl}/`) return DEFAULT_SEO.baseUrl;
+      return url.endsWith('/') ? url : `${url}/`;
+    };
+    
+    const canonicalUrl = canonical || normalizeUrl(`${DEFAULT_SEO.baseUrl}${location.pathname}`);
 
     document.title = fullTitle;
 

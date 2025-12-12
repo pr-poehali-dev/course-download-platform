@@ -49,10 +49,12 @@ export default function BlogPost() {
         <title>{article.title} | Tech Forma</title>
         <meta name="description" content={article.excerpt} />
         <meta name="keywords" content={article.keywords.join(', ')} />
+        <link rel="canonical" href={`https://techforma.pro/blog/${article.slug}`} />
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.excerpt} />
         <meta property="og:image" content={article.coverImage} />
         <meta property="og:type" content="article" />
+        <meta property="og:url" content={`https://techforma.pro/blog/${article.slug}`} />
         <meta property="article:published_time" content={article.publishedAt} />
         <meta property="article:tag" content={article.keywords.join(', ')} />
       </Helmet>

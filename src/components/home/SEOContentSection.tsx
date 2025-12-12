@@ -4,25 +4,25 @@ export default function SEOContentSection() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">
-            Скачать чертежи DWG, 3D-модели и CAD проекты
+            Каталог чертежей DWG и 3D-моделей для инженеров
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Обмен техническими материалами между инженерами и студентами технических специальностей
+            Техническая документация, готовые проекты и расчёты для студентов и специалистов
           </p>
         </div>
         
         <div className="space-y-8">
           <div className="cyber-card rounded-xl p-8">
-            <h3 className="text-2xl font-bold mb-4 text-foreground">Платформа для скачивания чертежей DWG и 3D-моделей CAD</h3>
+            <h3 className="text-2xl font-bold mb-4 text-foreground">Техническая документация в форматах AutoCAD, KOMPAS, SolidWorks</h3>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              TechForma — специализированная платформа для обмена инженерными материалами. 
-              Здесь вы найдёте чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты, 
-              проектную документацию и другие материалы для обучения и работы.
+              TechForma — библиотека инженерных материалов для студентов и специалистов. 
+              Файлы в форматах DWG, DXF, STEP, STL, PDF с детальными чертежами, 
+              объемными моделями и проверенными расчётами по ГОСТ.
             </p>
             <ul className="space-y-3 text-muted-foreground">
               <li className="flex items-start gap-3">
                 <span className="text-primary font-bold text-xl">✓</span>
-                <span><strong className="text-foreground">500+ материалов</strong> — чертежи, модели, расчёты по всем инженерным направлениям</span>
+                <span><strong className="text-foreground">Более 500 работ</strong> — чертежи, модели, расчёты по механике, электрике, строительству</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-primary font-bold text-xl">✓</span>
@@ -55,11 +55,11 @@ export default function SEOContentSection() {
           <div className="cyber-card rounded-xl p-6 border-2 border-primary/30 bg-primary/5">
             <p className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
               <span className="text-primary text-xl">⚡</span>
-              Материалы предназначены для образовательных целей
+              Справочные материалы для обучения
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Все материалы — справочные пособия для обучения. Используйте как основу для собственных разработок 
-              с обязательной адаптацией под ваши задачи.
+              Платформа предоставляет образовательные материалы для изучения. Применяйте как справочник для своих проектов, 
+              обязательно адаптируя под свои задачи.
             </p>
           </div>
         </div>

@@ -26,10 +26,12 @@ export default function BlogListPage() {
     <>
       <Helmet>
         <title>Блог Tech Forma — Полезные статьи для студентов</title>
-        <meta name="description" content="Блог с полезными статьями для студентов: выбор курсовых работ, инженерные чертежи, технические расчеты, советы по учебе и защите проектов." />
-        <meta name="keywords" content="блог для студентов, курсовые работы, инженерные чертежи, технические статьи, советы студентам" />
+        <meta name="description" content="Блог Tech Forma: как скачать чертежи DWG, выбрать 3D-модели CAD, оформить технические расчёты. Советы студентам по защите проектов." />
+        <meta name="keywords" content="блог для студентов, курсовые работы, инженерные чертежи, технические статьи, советы студентам, чертежи dwg, 3d модели" />
+        <link rel="canonical" href="https://techforma.pro/blog" />
         <meta property="og:title" content="Блог Tech Forma — Полезные статьи для студентов" />
-        <meta property="og:description" content="Блог с полезными статьями для студентов: выбор курсовых работ, инженерные чертежи, технические расчеты, советы по учебе и защите проектов." />
+        <meta property="og:description" content="Блог Tech Forma: как скачать чертежи DWG, выбрать 3D-модели CAD, оформить технические расчёты. Советы студентам по защите проектов." />
+        <meta property="og:url" content="https://techforma.pro/blog" />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">

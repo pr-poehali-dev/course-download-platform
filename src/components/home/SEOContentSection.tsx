@@ -4,7 +4,7 @@ export default function SEOContentSection() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-foreground section-title-line">
-            Инженерная платформа TechForma
+            Скачать чертежи DWG, 3D-модели и CAD проекты
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Обмен техническими материалами между инженерами и студентами технических специальностей
@@ -13,7 +13,7 @@ export default function SEOContentSection() {
         
         <div className="space-y-8">
           <div className="cyber-card rounded-xl p-8">
-            <h3 className="text-2xl font-bold mb-4 text-foreground">Что такое TechForma?</h3>
+            <h3 className="text-2xl font-bold mb-4 text-foreground">Платформа для скачивания чертежей DWG и 3D-моделей CAD</h3>
             <p className="text-muted-foreground leading-relaxed mb-4">
               TechForma — специализированная платформа для обмена инженерными материалами. 
               Здесь вы найдёте чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты, 

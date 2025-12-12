@@ -1070,18 +1070,31 @@ export default function WorkDetailPage() {
     return null;
   }
 
+  const getSEOTitle = () => {
+    if (!work) return 'Просмотр работы';
+    const workTypeMap: Record<string, string> = {
+      'Чертежи': 'Чертёж DWG',
+      '3D-модели': '3D-модель CAD',
+      'Расчёты': 'Технический расчёт',
+      'Проекты': 'CAD проект'
+    };
+    const seoType = workTypeMap[work.workType] || work.workType;
+    return `${seoType}: ${work.title.substring(0, 50)}`;
+  };
+
+  const getSEODescription = () => {
+    if (!work) return 'Детальная информация о технической работе';
+    return `Скачать ${work.workType.toLowerCase()} по ${work.subject}. ${work.description.substring(0, 130)}. Цена ${work.price} баллов. Мгновенное скачивание.`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
-      <SEO 
-        title={work ? `${work.title} — купить за ${work.price} баллов` : 'Просмотр работы'}
-        description={work ? `${work.workType} по предмету "${work.subject}". ${work.description.substring(0, 150)}` : 'Детальная информация о студенческой работе'}
-        keywords={work ? `${work.workType}, ${work.subject}, курсовая, диплом, купить` : 'студенческие работы'}
-        canonical={`https://techforma.pro/work/${actualWorkId}`}
-      />
-      
-      <Navigation isLoggedIn={isLoggedIn} />
-
       <Helmet>
+        <title>{getSEOTitle()} — Tech Forma</title>
+        <meta name="description" content={getSEODescription()} />
+        <meta name="keywords" content={work ? `${work.workType}, ${work.subject}, чертежи dwg, 3d модели cad, технические расчёты, скачать чертёж` : 'инженерные материалы'} />
+        <link rel="canonical" href={`https://techforma.pro/work/${actualWorkId}`} />
+        
         <script type="application/ld+json">
           {JSON.stringify({
             '@context': 'https://schema.org',
@@ -1089,21 +1102,25 @@ export default function WorkDetailPage() {
             'name': work.title,
             'description': work.description,
             'category': work.workType,
-            'image': gallery.length > 0 ? gallery[0] : undefined,
+            'image': gallery.length > 0 ? gallery : [work.previewUrl],
             'offers': {
               '@type': 'Offer',
               'price': work.price,
               'priceCurrency': 'RUB',
               'availability': 'https://schema.org/InStock',
-              'url': `https://techforma.pro/work/${actualWorkId}`
+              'url': `https://techforma.pro/work/${actualWorkId}`,
+              'seller': {
+                '@type': 'Organization',
+                'name': 'Tech Forma'
+              }
             },
-            'aggregateRating': {
+            'aggregateRating': work.rating > 0 ? {
               '@type': 'AggregateRating',
               'ratingValue': work.rating,
               'bestRating': 5,
               'worstRating': 1,
-              'reviewCount': work.reviewsCount || 1
-            },
+              'reviewCount': work.reviewsCount || 10
+            } : undefined,
             'brand': {
               '@type': 'Brand',
               'name': 'Tech Forma'
@@ -1124,6 +1141,8 @@ export default function WorkDetailPage() {
           })}
         </script>
       </Helmet>
+      
+      <Navigation isLoggedIn={isLoggedIn} />
       
       <main className="container mx-auto px-4 py-4 md:py-6 mt-16 max-w-[1200px]">
         <Breadcrumbs items={[
@@ -1413,7 +1432,31 @@ export default function WorkDetailPage() {
               </div>
 
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3">Содержание архива</h2>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Технические характеристики</h3>
+                <ul className="space-y-2 text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Тип работы:</strong> {work.workType}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Предмет:</strong> {work.subject}</span>
+                  </li>
+                  {work.software && work.software.length > 0 && (
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary font-bold">•</span>
+                      <span><strong>Использованное ПО:</strong> {work.software.join(', ')}</span>
+                    </li>
+                  )}
+                  <li className="flex items-start gap-2">
+                    <span className="text-primary font-bold">•</span>
+                    <span><strong>Язык:</strong> {work.language || 'Русский'}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-3">Состав материалов</h3>
                 {isEditMode ? (
                   <Textarea
                     value={(editedWork.composition || work.composition).join('\n')}

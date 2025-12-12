@@ -8,7 +8,6 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import CatalogFilters from '@/components/catalog/CatalogFilters';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import Footer from '@/components/Footer';
-import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import ExitIntentModal from '@/components/ExitIntentModal';
 import DiscountProgressBar from '@/components/DiscountProgressBar';
@@ -426,15 +425,36 @@ export default function CatalogPage() {
     ]
   };
 
+  const getCatalogSEOTitle = () => {
+    if (filterSubject !== 'all') {
+      const subjectNames: Record<string, string> = {
+        'ИВТ': 'Информатика и вычислительная техника',
+        'Математика': 'Математика',
+        'Электротехника': 'Электротехника',
+        'Механика': 'Механика',
+        'Строительство': 'Строительство',
+        'Машиностроение': 'Машиностроение',
+        'Программирование': 'Программирование'
+      };
+      return `Чертежи DWG и 3D-модели по ${subjectNames[filterSubject] || filterSubject}`;
+    }
+    return 'Каталог чертежей DWG и 3D-моделей CAD';
+  };
+
+  const getCatalogSEODescription = () => {
+    if (filterSubject !== 'all') {
+      return `Скачать чертежи DWG/DXF и 3D-модели по ${filterSubject}. Технические расчёты, проектная документация. Каталог из ${filteredWorks.length} материалов для студентов и инженеров.`;
+    }
+    return `Скачать чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты. Каталог из ${filteredWorks.length}+ материалов для студентов и инженеров. Мгновенное скачивание.`;
+  };
+
   return (
     <>
-      <SEO 
-        title={getCategoryTitle()}
-        description={getCategoryDescription()}
-        keywords="чертежи dwg купить, 3d модели step, технические расчёты, каталог чертежей, каталог 3д моделей, готовые чертежи, купить чертёж dwg, скачать 3d модель"
-        canonical="https://techforma.pro/catalog"
-      />
       <Helmet>
+        <title>{getCatalogSEOTitle()} — Tech Forma</title>
+        <meta name="description" content={getCatalogSEODescription()} />
+        <meta name="keywords" content="чертежи dwg купить, 3d модели step, технические расчёты, каталог чертежей, каталог 3д моделей, готовые чертежи, купить чертёж dwg, скачать 3d модель, cad проекты" />
+        <link rel="canonical" href="https://techforma.pro/catalog" />
         <script type="application/ld+json">
           {JSON.stringify(jsonLdSchema)}
         </script>

@@ -19,9 +19,9 @@ export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) 
         </div>
         
         <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-tight hero-title">
-          Инженерная платформа
+          Скачать чертежи DWG, 3D-модели CAD
           <br />
-          <span className="text-primary">технических знаний</span>
+          <span className="text-primary">и проектную документацию</span>
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
           Чертежи DWG/DXF, 3D-модели, технические расчёты и проектная документация. Обменивайтесь опытом и развивайте навыки.

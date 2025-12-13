@@ -42,6 +42,7 @@ export default function BlogSection() {
                     src={article.coverImage}
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    loading="lazy"
                   />
                   <div className="absolute top-3 left-3">
                     <Badge className="bg-primary text-white shadow-lg">

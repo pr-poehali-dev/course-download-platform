@@ -78,7 +78,7 @@ export default function BlogPost() {
                 alt={article.title}
                 className="w-full h-full object-cover"
                 onError={handleImageError}
-                loading="eager"
+                loading="lazy"
               />
               <div className="absolute top-4 left-4">
                 <span className="bg-primary/90 text-primary-foreground px-3 py-1 rounded-full text-sm font-medium">

@@ -254,12 +254,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             # Создаём запись о покупке с комиссией 10%
             commission = int(final_price * 0.10)
+            
+            # Проверяем что все значения положительные перед INSERT
+            if final_price <= 0 or commission < 0:
+                conn.rollback()
+                return {
+                    'statusCode': 400,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': f'Invalid price or commission: price={final_price}, commission={commission}'}),
+                    'isBase64Encoded': False
+                }
+            
+            print(f"[PURCHASE] Creating purchase record: buyer_id={user_id}, work_id={db_work_id}, price_paid={final_price}, commission={commission}")
+            
             cur.execute(
                 """INSERT INTO t_p63326274_course_download_plat.purchases 
                 (buyer_id, work_id, price_paid, commission) VALUES (%s, %s, %s, %s) RETURNING id""",
                 (user_id, db_work_id, final_price, commission)
             )
             purchase_id = cur.fetchone()[0]
+            print(f"[PURCHASE] Purchase record created with id={purchase_id}")
             
             # author_id уже получен в work_result выше
             author_id = work_author_id
@@ -288,7 +302,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     """INSERT INTO t_p63326274_course_download_plat.transactions
                     (user_id, amount, type, description)
                     VALUES (%s, %s, %s, %s)""",
-                    (author_id, author_share, 'sale', f'Продажа работы #{db_work_id} (комиссия 10%)')
+                    (author_id, author_share, 'sale', f'Продажа работы #{db_work_id} (начислено {author_share} баллов)')
                 )
                 
                 # Получаем email автора для уведомления
@@ -377,11 +391,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             conn.close()
             
     except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
         print(f"[ERROR] Purchase failed: {type(e).__name__}: {str(e)}")
+        print(f"[ERROR] Full traceback:\n{error_trace}")
+        conn.rollback()
+        
+        # Более информативное сообщение об ошибке
+        error_message = str(e)
+        if 'check constraint' in error_message.lower():
+            error_message = 'Ошибка проверки данных. Пожалуйста, обратитесь в поддержку.'
+        elif 'insufficient' in error_message.lower():
+            error_message = 'Недостаточно прав для выполнения операции. Проверьте свой баланс.'
+        
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': f'Purchase failed: {str(e)}'}),
+            'body': json.dumps({
+                'error': error_message,
+                'details': f'{type(e).__name__}: {str(e)}'
+            }),
             'isBase64Encoded': False
         }
 

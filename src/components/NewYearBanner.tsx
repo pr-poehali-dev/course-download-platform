@@ -48,61 +48,120 @@ export default function NewYearBanner({ onBuyPoints }: NewYearBannerProps) {
   };
 
   return (
-    <div className="relative bg-gradient-to-r from-red-600 via-green-600 to-red-600 text-white overflow-hidden">
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-2 left-10 text-4xl animate-pulse">🎄</div>
-        <div className="absolute top-4 right-20 text-3xl animate-bounce">⭐</div>
-        <div className="absolute bottom-3 left-1/4 text-2xl animate-pulse">🎁</div>
-        <div className="absolute top-1/2 right-10 text-4xl animate-bounce">🎅</div>
-        <div className="absolute bottom-4 right-1/3 text-3xl animate-pulse">❄️</div>
+    <div className="relative bg-gradient-to-br from-red-600 via-red-700 to-green-700 text-white overflow-hidden shadow-2xl">
+      {/* Анимированный фон */}
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yLjIxLTEuNzktNC00LTRzLTQgMS43OS00IDQgMS43OSA0IDQgNCA0LTEuNzkgNC00em0wLTEwYzAtMi4yMS0xLjc5LTQtNC00cy00IDEuNzktNCA0IDEuNzkgNCA0IDQgNC0xLjc5IDQtNHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
+      
+      {/* Декоративные элементы */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-12 -left-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-yellow-300/20 rounded-full blur-3xl"></div>
+        
+        {/* Летающие иконки */}
+        <div className="absolute top-4 left-[10%] text-5xl animate-bounce" style={{ animationDelay: '0s', animationDuration: '3s' }}>🎄</div>
+        <div className="absolute top-8 right-[15%] text-4xl animate-bounce" style={{ animationDelay: '0.5s', animationDuration: '2.5s' }}>⭐</div>
+        <div className="absolute bottom-6 left-[20%] text-3xl animate-bounce" style={{ animationDelay: '1s', animationDuration: '3.5s' }}>🎁</div>
+        <div className="absolute top-1/2 right-[8%] text-5xl animate-bounce" style={{ animationDelay: '1.5s', animationDuration: '2.8s' }}>🎅</div>
+        <div className="absolute bottom-8 right-[25%] text-4xl animate-bounce" style={{ animationDelay: '0.3s', animationDuration: '3.2s' }}>❄️</div>
+        <div className="absolute top-12 left-[45%] text-3xl animate-bounce" style={{ animationDelay: '2s', animationDuration: '2.7s' }}>🔔</div>
       </div>
 
-      <div className="container mx-auto px-4 py-4 relative z-10">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3 flex-1">
-            <div className="text-4xl animate-bounce">🎄</div>
-            <div className="text-center md:text-left">
-              <h3 className="text-xl md:text-2xl font-bold mb-1">
-                🎉 Новогодняя распродажа! 🎉
-              </h3>
-              <p className="text-sm md:text-base opacity-90">
-                Скидка <span className="font-bold text-yellow-300">20%</span> на все работы до Нового Года!
-              </p>
+      <div className="container mx-auto px-4 py-8 md:py-10 relative z-10">
+        <div className="flex flex-col items-center text-center gap-6">
+          {/* Заголовок */}
+          <div className="flex flex-col items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="text-6xl animate-bounce" style={{ animationDuration: '1.5s' }}>🎄</div>
+              <div>
+                <h2 className="text-3xl md:text-5xl font-black mb-2 drop-shadow-2xl">
+                  Новогодняя Распродажа!
+                </h2>
+                <div className="flex items-center justify-center gap-2 text-lg md:text-2xl">
+                  <span className="inline-block px-4 py-2 bg-yellow-400 text-red-700 font-black rounded-full shadow-lg transform -rotate-2">
+                    СКИДКА 20%
+                  </span>
+                  <span className="font-semibold">на все работы!</span>
+                </div>
+              </div>
+              <div className="text-6xl animate-bounce" style={{ animationDuration: '1.5s', animationDelay: '0.3s' }}>🎁</div>
             </div>
+            
+            <p className="text-base md:text-xl text-white/90 max-w-2xl leading-relaxed">
+              Успейте скачать чертежи и 3D-модели со специальной новогодней скидкой! 
+              Акция действует только до Нового Года! ⏰
+            </p>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center">
-              <div className="text-xs opacity-80 mb-1">До конца акции:</div>
-              <div className="flex gap-2 font-mono text-lg font-bold">
-                <span>{String(timeLeft.days).padStart(2, '0')}д</span>
-                <span>:</span>
-                <span>{String(timeLeft.hours).padStart(2, '0')}ч</span>
-                <span>:</span>
-                <span>{String(timeLeft.minutes).padStart(2, '0')}м</span>
-                <span>:</span>
-                <span>{String(timeLeft.seconds).padStart(2, '0')}с</span>
+          {/* Таймер */}
+          <div className="bg-white/95 backdrop-blur-md rounded-2xl px-8 py-6 shadow-2xl border-4 border-yellow-300">
+            <div className="text-red-700 font-bold text-sm md:text-base mb-3 uppercase tracking-wider">
+              ⏰ До конца акции осталось:
+            </div>
+            <div className="flex gap-3 md:gap-4">
+              <div className="flex flex-col items-center">
+                <div className="bg-gradient-to-br from-red-600 to-red-700 text-white rounded-xl px-4 py-3 md:px-6 md:py-4 shadow-lg min-w-[70px] md:min-w-[90px]">
+                  <div className="text-3xl md:text-5xl font-black">{String(timeLeft.days).padStart(2, '0')}</div>
+                </div>
+                <div className="text-red-700 font-semibold text-xs md:text-sm mt-2">дней</div>
+              </div>
+              
+              <div className="flex items-center">
+                <div className="text-3xl md:text-5xl font-black text-red-700">:</div>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <div className="bg-gradient-to-br from-green-600 to-green-700 text-white rounded-xl px-4 py-3 md:px-6 md:py-4 shadow-lg min-w-[70px] md:min-w-[90px]">
+                  <div className="text-3xl md:text-5xl font-black">{String(timeLeft.hours).padStart(2, '0')}</div>
+                </div>
+                <div className="text-green-700 font-semibold text-xs md:text-sm mt-2">часов</div>
+              </div>
+              
+              <div className="flex items-center">
+                <div className="text-3xl md:text-5xl font-black text-green-700">:</div>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <div className="bg-gradient-to-br from-red-600 to-red-700 text-white rounded-xl px-4 py-3 md:px-6 md:py-4 shadow-lg min-w-[70px] md:min-w-[90px]">
+                  <div className="text-3xl md:text-5xl font-black">{String(timeLeft.minutes).padStart(2, '0')}</div>
+                </div>
+                <div className="text-red-700 font-semibold text-xs md:text-sm mt-2">минут</div>
+              </div>
+              
+              <div className="flex items-center">
+                <div className="text-3xl md:text-5xl font-black text-red-700">:</div>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <div className="bg-gradient-to-br from-green-600 to-green-700 text-white rounded-xl px-4 py-3 md:px-6 md:py-4 shadow-lg min-w-[70px] md:min-w-[90px]">
+                  <div className="text-3xl md:text-5xl font-black">{String(timeLeft.seconds).padStart(2, '0')}</div>
+                </div>
+                <div className="text-green-700 font-semibold text-xs md:text-sm mt-2">секунд</div>
               </div>
             </div>
-
-            {onBuyPoints && (
-              <Button
-                onClick={onBuyPoints}
-                className="bg-yellow-400 hover:bg-yellow-500 text-red-700 font-bold shadow-lg hover:scale-105 transition-transform"
-              >
-                <Icon name="Gift" size={18} className="mr-2" />
-                Получить скидку
-              </Button>
-            )}
           </div>
 
-          <button
-            onClick={handleClose}
-            className="absolute top-2 right-2 md:relative md:top-0 md:right-0 text-white/80 hover:text-white transition-colors"
-          >
-            <Icon name="X" size={20} />
-          </button>
+          {/* Кнопка */}
+          {onBuyPoints && (
+            <Button
+              onClick={onBuyPoints}
+              size="lg"
+              className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-red-700 font-black text-lg md:text-xl px-8 py-6 md:px-12 md:py-8 shadow-2xl hover:scale-110 transition-all duration-300 border-4 border-white rounded-2xl"
+            >
+              <Icon name="Gift" size={28} className="mr-3" />
+              <span>Получить скидку 20%</span>
+              <Icon name="Sparkles" size={24} className="ml-3" />
+            </Button>
+          )}
         </div>
+
+        {/* Кнопка закрытия */}
+        <button
+          onClick={handleClose}
+          className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full text-white transition-all hover:scale-110"
+          aria-label="Закрыть баннер"
+        >
+          <Icon name="X" size={24} />
+        </button>
       </div>
     </div>
   );

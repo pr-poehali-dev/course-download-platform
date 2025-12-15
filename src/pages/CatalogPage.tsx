@@ -10,7 +10,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import Footer from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
 import ExitIntentModal from '@/components/ExitIntentModal';
-import DiscountProgressBar from '@/components/DiscountProgressBar';
 import { getUserDiscount } from '@/utils/discount';
 import { trackEvent, metrikaEvents } from '@/utils/metrika';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
@@ -464,7 +463,6 @@ export default function CatalogPage() {
       </Helmet>
 
       <ExitIntentModal />
-      {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <Navigation isLoggedIn={isLoggedIn} />
       

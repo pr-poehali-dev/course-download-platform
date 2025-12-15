@@ -39,7 +39,6 @@ import RotatingText from '@/components/home/RotatingText';
 import NewsSection from '@/components/NewsSection';
 
 import ExitIntentModal from '@/components/ExitIntentModal';
-import DiscountProgressBar from '@/components/DiscountProgressBar';
 import SEOHeroSection from '@/components/home/SEOHeroSection';
 import WorkCategoriesSection from '@/components/home/WorkCategoriesSection';
 import SEOContentSection from '@/components/home/SEOContentSection';

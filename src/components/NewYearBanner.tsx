@@ -13,12 +13,14 @@ export default function NewYearBanner({ onBuyPoints }: NewYearBannerProps) {
     minutes: 0,
     seconds: 0,
   });
+  const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const newYear = new Date('2025-01-01T00:00:00').getTime();
+      const moscowOffset = 3 * 60 * 60 * 1000;
+      const newYearMoscow = new Date('2025-01-01T00:00:00+03:00').getTime();
       const now = new Date().getTime();
-      const difference = newYear - now;
+      const difference = newYearMoscow - now;
 
       if (difference > 0) {
         setTimeLeft({
@@ -27,6 +29,10 @@ export default function NewYearBanner({ onBuyPoints }: NewYearBannerProps) {
           minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
           seconds: Math.floor((difference % (1000 * 60)) / 1000),
         });
+        setIsExpired(false);
+      } else {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        setIsExpired(true);
       }
     };
 
@@ -40,7 +46,7 @@ export default function NewYearBanner({ onBuyPoints }: NewYearBannerProps) {
     return localStorage.getItem('newYearBannerClosed') === 'true';
   });
 
-  if (closed) return null;
+  if (closed || isExpired) return null;
 
   const handleClose = () => {
     setClosed(true);

@@ -17,7 +17,6 @@ export default function NewYearBanner({ onBuyPoints }: NewYearBannerProps) {
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const moscowOffset = 3 * 60 * 60 * 1000;
       const newYearMoscow = new Date('2025-01-01T00:00:00+03:00').getTime();
       const now = new Date().getTime();
       const difference = newYearMoscow - now;

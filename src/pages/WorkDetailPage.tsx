@@ -20,6 +20,8 @@ import { toast } from '@/components/ui/use-toast';
 import { getUserDiscount } from '@/utils/discount';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { trackEvent, metrikaEvents } from '@/utils/metrika';
+import NewYearSnow from '@/components/NewYearSnow';
+import NewYearBanner from '@/components/NewYearBanner';
 
 
 interface Work {
@@ -1089,6 +1091,8 @@ export default function WorkDetailPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
+      <NewYearSnow />
+      <NewYearBanner />
       <Helmet>
         <title>{getSEOTitle()} — Tech Forma</title>
         <meta name="description" content={getSEODescription()} />

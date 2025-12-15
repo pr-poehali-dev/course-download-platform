@@ -49,6 +49,8 @@ import PopularSearches from '@/components/seo/PopularSearches';
 import BlogSection from '@/components/home/BlogSection';
 import Footer from '@/components/Footer';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
+import NewYearSnow from '@/components/NewYearSnow';
+import NewYearBanner from '@/components/NewYearBanner';
 
 
 
@@ -557,6 +559,8 @@ export default function Index() {
       </Helmet>
 
       <ExitIntentModal />
+      <NewYearSnow />
+      <NewYearBanner onBuyPoints={() => setPaymentDialogOpen(true)} />
       {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-background">
         <header className="glass-card border-b border-border sticky top-0 z-50 w-full backdrop-blur-md shadow-sm">

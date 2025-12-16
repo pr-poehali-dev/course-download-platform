@@ -130,6 +130,7 @@ export default function UploadsTab({
               id="files"
               type="file"
               multiple
+              key={uploadForm.files.length === 0 ? 'empty' : 'filled'}
               accept=".rar,.zip,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.dxf,.cdw,.frw,.step"
               onChange={(e) => {
                 const selectedFiles = Array.from(e.target.files || []);

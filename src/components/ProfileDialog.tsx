@@ -63,7 +63,7 @@ export default function ProfileDialog({
     
     setWorksLoading(true);
     try {
-      const response = await fetch(`https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0/user/${userId}`, {
+      const response = await fetch(`https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?author_id=${userId}`, {
         headers: { 'X-User-Id': userId.toString() }
       });
       
@@ -131,7 +131,7 @@ export default function ProfileDialog({
         files: filesData
       };
       
-      const response = await fetch('https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0', {
+      const response = await fetch('https://functions.poehali.dev/fb387705-926b-436e-9d4f-4f064c4a4b3d', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

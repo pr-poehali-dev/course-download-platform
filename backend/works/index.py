@@ -351,20 +351,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     else:
                         keywords = []
                     
-                    # Попытка получить файлы из work_files (пока не работает из-за прав)
-                    files = []
-                    try:
-                        cur.execute(f"""
-                            SELECT file_url, file_name, file_size 
-                            FROM t_p63326274_course_download_plat.work_files
-                            WHERE work_id = {work_id}
-                            ORDER BY created_at ASC
-                        """)
-                        file_rows = cur.fetchall()
-                        files = [{'url': f[0], 'name': f[1], 'size': f[2]} for f in file_rows]
-                    except:
-                        files = []
-                    
                     work = {
                         'id': work_id,
                         'title': row[1],
@@ -386,8 +372,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'keywords': keywords,
                         'file_url': row[18],
                         'downloads_count': row[19] or 0,
-                        'discount': row[20] or 0,
-                        'files': files
+                        'discount': row[20] or 0
                     }
                     works.append(work)
                 

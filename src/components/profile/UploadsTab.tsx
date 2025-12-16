@@ -42,7 +42,7 @@ export default function UploadsTab({
         <CardHeader>
           <CardTitle>Загрузить новую работу</CardTitle>
           <CardDescription>
-            Поделитесь своей работой и зарабатывайте баллы
+            Поделитесь своей работой и зарабатывайте баллы. Теперь можно загружать до 10 файлов одновременно!
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

@@ -1,6 +1,9 @@
 # robots.txt для TechForma
 # Оптимизировано для поисковых систем
 
+# Основное зеркало сайта
+Host: techforma.pro
+
 User-agent: *
 Allow: /
 Allow: /catalog

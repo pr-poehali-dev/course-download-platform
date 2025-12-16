@@ -15,6 +15,7 @@ interface UploadsTabProps {
     subject: string;
     description: string;
     file: File | null;
+    files: File[];
   };
   uploadLoading: boolean;
   userWorks: any[];
@@ -124,21 +125,48 @@ export default function UploadsTab({
           </div>
 
           <div>
-            <Label htmlFor="file">Файл работы (архив) *</Label>
+            <Label htmlFor="files">Файлы работы (до 10 файлов) *</Label>
             <Input
-              id="file"
+              id="files"
               type="file"
+              multiple
               accept=".rar,.zip,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.dxf,.cdw,.frw,.step"
               onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  onUploadFormChange({ ...uploadForm, file });
+                const selectedFiles = Array.from(e.target.files || []);
+                if (selectedFiles.length > 10) {
+                  alert('Можно загрузить максимум 10 файлов');
+                  return;
                 }
+                onUploadFormChange({ ...uploadForm, files: selectedFiles, file: selectedFiles[0] || null });
               }}
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Максимальный размер: 50 МБ. Поддерживаются: RAR, ZIP, PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, DXF, CDW, FRW, STEP
+              Максимум 10 файлов по 50 МБ каждый. Поддерживаются: RAR, ZIP, PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, DXF, CDW, FRW, STEP
             </p>
+            {uploadForm.files && uploadForm.files.length > 0 && (
+              <div className="mt-3 space-y-2">
+                <p className="text-sm font-medium">Выбрано файлов: {uploadForm.files.length}</p>
+                <div className="space-y-1">
+                  {uploadForm.files.map((file, index) => (
+                    <div key={index} className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded">
+                      <Icon name="File" size={14} />
+                      <span className="flex-1 truncate">{file.name}</span>
+                      <span className="text-xs">({(file.size / 1024 / 1024).toFixed(2)} МБ)</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newFiles = uploadForm.files.filter((_, i) => i !== index);
+                          onUploadFormChange({ ...uploadForm, files: newFiles, file: newFiles[0] || null });
+                        }}
+                        className="hover:text-destructive"
+                      >
+                        <Icon name="X" size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
         <CardFooter>
@@ -150,7 +178,7 @@ export default function UploadsTab({
               !uploadForm.workType ||
               !uploadForm.subject ||
               !uploadForm.price ||
-              !uploadForm.file
+              (!uploadForm.file && (!uploadForm.files || uploadForm.files.length === 0))
             }
             className="w-full"
           >

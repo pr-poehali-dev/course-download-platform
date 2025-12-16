@@ -1,6 +1,6 @@
 """
-Business: Загрузка работы автором с сохранением в БД
-Args: event с файлом, названием, описанием, категорией, ценой
+Business: Загрузка работы автором с сохранением множественных файлов в БД
+Args: event с массивом файлов, названием, описанием, категорией, ценой
 Returns: HTTP response с результатом загрузки
 """
 
@@ -10,7 +10,7 @@ import psycopg2
 import base64
 import boto3
 import uuid
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 YANDEX_S3_KEY_ID = os.environ.get('YANDEX_S3_KEY_ID', '')
@@ -24,7 +24,11 @@ def get_db_connection():
 def upload_to_s3(file_data: str, file_name: str) -> str:
     """Upload file to Yandex S3 and return public URL"""
     try:
-        # Clean base64 string (remove whitespace and newlines)
+        # Remove data URL prefix if present
+        if ',' in file_data:
+            file_data = file_data.split(',', 1)[1]
+        
+        # Clean base64 string
         clean_base64 = file_data.strip().replace('\n', '').replace('\r', '').replace(' ', '')
         
         # Add padding if needed
@@ -85,33 +89,36 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     try:
         body_data = json.loads(event.get('body', '{}'))
+        headers = event.get('headers', {})
         
         title = body_data.get('title')
-        description = body_data.get('description')
-        work_type = body_data.get('category')
+        description = body_data.get('description', '')
+        work_type = body_data.get('workType')
+        subject = body_data.get('subject', 'Общая')
         price_points = body_data.get('price')
-        file_data = body_data.get('file')
-        file_name = body_data.get('fileName')
-        author_id = body_data.get('authorId')
+        files = body_data.get('files', [])  # Массив файлов
+        user_id = headers.get('X-User-Id') or headers.get('x-user-id')
         
-        if not all([title, description, work_type, price_points, author_id]):
+        if not all([title, work_type, price_points, user_id]):
             return {
                 'statusCode': 400,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Missing required fields'})
+                'body': json.dumps({'error': 'Missing required fields: title, workType, price, userId'})
             }
         
-        # Upload file to S3 if provided
-        file_url = None
-        if file_data and file_name:
-            try:
-                file_url = upload_to_s3(file_data, file_name)
-            except Exception as e:
-                return {
-                    'statusCode': 500,
-                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': f'File upload failed: {str(e)}'})
-                }
+        if not files or len(files) == 0:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'At least one file is required'})
+            }
+        
+        if len(files) > 10:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Maximum 10 files allowed'})
+            }
         
         conn = get_db_connection()
         cur = conn.cursor()
@@ -119,32 +126,70 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         # Экранируем строки для Simple Query Protocol
         safe_title = title.replace("'", "''")
         safe_work_type = work_type.replace("'", "''")
+        safe_subject = subject.replace("'", "''")
         safe_description = description.replace("'", "''")
-        safe_file_url = file_url.replace("'", "''") if file_url else ''
         
-        # Вставляем работу в БД используя Simple Query Protocol
-        if file_url:
-            cur.execute(f"""
-                INSERT INTO t_p63326274_course_download_plat.works 
-                (title, work_type, subject, description, price_points, 
-                 created_at, updated_at, author_id, status, category, price, downloads, views_count, file_url)
-                VALUES ('{safe_title}', '{safe_work_type}', 'Общая', '{safe_description}', {int(price_points)}, 
-                        NOW(), NOW(), {int(author_id)}, 'pending', '{safe_work_type}', {int(price_points)}, 0, 0, '{safe_file_url}')
-                RETURNING id
-            """)
-        else:
-            cur.execute(f"""
-                INSERT INTO t_p63326274_course_download_plat.works 
-                (title, work_type, subject, description, price_points, 
-                 created_at, updated_at, author_id, status, category, price, downloads, views_count)
-                VALUES ('{safe_title}', '{safe_work_type}', 'Общая', '{safe_description}', {int(price_points)}, 
-                        NOW(), NOW(), {int(author_id)}, 'pending', '{safe_work_type}', {int(price_points)}, 0, 0)
-                RETURNING id
-            """)
+        # Создаём запись работы
+        cur.execute(f"""
+            INSERT INTO t_p63326274_course_download_plat.works 
+            (title, work_type, subject, description, price_points, 
+             created_at, updated_at, author_id, status, category, price, downloads, views_count)
+            VALUES ('{safe_title}', '{safe_work_type}', '{safe_subject}', '{safe_description}', {int(price_points)}, 
+                    NOW(), NOW(), {int(user_id)}, 'pending', '{safe_work_type}', {int(price_points)}, 0, 0)
+            RETURNING id
+        """)
         
         work_id = cur.fetchone()[0]
-        conn.commit()
         
+        # Загружаем все файлы в S3 и сохраняем в work_files
+        uploaded_files = []
+        for file_data in files:
+            file_name = file_data.get('name', 'file')
+            file_size = file_data.get('size', 0)
+            file_base64 = file_data.get('data', '')
+            
+            try:
+                file_url = upload_to_s3(file_base64, file_name)
+                
+                safe_file_url = file_url.replace("'", "''")
+                safe_file_name = file_name.replace("'", "''")
+                
+                cur.execute(f"""
+                    INSERT INTO t_p63326274_course_download_plat.work_files 
+                    (work_id, file_url, file_name, file_size, created_at)
+                    VALUES ({work_id}, '{safe_file_url}', '{safe_file_name}', {file_size}, NOW())
+                """)
+                
+                uploaded_files.append({
+                    'name': file_name,
+                    'url': file_url,
+                    'size': file_size
+                })
+            except Exception as e:
+                print(f"Error uploading file {file_name}: {str(e)}")
+                # Продолжаем загрузку остальных файлов
+        
+        # Обновляем file_url в works (первый файл для обратной совместимости)
+        if uploaded_files:
+            first_file_url = uploaded_files[0]['url'].replace("'", "''")
+            cur.execute(f"""
+                UPDATE t_p63326274_course_download_plat.works 
+                SET file_url = '{first_file_url}'
+                WHERE id = {work_id}
+            """)
+        
+        # Начисляем бонус за загрузку (50 баллов)
+        cur.execute(f"""
+            UPDATE t_p63326274_course_download_plat.users 
+            SET balance = balance + 50
+            WHERE id = {int(user_id)}
+            RETURNING balance
+        """)
+        
+        new_balance_row = cur.fetchone()
+        new_balance = new_balance_row[0] if new_balance_row else 0
+        
+        conn.commit()
         cur.close()
         conn.close()
         
@@ -154,11 +199,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({
                 'success': True,
                 'workId': work_id,
-                'message': 'Work uploaded successfully'
+                'uploadedFiles': len(uploaded_files),
+                'files': uploaded_files,
+                'bonusEarned': 50,
+                'newBalance': new_balance,
+                'message': f'Работа отправлена на модерацию! Загружено файлов: {len(uploaded_files)}'
             })
         }
         
     except Exception as e:
+        print(f"Error in handler: {str(e)}")
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

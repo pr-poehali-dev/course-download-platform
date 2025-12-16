@@ -325,6 +325,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 works = []
                 for row in cur.fetchall():
+                    work_id = row[0]
+                    
                     preview_urls_str = row[11]
                     if isinstance(preview_urls_str, str):
                         preview_urls = json.loads(preview_urls_str) if preview_urls_str else []
@@ -349,8 +351,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     else:
                         keywords = []
                     
+                    # Попытка получить файлы из work_files (пока не работает из-за прав)
+                    files = []
+                    try:
+                        cur.execute(f"""
+                            SELECT file_url, file_name, file_size 
+                            FROM t_p63326274_course_download_plat.work_files
+                            WHERE work_id = {work_id}
+                            ORDER BY created_at ASC
+                        """)
+                        file_rows = cur.fetchall()
+                        files = [{'url': f[0], 'name': f[1], 'size': f[2]} for f in file_rows]
+                    except:
+                        files = []
+                    
                     work = {
-                        'id': row[0],
+                        'id': work_id,
                         'title': row[1],
                         'work_type': row[2],
                         'subject': row[3],
@@ -370,7 +386,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'keywords': keywords,
                         'file_url': row[18],
                         'downloads_count': row[19] or 0,
-                        'discount': row[20] or 0
+                        'discount': row[20] or 0,
+                        'files': files
                     }
                     works.append(work)
                 

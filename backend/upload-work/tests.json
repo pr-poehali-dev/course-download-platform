@@ -1,19 +1,22 @@
 {
   "tests": [
     {
-      "name": "Upload work without file (only metadata)",
+      "name": "Upload work - missing files validation",
       "method": "POST",
       "path": "/",
-      "body": {
-        "title": "Тестовая курсовая работа",
-        "description": "Описание тестовой работы по программированию",
-        "category": "coursework",
-        "price": 600,
-        "authorId": 999999
+      "headers": {
+        "X-User-Id": "1"
       },
-      "expectedStatus": 200,
+      "body": {
+        "title": "Работа без файлов",
+        "workType": "Курсовая работа",
+        "subject": "Математика",
+        "price": 500,
+        "files": []
+      },
+      "expectedStatus": 400,
       "expectedBody": {
-        "success": true
+        "error": "At least one file is required"
       },
       "bodyMatcher": "partial"
     }

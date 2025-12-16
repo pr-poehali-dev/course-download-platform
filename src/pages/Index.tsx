@@ -90,7 +90,8 @@ export default function Index() {
     price: '',
     subject: '',
     description: '',
-    file: null as File | null
+    file: null as File | null,
+    files: [] as File[]
   });
   const [uploadLoading, setUploadLoading] = useState(false);
   

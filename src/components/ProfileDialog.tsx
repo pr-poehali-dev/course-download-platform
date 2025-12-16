@@ -45,7 +45,8 @@ export default function ProfileDialog({
     price: '',
     subject: '',
     description: '',
-    file: null as File | null
+    file: null as File | null,
+    files: [] as File[]
   });
   const [uploadLoading, setUploadLoading] = useState(false);
   const [userWorks, setUserWorks] = useState<any[]>([]);
@@ -89,76 +90,88 @@ export default function ProfileDialog({
       return;
     }
     
+    const filesToUpload = uploadForm.files.length > 0 ? uploadForm.files : (uploadForm.file ? [uploadForm.file] : []);
+    
+    if (filesToUpload.length === 0) {
+      toast({
+        title: 'Нет файлов',
+        description: 'Выберите хотя бы один файл',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     setUploadLoading(true);
     
     try {
-      const reader = new FileReader();
-      reader.readAsDataURL(uploadForm.file!);
+      // Конвертируем все файлы в base64
+      const filesData = await Promise.all(
+        filesToUpload.map(file => {
+          return new Promise<{name: string, size: number, data: string}>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              resolve({
+                name: file.name,
+                size: file.size,
+                data: reader.result as string
+              });
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        })
+      );
       
-      reader.onload = async () => {
-        const base64Data = reader.result as string;
-        
-        const uploadData = {
-          title: uploadForm.title,
-          workType: uploadForm.workType,
-          subject: uploadForm.subject,
-          description: uploadForm.description,
-          price: parseInt(uploadForm.price),
-          fileName: uploadForm.file!.name,
-          fileSize: uploadForm.file!.size,
-          fileData: base64Data
-        };
-        
-        const response = await fetch('https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-User-Id': userId.toString()
-          },
-          body: JSON.stringify(uploadData)
-        });
-        
-        const result = await response.json();
-        
-        setUploadLoading(false);
-        
-        if (response.ok && result.success) {
-          if (result.newBalance) {
-            onBalanceUpdate(result.newBalance);
-          }
-          
-          toast({
-            title: 'Работа загружена!',
-            description: `${result.message}. Начислено +${result.bonusEarned} баллов!`
-          });
-          
-          setUploadForm({
-            title: '',
-            workType: '',
-            price: '',
-            subject: '',
-            description: '',
-            file: null
-          });
-          
-          loadUserWorks();
-        } else {
-          toast({
-            title: 'Ошибка загрузки',
-            description: result.error || 'Не удалось загрузить работу',
-            variant: 'destructive'
-          });
-        }
+      const uploadData = {
+        title: uploadForm.title,
+        workType: uploadForm.workType,
+        subject: uploadForm.subject,
+        description: uploadForm.description,
+        price: parseInt(uploadForm.price),
+        files: filesData
       };
       
-      reader.onerror = () => {
-        setUploadLoading(false);
+      const response = await fetch('https://functions.poehali.dev/bca1c84a-e7e6-4b4c-8b15-85a8f319e0b0', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-User-Id': userId.toString()
+        },
+        body: JSON.stringify(uploadData)
+      });
+      
+      const result = await response.json();
+      
+      setUploadLoading(false);
+      
+      if (response.ok && result.success) {
+        if (result.newBalance) {
+          onBalanceUpdate(result.newBalance);
+        }
+        
         toast({
-          title: 'Ошибка чтения файла',
-          description: 'Не удалось прочитать файл',
+          title: 'Работа загружена!',
+          description: `${result.message}. Начислено +${result.bonusEarned} баллов!`
+        });
+        
+        setUploadForm({
+          title: '',
+          workType: '',
+          price: '',
+          subject: '',
+          description: '',
+          file: null,
+          files: []
+        });
+        
+        loadUserWorks();
+      } else {
+        toast({
+          title: 'Ошибка загрузки',
+          description: result.error || 'Не удалось загрузить работу',
           variant: 'destructive'
         });
-      };
+      }
     } catch (error) {
       setUploadLoading(false);
       toast({

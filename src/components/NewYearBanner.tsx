@@ -17,9 +17,17 @@ export default function NewYearBanner({ onBuyPoints }: NewYearBannerProps) {
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const newYearMoscow = new Date('2025-01-01T00:00:00+03:00').getTime();
-      const now = new Date().getTime();
+      // Московское время: 2025-01-01 00:00:00 MSK (UTC+3)
+      const newYearMoscow = Date.UTC(2024, 11, 31, 21, 0, 0); // 31 декабря 21:00 UTC = 1 января 00:00 MSK
+      const now = Date.now();
       const difference = newYearMoscow - now;
+
+      console.log('Countdown Debug:', {
+        now: new Date(now).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' }),
+        target: new Date(newYearMoscow).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' }),
+        difference,
+        days: Math.floor(difference / (1000 * 60 * 60 * 24))
+      });
 
       if (difference > 0) {
         setTimeLeft({

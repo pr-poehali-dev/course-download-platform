@@ -34,7 +34,7 @@ export default function Navigation({
           <a href="/" className="flex items-center gap-2 md:gap-3 relative group">
             <span className="absolute -top-2 -left-2 text-xl animate-bounce">🎄</span>
             <Icon name="Cpu" size={24} className="text-primary md:w-8 md:h-8" />
-            <h1 className="text-lg md:text-2xl font-bold">Tech Forma</h1>
+            <div className="text-lg md:text-2xl font-bold">Tech Forma</div>
             <span className="absolute -top-2 -right-2 text-xl animate-pulse">⭐</span>
           </a>
           

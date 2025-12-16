@@ -107,7 +107,6 @@ export default function BlogPost() {
       <Helmet>
         <title>{article.title} | Tech Forma</title>
         <meta name="description" content={article.excerpt} />
-        <meta name="keywords" content={article.keywords.join(', ')} />
         <link rel="canonical" href={`https://techforma.pro/blog/${article.slug}`} />
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.excerpt} />
@@ -115,7 +114,6 @@ export default function BlogPost() {
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://techforma.pro/blog/${article.slug}`} />
         <meta property="article:published_time" content={article.publishedAt} />
-        <meta property="article:tag" content={article.keywords.join(', ')} />
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-background">

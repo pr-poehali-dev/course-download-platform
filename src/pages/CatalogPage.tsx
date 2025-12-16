@@ -428,25 +428,16 @@ export default function CatalogPage() {
 
   const getCatalogSEOTitle = () => {
     if (filterSubject !== 'all') {
-      const subjectNames: Record<string, string> = {
-        'ИВТ': 'Информатика и вычислительная техника',
-        'Математика': 'Математика',
-        'Электротехника': 'Электротехника',
-        'Механика': 'Механика',
-        'Строительство': 'Строительство',
-        'Машиностроение': 'Машиностроение',
-        'Программирование': 'Программирование'
-      };
-      return `Чертежи DWG и 3D-модели по ${subjectNames[filterSubject] || filterSubject}`;
+      return `Чертежи ${filterSubject} | Tech Forma`;
     }
-    return 'Каталог чертежей DWG и 3D-моделей CAD';
+    return 'Каталог чертежей DWG | Tech Forma';
   };
 
   const getCatalogSEODescription = () => {
     if (filterSubject !== 'all') {
-      return `Скачать чертежи DWG/DXF и 3D-модели по ${filterSubject}. Технические расчёты, проектная документация. Каталог из ${filteredWorks.length} материалов для студентов и инженеров.`;
+      return `Скачать чертежи DWG и 3D-модели по ${filterSubject}. ${filteredWorks.length} материалов для студентов и инженеров. Мгновенный доступ после оплаты.`;
     }
-    return `Скачать чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты. Каталог из ${filteredWorks.length}+ материалов для студентов и инженеров. Мгновенное скачивание.`;
+    return `Каталог из ${filteredWorks.length}+ чертежей DWG, 3D-моделей и технических расчётов. Для студентов и инженеров. Скачать материалы сразу после оплаты.`;
   };
 
   const hasQueryParams = searchQuery || filterSubject !== 'all' || priceRange !== 'all' || sortBy !== 'default';
@@ -454,9 +445,8 @@ export default function CatalogPage() {
   return (
     <>
       <Helmet>
-        <title>{getCatalogSEOTitle()} — Tech Forma</title>
+        <title>{getCatalogSEOTitle()}</title>
         <meta name="description" content={getCatalogSEODescription()} />
-        <meta name="keywords" content="чертежи dwg купить, 3d модели step, технические расчёты, каталог чертежей, каталог 3д моделей, готовые чертежи, купить чертёж dwg, скачать 3d модель, cad проекты" />
         <link rel="canonical" href="https://techforma.pro/catalog" />
         {hasQueryParams && <meta name="robots" content="noindex, follow" />}
         <script type="application/ld+json">

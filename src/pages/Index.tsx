@@ -475,9 +475,8 @@ export default function Index() {
   return (
     <>
       <SEO 
-        title="Tech Forma — Инженерная платформа | Чертежи, CAD, примеры расчётов"
-        description="Инженерная платформа для студентов и специалистов. Чертежи, 3D-модели, примеры технических расчётов, проектная документация. База справочных материалов для обучения."
-        keywords="чертежи dwg, cad проекты, 3d модели, технические расчёты, проектная документация, учебные материалы, инженерная платформа, примеры проектов"
+        title="Чертежи DWG и 3D-модели CAD | Tech Forma"
+        description="Чертежи DWG/DXF, 3D-модели, технические расчёты. Инженерная платформа для студентов и специалистов. Скачать документацию и примеры."
         canonical="https://techforma.pro/"
       />
       <Helmet>
@@ -571,7 +570,7 @@ export default function Index() {
                   <Icon name="Ruler" size={24} className="text-white" />
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <h1 className="text-xl sm:text-2xl font-bold truncate leading-tight text-foreground">TechForma</h1>
+                  <div className="text-xl sm:text-2xl font-bold truncate leading-tight text-foreground">TechForma</div>
                   <p className="text-xs text-muted-foreground hidden sm:block">Инженерная платформа</p>
                 </div>
               </div>

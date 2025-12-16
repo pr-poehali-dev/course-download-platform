@@ -132,15 +132,20 @@ export default function UploadsTab({
                 type="file"
                 multiple
                 className="hidden"
-                key={uploadForm.files.length === 0 ? 'empty' : 'filled'}
+                key={uploadForm.files.length}
                 accept=".rar,.zip,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.dxf,.cdw,.frw,.step"
                 onChange={(e) => {
                   const selectedFiles = Array.from(e.target.files || []);
-                  if (selectedFiles.length > 10) {
-                    alert('Можно загрузить максимум 10 файлов');
+                  const existingFiles = uploadForm.files || [];
+                  const totalFiles = [...existingFiles, ...selectedFiles];
+                  
+                  if (totalFiles.length > 10) {
+                    alert(`Можно загрузить максимум 10 файлов. У вас уже ${existingFiles.length}, вы пытаетесь добавить ${selectedFiles.length}`);
                     return;
                   }
-                  onUploadFormChange({ ...uploadForm, files: selectedFiles, file: selectedFiles[0] || null });
+                  
+                  onUploadFormChange({ ...uploadForm, files: totalFiles, file: totalFiles[0] || null });
+                  e.target.value = '';
                 }}
               />
               
@@ -165,18 +170,24 @@ export default function UploadsTab({
                       </button>
                     </div>
                   ))}
-                  <label htmlFor="files" className="text-primary hover:underline cursor-pointer inline-block font-medium">
-                    Выбрать другой файл
-                  </label>
+                  {uploadForm.files.length < 10 && (
+                    <label htmlFor="files" className="text-primary hover:underline cursor-pointer inline-block font-medium">
+                      + Добавить ещё файлы (макс. {10 - uploadForm.files.length})
+                    </label>
+                  )}
                 </div>
               ) : (
                 <label htmlFor="files" className="cursor-pointer block">
                   <Icon name="Upload" size={48} className="mx-auto mb-3 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-lg font-medium mb-2">Нажмите для выбора файлов</p>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Можно выбрать до 10 файлов одновременно
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-2">
                     Поддерживаемые форматы: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, CDW, FRW, MAX, SPW, KOMPAS, A3D, M3D, RAR, ZIP, 7Z
                   </p>
-                  <p className="text-sm text-muted-foreground mb-1">
-                    Максимальный размер файла: 50 МБ
+                  <p className="text-xs text-muted-foreground">
+                    Максимальный размер одного файла: 50 МБ
                   </p>
                 </label>
               )}

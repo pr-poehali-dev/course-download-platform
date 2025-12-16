@@ -123,6 +123,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = get_db_connection()
         cur = conn.cursor()
         
+        # Проверяем существует ли пользователь, если нет - создаём
+        cur.execute(f"SELECT id FROM t_p63326274_course_download_plat.users WHERE id = {int(user_id)}")
+        user_exists = cur.fetchone()
+        
+        if not user_exists:
+            print(f"Creating user with id {user_id}")
+            cur.execute(f"""
+                INSERT INTO t_p63326274_course_download_plat.users 
+                (id, balance, created_at, role)
+                VALUES ({int(user_id)}, 0, NOW(), 'user')
+            """)
+        
         # Экранируем строки для Simple Query Protocol
         safe_title = title.replace("'", "''")
         safe_work_type = work_type.replace("'", "''")

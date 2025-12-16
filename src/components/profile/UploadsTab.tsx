@@ -125,34 +125,34 @@ export default function UploadsTab({
           </div>
 
           <div>
-            <Label htmlFor="files">Файлы работы (до 10 файлов) *</Label>
-            <Input
-              id="files"
-              type="file"
-              multiple
-              key={uploadForm.files.length === 0 ? 'empty' : 'filled'}
-              accept=".rar,.zip,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.dxf,.cdw,.frw,.step"
-              onChange={(e) => {
-                const selectedFiles = Array.from(e.target.files || []);
-                if (selectedFiles.length > 10) {
-                  alert('Можно загрузить максимум 10 файлов');
-                  return;
-                }
-                onUploadFormChange({ ...uploadForm, files: selectedFiles, file: selectedFiles[0] || null });
-              }}
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Максимум 10 файлов по 50 МБ каждый. Поддерживаются: RAR, ZIP, PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, DXF, CDW, FRW, STEP
-            </p>
-            {uploadForm.files && uploadForm.files.length > 0 && (
-              <div className="mt-3 space-y-2">
-                <p className="text-sm font-medium">Выбрано файлов: {uploadForm.files.length}</p>
-                <div className="space-y-1">
+            <Label htmlFor="files">Файл работы *</Label>
+            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
+              <input
+                id="files"
+                type="file"
+                multiple
+                className="hidden"
+                key={uploadForm.files.length === 0 ? 'empty' : 'filled'}
+                accept=".rar,.zip,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.dxf,.cdw,.frw,.step"
+                onChange={(e) => {
+                  const selectedFiles = Array.from(e.target.files || []);
+                  if (selectedFiles.length > 10) {
+                    alert('Можно загрузить максимум 10 файлов');
+                    return;
+                  }
+                  onUploadFormChange({ ...uploadForm, files: selectedFiles, file: selectedFiles[0] || null });
+                }}
+              />
+              
+              {uploadForm.files && uploadForm.files.length > 0 ? (
+                <div className="space-y-3">
                   {uploadForm.files.map((file, index) => (
-                    <div key={index} className="flex items-center gap-2 text-xs text-muted-foreground bg-muted/50 px-2 py-1 rounded">
-                      <Icon name="File" size={14} />
-                      <span className="flex-1 truncate">{file.name}</span>
-                      <span className="text-xs">({(file.size / 1024 / 1024).toFixed(2)} МБ)</span>
+                    <div key={index} className="flex items-center gap-3 bg-muted/50 px-4 py-3 rounded-lg">
+                      <Icon name="Upload" size={32} className="text-primary" />
+                      <div className="flex-1 text-left">
+                        <p className="font-medium text-foreground truncate">{file.name}</p>
+                        <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} МБ</p>
+                      </div>
                       <button
                         type="button"
                         onClick={() => {
@@ -161,13 +161,26 @@ export default function UploadsTab({
                         }}
                         className="hover:text-destructive"
                       >
-                        <Icon name="X" size={14} />
+                        <Icon name="X" size={20} />
                       </button>
                     </div>
                   ))}
+                  <label htmlFor="files" className="text-primary hover:underline cursor-pointer inline-block font-medium">
+                    Выбрать другой файл
+                  </label>
                 </div>
-              </div>
-            )}
+              ) : (
+                <label htmlFor="files" className="cursor-pointer block">
+                  <Icon name="Upload" size={48} className="mx-auto mb-3 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Поддерживаемые форматы: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, CDW, FRW, MAX, SPW, KOMPAS, A3D, M3D, RAR, ZIP, 7Z
+                  </p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Максимальный размер файла: 50 МБ
+                  </p>
+                </label>
+              )}
+            </div>
           </div>
         </CardContent>
         <CardFooter>

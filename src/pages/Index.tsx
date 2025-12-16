@@ -560,7 +560,6 @@ export default function Index() {
       <ExitIntentModal />
       <NewYearSnow />
       <NewYearBanner onBuyPoints={() => setPaymentDialogOpen(true)} />
-      {isLoggedIn && <DiscountProgressBar currentPoints={userBalance} />}
       <div className="min-h-screen w-full overflow-x-hidden bg-background">
         <header className="glass-card border-b border-border sticky top-0 z-50 w-full backdrop-blur-md shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">

@@ -51,7 +51,7 @@ export default function ModerationPage() {
   const loadPendingWorks = async () => {
     setLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/4b63f11a-68e3-479e-949a-15ef00c70b38?status=pending');
+      const response = await fetch('https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?status=pending');
       const data = await response.json();
       
       if (data.success && data.works) {
@@ -60,7 +60,7 @@ export default function ModerationPage() {
           data.works.map(async (work: any) => {
             try {
               const filesResponse = await fetch(
-                `https://functions.poehali.dev/09b0a66b-0e7f-4e66-8990-3e71bc3ddc58?work_id=${work.id}`
+                `https://functions.poehali.dev/ec3bbe78-f975-4ae0-9b3f-3a3fc67dd7d1?work_id=${work.id}`
               );
               const filesData = await filesResponse.json();
               return {

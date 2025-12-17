@@ -13,10 +13,10 @@ import uuid
 from typing import Dict, Any, List
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
-YANDEX_S3_KEY_ID = os.environ.get('YANDEX_S3_KEY_ID', '')
-YANDEX_S3_SECRET_KEY = os.environ.get('YANDEX_S3_SECRET_KEY', '')
-S3_BUCKET = 'kyra'
-S3_ENDPOINT = 'https://storage.yandexcloud.net'
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID', '')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY', '')
+S3_BUCKET = 'files'
+S3_ENDPOINT = 'https://bucket.poehali.dev'
 
 def get_db_connection():
     return psycopg2.connect(DATABASE_URL)
@@ -43,9 +43,8 @@ def upload_to_s3(file_data: str, file_name: str) -> str:
         s3_client = boto3.client(
             's3',
             endpoint_url=S3_ENDPOINT,
-            aws_access_key_id=YANDEX_S3_KEY_ID,
-            aws_secret_access_key=YANDEX_S3_SECRET_KEY,
-            region_name='ru-central1'
+            aws_access_key_id=AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=AWS_SECRET_ACCESS_KEY
         )
         
         # Generate unique filename
@@ -59,8 +58,8 @@ def upload_to_s3(file_data: str, file_name: str) -> str:
             ContentType='application/octet-stream'
         )
         
-        # Return public URL
-        return f"{S3_ENDPOINT}/{S3_BUCKET}/{unique_name}"
+        # Return CDN URL
+        return f"https://cdn.poehali.dev/projects/{AWS_ACCESS_KEY_ID}/bucket/{unique_name}"
     except Exception as e:
         print(f"Error uploading to S3: {str(e)}")
         raise Exception(f"Failed to upload file: {str(e)}")

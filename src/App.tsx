@@ -34,6 +34,7 @@ const TermsOfServicePage = lazyRetry(() => import("./pages/TermsOfServicePage"))
 const UsageRulesPage = lazyRetry(() => import("./pages/UsageRulesPage"));
 const OfferPage = lazyRetry(() => import("./pages/OfferPage"));
 const Requisites = lazyRetry(() => import("./pages/Requisites"));
+const ContactsPage = lazyRetry(() => import("./pages/ContactsPage"));
 
 const AdminPage = lazyRetry(() => import("./pages/AdminPage"));
 const AdminBlogPage = lazyRetry(() => import("./pages/AdminBlogPage"));
@@ -98,6 +99,7 @@ const App = () => (
           <Route path="/usage-rules" element={<UsageRulesPage />} />
           <Route path="/offer" element={<OfferPage />} />
           <Route path="/requisites" element={<Requisites />} />
+          <Route path="/contacts" element={<ContactsPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/admin/moderation" element={<ModerationPage />} />
           <Route path="/admin/support" element={<SupportAdmin />} />

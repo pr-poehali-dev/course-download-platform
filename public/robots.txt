@@ -1,14 +1,29 @@
 # robots.txt для TechForma
 # Оптимизировано для поисковых систем
+# Обновлено: 2025-12-17
 
-# Основное зеркало сайта
-Host: techforma.pro
+# Основное зеркало сайта (указание главного домена)
+Host: https://techforma.pro
 
+# Правила для всех поисковых роботов
 User-agent: *
 Allow: /
 Allow: /catalog
+Allow: /catalog?category=
 Allow: /marketplace
-Allow: /bot-subscription
+Allow: /blog
+Allow: /blog/
+Allow: /work/
+Allow: /buy-points
+Allow: /defense-kit
+Allow: /privacy-policy
+Allow: /terms-of-service
+Allow: /usage-rules
+Allow: /offer
+Allow: /requisites
+Allow: /contacts
+
+# Разрешаем статические ресурсы
 Allow: /*.css$
 Allow: /*.js$
 Allow: /*.png$
@@ -17,6 +32,9 @@ Allow: /*.jpeg$
 Allow: /*.gif$
 Allow: /*.svg$
 Allow: /*.webp$
+Allow: /*.woff$
+Allow: /*.woff2$
+Allow: /*.ttf$
 
 # Блокируем приватные страницы
 Disallow: /admin

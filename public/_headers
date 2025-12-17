@@ -1,23 +1,33 @@
-# Главная и каталог - индексировать
+# Глобальные заголовки для всех страниц
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: interest-cohort=()
+
+# Главная - индексировать с максимальным приоритетом
 /
-  X-Robots-Tag: index, follow
-  Cache-Control: public, max-age=3600
+  X-Robots-Tag: index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+  Link: <https://techforma.pro>; rel="canonical"
 
 /catalog
-  X-Robots-Tag: index, follow
-  Cache-Control: public, max-age=1800
+  X-Robots-Tag: index, follow, max-snippet:-1, max-image-preview:large
+  Cache-Control: public, max-age=1800, stale-while-revalidate=3600
+  Link: <https://techforma.pro/catalog>; rel="canonical"
 
 /work/*
-  X-Robots-Tag: index, follow
-  Cache-Control: public, max-age=3600
+  X-Robots-Tag: index, follow, max-snippet:-1, max-image-preview:large
+  Cache-Control: public, max-age=7200, stale-while-revalidate=86400
 
 /blog
-  X-Robots-Tag: index, follow
-  Cache-Control: public, max-age=3600
+  X-Robots-Tag: index, follow, max-snippet:-1
+  Cache-Control: public, max-age=3600, stale-while-revalidate=7200
+  Link: <https://techforma.pro/blog>; rel="canonical"
 
 /blog/*
-  X-Robots-Tag: index, follow
-  Cache-Control: public, max-age=3600
+  X-Robots-Tag: index, follow, max-snippet:-1, max-image-preview:large
+  Cache-Control: public, max-age=7200, stale-while-revalidate=86400
 
 # Служебные страницы - индексировать с follow для передачи веса
 /privacy-policy
@@ -34,6 +44,10 @@
 
 /requisites
   X-Robots-Tag: index, follow
+
+/contacts
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
 
 # Административные страницы
 /admin/*
@@ -58,13 +72,19 @@
   X-Robots-Tag: noindex, nofollow
 
 /buy-points
-  X-Robots-Tag: noindex, nofollow
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
+  Link: <https://techforma.pro/buy-points>; rel="canonical"
 
 /marketplace
-  X-Robots-Tag: noindex, nofollow
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
+  Link: <https://techforma.pro/marketplace>; rel="canonical"
 
 /defense-kit
-  X-Robots-Tag: noindex, nofollow
+  X-Robots-Tag: index, follow
+  Cache-Control: public, max-age=3600
+  Link: <https://techforma.pro/defense-kit>; rel="canonical"
 
 # Служебные файлы
 /yandex_*.html

@@ -5,17 +5,19 @@
   <!-- Главная страница -->
   <url>
     <loc>https://techforma.pro/</loc>
-    <lastmod>2025-12-16</lastmod>
+    <lastmod>2025-12-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="canonical" href="https://techforma.pro/" />
   </url>
   
   <!-- Каталог -->
   <url>
     <loc>https://techforma.pro/catalog</loc>
-    <lastmod>2025-12-16</lastmod>
+    <lastmod>2025-12-17</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <xhtml:link rel="canonical" href="https://techforma.pro/catalog" />
   </url>
 
   <!-- Категории каталога -->
@@ -58,9 +60,10 @@
   <!-- Маркетплейс -->
   <url>
     <loc>https://techforma.pro/marketplace</loc>
-    <lastmod>2025-12-13</lastmod>
+    <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+    <xhtml:link rel="canonical" href="https://techforma.pro/marketplace" />
   </url>
   
   <!-- Статические страницы -->
@@ -99,20 +102,31 @@
     <priority>0.2</priority>
   </url>
   
+  <!-- Контакты -->
+  <url>
+    <loc>https://techforma.pro/contacts</loc>
+    <lastmod>2025-12-17</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+    <xhtml:link rel="canonical" href="https://techforma.pro/contacts" />
+  </url>
+  
   <!-- Покупка баллов -->
   <url>
     <loc>https://techforma.pro/buy-points</loc>
-    <lastmod>2025-12-16</lastmod>
+    <lastmod>2025-12-17</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.7</priority>
+    <xhtml:link rel="canonical" href="https://techforma.pro/buy-points" />
   </url>
   
   <!-- Конструктор пакета защиты -->
   <url>
     <loc>https://techforma.pro/defense-kit</loc>
-    <lastmod>2025-12-13</lastmod>
+    <lastmod>2025-12-17</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <priority>0.7</priority>
+    <xhtml:link rel="canonical" href="https://techforma.pro/defense-kit" />
   </url>
   
   <!-- ПРИМЕЧАНИЕ: 

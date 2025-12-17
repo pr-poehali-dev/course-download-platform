@@ -15,13 +15,36 @@ const NotFoundPage = () => {
     );
   }, [location.pathname]);
 
+  useEffect(() => {
+    // Устанавливаем правильный статус 404 для страницы
+    if (typeof window !== 'undefined') {
+      const metaStatus = document.createElement('meta');
+      metaStatus.httpEquiv = 'status';
+      metaStatus.content = '404';
+      document.head.appendChild(metaStatus);
+      
+      return () => {
+        document.head.removeChild(metaStatus);
+      };
+    }
+  }, []);
+
   return (
     <>
       <Helmet>
         <title>404 - Страница не найдена | Tech Forma</title>
         <meta name="description" content="Запрашиваемая страница не найдена. Вернитесь на главную или перейдите в каталог чертежей и 3D-моделей." />
         <meta name="robots" content="noindex, nofollow" />
-        <meta httpEquiv="status" content="404" />
+        <meta httpEquiv="status" content="404 Not Found" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "404 - Страница не найдена",
+            "description": "Запрашиваемая страница не существует",
+            "url": `https://techforma.pro${location.pathname}`
+          })}
+        </script>
       </Helmet>
       
       <div className="min-h-screen flex flex-col bg-background">

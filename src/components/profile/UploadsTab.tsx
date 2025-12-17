@@ -125,8 +125,9 @@ export default function UploadsTab({
           </div>
 
           <div>
-            <Label htmlFor="files">Файл работы *</Label>
-            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
+            <Label htmlFor="files" className="text-lg font-semibold">Файлы работы *</Label>
+            <p className="text-sm text-muted-foreground mb-3">Загрузите до 10 файлов одновременно</p>
+            <div className="border-2 border-dashed border-primary/30 rounded-lg p-8 text-center hover:border-primary/60 transition-colors bg-gradient-to-b from-primary/5 to-transparent">
               <input
                 id="files"
                 type="file"
@@ -177,18 +178,25 @@ export default function UploadsTab({
                   )}
                 </div>
               ) : (
-                <label htmlFor="files" className="cursor-pointer block">
-                  <Icon name="Upload" size={48} className="mx-auto mb-3 text-muted-foreground" />
-                  <p className="text-lg font-medium mb-2">Нажмите для выбора файлов</p>
-                  <p className="text-sm text-muted-foreground mb-3">
-                    Можно выбрать до 10 файлов одновременно
+                <label htmlFor="files" className="cursor-pointer block group">
+                  <div className="bg-primary/10 w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Icon name="Upload" size={40} className="text-primary" />
+                  </div>
+                  <p className="text-xl font-bold mb-2 text-foreground">Загрузить файлы</p>
+                  <p className="text-base text-muted-foreground mb-4 font-medium">
+                    Нажмите или перетащите файлы сюда
                   </p>
-                  <p className="text-xs text-muted-foreground mb-2">
-                    Поддерживаемые форматы: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, CDW, FRW, MAX, SPW, KOMPAS, A3D, M3D, RAR, ZIP, 7Z
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Максимальный размер одного файла: 50 МБ
-                  </p>
+                  <div className="bg-muted/30 rounded-lg p-4 max-w-md mx-auto">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      📎 Поддерживаемые форматы:
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, CDW, FRW, RAR, ZIP, 7Z
+                    </p>
+                    <p className="text-sm font-medium text-primary">
+                      ✓ До 10 файлов • Максимум 50 МБ каждый
+                    </p>
+                  </div>
                 </label>
               )}
             </div>

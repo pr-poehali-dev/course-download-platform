@@ -34,6 +34,7 @@ const BulkGenerateReviewsPage = lazy(() => import("./pages/BulkGenerateReviewsPa
 const AutoGenerateReviewsPage = lazy(() => import("./pages/AutoGenerateReviewsPage"));
 const ReviewsCleanupPage = lazy(() => import("./pages/ReviewsCleanupPage"));
 const SitemapViewPage = lazy(() => import("./pages/SitemapViewPage"));
+const ModerationPage = lazy(() => import("./pages/ModerationPage"));
 
 const BuyPointsPage = lazy(() => import("./pages/BuyPointsPage"));
 const UploadWorkPage = lazy(() => import("./pages/UploadWorkPage"));
@@ -84,6 +85,7 @@ const App = () => (
           <Route path="/offer" element={<OfferPage />} />
           <Route path="/requisites" element={<Requisites />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/admin/moderation" element={<ModerationPage />} />
           <Route path="/admin/support" element={<SupportAdmin />} />
           <Route path="/admin/security-logs" element={<SecurityLogsPage />} />
           <Route path="/admin/points-audit" element={<PointsAuditPage />} />

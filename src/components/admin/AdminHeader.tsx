@@ -15,6 +15,12 @@ export default function AdminHeader({ onLogout }: AdminHeaderProps) {
         <p className="text-muted-foreground">Статистика и аналитика платформы</p>
       </div>
       <div className="flex gap-2">
+        <Button asChild variant="default">
+          <Link to="/admin/moderation">
+            <Icon name="CheckCircle" size={18} className="mr-2" />
+            Модерация работ
+          </Link>
+        </Button>
         <Button asChild variant="outline">
           <Link to="/admin/points-audit">
             <Icon name="SearchCheck" size={18} className="mr-2" />

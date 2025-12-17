@@ -1,42 +1,12 @@
 import { Link } from 'react-router-dom';
 import Icon from '@/components/ui/icon';
-import { Helmet } from 'react-helmet-async';
 
 export default function Footer() {
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "TechForma",
-    "legalName": "ИП Гагарская Елизавета Александровна",
-    "url": "https://techforma.pro",
-    "logo": "https://techforma.pro/favicon.svg",
-    "description": "Инженерная платформа для студентов и специалистов. Готовые чертежи, 3D-модели, курсовые и дипломные работы.",
-    "email": "tech.forma@yandex.ru",
-    "telephone": "+79991234567",
-    "address": {
-      "@type": "PostalAddress",
-      "addressLocality": "Архангельск",
-      "addressCountry": "RU"
-    },
-    "sameAs": [
-      "https://vk.com/club234274626",
-      "https://t.me/techforma_support"
-    ],
-    "taxID": "290540407146",
-    "vatID": "325290000045931"
-  };
-
   return (
-    <>
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(organizationSchema)}
-        </script>
-      </Helmet>
-      <footer className="bg-muted/30 border-t border-border py-16" itemScope itemType="https://schema.org/Organization">
-        <meta itemProp="name" content="TechForma" />
-        <meta itemProp="url" content="https://techforma.pro" />
-        <div className="container mx-auto px-4 max-w-7xl">
+    <footer className="bg-muted/30 border-t border-border py-16" itemScope itemType="https://schema.org/Organization">
+      <meta itemProp="name" content="TechForma" />
+      <meta itemProp="url" content="https://techforma.pro" />
+      <div className="container mx-auto px-4 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           <div>
             <div className="flex items-center gap-3 mb-4">

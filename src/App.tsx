@@ -1,5 +1,5 @@
 
-import { lazy, Suspense } from "react";
+import React, { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,16 +8,24 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { HelmetProvider } from 'react-helmet-async';
 
-// Retry helper for lazy imports
-const lazyRetry = (componentImport: () => Promise<any>) => 
-  lazy(() => 
-    componentImport().catch(() => {
-      // Retry after 1 second
-      return new Promise(resolve => {
-        setTimeout(() => resolve(componentImport()), 1000);
-      });
-    })
-  );
+// Retry helper for lazy imports with proper error handling
+const lazyRetry = (componentImport: () => Promise<any>, retries = 3) => 
+  lazy(async () => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await componentImport();
+      } catch (error) {
+        if (i === retries - 1) {
+          console.error('Failed to load component after retries:', error);
+          throw error;
+        }
+        // Wait before retry (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+      }
+    }
+    // Fallback return (TypeScript требует)
+    return await componentImport();
+  });
 
 const Index = lazyRetry(() => import("./pages/Index"));
 const NotFoundPage = lazyRetry(() => import("./pages/NotFoundPage"));
@@ -79,6 +87,48 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Error boundary component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Component error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background p-4">
+          <div className="text-center max-w-md">
+            <h1 className="text-2xl font-bold mb-4">Ошибка загрузки</h1>
+            <p className="text-muted-foreground mb-6">
+              Не удалось загрузить страницу. Попробуйте обновить.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Обновить страницу
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 
 
 const queryClient = new QueryClient();
@@ -91,8 +141,9 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <Suspense fallback={<LoadingFallback />}>
-              <Routes>
+            <ErrorBoundary>
+              <Suspense fallback={<LoadingFallback />}>
+                <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
@@ -139,6 +190,7 @@ const App = () => (
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>
+          </ErrorBoundary>
           </BrowserRouter>
     </TooltipProvider>
     </ThemeProvider>

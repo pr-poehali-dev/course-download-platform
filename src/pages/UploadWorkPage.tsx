@@ -28,7 +28,8 @@ export default function UploadWorkPage() {
     description: '',
     category: '',
     price: '',
-    file: null as File | null
+    file: null as File | null,
+    files: [] as File[]
   });
 
   const workTypes = [
@@ -44,13 +45,26 @@ export default function UploadWorkPage() {
   ];
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const selectedFiles = Array.from(e.target.files || []);
+    const existingFiles = formData.files || [];
+    const totalFiles = [...existingFiles, ...selectedFiles];
+    
+    if (totalFiles.length > 10) {
+      toast({
+        title: 'Ошибка',
+        description: `Можно загрузить максимум 10 файлов. У вас уже ${existingFiles.length}, вы пытаетесь добавить ${selectedFiles.length}`,
+        variant: 'destructive'
+      });
+      e.target.value = '';
+      return;
+    }
+
+    for (const file of selectedFiles) {
       const validation = validateFile(file);
       if (!validation.valid) {
         toast({
           title: 'Ошибка',
-          description: validation.error,
+          description: `${file.name}: ${validation.error}`,
           variant: 'destructive'
         });
         e.target.value = '';
@@ -61,21 +75,22 @@ export default function UploadWorkPage() {
       if (!magicBytesValid) {
         toast({
           title: 'Ошибка',
-          description: 'Файл поврежден или имеет неверный формат',
+          description: `${file.name}: Файл поврежден или имеет неверный формат`,
           variant: 'destructive'
         });
         e.target.value = '';
         return;
       }
-
-      setFormData({ ...formData, file });
     }
+
+    setFormData({ ...formData, files: totalFiles, file: totalFiles[0] || null });
+    e.target.value = '';
   };
 
   const handleCheckBeforeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.description || !formData.category || !formData.price || !formData.file) {
+    if (!formData.title || !formData.description || !formData.category || !formData.price || (!formData.file && (!formData.files || formData.files.length === 0))) {
       toast({
         title: 'Ошибка',
         description: 'Заполните все обязательные поля',
@@ -102,22 +117,30 @@ export default function UploadWorkPage() {
         return;
       }
 
-      let fileBase64 = '';
-      if (formData.file) {
-        fileBase64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const result = reader.result as string;
-            const base64 = result.split(',')[1];
-            resolve(base64);
+      const filesToUpload = formData.files.length > 0 ? formData.files : (formData.file ? [formData.file] : []);
+      
+      const filesData = await Promise.all(
+        filesToUpload.map(async (file) => {
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const result = reader.result as string;
+              const base64Content = result.split(',')[1];
+              resolve(base64Content);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          
+          return {
+            name: sanitizeFilename(file.name),
+            content: base64,
+            size: file.size
           };
-          reader.onerror = reject;
-          reader.readAsDataURL(formData.file!);
-        });
-      }
+        })
+      );
 
       const uploadUrl = func2url['upload-work'];
-      const safeFileName = sanitizeFilename(formData.file?.name || 'work.docx');
       
       const response = await fetch(uploadUrl, {
         method: 'POST',
@@ -131,8 +154,9 @@ export default function UploadWorkPage() {
           category: formData.category,
           price: parseInt(formData.price),
           authorId: user.id,
-          fileName: safeFileName,
-          file: fileBase64
+          files: filesData,
+          fileName: filesData[0]?.name || 'work.docx',
+          file: filesData[0]?.content || ''
         })
       });
 
@@ -268,45 +292,60 @@ export default function UploadWorkPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Загрузка файла</CardTitle>
-              <CardDescription>Выберите файл с вашей работой</CardDescription>
+              <CardTitle>Загрузка файлов</CardTitle>
+              <CardDescription>Можно загрузить до 10 файлов одновременно</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-3">
-                <Label htmlFor="file" className="text-base font-semibold">
-                  Файл работы <span className="text-destructive">*</span>
+                <Label htmlFor="files" className="text-base font-semibold">
+                  Файлы работы <span className="text-destructive">*</span>
                 </Label>
                 <div className="border-2 border-dashed border-primary/30 rounded-lg p-10 text-center hover:border-primary/60 transition-colors bg-gradient-to-b from-primary/5 to-transparent">
                   <input
-                    id="file"
+                    id="files"
                     type="file"
+                    multiple
                     className="hidden"
+                    key={formData.files.length}
                     accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.dwg,.cdw,.frw,.max,.spw,.kompas,.a3d,.m3d,.rar,.zip,.7z"
                     onChange={handleFileChange}
                     required
                   />
-                  {formData.file ? (
-                    <label htmlFor="file" className="cursor-pointer block">
-                      <div className="bg-green-50 w-24 h-24 rounded-full mx-auto mb-5 flex items-center justify-center">
-                        <Icon name="FileCheck" size={48} className="text-green-600" />
-                      </div>
-                      <p className="text-xl font-bold mb-2 text-foreground">{formData.file.name}</p>
-                      <p className="text-base text-muted-foreground mb-4 font-medium">
-                        {(formData.file.size / 1024 / 1024).toFixed(2)} МБ
-                      </p>
-                      <Button type="button" variant="outline" size="lg" className="mt-2">
-                        <Icon name="RefreshCw" size={18} className="mr-2" />
-                        Выбрать другой файл
-                      </Button>
-                    </label>
+                  {formData.files && formData.files.length > 0 ? (
+                    <div className="space-y-3">
+                      {formData.files.map((file, index) => (
+                        <div key={index} className="flex items-center gap-3 bg-muted/50 px-4 py-3 rounded-lg">
+                          <Icon name="Upload" size={32} className="text-primary" />
+                          <div className="flex-1 text-left">
+                            <p className="font-medium text-foreground truncate">{file.name}</p>
+                            <p className="text-sm text-muted-foreground">{(file.size / 1024 / 1024).toFixed(2)} МБ</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newFiles = formData.files.filter((_, i) => i !== index);
+                              setFormData({ ...formData, files: newFiles, file: newFiles[0] || null });
+                            }}
+                            className="hover:text-destructive transition-colors"
+                          >
+                            <Icon name="X" size={20} />
+                          </button>
+                        </div>
+                      ))}
+                      {formData.files.length < 10 && (
+                        <label htmlFor="files" className="text-primary hover:underline cursor-pointer inline-block font-medium text-base">
+                          + Добавить ещё файлы (макс. {10 - formData.files.length})
+                        </label>
+                      )}
+                    </div>
                   ) : (
-                    <label htmlFor="file" className="cursor-pointer block group">
+                    <label htmlFor="files" className="cursor-pointer block group">
                       <div className="bg-primary/10 w-24 h-24 rounded-full mx-auto mb-5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                         <Icon name="Upload" size={48} className="text-primary" />
                       </div>
-                      <p className="text-2xl font-bold mb-2 text-foreground">Нажмите для выбора файла</p>
+                      <p className="text-2xl font-bold mb-2 text-foreground">Загрузить файлы</p>
                       <p className="text-lg text-muted-foreground mb-5 font-medium">
-                        или перетащите файл сюда
+                        Нажмите или перетащите файлы сюда
                       </p>
                       <div className="bg-muted/40 rounded-lg p-5 max-w-lg mx-auto">
                         <p className="text-sm text-muted-foreground mb-2 font-medium">
@@ -316,7 +355,7 @@ export default function UploadWorkPage() {
                           PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, CDW, FRW, MAX, SPW, KOMPAS, A3D, M3D, RAR, ZIP, 7Z
                         </p>
                         <p className="text-sm font-semibold text-primary">
-                          ✓ Максимальный размер файла: 50 МБ
+                          ✓ До 10 файлов • Максимум 50 МБ каждый
                         </p>
                       </div>
                     </label>

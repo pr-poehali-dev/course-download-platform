@@ -272,11 +272,11 @@ export default function UploadWorkPage() {
               <CardDescription>Выберите файл с вашей работой</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="file">
+              <div className="space-y-3">
+                <Label htmlFor="file" className="text-base font-semibold">
                   Файл работы <span className="text-destructive">*</span>
                 </Label>
-                <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-primary transition-colors cursor-pointer">
+                <div className="border-2 border-dashed border-primary/30 rounded-lg p-10 text-center hover:border-primary/60 transition-colors bg-gradient-to-b from-primary/5 to-transparent">
                   <input
                     id="file"
                     type="file"
@@ -285,33 +285,43 @@ export default function UploadWorkPage() {
                     onChange={handleFileChange}
                     required
                   />
-                  <label htmlFor="file" className="cursor-pointer">
-                    <Icon name="Upload" size={48} className="mx-auto mb-4 text-muted-foreground" />
-                    {formData.file ? (
-                      <div>
-                        <p className="font-semibold mb-1">{formData.file.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {(formData.file.size / 1024 / 1024).toFixed(2)} МБ
-                        </p>
-                        <Button type="button" variant="link" size="sm" className="mt-2">
-                          Выбрать другой файл
-                        </Button>
+                  {formData.file ? (
+                    <label htmlFor="file" className="cursor-pointer block">
+                      <div className="bg-green-50 w-24 h-24 rounded-full mx-auto mb-5 flex items-center justify-center">
+                        <Icon name="FileCheck" size={48} className="text-green-600" />
                       </div>
-                    ) : (
-                      <div>
-                        <p className="font-semibold mb-1">Нажмите для выбора файла</p>
-                        <p className="text-sm text-muted-foreground">
-                          или перетащите файл сюда
+                      <p className="text-xl font-bold mb-2 text-foreground">{formData.file.name}</p>
+                      <p className="text-base text-muted-foreground mb-4 font-medium">
+                        {(formData.file.size / 1024 / 1024).toFixed(2)} МБ
+                      </p>
+                      <Button type="button" variant="outline" size="lg" className="mt-2">
+                        <Icon name="RefreshCw" size={18} className="mr-2" />
+                        Выбрать другой файл
+                      </Button>
+                    </label>
+                  ) : (
+                    <label htmlFor="file" className="cursor-pointer block group">
+                      <div className="bg-primary/10 w-24 h-24 rounded-full mx-auto mb-5 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                        <Icon name="Upload" size={48} className="text-primary" />
+                      </div>
+                      <p className="text-2xl font-bold mb-2 text-foreground">Нажмите для выбора файла</p>
+                      <p className="text-lg text-muted-foreground mb-5 font-medium">
+                        или перетащите файл сюда
+                      </p>
+                      <div className="bg-muted/40 rounded-lg p-5 max-w-lg mx-auto">
+                        <p className="text-sm text-muted-foreground mb-2 font-medium">
+                          📎 Поддерживаемые форматы:
+                        </p>
+                        <p className="text-xs text-muted-foreground mb-3">
+                          PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, CDW, FRW, MAX, SPW, KOMPAS, A3D, M3D, RAR, ZIP, 7Z
+                        </p>
+                        <p className="text-sm font-semibold text-primary">
+                          ✓ Максимальный размер файла: 50 МБ
                         </p>
                       </div>
-                    )}
-                  </label>
+                    </label>
+                  )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Поддерживаемые форматы: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, DWG, CDW, FRW, MAX, SPW, KOMPAS, A3D, M3D, RAR, ZIP, 7Z
-                  <br />
-                  Максимальный размер файла: 50 МБ
-                </p>
               </div>
             </CardContent>
           </Card>

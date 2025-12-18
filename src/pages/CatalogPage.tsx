@@ -469,10 +469,6 @@ export default function CatalogPage() {
         <div className="mb-8">
           <CatalogHeader worksCount={filteredWorks.length} />
           
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold mb-4">Фильтры для поиска готовых работ</h2>
-          </div>
-          
           <CatalogFilters
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}

@@ -49,31 +49,12 @@ export default function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Icon name="MessageCircle" size={16} className="text-primary flex-shrink-0" />
-                <a href="https://t.me/techforma_support" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
-                  Telegram поддержка
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Icon name="Phone" size={16} className="text-primary flex-shrink-0" />
-                <a href="tel:+79991234567" className="hover:text-primary transition-colors" itemProp="telephone">
-                  +7 (999) 123-45-67
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-primary flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M15.07 2H8.93C3.33 2 2 3.33 2 8.93v6.14C2 20.67 3.33 22 8.93 22h6.14c5.6 0 6.93-1.33 6.93-6.93V8.93C22 3.33 20.67 2 15.07 2zm1.46 13.31c-.76 1.17-2.07 1.94-3.53 1.94-1.46 0-2.77-.77-3.53-1.94-.37-.57-.37-1.31 0-1.88.76-1.17 2.07-1.94 3.53-1.94s2.77.77 3.53 1.94c.37.57.37 1.31 0 1.88z"/>
                 </svg>
                 <a href="https://vk.com/club234274626" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
                   Группа ВКонтакте
                 </a>
-              </li>
-              <li className="flex items-start gap-2 pt-2">
-                <Icon name="MapPin" size={16} className="text-primary flex-shrink-0 mt-0.5" />
-                <span itemProp="address" itemScope itemType="https://schema.org/PostalAddress">
-                  <span itemProp="addressLocality">Архангельск</span>, 
-                  <span itemProp="addressCountry"> Россия</span>
-                </span>
               </li>
             </ul>
           </div>

@@ -1452,6 +1452,32 @@ export default function Index() {
         userId={currentUser?.id}
       />
 
+      {currentUser?.role === 'admin' && (
+        <section className="py-8 bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900 border-t-2 border-purple-500">
+          <div className="container mx-auto px-4 max-w-7xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                  <Icon name="Shield" size={24} className="text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">Панель администратора</h3>
+                  <p className="text-sm text-purple-200">Добро пожаловать, {currentUser.username}</p>
+                </div>
+              </div>
+              <Button 
+                onClick={() => window.location.href = '/admin'}
+                size="lg"
+                className="bg-white text-purple-900 hover:bg-purple-50 font-bold shadow-lg"
+              >
+                <Icon name="Settings" size={20} className="mr-2" />
+                Перейти в админку
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
+
       <Footer />
       <CookieBanner />
     </>

@@ -4,6 +4,7 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: interest-cohort=()
+  Link: <https://techforma.pro>; rel="canonical"
 
 # Главная - индексировать с максимальным приоритетом
 /

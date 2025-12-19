@@ -35,8 +35,14 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="canonical" href="https://techforma.pro/">
-    <meta property="og:url" content="https://techforma.pro/">
+    <link rel="canonical" href="https://techforma.pro">
+    <meta property="og:url" content="https://techforma.pro">
+    
+    <!-- Alternate URLs для всех зеркал -->
+    <link rel="alternate" href="https://techforma.pro" hreflang="ru" />
+    <link rel="alternate" href="https://www.techforma.pro" hreflang="ru" />
+    <link rel="alternate" href="https://techforma.ru" hreflang="ru" />
+    <link rel="alternate" href="https://www.techforma.ru" hreflang="ru" />
     <meta property="og:title" content="Tech Forma — Чертежи DWG, 3D-модели CAD | Инженерная платформа">
     <meta property="og:description" content="Инженерная платформа для студентов и специалистов. 500+ чертежей DWG/DXF, 3D-модели STEP/STL, технические расчёты, проектная документация. База">
     <meta property="og:type" content="website">
@@ -73,6 +79,28 @@
       <script src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
       
       <script>
+        // Редирект с зеркал на основной домен techforma.pro
+        (function() {
+          const currentHost = window.location.hostname.toLowerCase();
+          const currentProtocol = window.location.protocol;
+          const mainDomain = 'techforma.pro';
+          
+          // Проверяем, находимся ли мы НЕ на главном домене
+          if (currentHost !== mainDomain) {
+            // Перенаправляем на главный домен с сохранением пути
+            const newUrl = 'https://' + mainDomain + window.location.pathname + window.location.search + window.location.hash;
+            window.location.replace(newUrl);
+            return;
+          }
+          
+          // Проверяем HTTP -> HTTPS редирект для главного домена
+          if (currentHost === mainDomain && currentProtocol === 'http:') {
+            const newUrl = 'https://' + mainDomain + window.location.pathname + window.location.search + window.location.hash;
+            window.location.replace(newUrl);
+            return;
+          }
+        })();
+        
         // Автоматическое принятие системных соглашений платформы
         window.addEventListener('DOMContentLoaded', function() {
           setTimeout(function() {

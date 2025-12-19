@@ -16,6 +16,38 @@ http://www.techforma.ru/* https://techforma.pro/:splat 301!
 # Редирект с HTTP на HTTPS для основного домена
 http://techforma.pro/* https://techforma.pro/:splat 301!
 
+# Удаление технических расширений и дублей URL
+# Редирект с .php, .html, .aspx на чистые URL
+/index.php / 301!
+/index.html / 301!
+/index.php/ / 301!
+/index.html/ / 301!
+/default.aspx / 301!
+/default.aspx/ / 301!
+/index.php/page /page 301!
+/index.php/page/ /page 301!
+/index.php/homepage /homepage 301!
+/index.php/homepage/ /homepage 301!
+/shop/page /shop/page 301!
+/shop/page/ /shop/page 301!
+/product /product 301!
+/product/ /product 301!
+/category /category 301!
+/category/ /category 301!
+/linkexchange /linkexchange 301!
+/linkexchange/ /linkexchange 301!
+/page /page 301!
+/page/ /page 301!
+
+# Редирект любых URL с расширениями на чистые
+/*.php /:splat 301!
+/*.html /:splat 301!
+/*.aspx /:splat 301!
+/*.htm /:splat 301!
+
+# Удаление trailing slash (слеша в конце) для всех URL кроме корня
+/*/ /:splat 301!
+
 # Sitemap redirect to dynamic backend
 /sitemap.xml https://functions.poehali.dev/e0e04210-74c2-4c83-8e1b-1d8541942972 200
 

@@ -23,6 +23,20 @@ Allow: /offer
 Allow: /requisites
 Allow: /contacts
 
+# Блокируем дубли с техническими расширениями
+Disallow: /*.php$
+Disallow: /*.html$
+Disallow: /*.aspx$
+Disallow: /*.htm$
+Disallow: /index.php
+Disallow: /index.html
+Disallow: /default.aspx
+Disallow: /page/
+Disallow: /homepage/
+Disallow: /category/
+Disallow: /product/
+Disallow: /linkexchange/
+
 # Разрешаем статические ресурсы
 Allow: /*.css$
 Allow: /*.js$

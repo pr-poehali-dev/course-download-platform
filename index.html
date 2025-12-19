@@ -83,19 +83,43 @@
         (function() {
           const currentHost = window.location.hostname.toLowerCase();
           const currentProtocol = window.location.protocol;
+          const currentPath = window.location.pathname;
           const mainDomain = 'techforma.pro';
           
           // Проверяем, находимся ли мы НЕ на главном домене
           if (currentHost !== mainDomain) {
-            // Перенаправляем на главный домен с сохранением пути
-            const newUrl = 'https://' + mainDomain + window.location.pathname + window.location.search + window.location.hash;
+            const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
             window.location.replace(newUrl);
             return;
           }
           
           // Проверяем HTTP -> HTTPS редирект для главного домена
           if (currentHost === mainDomain && currentProtocol === 'http:') {
-            const newUrl = 'https://' + mainDomain + window.location.pathname + window.location.search + window.location.hash;
+            const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
+            window.location.replace(newUrl);
+            return;
+          }
+          
+          // Удаление технических расширений из URL
+          const techExtensions = ['.php', '.html', '.aspx', '.htm'];
+          let cleanPath = currentPath;
+          
+          // Проверяем наличие технических расширений
+          for (const ext of techExtensions) {
+            if (currentPath.endsWith(ext) || currentPath.includes(ext + '/')) {
+              cleanPath = currentPath.replace(new RegExp(ext + '(/|$)', 'g'), '$1');
+              break;
+            }
+          }
+          
+          // Удаление trailing slash (кроме корня)
+          if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
+            cleanPath = cleanPath.slice(0, -1);
+          }
+          
+          // Если путь изменился - редиректим
+          if (cleanPath !== currentPath) {
+            const newUrl = 'https://' + mainDomain + cleanPath + window.location.search + window.location.hash;
             window.location.replace(newUrl);
             return;
           }

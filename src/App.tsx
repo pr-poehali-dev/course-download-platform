@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { HelmetProvider } from 'react-helmet-async';
+import SEOGuard from '@/components/SEOGuard';
 
 // Retry helper for lazy imports with proper error handling
 const lazyRetry = (componentImport: () => Promise<any>, retries = 3) => 
@@ -141,6 +142,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <SEOGuard />
             <ErrorBoundary>
               <Suspense fallback={<LoadingFallback />}>
                 <Routes>

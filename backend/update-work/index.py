@@ -5,7 +5,7 @@ import psycopg2
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: Update work details (title, description, composition, language, software, keywords, authorName) by admin
+    Business: Update work details (title, workType, subject, description, composition, price, language, software, keywords, authorName) by admin
     Args: event with httpMethod POST, body with workId and optional fields to update
     Returns: HTTP response with success status
     '''
@@ -35,17 +35,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
     work_id = body_data.get('workId')
     title = body_data.get('title')
+    work_type = body_data.get('workType')
+    subject = body_data.get('subject')
     description = body_data.get('description')
     composition = body_data.get('composition')
     language = body_data.get('language')
     software = body_data.get('software')
     keywords = body_data.get('keywords')
     author_name = body_data.get('authorName')
+    universities = body_data.get('universities')
     cover_images = body_data.get('coverImages')
     preview_image_url = body_data.get('previewImageUrl')
     yandex_disk_link = body_data.get('yandex_disk_link')
     category = body_data.get('category')
     price_points = body_data.get('price_points')
+    price = body_data.get('price')
     status = body_data.get('status')
     
     if not work_id:
@@ -73,6 +77,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if title is not None:
         escaped_title = title.replace("'", "''")
         updates.append(f"title = '{escaped_title}'")
+    
+    if work_type is not None:
+        escaped_work_type = work_type.replace("'", "''")
+        updates.append(f"work_type = '{escaped_work_type}'")
+    
+    if subject is not None:
+        escaped_subject = subject.replace("'", "''")
+        updates.append(f"subject = '{escaped_subject}'")
     
     if description is not None:
         escaped_desc = description.replace("'", "''")
@@ -102,6 +114,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             escaped_author = author_name.replace("'", "''")
             updates.append(f"author_name = '{escaped_author}'")
     
+    if universities is not None:
+        if universities == '':
+            updates.append("universities = NULL")
+        else:
+            escaped_universities = universities.replace("'", "''")
+            updates.append(f"universities = '{escaped_universities}'")
+    
     if cover_images is not None:
         cover_images_json = json.dumps(cover_images, ensure_ascii=False).replace("'", "''")
         updates.append(f"cover_images = '{cover_images_json}'")
@@ -126,6 +145,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     
     if price_points is not None:
         updates.append(f"price_points = {int(price_points)}")
+    
+    if price is not None:
+        updates.append(f"price_points = {int(price)}")
     
     if status is not None:
         escaped_status = status.replace("'", "''")

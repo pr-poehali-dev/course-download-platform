@@ -873,12 +873,16 @@ export default function WorkDetailPage() {
       const updatedData = {
         workId: actualWorkId,
         title: editedWork.title !== undefined ? editedWork.title : work.title,
+        workType: editedWork.workType !== undefined ? editedWork.workType : work.workType,
+        subject: editedWork.subject !== undefined ? editedWork.subject : work.subject,
         description: editedWork.description !== undefined ? editedWork.description : work.description,
         composition: editedWork.composition !== undefined ? editedWork.composition : work.composition,
+        price: editedWork.price !== undefined ? editedWork.price : work.price,
         language: editedWork.language !== undefined ? editedWork.language : work.language,
         software: editedWork.software !== undefined ? editedWork.software : work.software,
         keywords: editedWork.keywords !== undefined ? editedWork.keywords : work.keywords,
-        authorName: editedWork.authorName !== undefined ? editedWork.authorName : work.authorName
+        authorName: editedWork.authorName !== undefined ? editedWork.authorName : work.authorName,
+        universities: editedWork.universities !== undefined ? editedWork.universities : work.universities
       };
       
       const response = await fetch(`${func2url['update-work']}`, {
@@ -904,13 +908,23 @@ export default function WorkDetailPage() {
       setEditedWork({});
       setIsEditMode(false);
       
+      // Очищаем кеш каталога для мгновенного обновления
       localStorage.removeItem('catalog_works_cache_v9');
       
-      alert('✅ Работа успешно обновлена!');
+      toast({
+        title: '✅ Работа успешно обновлена!',
+        description: 'Изменения сохранены и отображаются в каталоге',
+        duration: 3000,
+      });
       
     } catch (error) {
       console.error('Error updating work:', error);
-      alert('❌ Ошибка при обновлении работы: ' + (error instanceof Error ? error.message : 'Неизвестная ошибка'));
+      toast({
+        title: '❌ Ошибка обновления',
+        description: error instanceof Error ? error.message : 'Неизвестная ошибка',
+        variant: 'destructive',
+        duration: 5000,
+      });
     }
   };
 
@@ -1164,6 +1178,15 @@ export default function WorkDetailPage() {
           Назад к каталогу
         </Button>
 
+        {isEditMode && (
+          <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-center gap-2">
+            <Icon name="Edit" size={18} className="text-yellow-600" />
+            <span className="text-sm font-medium text-yellow-800">
+              Режим редактирования активен. Внесите изменения и нажмите "Сохранить"
+            </span>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2">
             <div className="mb-6">
@@ -1179,30 +1202,62 @@ export default function WorkDetailPage() {
               </div>
               
               <div className="flex items-start justify-between gap-4 mb-4">
-                <h1 className="text-xl md:text-3xl font-bold text-gray-900 leading-tight flex-1">
-                  {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
-                </h1>
+                {isEditMode ? (
+                  <Input
+                    value={editedWork.title || work.title}
+                    onChange={(e) => setEditedWork({...editedWork, title: e.target.value})}
+                    className="text-xl md:text-3xl font-bold flex-1"
+                    placeholder="Название работы"
+                  />
+                ) : (
+                  <h1 className="text-xl md:text-3xl font-bold text-gray-900 leading-tight flex-1">
+                    {work.title.charAt(0).toUpperCase() + work.title.slice(1)}
+                  </h1>
+                )}
                 {showUploadButton && (
-                  <Button
-                    variant={isEditMode ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      if (isEditMode) {
-                        handleSaveWorkEdits();
-                      } else {
-                        setIsEditMode(true);
-                        setEditedWork({
-                          title: work.title,
-                          description: work.description,
-                          composition: work.composition
-                        });
-                      }
-                    }}
-                    className={isEditMode ? "bg-green-600 hover:bg-green-700" : ""}
-                  >
-                    <Icon name={isEditMode ? "Save" : "Edit"} size={16} className="mr-1" />
-                    {isEditMode ? "Сохранить" : "Редактировать"}
-                  </Button>
+                  <div className="flex gap-2">
+                    {isEditMode && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setIsEditMode(false);
+                          setEditedWork({});
+                        }}
+                      >
+                        <Icon name="X" size={16} className="mr-1" />
+                        Отмена
+                      </Button>
+                    )}
+                    <Button
+                      variant={isEditMode ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => {
+                        if (isEditMode) {
+                          handleSaveWorkEdits();
+                        } else {
+                          setIsEditMode(true);
+                          setEditedWork({
+                            title: work.title,
+                            workType: work.workType,
+                            subject: work.subject,
+                            description: work.description,
+                            composition: work.composition,
+                            price: work.price,
+                            language: work.language,
+                            software: work.software,
+                            keywords: work.keywords,
+                            authorName: work.authorName,
+                            universities: work.universities
+                          });
+                        }
+                      }}
+                      className={isEditMode ? "bg-green-600 hover:bg-green-700" : ""}
+                    >
+                      <Icon name={isEditMode ? "Save" : "Edit"} size={16} className="mr-1" />
+                      {isEditMode ? "Сохранить" : "Редактировать"}
+                    </Button>
+                  </div>
                 )}
               </div>
 
@@ -1440,11 +1495,35 @@ export default function WorkDetailPage() {
                 <ul className="space-y-2 text-gray-700">
                   <li className="flex items-start gap-2">
                     <span className="text-primary font-bold">•</span>
-                    <span><strong>Тип работы:</strong> {work.workType}</span>
+                    {isEditMode ? (
+                      <span className="flex items-center gap-2 flex-1">
+                        <strong>Тип работы:</strong>
+                        <Input
+                          value={editedWork.workType || work.workType}
+                          onChange={(e) => setEditedWork({...editedWork, workType: e.target.value})}
+                          className="max-w-xs"
+                          placeholder="Чертежи, 3D-модели, Расчёты"
+                        />
+                      </span>
+                    ) : (
+                      <span><strong>Тип работы:</strong> {work.workType}</span>
+                    )}
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-primary font-bold">•</span>
-                    <span><strong>Предмет:</strong> {work.subject}</span>
+                    {isEditMode ? (
+                      <span className="flex items-center gap-2 flex-1">
+                        <strong>Предмет:</strong>
+                        <Input
+                          value={editedWork.subject || work.subject}
+                          onChange={(e) => setEditedWork({...editedWork, subject: e.target.value})}
+                          className="max-w-xs"
+                          placeholder="Электроэнергетика, Механика"
+                        />
+                      </span>
+                    ) : (
+                      <span><strong>Предмет:</strong> {work.subject}</span>
+                    )}
                   </li>
                   {work.software && work.software.length > 0 && (
                     <li className="flex items-start gap-2">
@@ -1540,19 +1619,30 @@ export default function WorkDetailPage() {
                 )}
               </div>
 
-              {work.universities && (
+              {(work.universities || isEditMode) && (
                 <div>
                   <h2 className="text-lg md:text-xl font-semibold text-gray-900 mb-2 md:mb-3">Подходит для университетов</h2>
-                  <div className="bg-gray-50 rounded-lg p-3 md:p-4">
-                    <ul className="space-y-2">
-                      {work.universities.split(', ').map((uni, index) => (
-                        <li key={index} className="flex items-start gap-2 md:gap-3">
-                          <Icon name="GraduationCap" size={16} className="mt-0.5 flex-shrink-0 text-blue-600" />
-                          <span className="text-xs md:text-sm text-gray-700">{uni}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {isEditMode ? (
+                    <Textarea
+                      value={editedWork.universities !== undefined ? editedWork.universities || '' : work.universities || ''}
+                      onChange={(e) => setEditedWork({...editedWork, universities: e.target.value})}
+                      placeholder="МГУ, МГТУ, СПбГУ (через запятую)"
+                      className="min-h-[100px] text-sm"
+                    />
+                  ) : (
+                    work.universities && (
+                      <div className="bg-gray-50 rounded-lg p-3 md:p-4">
+                        <ul className="space-y-2">
+                          {work.universities.split(', ').map((uni, index) => (
+                            <li key={index} className="flex items-start gap-2 md:gap-3">
+                              <Icon name="GraduationCap" size={16} className="mt-0.5 flex-shrink-0 text-blue-600" />
+                              <span className="text-xs md:text-sm text-gray-700">{uni}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )
+                  )}
                 </div>
               )}
             </div>
@@ -1562,31 +1652,44 @@ export default function WorkDetailPage() {
             <div className="glass-card tech-border rounded-xl p-4 md:p-6 lg:sticky lg:top-20 hover:shadow-xl transition-all">
               <div className="text-center mb-4 md:mb-5 pb-4 md:pb-5 border-b border-border">
                 <div className="text-[10px] md:text-xs font-semibold text-muted-foreground mb-1 md:mb-2 uppercase tracking-wider">Стоимость</div>
-                <div className="flex items-baseline justify-center gap-1.5">
-                  {(work.discount || userDiscount > 0) ? (
-                    <div className="flex flex-col items-center gap-1">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-xl md:text-2xl font-semibold text-muted-foreground line-through">
+                {isEditMode ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <Input
+                      type="number"
+                      value={editedWork.price !== undefined ? editedWork.price : work.price}
+                      onChange={(e) => setEditedWork({...editedWork, price: parseInt(e.target.value) || 0})}
+                      className="max-w-[120px] text-center text-2xl font-bold"
+                      placeholder="Цена"
+                    />
+                    <span className="text-base font-medium text-muted-foreground">баллов</span>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline justify-center gap-1.5">
+                    {(work.discount || userDiscount > 0) ? (
+                      <div className="flex flex-col items-center gap-1">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-xl md:text-2xl font-semibold text-muted-foreground line-through">
+                            {work.price.toLocaleString()}
+                          </span>
+                          <Badge className="bg-red-500 text-white text-xs">−{work.discount || userDiscount}%</Badge>
+                        </div>
+                        <div className="flex items-baseline gap-1.5">
+                          <span className="text-3xl md:text-4xl font-extrabold text-green-600">
+                            {Math.round(work.price * (1 - (work.discount || userDiscount) / 100)).toLocaleString()}
+                          </span>
+                          <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-3xl md:text-4xl font-extrabold text-primary">
                           {work.price.toLocaleString()}
                         </span>
-                        <Badge className="bg-red-500 text-white text-xs">−{work.discount || userDiscount}%</Badge>
-                      </div>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-3xl md:text-4xl font-extrabold text-green-600">
-                          {Math.round(work.price * (1 - (work.discount || userDiscount) / 100)).toLocaleString()}
-                        </span>
                         <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <span className="text-3xl md:text-4xl font-extrabold text-primary">
-                        {work.price.toLocaleString()}
-                      </span>
-                      <span className="text-base md:text-lg font-medium text-muted-foreground">баллов</span>
-                    </>
-                  )}
-                </div>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
 
 

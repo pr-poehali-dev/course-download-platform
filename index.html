@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-    <meta http-equiv="Pragma" content="no-cache"/>
-    <meta http-equiv="Expires" content="0"/>
+    <!-- Кеширование для ускорения загрузки -->
     <meta name="yandex-verification" content="97a99670c71be666" />
     <title>Tech Forma — Чертежи DWG, 3D-модели CAD</title>
     <meta name="description" content="Инженерная платформа для студентов и специалистов. 500+ чертежей DWG/DXF, 3D-модели STEP/STL, технические расчёты, документация.">
@@ -57,6 +55,8 @@
     <meta name="twitter:image" content="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e25efd0b-8d04-4b71-b6d0-2a3a0d0123a4.jpg">
 
     <!-- Preconnect для ускорения загрузки ресурсов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.poehali.dev" crossorigin>
     <link rel="preconnect" href="https://functions.poehali.dev" crossorigin>
     <link rel="dns-prefetch" href="https://mc.yandex.ru">
@@ -64,6 +64,13 @@
     
     <!-- Preload критичных ресурсов -->
     <link rel="preload" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg" as="image" type="image/jpeg">
+    <link rel="preload" href="/src/main.tsx" as="script" crossorigin>
+    
+    <!-- Оптимизированная загрузка шрифтов -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap">
+    </noscript>
 
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
 
@@ -205,7 +212,7 @@
 <script type="module" src="/src/main.tsx"></script>
 
 <!-- Yandex.Metrika counter -->
-<script type="text/javascript">
+<script type="text/javascript" defer>
     (function (m, e, t, r, i, k, a) {
         m[i] = m[i] || function () {
             (m[i].a = m[i].a || []).push(arguments)
@@ -235,7 +242,7 @@
 
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script>
+<script defer>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());

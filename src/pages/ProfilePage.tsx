@@ -995,12 +995,16 @@ export default function ProfilePage() {
                       {messages.map((msg) => (
                         <div 
                           key={msg.id} 
-                          className={`border rounded-lg p-4 transition-all ${
+                          className={`border rounded-lg p-4 transition-all cursor-pointer hover:shadow-md ${
                             msg.is_read 
-                              ? 'bg-white' 
-                              : 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200'
+                              ? 'bg-white hover:bg-gray-50' 
+                              : 'bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200 hover:from-blue-100 hover:to-cyan-100'
                           }`}
-                          onClick={() => !msg.is_read && handleMarkMessageRead(msg.id)}
+                          onClick={() => {
+                            if (!msg.is_read) {
+                              handleMarkMessageRead(msg.id);
+                            }
+                          }}
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex items-center gap-2">

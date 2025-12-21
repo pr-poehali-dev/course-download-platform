@@ -1,24 +1,16 @@
 # robots.txt для TechForma
 # Оптимизировано для поисковых систем
-# Обновлено: 2025-12-17
+# Обновлено: 2025-12-21
 
 # Основное зеркало сайта (указание главного домена)
 Host: https://techforma.pro
-
-# Индексация только основного домена (без www)
-User-agent: *
-Disallow: /*?
-Allow: /?$
-Allow: /catalog?
-Allow: /work/
-Allow: /blog/
-Allow: /blog$
 
 # Правила для всех поисковых роботов
 User-agent: *
 Allow: /
 Allow: /catalog
 Allow: /catalog?category=
+Allow: /catalog?search=
 Allow: /marketplace
 Allow: /blog
 Allow: /blog/

@@ -38,8 +38,10 @@ export default function SEO({
     const metaImage = ogImage || DEFAULT_SEO.ogImage;
     
     const normalizeUrl = (url: string) => {
-      if (url === DEFAULT_SEO.baseUrl || url === `${DEFAULT_SEO.baseUrl}/`) return DEFAULT_SEO.baseUrl;
-      return url.endsWith('/') ? url : `${url}/`;
+      // Для главной страницы оставляем только домен с trailing slash
+      if (url === DEFAULT_SEO.baseUrl || url === `${DEFAULT_SEO.baseUrl}/`) return `${DEFAULT_SEO.baseUrl}/`;
+      // Для всех остальных страниц убираем trailing slash
+      return url.endsWith('/') && url !== `${DEFAULT_SEO.baseUrl}/` ? url.slice(0, -1) : url;
     };
     
     const canonicalUrl = canonical || normalizeUrl(`${DEFAULT_SEO.baseUrl}${location.pathname}`);

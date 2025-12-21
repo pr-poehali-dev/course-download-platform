@@ -1103,6 +1103,36 @@ export default function WorkDetailPage() {
     return `Скачать ${work.workType.toLowerCase()} по ${work.subject}. ${work.description.substring(0, 130)}. Цена ${work.price} баллов. Мгновенное скачивание.`;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
+        <Navigation isLoggedIn={isLoggedIn} />
+        <main className="container mx-auto px-4 py-8 mt-16">
+          <div className="text-center py-20">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            <p className="mt-4 text-gray-600">Загрузка работы...</p>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!work) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
+        <Navigation isLoggedIn={isLoggedIn} />
+        <main className="container mx-auto px-4 py-8 mt-16">
+          <div className="text-center py-20">
+            <p className="text-xl text-gray-600">Работа не найдена</p>
+            <Button onClick={() => navigate('/catalog')} className="mt-4">
+              Вернуться в каталог
+            </Button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <NewYearSnow />

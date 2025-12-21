@@ -5,6 +5,15 @@
 # Основное зеркало сайта (указание главного домена)
 Host: https://techforma.pro
 
+# Индексация только основного домена (без www)
+User-agent: *
+Disallow: /*?
+Allow: /?$
+Allow: /catalog?
+Allow: /work/
+Allow: /blog/
+Allow: /blog$
+
 # Правила для всех поисковых роботов
 User-agent: *
 Allow: /
@@ -23,7 +32,7 @@ Allow: /offer
 Allow: /requisites
 Allow: /contacts
 
-# Блокируем дубли с техническими расширениями
+# Блокируем дубли страниц и технические расширения
 Disallow: /*.php$
 Disallow: /*.html$
 Disallow: /*.aspx$
@@ -36,6 +45,17 @@ Disallow: /homepage/
 Disallow: /category/
 Disallow: /product/
 Disallow: /linkexchange/
+
+# Блокируем дубли с параметрами (кроме каталога)
+Disallow: /*?*utm_
+Disallow: /*?*fbclid
+Disallow: /*?*gclid
+Disallow: /*?*_ym_
+Disallow: /*?*ref=
+Disallow: /*?*source=
+Disallow: /*&utm_
+Disallow: /*&fbclid
+Disallow: /*&gclid
 
 # Разрешаем статические ресурсы
 Allow: /*.css$

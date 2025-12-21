@@ -93,6 +93,7 @@ export default function SEO({
     linkCanonical.href = canonicalUrl;
 
     const isHomePage = location.pathname === '/';
+    const isCatalogPage = location.pathname === '/catalog' || location.pathname === '/catalog/';
     
     const jsonLd = isHomePage ? {
       '@context': 'https://schema.org',
@@ -104,6 +105,10 @@ export default function SEO({
           'alternateName': 'TechForma',
           'url': DEFAULT_SEO.baseUrl,
           'description': DEFAULT_SEO.description,
+          'inLanguage': 'ru-RU',
+          'publisher': {
+            '@id': `${DEFAULT_SEO.baseUrl}/#organization`
+          },
           'potentialAction': {
             '@type': 'SearchAction',
             'target': {
@@ -147,7 +152,11 @@ export default function SEO({
             'reviewCount': '150',
             'bestRating': '5',
             'worstRating': '1'
-          }
+          },
+          'sameAs': [
+            'https://vk.com/techforma',
+            'https://t.me/techforma'
+          ]
         },
         {
           '@type': 'WebPage',
@@ -189,6 +198,35 @@ export default function SEO({
               'position': 4,
               'name': 'Проектная документация',
               'url': `${DEFAULT_SEO.baseUrl}/catalog?category=documentation`
+            }
+          ]
+        },
+        {
+          '@type': 'FAQPage',
+          'mainEntity': [
+            {
+              '@type': 'Question',
+              'name': 'Что такое Tech Forma?',
+              'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': 'Tech Forma — это инженерная платформа для студентов и специалистов, где можно скачать чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты и проектную документацию. База содержит более 500 работ для обучения и практики.'
+              }
+            },
+            {
+              '@type': 'Question',
+              'name': 'Какие форматы файлов доступны?',
+              'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': 'На платформе доступны чертежи в форматах DWG и DXF (AutoCAD, КОМПАС), 3D-модели в форматах STEP, STL, SLDPRT (SolidWorks), технические расчёты в Excel/PDF и проектная документация.'
+              }
+            },
+            {
+              '@type': 'Question',
+              'name': 'Как скачать чертежи?',
+              'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': 'Для скачивания чертежей нужно зарегистрироваться, пополнить баланс баллами и приобрести нужную работу. После покупки файл доступен для скачивания в течение 7 дней.'
+              }
             }
           ]
         }

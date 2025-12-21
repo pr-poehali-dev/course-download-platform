@@ -48,6 +48,15 @@ http://techforma.pro/* https://techforma.pro/:splat 301!
 # Удаление trailing slash (слеша в конце) для всех URL кроме корня
 /*/ /:splat 301!
 
+# Удаление UTM-меток и рекламных параметров (очистка дублей)
+/*?utm_source=* /:splat 301
+/*?utm_medium=* /:splat 301
+/*?utm_campaign=* /:splat 301
+/*?fbclid=* /:splat 301
+/*?gclid=* /:splat 301
+/*?_ym_uid=* /:splat 301
+/*?ref=* /:splat 301
+
 # Sitemap redirect to dynamic backend
 /sitemap.xml https://functions.poehali.dev/e0e04210-74c2-4c83-8e1b-1d8541942972 200
 

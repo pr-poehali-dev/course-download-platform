@@ -749,6 +749,99 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.close()
             conn.close()
     
+    if method == 'PUT':
+        # Handle moderation (approve/reject) via PUT request
+        body_data = json.loads(event.get('body', '{}'))
+        work_id = body_data.get('work_id')
+        new_status = body_data.get('status')
+        rejection_reason = body_data.get('rejection_reason')
+        
+        admin_email = event.get('headers', {}).get('X-Admin-Email') or event.get('headers', {}).get('x-admin-email')
+        if admin_email != 'rekrutiw@yandex.ru':
+            return {
+                'statusCode': 403,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Admin access required'})
+            }
+        
+        if not work_id or not new_status:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'work_id and status required'})
+            }
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            # Get work details and author_id
+            cur.execute(f"SELECT author_id, title FROM t_p63326274_course_download_plat.works WHERE id = {int(work_id)}")
+            work_data = cur.fetchone()
+            
+            if not work_data:
+                return {
+                    'statusCode': 404,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Work not found'})
+                }
+            
+            author_id = work_data[0]
+            work_title = work_data[1]
+            
+            # Update work status
+            safe_status = new_status.replace("'", "''")
+            
+            if rejection_reason:
+                safe_reason = rejection_reason.replace("'", "''")
+                cur.execute(f"""
+                    UPDATE t_p63326274_course_download_plat.works 
+                    SET status = '{safe_status}', moderation_comment = '{safe_reason}'
+                    WHERE id = {int(work_id)}
+                """)
+            else:
+                cur.execute(f"""
+                    UPDATE t_p63326274_course_download_plat.works 
+                    SET status = '{safe_status}'
+                    WHERE id = {int(work_id)}
+                """)
+            
+            # Send notification to author
+            if new_status == 'approved':
+                safe_title = 'Работа одобрена!'.replace("'", "''")
+                safe_work_title = work_title.replace("'", "''")
+                safe_message = f'Ваша работа "{safe_work_title}" была одобрена и опубликована в каталоге. Пользователи теперь могут её покупать.'.replace("'", "''")
+                cur.execute(f"""
+                    INSERT INTO t_p63326274_course_download_plat.user_messages 
+                    (user_id, title, message, type, is_read, created_at)
+                    VALUES ({int(author_id)}, '{safe_title}', '{safe_message}', 'success', FALSE, NOW())
+                """)
+            elif new_status == 'rejected' and rejection_reason:
+                safe_title = 'Работа отклонена'.replace("'", "''")
+                safe_work_title = work_title.replace("'", "''")
+                safe_reason_msg = rejection_reason.replace("'", "''")
+                safe_message = f'Ваша работа "{safe_work_title}" была отклонена. Причина: {safe_reason_msg}'.replace("'", "''")
+                cur.execute(f"""
+                    INSERT INTO t_p63326274_course_download_plat.user_messages 
+                    (user_id, title, message, type, is_read, created_at)
+                    VALUES ({int(author_id)}, '{safe_title}', '{safe_message}', 'error', FALSE, NOW())
+                """)
+            
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'success': True,
+                    'work_id': work_id,
+                    'status': new_status
+                })
+            }
+        finally:
+            cur.close()
+            conn.close()
+    
     return {
         'statusCode': 405,
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

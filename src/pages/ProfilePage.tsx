@@ -45,8 +45,9 @@ interface Upload {
   title: string;
   price: number;
   downloads: number;
-  status: 'active' | 'moderation' | 'rejected';
+  status: 'approved' | 'pending' | 'rejected' | 'active' | 'moderation';
   uploadDate: string;
+  moderation_comment?: string | null;
 }
 
 interface Transaction {
@@ -236,8 +237,9 @@ export default function ProfilePage() {
             title: w.title,
             price: w.price_points || w.price || 0,
             downloads: w.downloads || 0,
-            status: w.status === 'approved' ? 'active' : w.status === 'pending' ? 'moderation' : 'rejected',
-            uploadDate: w.created_at || new Date().toISOString()
+            status: w.status || 'pending',
+            uploadDate: w.created_at || new Date().toISOString(),
+            moderation_comment: w.moderation_comment || null
           })));
         }
       } catch (error) {
@@ -426,14 +428,16 @@ export default function ProfilePage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'approved':
       case 'active':
-        return <Badge className="bg-green-500">Активна</Badge>;
+        return <Badge className="bg-green-500">✅ Опубликована</Badge>;
+      case 'pending':
       case 'moderation':
-        return <Badge className="bg-yellow-500">На модерации</Badge>;
+        return <Badge className="bg-yellow-500">⏳ На модерации</Badge>;
       case 'rejected':
-        return <Badge variant="destructive">Отклонена</Badge>;
+        return <Badge variant="destructive">❌ Отклонена</Badge>;
       default:
-        return <Badge>Неизвестно</Badge>;
+        return <Badge variant="outline">❓ {status}</Badge>;
     }
   };
 

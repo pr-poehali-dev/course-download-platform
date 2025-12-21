@@ -249,26 +249,47 @@ export default function UploadsTab({
           ) : (
             <div className="space-y-3">
               {userWorks.map((work) => (
-                <div key={work.id} className="flex items-start justify-between p-4 border rounded-lg">
-                  <div className="flex-1">
-                    <h4 className="font-medium">{work.title}</h4>
-                    <div className="flex items-center gap-2 mt-1 flex-wrap">
-                      <Badge variant="secondary">{work.work_type}</Badge>
-                      <Badge variant="outline">{work.subject}</Badge>
-                      {getStatusBadge(work.status)}
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Загружено: {new Date(work.created_at).toLocaleDateString('ru-RU')}
-                    </p>
-                  </div>
-                  <div className="text-right ml-4">
-                    <p className="font-bold text-lg">{work.price_points} баллов</p>
-                    {work.status === 'approved' && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Продано: {work.purchase_count || 0} раз
+                <div key={work.id} className="flex flex-col p-4 border rounded-lg gap-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium">{work.title}</h4>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <Badge variant="secondary">{work.work_type}</Badge>
+                        <Badge variant="outline">{work.subject}</Badge>
+                        {getStatusBadge(work.status)}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Загружено: {new Date(work.created_at).toLocaleDateString('ru-RU')}
                       </p>
-                    )}
+                    </div>
+                    <div className="text-right ml-4">
+                      <p className="font-bold text-lg">{work.price_points} баллов</p>
+                      {work.status === 'approved' && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Продано: {work.purchase_count || 0} раз
+                        </p>
+                      )}
+                    </div>
                   </div>
+                  
+                  {work.status === 'rejected' && work.moderation_comment && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                      <Icon name="AlertCircle" size={18} className="text-red-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-red-800">Причина отклонения:</p>
+                        <p className="text-sm text-red-700 mt-1">{work.moderation_comment}</p>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {work.status === 'approved' && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
+                      <Icon name="CheckCircle2" size={18} className="text-green-600" />
+                      <p className="text-sm text-green-700">
+                        Работа опубликована в каталоге и доступна для покупки
+                      </p>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

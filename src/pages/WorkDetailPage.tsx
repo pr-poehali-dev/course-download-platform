@@ -899,17 +899,35 @@ export default function WorkDetailPage() {
         throw new Error(data.error || 'Ошибка обновления работы');
       }
       
-      const newWork = {
-        ...work,
-        ...updatedData
-      };
-      
-      setWork(newWork);
-      setEditedWork({});
-      setIsEditMode(false);
-      
       // Очищаем кеш каталога для мгновенного обновления
       localStorage.removeItem('catalog_works_cache_v9');
+      
+      // Перезагружаем работу с сервера для актуальных данных
+      const response2 = await fetch(
+        `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?id=${actualWorkId}`
+      );
+      const freshData = await response2.json();
+      
+      if (freshData && freshData.id) {
+        const updatedWork = {
+          ...work,
+          title: freshData.title || work.title,
+          workType: freshData.work_type || work.workType,
+          subject: freshData.subject || work.subject,
+          description: freshData.description || work.description,
+          composition: freshData.composition ? freshData.composition.split(',').map((c: string) => c.trim()) : work.composition,
+          price: freshData.price_points || freshData.price || work.price,
+          language: freshData.language || work.language,
+          software: freshData.software || work.software,
+          keywords: freshData.keywords || work.keywords,
+          authorName: freshData.author_name || work.authorName,
+          universities: freshData.universities || work.universities,
+        };
+        setWork(updatedWork);
+      }
+      
+      setEditedWork({});
+      setIsEditMode(false);
       
       toast({
         title: '✅ Работа успешно обновлена!',

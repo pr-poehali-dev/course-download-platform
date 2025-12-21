@@ -290,6 +290,20 @@ export default function UploadsTab({
                       </p>
                     </div>
                   )}
+                  
+                  {work.status === 'rejected' && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => window.location.href = `/work/${work.id}/edit`}
+                      >
+                        <Icon name="Edit" size={16} className="mr-2" />
+                        Исправить и отправить заново
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

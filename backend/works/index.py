@@ -757,7 +757,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         rejection_reason = body_data.get('rejection_reason')
         
         admin_email = event.get('headers', {}).get('X-Admin-Email') or event.get('headers', {}).get('x-admin-email')
-        if admin_email != 'rekrutiw@yandex.ru':
+        
+        # Allow "system" header for author resubmission OR admin email for moderation
+        is_admin = admin_email == 'rekrutiw@yandex.ru'
+        is_resubmit = admin_email == 'system' and new_status == 'pending'
+        
+        if not is_admin and not is_resubmit:
             return {
                 'statusCode': 403,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -797,6 +802,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute(f"""
                     UPDATE t_p63326274_course_download_plat.works 
                     SET status = '{safe_status}', moderation_comment = '{safe_reason}'
+                    WHERE id = {int(work_id)}
+                """)
+            elif new_status == 'pending' and is_resubmit:
+                # Clear moderation_comment when resubmitting
+                cur.execute(f"""
+                    UPDATE t_p63326274_course_download_plat.works 
+                    SET status = '{safe_status}', moderation_comment = NULL
                     WHERE id = {int(work_id)}
                 """)
             else:

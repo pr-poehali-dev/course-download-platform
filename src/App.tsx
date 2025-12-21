@@ -59,6 +59,7 @@ const ModerationPage = lazyRetry(() => import("./pages/ModerationPage"));
 
 const BuyPointsPage = lazyRetry(() => import("./pages/BuyPointsPage"));
 const UploadWorkPage = lazyRetry(() => import("./pages/UploadWorkPage"));
+const EditWorkPage = lazyRetry(() => import("./pages/EditWorkPage"));
 const AuthorMarketplacePage = lazyRetry(() => import("./pages/AuthorMarketplacePage"));
 const SyncPreviewsPage = lazyRetry(() => import("./pages/SyncPreviewsPage"));
 const FullSyncPage = lazyRetry(() => import("./pages/FullSyncPage"));
@@ -162,6 +163,7 @@ const App = () => (
           <Route path="/buy-points" element={<BuyPointsPage />} />
           <Route path="/upload" element={<UploadWorkPage />} />
           <Route path="/work/:id" element={<WorkDetailPage />} />
+          <Route path="/work/:id/edit" element={<EditWorkPage />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/marketplace" element={<AuthorMarketplacePage />} />
           <Route path="/sync-previews" element={<SyncPreviewsPage />} />

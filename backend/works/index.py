@@ -854,6 +854,51 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.close()
             conn.close()
     
+    if method == 'DELETE':
+        query_params = event.get('queryStringParameters') or {}
+        work_id = query_params.get('id')
+        
+        admin_email = event.get('headers', {}).get('X-Admin-Email') or event.get('headers', {}).get('x-admin-email')
+        if admin_email != 'rekrutiw@yandex.ru':
+            return {
+                'statusCode': 403,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Admin access required'})
+            }
+        
+        if not work_id:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'work id required'})
+            }
+        
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        try:
+            cur.execute(f"DELETE FROM t_p63326274_course_download_plat.work_files WHERE work_id = {int(work_id)}")
+            cur.execute(f"DELETE FROM t_p63326274_course_download_plat.favorites WHERE work_id = {int(work_id)}")
+            cur.execute(f"DELETE FROM t_p63326274_course_download_plat.reviews WHERE work_id = {int(work_id)}")
+            cur.execute(f"DELETE FROM t_p63326274_course_download_plat.purchases WHERE work_id = {int(work_id)}")
+            cur.execute(f"DELETE FROM t_p63326274_course_download_plat.works WHERE id = {int(work_id)}")
+            
+            deleted_count = cur.rowcount
+            conn.commit()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({
+                    'success': True,
+                    'deleted': deleted_count,
+                    'message': f'Work {work_id} deleted successfully'
+                })
+            }
+        finally:
+            cur.close()
+            conn.close()
+    
     return {
         'statusCode': 405,
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

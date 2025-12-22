@@ -243,7 +243,7 @@ def get_all_users(headers: Dict[str, str]) -> Dict[str, Any]:
             LEFT JOIN t_p63326274_course_download_plat.works w ON w.author_id = u.id
             LEFT JOIN t_p63326274_course_download_plat.purchases p ON p.buyer_id = u.id
             LEFT JOIN t_p63326274_course_download_plat.purchases p2 ON p2.work_id IN (SELECT id FROM t_p63326274_course_download_plat.works WHERE author_id = u.id)
-            WHERE u.id < 1000000 AND u.email NOT LIKE '%@fake.local%'
+            WHERE u.email NOT LIKE '%@fake.local%' AND u.email NOT LIKE '%@example.com%'
             GROUP BY u.id, u.username, u.email, u.balance, u.created_at, u.registration_ip, u.referral_code, u.referred_by
             ORDER BY u.created_at DESC
         """)

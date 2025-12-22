@@ -67,6 +67,20 @@ export default function WorksManagement() {
     if (!editingWork) return;
 
     try {
+      console.log('Sending update request for work:', editingWork.id);
+      console.log('Update data:', {
+        workId: editingWork.id,
+        title: editingWork.title,
+        description: editingWork.description,
+        composition: editingWork.composition,
+        coverImages: editingWork.cover_images || [],
+        previewImageUrl: editingWork.preview_image_url || '',
+        yandex_disk_link: editingWork.yandex_disk_link || '',
+        category: editingWork.category,
+        price_points: editingWork.price_points,
+        status: editingWork.status
+      });
+      
       const response = await fetch(func2url['update-work'], {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -84,7 +98,9 @@ export default function WorksManagement() {
         })
       });
 
+      console.log('Response status:', response.status);
       const data = await response.json();
+      console.log('Response data:', data);
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Ошибка при обновлении работы');
@@ -99,6 +115,7 @@ export default function WorksManagement() {
       setWorks(updatedWorks);
       setEditingWork(null);
     } catch (error) {
+      console.error('Error updating work:', error);
       toast({
         title: 'Ошибка',
         description: error instanceof Error ? error.message : 'Не удалось обновить работу',
@@ -141,15 +158,42 @@ export default function WorksManagement() {
   };
 
   const handleStatusChange = async (workId: number, newStatus: 'active' | 'moderation' | 'blocked') => {
-    const updatedWorks = works.map(w => 
-      w.id === workId ? { ...w, status: newStatus } : w
-    );
-    setWorks(updatedWorks);
+    try {
+      console.log('Changing work status:', workId, newStatus);
+      
+      const response = await fetch(func2url['update-work'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workId: workId,
+          status: newStatus
+        })
+      });
 
-    toast({
-      title: 'Статус изменен',
-      description: `Статус работы изменен на "${newStatus}"`
-    });
+      const data = await response.json();
+      console.log('Status change response:', data);
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Ошибка при изменении статуса');
+      }
+
+      const updatedWorks = works.map(w => 
+        w.id === workId ? { ...w, status: newStatus } : w
+      );
+      setWorks(updatedWorks);
+
+      toast({
+        title: 'Статус изменен',
+        description: `Статус работы изменен на "${newStatus}"`
+      });
+    } catch (error) {
+      console.error('Error changing status:', error);
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось изменить статус',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleBulkApprove = async () => {

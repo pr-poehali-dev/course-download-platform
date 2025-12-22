@@ -315,7 +315,7 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     
     cur.execute(
         """
-        SELECT id, username, email, password_hash, balance, referral_code, created_at 
+        SELECT id, username, email, password_hash, balance, referral_code, created_at, role 
         FROM t_p63326274_course_download_plat.users 
         WHERE lower(username) = lower(%s) OR lower(email) = lower(%s)
         """,
@@ -334,7 +334,7 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    user_id, db_username, email, password_hash, balance, referral_code, created_at = user
+    user_id, db_username, email, password_hash, balance, referral_code, created_at, role = user
     print(f"LOGIN: found user_id={user_id}, hash_start={password_hash[:20]}")
     
     verified = verify_password(password, password_hash)
@@ -361,6 +361,7 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 'email': email,
                 'balance': balance,
                 'referral_code': referral_code,
+                'role': role,
                 'created_at': created_at.isoformat() if created_at else None
             }
         }),

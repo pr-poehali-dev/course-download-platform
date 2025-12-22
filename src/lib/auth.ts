@@ -76,13 +76,21 @@ export const authService = {
       const data = await response.json();
 
       if (!response.ok) {
-        this.logout();
+        // Только если токен истёк или недействителен - разлогиниваем
+        if (response.status === 401 && (data.error === 'Токен истёк' || data.error === 'Недействительный токен' || data.error === 'Пользователь не найден')) {
+          console.log('Token expired or invalid, logging out');
+          this.logout();
+        } else {
+          // При других ошибках (сеть, сервер) - просто возвращаем null, не удаляя токен
+          console.warn('Verify failed, but keeping token:', data.error);
+        }
         return null;
       }
 
       return data.user;
     } catch (error) {
-      this.logout();
+      // Сетевая ошибка - НЕ удаляем токен, просто возвращаем null
+      console.warn('Network error during verify, keeping token:', error);
       return null;
     }
   },

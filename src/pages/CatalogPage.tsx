@@ -71,13 +71,28 @@ export default function CatalogPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const user = await authService.verify();
-      setIsLoggedIn(!!user);
-      setIsAdmin(user?.role === 'admin');
-      if (user) {
-        setUserId(user.id);
-        setUserBalance(user.balance || 0);
-        loadFavorites(user.id);
+      // Сначала проверяем localStorage на случай если backend недоступен
+      const cachedUserStr = localStorage.getItem('user');
+      const cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null;
+      
+      // Пытаемся получить свежие данные
+      const freshUser = await authService.verify();
+      
+      // Используем свежие данные если есть, иначе кэш
+      const currentUser = freshUser || cachedUser;
+      
+      setIsLoggedIn(!!currentUser);
+      setIsAdmin(currentUser?.role === 'admin');
+      
+      if (currentUser) {
+        setUserId(currentUser.id);
+        setUserBalance(currentUser.balance || 0);
+        loadFavorites(currentUser.id);
+        
+        // Обновляем кэш если получили свежие данные
+        if (freshUser) {
+          localStorage.setItem('user', JSON.stringify(freshUser));
+        }
       }
     };
     checkAuth();

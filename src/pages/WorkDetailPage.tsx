@@ -80,11 +80,19 @@ export default function WorkDetailPage() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      // ✅ ПРИНУДИТЕЛЬНО получаем СВЕЖИЕ данные из backend, НЕ из localStorage
-      const freshUser = await authService.verify();
-      setIsLoggedIn(!!freshUser);
+      // Сначала проверяем localStorage на случай если backend недоступен
+      const cachedUserStr = localStorage.getItem('user');
+      const cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null;
       
-      // ✅ КРИТИЧНО: Обновляем localStorage свежими данными сразу после загрузки
+      // ✅ Пытаемся получить свежие данные из backend
+      const freshUser = await authService.verify();
+      
+      // Используем свежие данные если есть, иначе кэш
+      const currentUser = freshUser || cachedUser;
+      
+      setIsLoggedIn(!!currentUser);
+      
+      // ✅ Обновляем localStorage свежими данными если они есть
       if (freshUser) {
         localStorage.setItem('user', JSON.stringify(freshUser));
         console.log('🔄 localStorage ОБНОВЛЕН свежими данными:', freshUser);
@@ -93,12 +101,17 @@ export default function WorkDetailPage() {
         const discount = getUserDiscount(freshUser.balance || 0);
         setUserDiscount(discount);
         console.log(`💰 Баланс: ${freshUser.balance}, Скидка: ${discount}%`);
+      } else if (cachedUser) {
+        // Если backend недоступен, используем кэшированные данные
+        console.log('⚠️ Backend недоступен, используем кэш:', cachedUser);
+        const discount = getUserDiscount(cachedUser.balance || 0);
+        setUserDiscount(discount);
       }
       
       // Проверяем, куплена ли работа
-      if (freshUser && actualWorkId) {
+      if (currentUser && actualWorkId) {
         try {
-          const response = await fetch(`${func2url['user-data']}?user_id=${freshUser.id}&action=purchases`);
+          const response = await fetch(`${func2url['user-data']}?user_id=${currentUser.id}&action=purchases`);
           const data = await response.json();
           console.log('Purchases data:', data);
           console.log('Current work ID:', actualWorkId);
@@ -112,8 +125,8 @@ export default function WorkDetailPage() {
         }
       }
       
-      // Проверяем, является ли пользователь админом
-      if (freshUser && freshUser.role === 'admin') {
+      // Проверяем, является ли пользователь админом (используем currentUser!)
+      if (currentUser && currentUser.role === 'admin') {
         setShowUploadButton(true);
         setIsAdmin(true);
       }

@@ -110,6 +110,17 @@ export default function Index() {
           description: `Текущий баланс: ${freshUser.balance} баллов`,
           duration: 2000,
         });
+      } else {
+        // Если не удалось получить данные с сервера, используем кэш
+        const cachedUserStr = localStorage.getItem('user');
+        if (cachedUserStr) {
+          const cachedUser = JSON.parse(cachedUserStr);
+          toast({
+            title: '⚠️ Кэшированные данные',
+            description: `Баланс (кэш): ${cachedUser.balance} баллов`,
+            duration: 2000,
+          });
+        }
       }
     } catch (error) {
       console.error('Failed to refresh balance:', error);
@@ -125,11 +136,31 @@ export default function Index() {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const user = await authService.verify();
-        setCurrentUser(user);
+        // Сначала проверяем localStorage на случай если backend недоступен
+        const cachedUserStr = localStorage.getItem('user');
+        const cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null;
+        
+        // Пытаемся получить свежие данные
+        const freshUser = await authService.verify();
+        
+        // Используем свежие данные если есть, иначе кэш
+        const currentUser = freshUser || cachedUser;
+        
+        setCurrentUser(currentUser);
+        
+        // Обновляем кэш если получили свежие данные
+        if (freshUser) {
+          localStorage.setItem('user', JSON.stringify(freshUser));
+        }
       } catch (error) {
         console.error('Auth verification failed:', error);
-        setCurrentUser(null);
+        // При ошибке пытаемся использовать кэш
+        const cachedUserStr = localStorage.getItem('user');
+        if (cachedUserStr) {
+          setCurrentUser(JSON.parse(cachedUserStr));
+        } else {
+          setCurrentUser(null);
+        }
       }
     };
     initAuth();

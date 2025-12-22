@@ -42,13 +42,19 @@ export default function UsersManagement() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deletingFakeUsers, setDeletingFakeUsers] = useState(false);
 
   useEffect(() => {
     loadUsers();
+    // Автообновление списка каждые 30 секунд
+    const interval = setInterval(() => {
+      loadUsers();
+    }, 30000);
+    return () => clearInterval(interval);
   }, []);
 
-  const loadUsers = async () => {
-    setLoading(true);
+  const loadUsers = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const response = await fetch(`${func2url['user-data']}?action=all_users`, {
         headers: {
@@ -63,19 +69,61 @@ export default function UsersManagement() {
       const data = await response.json();
       setUsers(data.users || []);
       
-      toast({
-        title: 'Пользователи загружены',
-        description: `Найдено ${data.users?.length || 0} пользователей`
-      });
+      if (!silent) {
+        toast({
+          title: 'Пользователи загружены',
+          description: `Найдено ${data.users?.length || 0} пользователей`
+        });
+      }
     } catch (error: any) {
       console.error('Failed to load users:', error);
+      if (!silent) {
+        toast({
+          title: 'Ошибка загрузки',
+          description: error.message,
+          variant: 'destructive'
+        });
+      }
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  };
+
+  const handleDeleteFakeUsers = async () => {
+    if (!confirm('Удалить всех тестовых пользователей с @fake.local? Это действие нельзя отменить!')) {
+      return;
+    }
+
+    setDeletingFakeUsers(true);
+    try {
+      const response = await fetch(`${func2url['user-data']}?action=delete_fake_users`, {
+        method: 'DELETE',
+        headers: {
+          'X-Admin-Email': 'rekrutiw@yandex.ru'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        toast({
+          title: 'Успешно удалено',
+          description: data.message
+        });
+        await loadUsers();
+      }
+    } catch (error: any) {
       toast({
-        title: 'Ошибка загрузки',
+        title: 'Ошибка удаления',
         description: error.message,
         variant: 'destructive'
       });
     } finally {
-      setLoading(false);
+      setDeletingFakeUsers(false);
     }
   };
 
@@ -233,8 +281,28 @@ export default function UsersManagement() {
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Фильтры</CardTitle>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle>Фильтры</CardTitle>
+            <CardDescription>Автообновление каждые 30 секунд</CardDescription>
+          </div>
+          <Button 
+            variant="destructive" 
+            onClick={handleDeleteFakeUsers}
+            disabled={deletingFakeUsers}
+          >
+            {deletingFakeUsers ? (
+              <>
+                <Icon name="Loader2" size={16} className="mr-2 animate-spin" />
+                Удаление...
+              </>
+            ) : (
+              <>
+                <Icon name="Trash2" size={16} className="mr-2" />
+                Удалить тестовых
+              </>
+            )}
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

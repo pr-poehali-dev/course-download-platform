@@ -42,6 +42,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if method == 'PUT' and is_admin:
         return update_user_balance(event, headers)
     
+    # Админ может удалять тестовых пользователей
+    if method == 'DELETE' and is_admin:
+        params = event.get('queryStringParameters', {}) or {}
+        if params.get('action') == 'delete_fake_users':
+            return delete_fake_users(headers)
+    
     dsn = os.environ.get('DATABASE_URL')
     conn = psycopg2.connect(dsn)
     cur = conn.cursor()
@@ -299,6 +305,64 @@ def update_user_balance(event: Dict[str, Any], headers: Dict[str, str]) -> Dict[
             'statusCode': 200,
             'headers': headers,
             'body': json.dumps({'success': True, 'message': 'Баланс обновлен'})
+        }
+    except Exception as e:
+        conn.rollback()
+        return {
+            'statusCode': 500,
+            'headers': headers,
+            'body': json.dumps({'error': str(e)})
+        }
+    finally:
+        cur.close()
+        conn.close()
+
+def delete_fake_users(headers: Dict[str, str]) -> Dict[str, Any]:
+    '''Удалить всех тестовых пользователей с email @fake.local'''
+    dsn = os.environ.get('DATABASE_URL')
+    conn = psycopg2.connect(dsn)
+    conn.autocommit = False
+    cur = conn.cursor()
+    
+    try:
+        # Сначала получаем список ID тестовых пользователей
+        cur.execute("""
+            SELECT id FROM t_p63326274_course_download_plat.users 
+            WHERE email LIKE '%@fake.local%'
+        """)
+        fake_user_ids = [row[0] for row in cur.fetchall()]
+        
+        if not fake_user_ids:
+            return {
+                'statusCode': 200,
+                'headers': headers,
+                'body': json.dumps({'success': True, 'deleted': 0, 'message': 'Нет тестовых пользователей для удаления'})
+            }
+        
+        # Удаляем связанные данные для каждого тестового пользователя
+        for user_id in fake_user_ids:
+            cur.execute("DELETE FROM t_p63326274_course_download_plat.favorites WHERE user_id = %s", (user_id,))
+            cur.execute("DELETE FROM t_p63326274_course_download_plat.purchases WHERE buyer_id = %s", (user_id,))
+            cur.execute("DELETE FROM t_p63326274_course_download_plat.transactions WHERE user_id = %s", (user_id,))
+            cur.execute("DELETE FROM t_p63326274_course_download_plat.reviews WHERE user_id = %s", (user_id,))
+            cur.execute("DELETE FROM t_p63326274_course_download_plat.download_tokens WHERE user_id = %s", (user_id,))
+            cur.execute("DELETE FROM t_p63326274_course_download_plat.user_messages WHERE sender_id = %s OR recipient_id = %s", (user_id, user_id))
+            cur.execute("DELETE FROM t_p63326274_course_download_plat.works WHERE author_id = %s", (user_id,))
+        
+        # Удаляем самих пользователей
+        cur.execute("DELETE FROM t_p63326274_course_download_plat.users WHERE email LIKE '%@fake.local%'")
+        deleted_count = cur.rowcount
+        
+        conn.commit()
+        
+        return {
+            'statusCode': 200,
+            'headers': headers,
+            'body': json.dumps({
+                'success': True,
+                'deleted': deleted_count,
+                'message': f'Удалено {deleted_count} тестовых пользователей'
+            })
         }
     except Exception as e:
         conn.rollback()

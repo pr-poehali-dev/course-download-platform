@@ -22,6 +22,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { trackEvent, metrikaEvents } from '@/utils/metrika';
 import NewYearSnow from '@/components/NewYearSnow';
 import NewYearBanner from '@/components/NewYearBanner';
+import WorkEditDialog from '@/components/WorkEditDialog';
 
 
 interface Work {
@@ -73,6 +74,8 @@ export default function WorkDetailPage() {
   const [isPurchased, setIsPurchased] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userDiscount, setUserDiscount] = useState<number>(0);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editingWork, setEditingWork] = useState<any>(null);
 
 
   useEffect(() => {
@@ -571,6 +574,72 @@ export default function WorkDetailPage() {
         title: 'Ошибка',
         description: error instanceof Error ? error.message : 'Не удалось удалить работу',
         variant: 'destructive',
+      });
+    }
+  };
+
+  const handleEditWork = () => {
+    if (!work) return;
+    
+    setEditingWork({
+      id: parseInt(work.id),
+      title: work.title,
+      description: work.description,
+      composition: Array.isArray(work.composition) ? work.composition.join(', ') : work.composition,
+      cover_images: [],
+      preview_image_url: work.previewUrl || '',
+      yandex_disk_link: work.yandexDiskLink,
+      category: work.workType,
+      price_points: work.price,
+      status: 'active'
+    });
+    setShowEditDialog(true);
+  };
+
+  const handleSaveEditedWork = async () => {
+    if (!editingWork) return;
+
+    try {
+      console.log('Saving work edits:', editingWork);
+      
+      const response = await fetch(func2url['update-work'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          workId: editingWork.id,
+          title: editingWork.title,
+          description: editingWork.description,
+          composition: editingWork.composition,
+          coverImages: editingWork.cover_images || [],
+          previewImageUrl: editingWork.preview_image_url || '',
+          yandex_disk_link: editingWork.yandex_disk_link || '',
+          category: editingWork.category,
+          price_points: editingWork.price_points,
+          status: editingWork.status
+        })
+      });
+
+      const data = await response.json();
+      console.log('Update response:', data);
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Ошибка при обновлении работы');
+      }
+
+      toast({
+        title: 'Работа обновлена',
+        description: 'Изменения успешно сохранены'
+      });
+      
+      setShowEditDialog(false);
+      
+      window.location.reload();
+    } catch (error) {
+      console.error('Error updating work:', error);
+      toast({
+        title: 'Ошибка',
+        description: error instanceof Error ? error.message : 'Не удалось обновить работу',
+        variant: 'destructive'
       });
     }
   };
@@ -1775,6 +1844,18 @@ export default function WorkDetailPage() {
                 )}
               </Button>
 
+              {isAdmin && (
+                <Button 
+                  variant="outline"
+                  size="default"
+                  className="w-full font-semibold rounded-lg mb-3 h-10 md:h-11 text-sm md:text-base border-2 border-blue-500 text-blue-600 hover:bg-blue-50"
+                  onClick={handleEditWork}
+                >
+                  <Icon name="Edit" size={18} className="mr-2" />
+                  Редактировать работу
+                </Button>
+              )}
+
               <Button 
                 variant="secondary"
                 size="default"
@@ -1979,6 +2060,14 @@ export default function WorkDetailPage() {
           isAdmin={isAdmin}
         />
       </div>
+
+      <WorkEditDialog
+        work={editingWork}
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        onSave={handleSaveEditedWork}
+        onWorkChange={setEditingWork}
+      />
 
       <Footer />
     </div>

@@ -41,6 +41,7 @@ export default function UsersManagement() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [sortBy, setSortBy] = useState<'registration' | 'activity' | 'balance' | 'purchases'>('activity');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [deletingFakeUsers, setDeletingFakeUsers] = useState(false);
 
@@ -191,6 +192,21 @@ export default function UsersManagement() {
       user.email.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = filterStatus === 'all' || user.status === filterStatus;
     return matchesSearch && matchesStatus;
+  }).sort((a, b) => {
+    switch (sortBy) {
+      case 'activity':
+        if (!a.lastActivity) return 1;
+        if (!b.lastActivity) return -1;
+        return new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime();
+      case 'registration':
+        return new Date(b.registrationDate).getTime() - new Date(a.registrationDate).getTime();
+      case 'balance':
+        return b.balance - a.balance;
+      case 'purchases':
+        return b.totalPurchases - a.totalPurchases;
+      default:
+        return 0;
+    }
   });
 
   if (loading) {
@@ -219,16 +235,37 @@ export default function UsersManagement() {
     }
   };
 
+  // Проверяем активность за последние 7 дней
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+  const activeLastWeek = users.filter(u => {
+    if (!u.lastActivity) return false;
+    const lastActivity = new Date(u.lastActivity);
+    return lastActivity >= sevenDaysAgo;
+  }).length;
+
   const totalStats = {
     totalUsers: users.length,
     activeUsers: users.filter(u => u.status === 'active').length,
+    activeLastWeek: activeLastWeek,
     totalBalance: users.reduce((sum, u) => sum + u.balance, 0),
     totalEarned: users.reduce((sum, u) => sum + u.totalEarned, 0)
   };
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+        <CardHeader>
+          <CardTitle className="text-xl flex items-center gap-2">
+            <Icon name="Activity" size={24} className="text-blue-600" />
+            Статистика активности пользователей
+          </CardTitle>
+          <CardDescription>Реальные зарегистрированные пользователи (без тестовых аккаунтов)</CardDescription>
+        </CardHeader>
+      </Card>
+
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -238,6 +275,7 @@ export default function UsersManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold">{totalStats.totalUsers}</div>
+            <p className="text-xs text-muted-foreground mt-1">реальных аккаунтов</p>
           </CardContent>
         </Card>
 
@@ -250,6 +288,20 @@ export default function UsersManagement() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600">{totalStats.activeUsers}</div>
+            <p className="text-xs text-muted-foreground mt-1">со статусом "Активен"</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-green-200 bg-green-50">
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Icon name="Zap" size={18} className="text-green-600" />
+              Активны за неделю
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-600">{totalStats.activeLastWeek}</div>
+            <p className="text-xs text-muted-foreground mt-1">действия за 7 дней</p>
           </CardContent>
         </Card>
 
@@ -261,7 +313,7 @@ export default function UsersManagement() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{totalStats.totalBalance}</div>
+            <div className="text-3xl font-bold">{totalStats.totalBalance.toLocaleString()}</div>
             <p className="text-sm text-muted-foreground">баллов</p>
           </CardContent>
         </Card>
@@ -274,7 +326,7 @@ export default function UsersManagement() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{totalStats.totalEarned}</div>
+            <div className="text-3xl font-bold">{totalStats.totalEarned.toLocaleString()}</div>
             <p className="text-sm text-muted-foreground">баллов</p>
           </CardContent>
         </Card>
@@ -305,7 +357,7 @@ export default function UsersManagement() {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label>Поиск по имени или email</Label>
               <Input
@@ -328,26 +380,54 @@ export default function UsersManagement() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Сортировка</Label>
+              <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="activity">По активности (новые первыми)</SelectItem>
+                  <SelectItem value="registration">По регистрации (новые первыми)</SelectItem>
+                  <SelectItem value="balance">По балансу (больше первыми)</SelectItem>
+                  <SelectItem value="purchases">По покупкам (больше первыми)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Список пользователей ({filteredUsers.length})</CardTitle>
+          <CardTitle className="flex items-center justify-between">
+            <span>Список пользователей ({filteredUsers.length})</span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground font-normal">
+              <div className="w-2 h-2 rounded-full bg-green-500" />
+              <span>Активны за неделю</span>
+            </div>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {filteredUsers.map((user) => (
-              <div key={user.id} className="border rounded-lg p-4">
+            {filteredUsers.map((user) => {
+              const isActiveLastWeek = user.lastActivity 
+                ? new Date(user.lastActivity) >= sevenDaysAgo 
+                : false;
+              
+              return (
+              <div key={user.id} className={`border rounded-lg p-4 transition-all ${isActiveLastWeek ? 'border-green-300 bg-green-50/30' : ''}`}>
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
+                      {isActiveLastWeek && (
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" title="Активен за последние 7 дней" />
+                      )}
                       <h3 className="font-semibold">{user.name}</h3>
                       {getStatusBadge(user.status)}
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">{user.email}</p>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+                    <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Баланс</p>
                         <p className="font-semibold flex items-center gap-1">
@@ -370,6 +450,19 @@ export default function UsersManagement() {
                       <div>
                         <p className="text-muted-foreground">Регистрация</p>
                         <p className="font-semibold">{new Date(user.registrationDate).toLocaleDateString('ru-RU')}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Последняя активность</p>
+                        <p className="font-semibold text-xs">
+                          {user.lastActivity 
+                            ? new Date(user.lastActivity).toLocaleDateString('ru-RU', { 
+                                day: '2-digit', 
+                                month: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })
+                            : 'Нет активности'}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -490,7 +583,8 @@ export default function UsersManagement() {
                   </div>
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </CardContent>
       </Card>

@@ -210,7 +210,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn.close()
 
 def get_all_users(headers: Dict[str, str]) -> Dict[str, Any]:
-    '''Получить список всех пользователей для админа'''
+    '''Получить список всех зарегистрированных пользователей (без фейковых) для админа'''
     dsn = os.environ.get('DATABASE_URL')
     conn = psycopg2.connect(dsn)
     cur = conn.cursor()
@@ -228,12 +228,22 @@ def get_all_users(headers: Dict[str, str]) -> Dict[str, Any]:
                 u.referred_by,
                 COUNT(DISTINCT w.id) as total_uploads,
                 COUNT(DISTINCT p.id) as total_purchases,
-                COALESCE(SUM(CASE WHEN p2.work_id IN (SELECT id FROM t_p63326274_course_download_plat.works WHERE author_id = u.id) THEN p2.price_paid ELSE 0 END), 0) as total_earned
+                COALESCE(SUM(CASE WHEN p2.work_id IN (SELECT id FROM t_p63326274_course_download_plat.works WHERE author_id = u.id) THEN p2.price_paid ELSE 0 END), 0) as total_earned,
+                (
+                    SELECT MAX(created_at) 
+                    FROM (
+                        SELECT created_at FROM t_p63326274_course_download_plat.purchases WHERE buyer_id = u.id
+                        UNION ALL
+                        SELECT created_at FROM t_p63326274_course_download_plat.transactions WHERE user_id = u.id
+                        UNION ALL
+                        SELECT created_at FROM t_p63326274_course_download_plat.favorites WHERE user_id = u.id
+                    ) activities
+                ) as last_activity
             FROM t_p63326274_course_download_plat.users u
             LEFT JOIN t_p63326274_course_download_plat.works w ON w.author_id = u.id
             LEFT JOIN t_p63326274_course_download_plat.purchases p ON p.buyer_id = u.id
             LEFT JOIN t_p63326274_course_download_plat.purchases p2 ON p2.work_id IN (SELECT id FROM t_p63326274_course_download_plat.works WHERE author_id = u.id)
-            WHERE u.id < 1000000
+            WHERE u.id < 1000000 AND u.email NOT LIKE '%@fake.local%'
             GROUP BY u.id, u.username, u.email, u.balance, u.created_at, u.registration_ip, u.referral_code, u.referred_by
             ORDER BY u.created_at DESC
         """)
@@ -253,7 +263,7 @@ def get_all_users(headers: Dict[str, str]) -> Dict[str, Any]:
                 'totalPurchases': row[9],
                 'totalEarned': int(row[10]),
                 'status': 'active',
-                'lastActivity': row[4].isoformat() if row[4] else None
+                'lastActivity': row[11].isoformat() if row[11] else (row[4].isoformat() if row[4] else None)
             })
         
         return {

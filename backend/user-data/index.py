@@ -250,8 +250,41 @@ def get_all_users(headers: Dict[str, str]) -> Dict[str, Any]:
         
         users = []
         for row in cur.fetchall():
+            user_id = row[0]
+            
+            # Получаем количество скачиваний
+            cur.execute("""
+                SELECT COUNT(*) FROM t_p63326274_course_download_plat.user_downloads
+                WHERE user_id = %s
+            """, (user_id,))
+            total_downloads = cur.fetchone()[0]
+            
+            # Получаем топ-3 категории по покупкам
+            cur.execute("""
+                SELECT w.category, COUNT(*) as count
+                FROM t_p63326274_course_download_plat.purchases p
+                JOIN t_p63326274_course_download_plat.works w ON p.work_id = w.id
+                WHERE p.buyer_id = %s
+                GROUP BY w.category
+                ORDER BY count DESC
+                LIMIT 3
+            """, (user_id,))
+            favorite_categories = [cat[0] for cat in cur.fetchall() if cat[0]]
+            
+            # Получаем топ-3 предмета по покупкам
+            cur.execute("""
+                SELECT w.subject, COUNT(*) as count
+                FROM t_p63326274_course_download_plat.purchases p
+                JOIN t_p63326274_course_download_plat.works w ON p.work_id = w.id
+                WHERE p.buyer_id = %s AND w.subject IS NOT NULL
+                GROUP BY w.subject
+                ORDER BY count DESC
+                LIMIT 3
+            """, (user_id,))
+            favorite_subjects = [subj[0] for subj in cur.fetchall() if subj[0]]
+            
             users.append({
-                'id': row[0],
+                'id': user_id,
                 'name': row[1],
                 'email': row[2],
                 'balance': row[3],
@@ -262,6 +295,9 @@ def get_all_users(headers: Dict[str, str]) -> Dict[str, Any]:
                 'totalUploads': row[8],
                 'totalPurchases': row[9],
                 'totalEarned': int(row[10]),
+                'totalDownloads': total_downloads,
+                'favoriteCategories': favorite_categories,
+                'favoriteSubjects': favorite_subjects,
                 'status': 'active',
                 'lastActivity': row[11].isoformat() if row[11] else (row[4].isoformat() if row[4] else None)
             })

@@ -31,6 +31,9 @@ interface User {
   totalUploads: number;
   totalPurchases: number;
   totalEarned: number;
+  totalDownloads: number;
+  favoriteCategories: string[];
+  favoriteSubjects: string[];
   registrationDate: string;
   status: 'active' | 'blocked' | 'suspended';
   lastActivity: string;
@@ -427,7 +430,7 @@ export default function UsersManagement() {
                       {getStatusBadge(user.status)}
                     </div>
                     <p className="text-sm text-muted-foreground mb-3">{user.email}</p>
-                    <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
+                    <div className="grid grid-cols-2 md:grid-cols-7 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Баланс</p>
                         <p className="font-semibold flex items-center gap-1">
@@ -442,6 +445,13 @@ export default function UsersManagement() {
                       <div>
                         <p className="text-muted-foreground">Покупок</p>
                         <p className="font-semibold">{user.totalPurchases}</p>
+                      </div>
+                      <div>
+                        <p className="text-muted-foreground">Скачано</p>
+                        <p className="font-semibold flex items-center gap-1">
+                          <Icon name="Download" size={14} />
+                          {user.totalDownloads || 0}
+                        </p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Заработано</p>
@@ -465,6 +475,19 @@ export default function UsersManagement() {
                         </p>
                       </div>
                     </div>
+                    
+                    {user.favoriteCategories && user.favoriteCategories.length > 0 && (
+                      <div className="mt-3 pt-3 border-t">
+                        <p className="text-xs text-muted-foreground mb-1">Предпочтения:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {user.favoriteCategories.slice(0, 3).map((cat, idx) => (
+                            <Badge key={idx} variant="secondary" className="text-xs">
+                              {cat}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                   <div className="flex gap-2 ml-4">
                     <Dialog>
@@ -562,6 +585,54 @@ export default function UsersManagement() {
                                 <p>Дата регистрации: {new Date(user.registrationDate).toLocaleDateString('ru-RU')}</p>
                               </div>
                             </div>
+
+                            <div className="pt-4 border-t">
+                              <h4 className="font-semibold mb-2">Статистика использования</h4>
+                              <div className="text-sm space-y-2">
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Всего скачиваний:</span>
+                                  <span className="font-medium">{user.totalDownloads}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Всего покупок:</span>
+                                  <span className="font-medium">{user.totalPurchases}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span className="text-muted-foreground">Загружено работ:</span>
+                                  <span className="font-medium">{user.totalUploads}</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {user.favoriteCategories && user.favoriteCategories.length > 0 && (
+                              <div className="pt-4 border-t">
+                                <h4 className="font-semibold mb-2">Предпочтения</h4>
+                                <div className="text-sm space-y-2">
+                                  <div>
+                                    <span className="text-muted-foreground">Категории:</span>
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                      {user.favoriteCategories.map((cat, idx) => (
+                                        <Badge key={idx} variant="secondary" className="text-xs">
+                                          {cat}
+                                        </Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  {user.favoriteSubjects && user.favoriteSubjects.length > 0 && (
+                                    <div>
+                                      <span className="text-muted-foreground">Предметы:</span>
+                                      <div className="flex flex-wrap gap-1 mt-1">
+                                        {user.favoriteSubjects.map((subj, idx) => (
+                                          <Badge key={idx} variant="outline" className="text-xs">
+                                            {subj}
+                                          </Badge>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         )}
                       </DialogContent>

@@ -9,6 +9,7 @@ import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
 import { getTimeRemaining, formatTime } from '@/utils/urgencyTriggers';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface PointsPackage {
   id: number;
@@ -118,6 +119,13 @@ export default function BuyPointsPage() {
       const data = await response.json();
 
       if (data.payment_url) {
+        // Отслеживаем переход в кассу
+        trackEvent(metrikaEvents.PAYMENT_INITIATED, {
+          package_id: selectedPackage.id,
+          points: selectedPackage.points + selectedPackage.bonus,
+          price: selectedPackage.price
+        });
+        
         // Сохраняем текущий баланс перед оплатой
         localStorage.setItem('balance_before_payment', String(user.balance || 0));
         window.location.href = data.payment_url;

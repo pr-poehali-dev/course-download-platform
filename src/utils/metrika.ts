@@ -8,7 +8,10 @@ const METRIKA_ID = 99299244;
 
 export const trackEvent = (eventName: string, params?: Record<string, any>) => {
   if (typeof window !== 'undefined' && window.ym) {
+    console.log('📊 Метрика:', eventName, params);
     window.ym(METRIKA_ID, 'reachGoal', eventName, params);
+  } else {
+    console.warn('⚠️ Яндекс.Метрика не загружена');
   }
 };
 
@@ -35,6 +38,7 @@ export const metrikaEvents = {
   WORK_DOWNLOAD: 'work_download',
   WORK_QUICKVIEW: 'work_quickview',
   WORK_BUY_CLICK: 'work_buy_click',
+  WORK_PURCHASE_CLICK: 'work_purchase_click',
   WORK_FAVORITE: 'work_favorite',
   BUTTON_CLICK: 'button_click',
   SCROLL_25: 'scroll_25',
@@ -53,7 +57,9 @@ export const metrikaEvents = {
   CONTACT_CLICK: 'contact_click',
   FAQ_OPEN: 'faq_open',
   PAYMENT_OPEN: 'payment_open',
+  PAYMENT_INITIATED: 'payment_initiated',
   PAYMENT_SUCCESS: 'payment_success',
+  PREMIUM_SUBSCRIBE_CLICK: 'premium_subscribe_click',
   REFERRAL_COPY: 'referral_copy',
   PROFILE_TAB: 'profile_tab'
 };

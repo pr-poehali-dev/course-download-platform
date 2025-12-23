@@ -97,6 +97,12 @@ export default function PaymentSuccessPage() {
         throw new Error(orderData.error || 'Ошибка создания заказа');
       }
       
+      trackEvent(metrikaEvents.WORK_PURCHASE_CLICK, {
+        work_id: workId,
+        auto_purchase: true,
+        from: 'payment_success_page'
+      });
+      
       if (orderData.payUrl) {
         // Всё ещё недостаточно баллов
         setIsProcessing(false);
@@ -140,6 +146,12 @@ export default function PaymentSuccessPage() {
       } catch (fetchError) {
         window.location.href = downloadData.download_url;
       }
+      
+      trackEvent(metrikaEvents.WORK_DOWNLOAD, {
+        work_id: workId,
+        auto_purchase: true,
+        from: 'payment_success_page'
+      });
       
       // Обновляем баланс
       if (user.role !== 'admin' && orderData.newBalance !== undefined) {

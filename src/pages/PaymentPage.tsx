@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authService } from '@/lib/auth';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 export default function PaymentPage() {
   const [searchParams] = useSearchParams();
@@ -48,6 +49,11 @@ export default function PaymentPage() {
   const handlePay = async () => {
     const user = authService.getUser();
     if (!user || !orderId) return;
+
+    trackEvent(metrikaEvents.PAYMENT_OPEN, {
+      order_id: orderId,
+      work_id: orderInfo?.work_id
+    });
 
     setStatus('processing');
     setMessage('Подтверждаем оплату...');

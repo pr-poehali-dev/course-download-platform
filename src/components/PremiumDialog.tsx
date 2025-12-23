@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 import { useState } from 'react';
 import func2url from '../../backend/func2url.json';
+import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 interface PremiumDialogProps {
   open: boolean;
@@ -54,6 +55,12 @@ export default function PremiumDialog({
       const data = await response.json();
       
       if (data.confirmation_url) {
+        // Отслеживаем переход в кассу
+        trackEvent(metrikaEvents.PREMIUM_SUBSCRIBE_CLICK, {
+          price: 399,
+          user_id: userId
+        });
+        
         // Перенаправить на страницу оплаты ЮKassa
         window.location.href = data.confirmation_url;
       } else {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { authService, User } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,40 +13,42 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
-import AuthDialog from '@/components/AuthDialog';
-import ProfileDialog from '@/components/ProfileDialog';
+// Lazy загрузка диалогов для уменьшения начального бандла
+const AuthDialog = lazy(() => import('@/components/AuthDialog'));
+const ProfileDialog = lazy(() => import('@/components/ProfileDialog'));
+const PaymentDialog = lazy(() => import('@/components/PaymentDialog'));
+const CartDialog = lazy(() => import('@/components/CartDialog'));
+const FavoritesDialog = lazy(() => import('@/components/FavoritesDialog'));
+const PromoCodeDialog = lazy(() => import('@/components/PromoCodeDialog'));
+const ReferralDialog = lazy(() => import('@/components/ReferralDialog'));
+const ExitIntentModal = lazy(() => import('@/components/ExitIntentModal'));
 import { ThemeToggle } from '@/components/ThemeToggle';
 import SupportPage from '@/components/SupportPage';
 import AdminPanel from '@/components/AdminPanel';
-import PaymentDialog from '@/components/PaymentDialog';
-import CartDialog from '@/components/CartDialog';
-import FavoritesDialog from '@/components/FavoritesDialog';
-import PromoCodeDialog from '@/components/PromoCodeDialog';
-import ReferralDialog from '@/components/ReferralDialog';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 
-import AboutSection from '@/components/AboutSection';
-import RecentlyViewed from '@/components/RecentlyViewed';
-
-import FAQSection from '@/components/FAQSection';
-import CookieBanner from '@/components/CookieBanner';
+// Lazy loading для некритичных секций
+const AboutSection = lazy(() => import('@/components/AboutSection'));
+const RecentlyViewed = lazy(() => import('@/components/RecentlyViewed'));
+const FAQSection = lazy(() => import('@/components/FAQSection'));
+const CookieBanner = lazy(() => import('@/components/CookieBanner'));
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import HomeHeader from '@/components/home/HomeHeader';
 import RotatingText from '@/components/home/RotatingText';
-import NewsSection from '@/components/NewsSection';
+const NewsSection = lazy(() => import('@/components/NewsSection'));
 
-import ExitIntentModal from '@/components/ExitIntentModal';
-import SEOHeroSection from '@/components/home/SEOHeroSection';
-import WorkCategoriesSection from '@/components/home/WorkCategoriesSection';
-import SEOContentSection from '@/components/home/SEOContentSection';
-import SEOFAQSection from '@/components/home/SEOFAQSection';
-import PopularCategoriesLinks from '@/components/home/PopularCategoriesLinks';
-import CategoryLinksSection from '@/components/seo/CategoryLinksSection';
-import PopularSearches from '@/components/seo/PopularSearches';
-import BlogSection from '@/components/home/BlogSection';
+
+const SEOHeroSection = lazy(() => import('@/components/home/SEOHeroSection'));
+const WorkCategoriesSection = lazy(() => import('@/components/home/WorkCategoriesSection'));
+const SEOContentSection = lazy(() => import('@/components/home/SEOContentSection'));
+const SEOFAQSection = lazy(() => import('@/components/home/SEOFAQSection'));
+const PopularCategoriesLinks = lazy(() => import('@/components/home/PopularCategoriesLinks'));
+const CategoryLinksSection = lazy(() => import('@/components/seo/CategoryLinksSection'));
+const PopularSearches = lazy(() => import('@/components/seo/PopularSearches'));
+const BlogSection = lazy(() => import('@/components/home/BlogSection'));
 import Footer from '@/components/Footer';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
 import NewYearSnow from '@/components/NewYearSnow';
@@ -589,7 +591,9 @@ export default function Index() {
         </script>
       </Helmet>
 
-      <ExitIntentModal />
+      <Suspense fallback={<div />}>
+        <ExitIntentModal />
+      </Suspense>
       <NewYearSnow />
       <NewYearBanner onBuyPoints={() => setPaymentDialogOpen(true)} />
       <div className="min-h-screen w-full overflow-x-hidden bg-background">
@@ -1338,9 +1342,13 @@ export default function Index() {
 
 
 
-        <AboutSection />
+        <Suspense fallback={<div className="py-20" />}>
+          <AboutSection />
+        </Suspense>
 
-        <NewsSection isAdmin={currentUser?.role === 'admin'} />
+        <Suspense fallback={<div className="py-20" />}>
+          <NewsSection isAdmin={currentUser?.role === 'admin'} />
+        </Suspense>
 
         <section id="faq" className="py-20 bg-background border-b border-border">
           <div className="container mx-auto px-4 max-w-4xl">
@@ -1412,76 +1420,98 @@ export default function Index() {
           </div>
         </section>
 
-        <CategoryLinksSection />
+        <Suspense fallback={<div className="py-20" />}>
+          <CategoryLinksSection />
+        </Suspense>
         
-        <BlogSection />
+        <Suspense fallback={<div className="py-20" />}>
+          <BlogSection />
+        </Suspense>
         
-        <PopularSearches />
+        <Suspense fallback={<div className="py-20" />}>
+          <PopularSearches />
+        </Suspense>
         
-        <SEOContentSection />
+        <Suspense fallback={<div className="py-20" />}>
+          <SEOContentSection />
+        </Suspense>
       </div>
 
-      <AuthDialog 
-        open={authDialogOpen} 
-        onOpenChange={setAuthDialogOpen}
-        onLogin={handleLogin}
-        onRegister={handleRegister}
-      />
+      <Suspense fallback={<div />}>
+        <AuthDialog 
+          open={authDialogOpen} 
+          onOpenChange={setAuthDialogOpen}
+          onLogin={handleLogin}
+          onRegister={handleRegister}
+        />
+      </Suspense>
 
-      <ProfileDialog
-        open={profileDialogOpen}
-        onOpenChange={setProfileDialogOpen}
-        username={username}
-        email={email}
-        balance={userBalance}
-        onLogout={handleLogout}
-        purchases={purchases}
-        onOpenReferral={() => setReferralDialogOpen(true)}
-        userId={currentUser?.id || null}
-        onBalanceUpdate={(newBalance) => {
-          if (currentUser) {
-            setCurrentUser({ ...currentUser, balance: newBalance });
-          }
-        }}
-      />
+      <Suspense fallback={<div />}>
+        <ProfileDialog
+          open={profileDialogOpen}
+          onOpenChange={setProfileDialogOpen}
+          username={username}
+          email={email}
+          balance={userBalance}
+          onLogout={handleLogout}
+          purchases={purchases}
+          onOpenReferral={() => setReferralDialogOpen(true)}
+          userId={currentUser?.id || null}
+          onBalanceUpdate={(newBalance) => {
+            if (currentUser) {
+              setCurrentUser({ ...currentUser, balance: newBalance });
+            }
+          }}
+        />
+      </Suspense>
 
-      <PaymentDialog
-        open={paymentDialogOpen}
-        onOpenChange={setPaymentDialogOpen}
-        onSuccess={handlePaymentSuccess}
-        userEmail={email}
-      />
+      <Suspense fallback={<div />}>
+        <PaymentDialog
+          open={paymentDialogOpen}
+          onOpenChange={setPaymentDialogOpen}
+          onSuccess={handlePaymentSuccess}
+          userEmail={email}
+        />
+      </Suspense>
 
-      <CartDialog
-        open={cartDialogOpen}
-        onOpenChange={setCartDialogOpen}
-        items={cartItems}
-        onRemoveItem={handleRemoveFromCart}
-        onCheckout={handleCheckout}
-        userBalance={userBalance}
-      />
+      <Suspense fallback={<div />}>
+        <CartDialog
+          open={cartDialogOpen}
+          onOpenChange={setCartDialogOpen}
+          items={cartItems}
+          onRemoveItem={handleRemoveFromCart}
+          onCheckout={handleCheckout}
+          userBalance={userBalance}
+        />
+      </Suspense>
 
-      <FavoritesDialog
-        open={favoritesDialogOpen}
-        onOpenChange={setFavoritesDialogOpen}
-        items={favoriteItems}
-        onRemoveItem={handleRemoveFromFavorites}
-        onAddToCart={handleAddToCart}
-      />
+      <Suspense fallback={<div />}>
+        <FavoritesDialog
+          open={favoritesDialogOpen}
+          onOpenChange={setFavoritesDialogOpen}
+          items={favoriteItems}
+          onRemoveItem={handleRemoveFromFavorites}
+          onAddToCart={handleAddToCart}
+        />
+      </Suspense>
 
-      <PromoCodeDialog
-        open={promoDialogOpen}
-        onOpenChange={setPromoDialogOpen}
-        onApplyPromo={handleApplyPromo}
-        userId={currentUser?.id}
-      />
+      <Suspense fallback={<div />}>
+        <PromoCodeDialog
+          open={promoDialogOpen}
+          onOpenChange={setPromoDialogOpen}
+          onApplyPromo={handleApplyPromo}
+          userId={currentUser?.id}
+        />
+      </Suspense>
 
-      <ReferralDialog
-        open={referralDialogOpen}
-        onOpenChange={setReferralDialogOpen}
-        username={username}
-        userId={currentUser?.id}
-      />
+      <Suspense fallback={<div />}>
+        <ReferralDialog
+          open={referralDialogOpen}
+          onOpenChange={setReferralDialogOpen}
+          username={username}
+          userId={currentUser?.id}
+        />
+      </Suspense>
 
       {currentUser?.role === 'admin' && (
         <section className="py-8 bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900 border-t-2 border-purple-500">

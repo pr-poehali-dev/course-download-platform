@@ -1,8 +1,18 @@
 /* Шрифты загружаются через link preconnect в index.html */
+/* Критичные CSS inline для ускорения отрисовки */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* Оптимизация шрифтов */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+}
 
 @layer base {
   :root {
@@ -140,6 +150,12 @@
 }
 
 @layer utilities {
+  /* Оптимизация рендеринга для тяжелых секций */
+  .lazy-section {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 500px;
+  }
+
   .animate-gradient {
     background-size: 200% 200%;
     animation: gradient-shift 3s ease infinite;

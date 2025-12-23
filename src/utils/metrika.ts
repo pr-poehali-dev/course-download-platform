@@ -8,9 +8,12 @@ const METRIKA_ID = 99299244;
 
 export const trackEvent = (eventName: string, params?: Record<string, any>) => {
   if (typeof window !== 'undefined' && window.ym) {
-    console.log('📊 Метрика:', eventName, params);
+    // Логи только в режиме разработки
+    if (import.meta.env.DEV) {
+      console.log('📊 Метрика:', eventName, params);
+    }
     window.ym(METRIKA_ID, 'reachGoal', eventName, params);
-  } else {
+  } else if (import.meta.env.DEV) {
     console.warn('⚠️ Яндекс.Метрика не загружена');
   }
 };

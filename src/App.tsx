@@ -7,24 +7,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { HelmetProvider } from 'react-helmet-async';
 import SEOGuard from '@/components/SEOGuard';
-import CriticalCSS from '@/components/CriticalCSS';
 
-// Retry helper for lazy imports with proper error handling
 const lazyRetry = (componentImport: () => Promise<any>, retries = 3) => 
   lazy(async () => {
     for (let i = 0; i < retries; i++) {
       try {
         return await componentImport();
       } catch (error) {
-        if (i === retries - 1) {
-          console.error('Failed to load component after retries:', error);
-          throw error;
-        }
-        // Wait before retry (exponential backoff)
+        if (i === retries - 1) throw error;
         await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
       }
     }
-    // Fallback return (TypeScript требует)
     return await componentImport();
   });
 
@@ -103,11 +96,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error): void {
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Component error:', error);
-    }
-  }
+  componentDidCatch(): void {}
 
   render(): ReactNode {
     if (this.state.hasError) {
@@ -148,7 +137,6 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <HelmetProvider>
-    <CriticalCSS />
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="techforma-theme">
         <TooltipProvider>

@@ -18,21 +18,12 @@
     <meta name="ICBM" content="59.938955, 30.315644"/>
     <meta name="language" content="Russian"/>
     
-    <!-- Favicons для всех браузеров и устройств -->
-    <link rel="icon" type="image/png" sizes="512x512" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
-    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
-    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
-    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
-    <link rel="shortcut icon" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <!-- Favicons (оптимизированные) -->
+    <link rel="icon" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <link rel="apple-touch-icon" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
     <link rel="manifest" href="/manifest.json">
     
-    <!-- Yandex Browser -->
-    <meta name="yandex-tableau-widget" content="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
-    <meta name="msapplication-TileImage" content="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
-    <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="canonical" href="https://techforma.pro">
     <meta property="og:url" content="https://techforma.pro">
     
@@ -54,9 +45,12 @@
     <meta name="twitter:description" content="Инженерная платформа. 500+ чертежей DWG/DXF, 3D-модели, технические расчёты.">
     <meta name="twitter:image" content="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e25efd0b-8d04-4b71-b6d0-2a3a0d0123a4.jpg">
 
-    <!-- Preconnect для ускорения загрузки ресурсов -->
+    <!-- Resource Hints для критичных доменов -->
     <link rel="preconnect" href="https://cdn.poehali.dev" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://functions.poehali.dev">
+    <link rel="dns-prefetch" href="https://mc.yandex.ru">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     
     <!-- Яндекс.Метрика (отложенная загрузка) -->
     <script type="text/javascript">
@@ -86,11 +80,11 @@
     <noscript><div><img src="https://mc.yandex.ru/watch/99299244" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Яндекс.Метрика -->
     
-    <!-- Оптимизированная загрузка шрифтов -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic">
-    </noscript>
+    <!-- Шрифты (отложенная загрузка) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic"></noscript>
 
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
 
@@ -106,21 +100,15 @@
       <script async src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
       
       <script>
-        // Редирект с зеркал на основной домен (только критичные проверки)
+        // Критичная инициализация
         (function() {
-          var h = location.hostname, p = location.protocol;
-          if (h !== 'techforma.pro') {
-            location.replace('https://techforma.pro' + location.pathname + location.search + location.hash);
-          } else if (p === 'http:') {
-            location.replace('https://techforma.pro' + location.pathname + location.search + location.hash);
+          var h = location.hostname;
+          if (h !== 'techforma.pro') location.replace('https://techforma.pro' + location.pathname + location.search + location.hash);
+          if (!localStorage.getItem('pp_terms_accepted')) {
+            localStorage.setItem('pp_terms_accepted', 'true');
+            localStorage.setItem('pp_privacy_accepted', 'true');
           }
         })();
-        
-        // Автоматическое принятие соглашений
-        if (!localStorage.getItem('pp_terms_accepted')) {
-          localStorage.setItem('pp_terms_accepted', 'true');
-          localStorage.setItem('pp_privacy_accepted', 'true');
-        }
       </script>
       <script src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js"></script>
       <script src="https://cdn.poehali.dev/intertnal/js/route-min.js"></script>

@@ -222,6 +222,17 @@
   }
   </script>
 
+  <!-- Service Worker регистрация -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+
   <!-- Минимальный контент для noscript -->
   <div style="position: absolute; left: -9999px; top: -9999px;" aria-hidden="true">
     <h2>Tech Forma — Чертежи DWG, 3D-модели CAD</h2>

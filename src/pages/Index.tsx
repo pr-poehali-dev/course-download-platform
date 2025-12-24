@@ -600,11 +600,15 @@ export default function Index() {
         </script>
       </Helmet>
 
-      <Suspense fallback={<div />}>
+      <Suspense fallback={null}>
         <ExitIntentModal />
       </Suspense>
-      <NewYearSnow />
-      <NewYearBanner onBuyPoints={() => setPaymentDialogOpen(true)} />
+      <Suspense fallback={null}>
+        <NewYearSnow />
+      </Suspense>
+      <Suspense fallback={null}>
+        <NewYearBanner onBuyPoints={() => setPaymentDialogOpen(true)} />
+      </Suspense>
       <div className="min-h-screen w-full overflow-x-hidden bg-background">
         <header className="glass-card border-b border-border sticky top-0 z-50 w-full backdrop-blur-md shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
@@ -631,7 +635,9 @@ export default function Index() {
                 </nav>
                 
                 <div className="flex items-center gap-2">
-                  <ThemeToggle />
+                  <Suspense fallback={<div className="w-10 h-10" />}>
+                    <ThemeToggle />
+                  </Suspense>
                   
                   <Button 
                     variant="ghost" 
@@ -801,15 +807,19 @@ export default function Index() {
           </div>
         </header>
 
-        <SEOHeroSection onCatalogClick={() => window.location.href = '/catalog'} />
+        <Suspense fallback={<div className="h-[500px]" />}>
+          <SEOHeroSection onCatalogClick={() => window.location.href = '/catalog'} />
+        </Suspense>
 
-        <WorkCategoriesSection onCatalogClick={(category) => {
-          if (category) {
-            window.location.href = `/catalog?category=${category}`;
-          } else {
-            window.location.href = '/catalog';
-          }
-        }} />
+        <Suspense fallback={<div className="h-[400px]" />}>
+          <WorkCategoriesSection onCatalogClick={(category) => {
+            if (category) {
+              window.location.href = `/catalog?category=${category}`;
+            } else {
+              window.location.href = '/catalog';
+            }
+          }} />
+        </Suspense>
 
         <section className="relative py-20 bg-background border-b border-border">
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">

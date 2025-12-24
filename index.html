@@ -55,16 +55,11 @@
     <meta name="twitter:image" content="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e25efd0b-8d04-4b71-b6d0-2a3a0d0123a4.jpg">
 
     <!-- Preconnect для ускорения загрузки ресурсов -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.poehali.dev" crossorigin>
     <link rel="dns-prefetch" href="https://functions.poehali.dev">
-    <link rel="dns-prefetch" href="https://mc.yandex.ru">
-    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     
     <!-- Яндекс.Метрика (отложенная загрузка) -->
     <script type="text/javascript">
-      // Загружаем метрику после взаимодействия пользователя
       var yandexMetricaLoaded = false;
       function loadYandexMetrica() {
         if (yandexMetricaLoaded) return;
@@ -75,26 +70,24 @@
         k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
         (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
         ym(99299244, "init", {
-          clickmap:true,
+          clickmap:false,
           trackLinks:true,
-          accurateTrackBounce:true,
+          accurateTrackBounce:false,
           webvisor:false,
           ecommerce:"dataLayer"
         });
       }
-      // Загрузка при первом взаимодействии или через 3 секунды
-      ['scroll', 'click', 'mousemove', 'touchstart'].forEach(function(e) {
-        window.addEventListener(e, loadYandexMetrica, {once: true, passive: true});
-      });
-      window.addEventListener('load', function() {
-        setTimeout(loadYandexMetrica, 3000);
-      });
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadYandexMetrica, {timeout: 5000});
+      } else {
+        setTimeout(loadYandexMetrica, 5000);
+      }
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/99299244" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Яндекс.Метрика -->
     
-    <!-- Оптимизированная загрузка шрифтов (только Inter для ускорения) -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic" media="print" onload="this.media='all'">
+    <!-- Оптимизированная загрузка шрифтов -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic">
     </noscript>
@@ -102,15 +95,15 @@
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
 
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
-    <script defer src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js" fetchpriority="low"></script>
-    <script defer src="https://cdn.poehali.dev/intertnal/js/route-min.js" fetchpriority="low"></script>
-    <script defer src="https://cdn.poehali.dev/intertnal/js/telemetry-min.js" fetchpriority="low"></script>
+    <script defer src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js" fetchpriority="low" async></script>
+    <script defer src="https://cdn.poehali.dev/intertnal/js/route-min.js" fetchpriority="low" async></script>
+    <script defer src="https://cdn.poehali.dev/intertnal/js/telemetry-min.js" fetchpriority="low" async></script>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
 
 
 
     <meta name="pp-name" value="course-download-platform">
-      <script defer src="https://cdn.poehali.dev/intertnal/js/inspector-min.js" fetchpriority="low"></script>
+      <script defer src="https://cdn.poehali.dev/intertnal/js/inspector-min.js" fetchpriority="low" async></script>
       
       <script>
         // Редирект с зеркал на основной домен techforma.pro

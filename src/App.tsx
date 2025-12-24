@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { HelmetProvider } from 'react-helmet-async';
 import SEOGuard from '@/components/SEOGuard';
+import CriticalCSS from '@/components/CriticalCSS';
 
 // Retry helper for lazy imports with proper error handling
 const lazyRetry = (componentImport: () => Promise<any>, retries = 3) => 
@@ -78,14 +79,8 @@ const DefenseKitBuilder = lazyRetry(() => import("./pages/DefenseKitBuilder"));
 const YandexVerification = lazyRetry(() => import("./pages/YandexVerification"));
 
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-slate-50/30 to-white">
-    <div className="text-center space-y-4">
-      <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-blue-600"></div>
-      <div className="space-y-2">
-        <p className="text-xl font-semibold text-gray-800">Загрузка страницы</p>
-        <p className="text-sm text-gray-500">Пожалуйста, подождите...</p>
-      </div>
-    </div>
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-primary"></div>
   </div>
 );
 
@@ -146,6 +141,7 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <HelmetProvider>
+    <CriticalCSS />
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="techforma-theme">
         <TooltipProvider>

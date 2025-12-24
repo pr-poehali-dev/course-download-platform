@@ -9,8 +9,8 @@ interface SEOHeroSectionProps {
 
 export default function SEOHeroSection({ onCatalogClick }: SEOHeroSectionProps) {
   return (
-    <section className="relative w-full py-24 bg-gradient-to-b from-background to-muted/30 text-center overflow-hidden">
-      <div className="absolute inset-0 blueprint-grid opacity-30 pointer-events-none"></div>
+    <section className="relative w-full py-24 bg-gradient-to-b from-background to-muted/30 text-center overflow-hidden will-change-auto">
+      <div className="absolute inset-0 blueprint-grid opacity-30 pointer-events-none" aria-hidden="true"></div>
       
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8">

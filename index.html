@@ -52,6 +52,10 @@
     <link rel="dns-prefetch" href="https://mc.yandex.ru">
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     
+    <!-- Preload критичных ресурсов -->
+    <link rel="modulepreload" href="/src/main.tsx">
+    <link rel="modulepreload" href="/src/App.tsx">
+    
     <!-- Яндекс.Метрика (отложенная загрузка) -->
     <script type="text/javascript">
       var yandexMetricaLoaded = false;
@@ -80,6 +84,11 @@
     <noscript><div><img src="https://mc.yandex.ru/watch/99299244" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Яндекс.Метрика -->
     
+    <!-- Critical CSS (inline для мгновенной отрисовки) -->
+    <style>
+      *{font-family:system-ui,sans-serif;box-sizing:border-box}body{margin:0;background:#fafafa;color:#1e293b}#root{min-height:100vh}.animate-spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}img{max-width:100%;height:auto}
+    </style>
+    
     <!-- Шрифты (отложенная загрузка) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -87,29 +96,16 @@
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic"></noscript>
 
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
-
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
     <script async src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js"></script>
     <script async src="https://cdn.poehali.dev/intertnal/js/route-min.js"></script>
     <script async src="https://cdn.poehali.dev/intertnal/js/telemetry-min.js"></script>
+    <script async src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
 
-
-
     <meta name="pp-name" value="course-download-platform">
-      <script async src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
-      
-      <script>
-        // Критичная инициализация
-        (function() {
-          var h = location.hostname;
-          if (h !== 'techforma.pro') location.replace('https://techforma.pro' + location.pathname + location.search + location.hash);
-          if (!localStorage.getItem('pp_terms_accepted')) {
-            localStorage.setItem('pp_terms_accepted', 'true');
-            localStorage.setItem('pp_privacy_accepted', 'true');
-          }
-        })();
-      </script>
+    <script>
+      (function(){var h=location.hostname;if(h!=="techforma.pro")location.replace("https://techforma.pro"+location.pathname+location.search+location.hash);if(!localStorage.getItem("pp_terms_accepted")){localStorage.setItem("pp_terms_accepted","true");localStorage.setItem("pp_privacy_accepted","true");}})()
+    </script>
       <script src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js"></script>
       <script src="https://cdn.poehali.dev/intertnal/js/route-min.js"></script>
       <script src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>

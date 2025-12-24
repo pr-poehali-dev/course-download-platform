@@ -1,5 +1,4 @@
-
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -98,8 +97,10 @@ class ErrorBoundary extends React.Component<
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error('Component error:', error, errorInfo);
+  componentDidCatch(error: Error) {
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Component error:', error);
+    }
   }
 
   render() {

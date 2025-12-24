@@ -78,9 +78,9 @@
         });
       }
       if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadYandexMetrica, {timeout: 5000});
+        requestIdleCallback(loadYandexMetrica, {timeout: 8000});
       } else {
-        setTimeout(loadYandexMetrica, 5000);
+        setTimeout(loadYandexMetrica, 8000);
       }
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/99299244" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
@@ -95,73 +95,32 @@
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
 
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
-    <script defer src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js" fetchpriority="low" async></script>
-    <script defer src="https://cdn.poehali.dev/intertnal/js/route-min.js" fetchpriority="low" async></script>
-    <script defer src="https://cdn.poehali.dev/intertnal/js/telemetry-min.js" fetchpriority="low" async></script>
+    <script async src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js"></script>
+    <script async src="https://cdn.poehali.dev/intertnal/js/route-min.js"></script>
+    <script async src="https://cdn.poehali.dev/intertnal/js/telemetry-min.js"></script>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
 
 
 
     <meta name="pp-name" value="course-download-platform">
-      <script defer src="https://cdn.poehali.dev/intertnal/js/inspector-min.js" fetchpriority="low" async></script>
+      <script async src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
       
       <script>
-        // Редирект с зеркал на основной домен techforma.pro
+        // Редирект с зеркал на основной домен (только критичные проверки)
         (function() {
-          const currentHost = window.location.hostname.toLowerCase();
-          const currentProtocol = window.location.protocol;
-          const currentPath = window.location.pathname;
-          const mainDomain = 'techforma.pro';
-          
-          // Проверяем, находимся ли мы НЕ на главном домене
-          if (currentHost !== mainDomain) {
-            const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
-            window.location.replace(newUrl);
-            return;
-          }
-          
-          // Проверяем HTTP -> HTTPS редирект для главного домена
-          if (currentHost === mainDomain && currentProtocol === 'http:') {
-            const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
-            window.location.replace(newUrl);
-            return;
-          }
-          
-          // Удаление технических расширений из URL
-          const techExtensions = ['.php', '.html', '.aspx', '.htm'];
-          let cleanPath = currentPath;
-          
-          // Проверяем наличие технических расширений
-          for (const ext of techExtensions) {
-            if (currentPath.endsWith(ext) || currentPath.includes(ext + '/')) {
-              cleanPath = currentPath.replace(new RegExp(ext + '(/|$)', 'g'), '$1');
-              break;
-            }
-          }
-          
-          // Удаление trailing slash (кроме корня)
-          if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
-            cleanPath = cleanPath.slice(0, -1);
-          }
-          
-          // Если путь изменился - редиректим
-          if (cleanPath !== currentPath) {
-            const newUrl = 'https://' + mainDomain + cleanPath + window.location.search + window.location.hash;
-            window.location.replace(newUrl);
-            return;
+          var h = location.hostname, p = location.protocol;
+          if (h !== 'techforma.pro') {
+            location.replace('https://techforma.pro' + location.pathname + location.search + location.hash);
+          } else if (p === 'http:') {
+            location.replace('https://techforma.pro' + location.pathname + location.search + location.hash);
           }
         })();
         
-        // Автоматическое принятие системных соглашений платформы
-        window.addEventListener('DOMContentLoaded', function() {
-          setTimeout(function() {
-            // Проверяем, показано ли уже согласие
-            if (!localStorage.getItem('pp_terms_accepted')) {
-              localStorage.setItem('pp_terms_accepted', 'true');
-              localStorage.setItem('pp_privacy_accepted', 'true');
-            }
-          }, 100);
-        });
+        // Автоматическое принятие соглашений
+        if (!localStorage.getItem('pp_terms_accepted')) {
+          localStorage.setItem('pp_terms_accepted', 'true');
+          localStorage.setItem('pp_privacy_accepted', 'true');
+        }
       </script>
       <script src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js"></script>
       <script src="https://cdn.poehali.dev/intertnal/js/route-min.js"></script>
@@ -225,10 +184,8 @@
   <!-- Service Worker регистрация -->
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(reg => console.log('SW registered:', reg.scope))
-          .catch(err => console.log('SW registration failed:', err));
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').catch(function(){});
       });
     }
   </script>
@@ -246,44 +203,7 @@
 </div>
 <script type="module" src="/src/main.tsx"></script>
 
-<!-- Yandex.Metrika counter -->
-<script type="text/javascript" defer>
-    (function (m, e, t, r, i, k, a) {
-        m[i] = m[i] || function () {
-            (m[i].a = m[i].a || []).push(arguments)
-        };
-        m[i].l = 1 * new Date();
-        for (var j = 0; j < document.scripts.length; j++) {
-            if (document.scripts[j].src === r) {
-                return;
-            }
-        }
-        k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
-    })
-    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
-    ym(105713494, "init", {
-        clickmap: true,
-        trackLinks: true,
-        accurateTrackBounce: true,
-        webvisor: true,
-        ecommerce: "dataLayer"
-    });
-</script>
-<noscript>
-    <div><img src="https://mc.yandex.ru/watch/105713494" style="position:absolute; left:-9999px;" alt=""/></div>
-</noscript>
-<!-- /Yandex.Metrika counter -->
-
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-<script defer>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-XXXXXXXXXX');
-</script>
-<!-- /Google Analytics -->
 
 <!-- Schema.org разметка для поисковиков -->
 <script type="application/ld+json">

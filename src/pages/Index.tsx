@@ -22,10 +22,10 @@ const FavoritesDialog = lazy(() => import('@/components/FavoritesDialog'));
 const PromoCodeDialog = lazy(() => import('@/components/PromoCodeDialog'));
 const ReferralDialog = lazy(() => import('@/components/ReferralDialog'));
 const ExitIntentModal = lazy(() => import('@/components/ExitIntentModal'));
-import { ThemeToggle } from '@/components/ThemeToggle';
-import SupportPage from '@/components/SupportPage';
-import AdminPanel from '@/components/AdminPanel';
-import Breadcrumbs from '@/components/Breadcrumbs';
+const ThemeToggle = lazy(() => import('@/components/ThemeToggle').then(m => ({ default: m.ThemeToggle })));
+const SupportPage = lazy(() => import('@/components/SupportPage'));
+const AdminPanel = lazy(() => import('@/components/AdminPanel'));
+const Breadcrumbs = lazy(() => import('@/components/Breadcrumbs'));
 
 
 // Lazy loading для некритичных секций
@@ -37,7 +37,7 @@ import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifi
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import HomeHeader from '@/components/home/HomeHeader';
-import RotatingText from '@/components/home/RotatingText';
+const RotatingText = lazy(() => import('@/components/home/RotatingText'));
 const NewsSection = lazy(() => import('@/components/NewsSection'));
 
 
@@ -49,10 +49,10 @@ const PopularCategoriesLinks = lazy(() => import('@/components/home/PopularCateg
 const CategoryLinksSection = lazy(() => import('@/components/seo/CategoryLinksSection'));
 const PopularSearches = lazy(() => import('@/components/seo/PopularSearches'));
 const BlogSection = lazy(() => import('@/components/home/BlogSection'));
-import Footer from '@/components/Footer';
+const Footer = lazy(() => import('@/components/Footer'));
 import { useScrollTracking } from '@/hooks/useScrollTracking';
-import NewYearSnow from '@/components/NewYearSnow';
-import NewYearBanner from '@/components/NewYearBanner';
+const NewYearSnow = lazy(() => import('@/components/NewYearSnow'));
+const NewYearBanner = lazy(() => import('@/components/NewYearBanner'));
 
 
 
@@ -171,10 +171,19 @@ export default function Index() {
   useEffect(() => {
     const loadWorks = async () => {
       try {
+        // Проверяем кэш
+        const cachedWorks = sessionStorage.getItem('works_cache');
+        if (cachedWorks) {
+          setRealWorks(JSON.parse(cachedWorks));
+          setWorksLoading(false);
+        }
+        
+        // Загружаем с сервера
         const response = await fetch(func2url.works);
         const data = await response.json();
         if (data.works) {
           setRealWorks(data.works);
+          sessionStorage.setItem('works_cache', JSON.stringify(data.works));
         }
       } catch (error) {
         console.error('Failed to load works:', error);

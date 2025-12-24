@@ -37,7 +37,7 @@ export default function NewYearBanner({ onBuyPoints }: NewYearBannerProps) {
     };
 
     calculateTimeLeft();
-    const timer = setInterval(calculateTimeLeft, 1000);
+    const timer = setInterval(calculateTimeLeft, 5000); // Обновление каждые 5 сек вместо 1
 
     return () => clearInterval(timer);
   }, []);

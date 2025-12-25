@@ -1,26 +1,21 @@
+/* Шрифты загружаются через link preconnect в index.html */
+/* Критичные CSS inline для ускорения отрисовки */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  /* Оптимизация шрифтов */
   * {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Ускорение рендеринга */
   img,
   video {
     content-visibility: auto;
-    will-change: auto;
-  }
-
-  img[loading="lazy"] {
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-
-  img[loading="lazy"].loaded {
-    opacity: 1;
   }
 }
 

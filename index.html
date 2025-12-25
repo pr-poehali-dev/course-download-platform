@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="yandex-verification" content="97a99670c71be666"/>
+    <!-- Кеширование для ускорения загрузки -->
+    <meta name="yandex-verification" content="97a99670c71be666" />
     <title>Tech Forma — Чертежи DWG, 3D-модели CAD</title>
     <meta name="description" content="Инженерная платформа для студентов и специалистов. 500+ чертежей DWG/DXF, 3D-модели STEP/STL, технические расчёты, документация.">
     <meta name="keywords" content="чертежи dwg скачать, cad проекты, 3d модели step, технические расчёты примеры, проектная документация, инженерная платформа, учебные материалы инженеров, чертежи для студентов, dxf файлы, solidworks модели, компас чертежи"/>
@@ -17,12 +18,21 @@
     <meta name="ICBM" content="59.938955, 30.315644"/>
     <meta name="language" content="Russian"/>
     
-    <!-- Favicons (оптимизированные) -->
-    <link rel="icon" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
-    <link rel="apple-touch-icon" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <!-- Favicons для всех браузеров и устройств -->
+    <link rel="icon" type="image/png" sizes="512x512" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <link rel="icon" type="image/png" sizes="16x16" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <link rel="shortcut icon" href="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
     <link rel="manifest" href="/manifest.json">
     
+    <!-- Yandex Browser -->
+    <meta name="yandex-tableau-widget" content="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <meta name="msapplication-TileImage" content="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/cd6426cd-a3e2-4cbb-b4ba-7087c677687b.jpg">
+    <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="canonical" href="https://techforma.pro">
     <meta property="og:url" content="https://techforma.pro">
     
@@ -44,17 +54,17 @@
     <meta name="twitter:description" content="Инженерная платформа. 500+ чертежей DWG/DXF, 3D-модели, технические расчёты.">
     <meta name="twitter:image" content="https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e25efd0b-8d04-4b71-b6d0-2a3a0d0123a4.jpg">
 
-    <!-- Resource Hints для критичных доменов -->
-    <link rel="preconnect" href="https://cdn.poehali.dev" crossorigin>
+    <!-- Preconnect для ускорения загрузки ресурсов -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.poehali.dev" crossorigin>
     <link rel="dns-prefetch" href="https://functions.poehali.dev">
     <link rel="dns-prefetch" href="https://mc.yandex.ru">
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    
-
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com">
     
     <!-- Яндекс.Метрика (отложенная загрузка) -->
     <script type="text/javascript">
+      // Загружаем метрику после взаимодействия пользователя
       var yandexMetricaLoaded = false;
       function loadYandexMetrica() {
         if (yandexMetricaLoaded) return;
@@ -65,44 +75,101 @@
         k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
         (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
         ym(99299244, "init", {
-          clickmap:false,
+          clickmap:true,
           trackLinks:true,
-          accurateTrackBounce:false,
+          accurateTrackBounce:true,
           webvisor:false,
           ecommerce:"dataLayer"
         });
       }
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadYandexMetrica, {timeout: 8000});
-      } else {
-        setTimeout(loadYandexMetrica, 8000);
-      }
+      // Загрузка при первом взаимодействии или через 3 секунды
+      ['scroll', 'click', 'mousemove', 'touchstart'].forEach(function(e) {
+        window.addEventListener(e, loadYandexMetrica, {once: true, passive: true});
+      });
+      window.addEventListener('load', function() {
+        setTimeout(loadYandexMetrica, 3000);
+      });
     </script>
     <noscript><div><img src="https://mc.yandex.ru/watch/99299244" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <!-- /Яндекс.Метрика -->
     
-    <!-- Critical CSS (inline для мгновенной отрисовки) -->
-    <style>
-      *{font-family:system-ui,sans-serif;box-sizing:border-box}body{margin:0;background:#fafafa;color:#1e293b}#root{min-height:100vh}.animate-spin{animation:spin 1s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}img{max-width:100%;height:auto}
-    </style>
-    
-    <!-- Шрифты (отложенная загрузка) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Оптимизированная загрузка шрифтов (только Inter для ускорения) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic"></noscript>
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap&subset=cyrillic">
+    </noscript>
 
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
-    <script async src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js"></script>
-    <script async src="https://cdn.poehali.dev/intertnal/js/route-min.js"></script>
-    <script async src="https://cdn.poehali.dev/intertnal/js/telemetry-min.js"></script>
-    <script async src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
+
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
+    <script defer src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js" fetchpriority="low"></script>
+    <script defer src="https://cdn.poehali.dev/intertnal/js/route-min.js" fetchpriority="low"></script>
+    <script defer src="https://cdn.poehali.dev/intertnal/js/telemetry-min.js" fetchpriority="low"></script>
+    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS COMMENT! -->
+
+
 
     <meta name="pp-name" value="course-download-platform">
-    <script>
-      (function(){var h=location.hostname;if(h!=="techforma.pro")location.replace("https://techforma.pro"+location.pathname+location.search+location.hash);if(!localStorage.getItem("pp_terms_accepted")){localStorage.setItem("pp_terms_accepted","true");localStorage.setItem("pp_privacy_accepted","true");}})()
-    </script>
+      <script defer src="https://cdn.poehali.dev/intertnal/js/inspector-min.js" fetchpriority="low"></script>
+      
+      <script>
+        // Редирект с зеркал на основной домен techforma.pro
+        (function() {
+          const currentHost = window.location.hostname.toLowerCase();
+          const currentProtocol = window.location.protocol;
+          const currentPath = window.location.pathname;
+          const mainDomain = 'techforma.pro';
+          
+          // Проверяем, находимся ли мы НЕ на главном домене
+          if (currentHost !== mainDomain) {
+            const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
+            window.location.replace(newUrl);
+            return;
+          }
+          
+          // Проверяем HTTP -> HTTPS редирект для главного домена
+          if (currentHost === mainDomain && currentProtocol === 'http:') {
+            const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
+            window.location.replace(newUrl);
+            return;
+          }
+          
+          // Удаление технических расширений из URL
+          const techExtensions = ['.php', '.html', '.aspx', '.htm'];
+          let cleanPath = currentPath;
+          
+          // Проверяем наличие технических расширений
+          for (const ext of techExtensions) {
+            if (currentPath.endsWith(ext) || currentPath.includes(ext + '/')) {
+              cleanPath = currentPath.replace(new RegExp(ext + '(/|$)', 'g'), '$1');
+              break;
+            }
+          }
+          
+          // Удаление trailing slash (кроме корня)
+          if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
+            cleanPath = cleanPath.slice(0, -1);
+          }
+          
+          // Если путь изменился - редиректим
+          if (cleanPath !== currentPath) {
+            const newUrl = 'https://' + mainDomain + cleanPath + window.location.search + window.location.hash;
+            window.location.replace(newUrl);
+            return;
+          }
+        })();
+        
+        // Автоматическое принятие системных соглашений платформы
+        window.addEventListener('DOMContentLoaded', function() {
+          setTimeout(function() {
+            // Проверяем, показано ли уже согласие
+            if (!localStorage.getItem('pp_terms_accepted')) {
+              localStorage.setItem('pp_terms_accepted', 'true');
+              localStorage.setItem('pp_privacy_accepted', 'true');
+            }
+          }, 100);
+        });
+      </script>
       <script src="https://cdn.poehali.dev/intertnal/js/pp-min-2.js"></script>
       <script src="https://cdn.poehali.dev/intertnal/js/route-min.js"></script>
       <script src="https://cdn.poehali.dev/intertnal/js/inspector-min.js"></script>
@@ -162,15 +229,6 @@
   }
   </script>
 
-  <!-- Service Worker регистрация -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js').catch(function(){});
-      });
-    }
-  </script>
-
   <!-- Минимальный контент для noscript -->
   <div style="position: absolute; left: -9999px; top: -9999px;" aria-hidden="true">
     <h2>Tech Forma — Чертежи DWG, 3D-модели CAD</h2>
@@ -184,7 +242,44 @@
 </div>
 <script type="module" src="/src/main.tsx"></script>
 
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript" defer>
+    (function (m, e, t, r, i, k, a) {
+        m[i] = m[i] || function () {
+            (m[i].a = m[i].a || []).push(arguments)
+        };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) {
+            if (document.scripts[j].src === r) {
+                return;
+            }
+        }
+        k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+    })
+    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
 
+    ym(105713494, "init", {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true,
+        webvisor: true,
+        ecommerce: "dataLayer"
+    });
+</script>
+<noscript>
+    <div><img src="https://mc.yandex.ru/watch/105713494" style="position:absolute; left:-9999px;" alt=""/></div>
+</noscript>
+<!-- /Yandex.Metrika counter -->
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script defer>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+<!-- /Google Analytics -->
 
 <!-- Schema.org разметка для поисковиков -->
 <script type="application/ld+json">

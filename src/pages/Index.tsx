@@ -22,10 +22,10 @@ const FavoritesDialog = lazy(() => import('@/components/FavoritesDialog'));
 const PromoCodeDialog = lazy(() => import('@/components/PromoCodeDialog'));
 const ReferralDialog = lazy(() => import('@/components/ReferralDialog'));
 const ExitIntentModal = lazy(() => import('@/components/ExitIntentModal'));
-const ThemeToggle = lazy(() => import('@/components/ThemeToggle').then(m => ({ default: m.ThemeToggle })));
-const SupportPage = lazy(() => import('@/components/SupportPage'));
-const AdminPanel = lazy(() => import('@/components/AdminPanel'));
-const Breadcrumbs = lazy(() => import('@/components/Breadcrumbs'));
+import { ThemeToggle } from '@/components/ThemeToggle';
+import SupportPage from '@/components/SupportPage';
+import AdminPanel from '@/components/AdminPanel';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 
 // Lazy loading для некритичных секций
@@ -37,7 +37,7 @@ import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifi
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import HomeHeader from '@/components/home/HomeHeader';
-const RotatingText = lazy(() => import('@/components/home/RotatingText'));
+import RotatingText from '@/components/home/RotatingText';
 const NewsSection = lazy(() => import('@/components/NewsSection'));
 
 
@@ -49,10 +49,10 @@ const PopularCategoriesLinks = lazy(() => import('@/components/home/PopularCateg
 const CategoryLinksSection = lazy(() => import('@/components/seo/CategoryLinksSection'));
 const PopularSearches = lazy(() => import('@/components/seo/PopularSearches'));
 const BlogSection = lazy(() => import('@/components/home/BlogSection'));
-const Footer = lazy(() => import('@/components/Footer'));
+import Footer from '@/components/Footer';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
-const NewYearSnow = lazy(() => import('@/components/NewYearSnow'));
-const NewYearBanner = lazy(() => import('@/components/NewYearBanner'));
+import NewYearSnow from '@/components/NewYearSnow';
+import NewYearBanner from '@/components/NewYearBanner';
 
 
 
@@ -171,19 +171,10 @@ export default function Index() {
   useEffect(() => {
     const loadWorks = async () => {
       try {
-        // Проверяем кэш
-        const cachedWorks = sessionStorage.getItem('works_cache');
-        if (cachedWorks) {
-          setRealWorks(JSON.parse(cachedWorks));
-          setWorksLoading(false);
-        }
-        
-        // Загружаем с сервера
         const response = await fetch(func2url.works);
         const data = await response.json();
         if (data.works) {
           setRealWorks(data.works);
-          sessionStorage.setItem('works_cache', JSON.stringify(data.works));
         }
       } catch (error) {
         console.error('Failed to load works:', error);
@@ -600,15 +591,11 @@ export default function Index() {
         </script>
       </Helmet>
 
-      <Suspense fallback={null}>
+      <Suspense fallback={<div />}>
         <ExitIntentModal />
       </Suspense>
-      <Suspense fallback={null}>
-        <NewYearSnow />
-      </Suspense>
-      <Suspense fallback={null}>
-        <NewYearBanner onBuyPoints={() => setPaymentDialogOpen(true)} />
-      </Suspense>
+      <NewYearSnow />
+      <NewYearBanner onBuyPoints={() => setPaymentDialogOpen(true)} />
       <div className="min-h-screen w-full overflow-x-hidden bg-background">
         <header className="glass-card border-b border-border sticky top-0 z-50 w-full backdrop-blur-md shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">
@@ -635,9 +622,7 @@ export default function Index() {
                 </nav>
                 
                 <div className="flex items-center gap-2">
-                  <Suspense fallback={<div className="w-10 h-10" />}>
-                    <ThemeToggle />
-                  </Suspense>
+                  <ThemeToggle />
                   
                   <Button 
                     variant="ghost" 
@@ -807,19 +792,15 @@ export default function Index() {
           </div>
         </header>
 
-        <Suspense fallback={<div className="h-[500px]" />}>
-          <SEOHeroSection onCatalogClick={() => window.location.href = '/catalog'} />
-        </Suspense>
+        <SEOHeroSection onCatalogClick={() => window.location.href = '/catalog'} />
 
-        <Suspense fallback={<div className="h-[400px]" />}>
-          <WorkCategoriesSection onCatalogClick={(category) => {
-            if (category) {
-              window.location.href = `/catalog?category=${category}`;
-            } else {
-              window.location.href = '/catalog';
-            }
-          }} />
-        </Suspense>
+        <WorkCategoriesSection onCatalogClick={(category) => {
+          if (category) {
+            window.location.href = `/catalog?category=${category}`;
+          } else {
+            window.location.href = '/catalog';
+          }
+        }} />
 
         <section className="relative py-20 bg-background border-b border-border">
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">

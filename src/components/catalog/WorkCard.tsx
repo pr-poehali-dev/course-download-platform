@@ -40,21 +40,37 @@ interface WorkCardProps {
   isFavorite: boolean;
   onPreview?: (workId: string) => void;
   isAdmin?: boolean;
-  userDiscount?: number;
 }
 
-export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite, onPreview, isAdmin = false, userDiscount = 0 }: WorkCardProps) {
+export default function WorkCard({ work, onQuickView, onAddToFavorite, isFavorite, onPreview, isAdmin = false }: WorkCardProps) {
   const [imageError, setImageError] = useState(false);
   const [viewCount, setViewCount] = useState(0);
+  const [userDiscount, setUserDiscount] = useState(0);
   const coverImages = work.cover_images && work.cover_images.length > 0 ? work.cover_images : work.previewUrls;
   const hasPreview = coverImages && coverImages.length > 0 && !imageError;
   
+  // Рассчитываем финальную скидку: скидка работы + персональная скидка пользователя
   const workDiscount = work.discount || 0;
   const totalDiscount = workDiscount + userDiscount - (workDiscount * userDiscount / 100);
   
   const finalPrice = work.price * (1 - totalDiscount / 100);
 
   const author = getFakeAuthor(work.id);
+  
+  useEffect(() => {
+    const loadUserDiscount = async () => {
+      try {
+        const user = await authService.verify();
+        if (user) {
+          const discount = getUserDiscount(user.balance || 0);
+          setUserDiscount(discount);
+        }
+      } catch {
+        setUserDiscount(0);
+      }
+    };
+    loadUserDiscount();
+  }, []);
   
   // Триггеры срочности для повышения конверсии
   const showUrgency = shouldShowUrgency(work.id, work.rating);

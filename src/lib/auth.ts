@@ -66,29 +66,31 @@ export const authService = {
     }
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 сек таймаут
-      
       const response = await fetch(`${AUTH_API}?action=verify`, {
         method: 'GET',
         headers: {
           'X-Auth-Token': token,
         },
-        signal: controller.signal
       });
 
-      clearTimeout(timeoutId);
       const data = await response.json();
 
       if (!response.ok) {
+        // Только если токен истёк или недействителен - разлогиниваем
         if (response.status === 401 && (data.error === 'Токен истёк' || data.error === 'Недействительный токен' || data.error === 'Пользователь не найден')) {
+          console.log('Token expired or invalid, logging out');
           this.logout();
+        } else {
+          // При других ошибках (сеть, сервер) - просто возвращаем null, не удаляя токен
+          console.warn('Verify failed, but keeping token:', data.error);
         }
         return null;
       }
 
       return data.user;
     } catch (error) {
+      // Сетевая ошибка - НЕ удаляем токен, просто возвращаем null
+      console.warn('Network error during verify, keeping token:', error);
       return null;
     }
   },

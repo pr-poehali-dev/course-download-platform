@@ -14,21 +14,16 @@ export default function RotatingText() {
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-    
     const interval = setInterval(() => {
       setIsVisible(false);
       
-      timeoutId = setTimeout(() => {
+      setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % ROTATING_TEXTS.length);
         setIsVisible(true);
       }, 500);
-    }, 4000); // Увеличили с 3 до 4 сек - меньше нагрузки
+    }, 3000);
 
-    return () => {
-      clearInterval(interval);
-      clearTimeout(timeoutId);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   return (

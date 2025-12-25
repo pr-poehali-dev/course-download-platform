@@ -1,4 +1,5 @@
-import { lazy, Suspense, Component, ReactNode } from "react";
+
+import React, { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,16 +9,22 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { HelmetProvider } from 'react-helmet-async';
 import SEOGuard from '@/components/SEOGuard';
 
+// Retry helper for lazy imports with proper error handling
 const lazyRetry = (componentImport: () => Promise<any>, retries = 3) => 
   lazy(async () => {
     for (let i = 0; i < retries; i++) {
       try {
         return await componentImport();
       } catch (error) {
-        if (i === retries - 1) throw error;
+        if (i === retries - 1) {
+          console.error('Failed to load component after retries:', error);
+          throw error;
+        }
+        // Wait before retry (exponential backoff)
         await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
       }
     }
+    // Fallback return (TypeScript требует)
     return await componentImport();
   });
 
@@ -71,34 +78,36 @@ const DefenseKitBuilder = lazyRetry(() => import("./pages/DefenseKitBuilder"));
 const YandexVerification = lazyRetry(() => import("./pages/YandexVerification"));
 
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-primary"></div>
+  <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-slate-50/30 to-white">
+    <div className="text-center space-y-4">
+      <div className="inline-block animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-blue-600"></div>
+      <div className="space-y-2">
+        <p className="text-xl font-semibold text-gray-800">Загрузка страницы</p>
+        <p className="text-sm text-gray-500">Пожалуйста, подождите...</p>
+      </div>
+    </div>
   </div>
 );
 
 // Error boundary component
-interface ErrorBoundaryProps {
-  children: ReactNode;
-}
-
-interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
-}
-
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
   }
 
-  componentDidCatch(): void {}
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Component error:', error, errorInfo);
+  }
 
-  render(): ReactNode {
+  render() {
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -124,16 +133,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
 
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 минут
-      gcTime: 1000 * 60 * 10, // 10 минут
-      refetchOnWindowFocus: false,
-      retry: 1
-    }
-  }
-});
+const queryClient = new QueryClient();
 
 const App = () => (
   <HelmetProvider>

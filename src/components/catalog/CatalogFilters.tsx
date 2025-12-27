@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +31,28 @@ export default function CatalogFilters({
   subjects,
   onResetFilters
 }: CatalogFiltersProps) {
+  // ✅ Локальный стейт для мгновенного отображения в input
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  // ✅ Debounce: обновляем родительский стейт с задержкой 300ms
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onSearchChange(localSearch);
+      if (localSearch.length > 2) {
+        trackEvent(metrikaEvents.CATALOG_SEARCH, { query: localSearch });
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [localSearch]);
+
+  // ✅ Синхронизируем при сбросе фильтров
+  useEffect(() => {
+    if (searchQuery === '') {
+      setLocalSearch('');
+    }
+  }, [searchQuery]);
+
   const activeFiltersCount = [
     filterSubject !== 'all',
     priceRange !== 'all',
@@ -68,13 +91,8 @@ export default function CatalogFilters({
           <Input
             type="text"
             placeholder="Поиск по названию, предмету..."
-            value={searchQuery}
-            onChange={(e) => {
-              onSearchChange(e.target.value);
-              if (e.target.value.length > 2) {
-                trackEvent(metrikaEvents.CATALOG_SEARCH, { query: e.target.value });
-              }
-            }}
+            value={localSearch}
+            onChange={(e) => setLocalSearch(e.target.value)}
             className="pl-10"
           />
         </div>

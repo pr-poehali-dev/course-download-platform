@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -39,7 +40,8 @@ interface CatalogWorkCardProps {
   onNavigate: (workId: string) => void;
 }
 
-export default function CatalogWorkCard({
+// ✅ Мемоизация компонента для предотвращения лишних ререндеров
+const CatalogWorkCard = memo(function CatalogWorkCard({
   work,
   isAdmin,
   isFavorite,
@@ -221,4 +223,6 @@ export default function CatalogWorkCard({
       {cardContent}
     </Link>
   );
-}
+});
+
+export default CatalogWorkCard;

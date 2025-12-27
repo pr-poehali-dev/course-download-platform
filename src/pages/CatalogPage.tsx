@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { authService } from '@/lib/auth';
@@ -49,7 +49,6 @@ export default function CatalogPage() {
   useScrollTracking();
   
   const [works, setWorks] = useState<Work[]>([]);
-  const [filteredWorks, setFilteredWorks] = useState<Work[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterSubject, setFilterSubject] = useState<string>('all');
@@ -111,7 +110,8 @@ export default function CatalogPage() {
     }
   };
 
-  const toggleFavorite = async (workId: string) => {
+  // ✅ Мемоизируем callback для избежания лишних ререндеров карточек
+  const toggleFavorite = useCallback(async (workId: string) => {
     if (!userId) {
       alert('Войдите в систему для добавления в избранное');
       return;
@@ -140,7 +140,7 @@ export default function CatalogPage() {
     } catch (error) {
       console.error('Failed to toggle favorite:', error);
     }
-  };
+  }, [userId]);
 
   const normalizeWorkType = (workType: string, title: string = ''): string => {
     const wt = workType.toLowerCase().trim();
@@ -305,7 +305,6 @@ export default function CatalogPage() {
           });
           
           setWorks(processedWorks);
-          setFilteredWorks(processedWorks);
         }
         
         setLoadingProgress(100);
@@ -322,21 +321,28 @@ export default function CatalogPage() {
     loadWorks();
   }, []);
 
-  useEffect(() => {
-    let filtered = [...works];
+  // ✅ Оптимизированная фильтрация с useMemo для мгновенного поиска
+  const filteredWorks = useMemo(() => {
+    const searchLower = searchQuery.toLowerCase();
+    
+    let filtered = works;
 
+    // Фильтр по поиску
     if (searchQuery) {
-      filtered = filtered.filter(w => 
-        w.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        w.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        w.subject.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      filtered = filtered.filter(w => {
+        const titleMatch = w.title.toLowerCase().includes(searchLower);
+        const descMatch = w.description.toLowerCase().includes(searchLower);
+        const subjectMatch = w.subject.toLowerCase().includes(searchLower);
+        return titleMatch || descMatch || subjectMatch;
+      });
     }
 
+    // Фильтр по предмету
     if (filterSubject && filterSubject !== 'all') {
       filtered = filtered.filter(w => w.subject === filterSubject);
     }
 
+    // Фильтр по цене
     if (priceRange && priceRange !== 'all') {
       const [min, max] = priceRange.split('-').map(Number);
       if (max) {
@@ -346,22 +352,24 @@ export default function CatalogPage() {
       }
     }
 
+    // Сортировка
     if (sortBy === 'price-asc') {
-      filtered = [...filtered].sort((a, b) => a.price - b.price);
+      return [...filtered].sort((a, b) => a.price - b.price);
     } else if (sortBy === 'price-desc') {
-      filtered = [...filtered].sort((a, b) => b.price - a.price);
+      return [...filtered].sort((a, b) => b.price - a.price);
     } else if (sortBy === 'rating') {
-      filtered = [...filtered].sort((a, b) => b.rating - a.rating);
+      return [...filtered].sort((a, b) => b.rating - a.rating);
     } else if (sortBy === 'popular') {
-      filtered = [...filtered].sort((a, b) => (b.purchaseCount || 0) - (a.purchaseCount || 0));
+      return [...filtered].sort((a, b) => (b.purchaseCount || 0) - (a.purchaseCount || 0));
     } else if (sortBy === 'new') {
-      filtered = [...filtered].sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+      return [...filtered].sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
     }
 
-    setFilteredWorks(filtered);
+    return filtered;
   }, [searchQuery, filterSubject, priceRange, sortBy, works]);
 
-  const subjects = Array.from(new Set(works.map(w => w.subject)));
+  // ✅ Мемоизируем список предметов
+  const subjects = useMemo(() => Array.from(new Set(works.map(w => w.subject))), [works]);
 
   const getCategoryTitle = () => {
     if (filterSubject && filterSubject !== 'all') {

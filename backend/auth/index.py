@@ -220,18 +220,19 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
             RETURNING id
             """,
-            (username, email, password_hash, referral_code, 1000, security_question, security_answer_hash, ip_address, referrer_id)
+            (username, email, password_hash, referral_code, 0, security_question, security_answer_hash, ip_address, referrer_id)
         )
         user_id = cur.fetchone()[0]
         
-        cur.execute(
-            """
-            INSERT INTO t_p63326274_course_download_plat.transactions 
-            (user_id, type, amount, description) 
-            VALUES (%s, %s, %s, %s)
-            """,
-            (user_id, 'refill', 1000, 'Бонус при регистрации')
-        )
+        # Бонус при регистрации отключен
+        # cur.execute(
+        #     """
+        #     INSERT INTO t_p63326274_course_download_plat.transactions 
+        #     (user_id, type, amount, description) 
+        #     VALUES (%s, %s, %s, %s)
+        #     """,
+        #     (user_id, 'refill', 0, 'Регистрация')
+        # )
         
         # ✅ Если был реферал, начисляем бонус рефереру
         if referrer_id:

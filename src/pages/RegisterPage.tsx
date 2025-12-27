@@ -37,7 +37,7 @@ export default function RegisterPage() {
     if (referralCode) {
       toast({
         title: '🎉 Реферальная ссылка активна',
-        description: 'При регистрации вы получите 1000 баллов, а ваш друг — 600 баллов!',
+        description: 'Ваш друг получит 600 баллов за вашу регистрацию!',
         duration: 5000,
       });
     }
@@ -108,7 +108,7 @@ export default function RegisterPage() {
         
         toast({
           title: 'Регистрация успешна!',
-          description: 'Добро пожаловать! Вам начислено 100 бонусных баллов.'
+          description: 'Добро пожаловать на Tech Forma!'
         });
         
         navigate('/profile');
@@ -134,7 +134,7 @@ export default function RegisterPage() {
     <>
       <SEO 
         title="Регистрация"
-        description="Создайте аккаунт Tech Forma и получите 100 бонусных баллов в подарок. Покупайте и продавайте студенческие работы"
+        description="Создайте аккаунт Tech Forma. Покупайте и продавайте студенческие работы"
         noindex={true}
         canonical="https://techforma.pro/"
       />
@@ -162,7 +162,7 @@ export default function RegisterPage() {
                   <div>
                     <p className="font-semibold text-sm">Реферальный бонус активирован!</p>
                     <p className="text-xs">Код: <span className="font-mono font-bold">{referralCode}</span></p>
-                    <p className="text-xs mt-1">Вы получите 1000 баллов, ваш друг — 600 баллов</p>
+                    <p className="text-xs mt-1">Ваш друг получит 600 баллов</p>
                   </div>
                 </div>
               </div>

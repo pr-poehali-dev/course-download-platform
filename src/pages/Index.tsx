@@ -829,7 +829,7 @@ export default function Index() {
                   <span className="text-3xl font-bold">1</span>
                 </div>
                 <h3 className="text-xl font-bold mb-3 text-foreground">Регистрация</h3>
-                <p className="text-base text-muted-foreground leading-relaxed">Создайте аккаунт и получите приветственные баллы</p>
+                <p className="text-base text-muted-foreground leading-relaxed">Создайте аккаунт для доступа к платформе</p>
               </div>
 
               <div className="cyber-card rounded-xl p-8 text-center relative overflow-hidden group">

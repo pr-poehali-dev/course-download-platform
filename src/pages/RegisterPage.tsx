@@ -37,7 +37,7 @@ export default function RegisterPage() {
     if (referralCode) {
       toast({
         title: '🎉 Реферальная ссылка активна',
-        description: 'Ваш друг получит 600 баллов за вашу регистрацию!',
+        description: 'Вы получите 500 баллов, а ваш друг — 250 баллов!',
         duration: 5000,
       });
     }
@@ -106,9 +106,14 @@ export default function RegisterPage() {
         localStorage.setItem('auth_token', data.token);
         localStorage.setItem('userId', data.user.id);
         
+        // Показываем уведомление с учетом реферального бонуса
+        const welcomeMessage = referralCode 
+          ? 'Добро пожаловать! Вам начислено 500 баллов по реферальной ссылке.' 
+          : 'Добро пожаловать на Tech Forma!';
+        
         toast({
           title: 'Регистрация успешна!',
-          description: 'Добро пожаловать на Tech Forma!'
+          description: welcomeMessage
         });
         
         navigate('/profile');
@@ -162,7 +167,7 @@ export default function RegisterPage() {
                   <div>
                     <p className="font-semibold text-sm">Реферальный бонус активирован!</p>
                     <p className="text-xs">Код: <span className="font-mono font-bold">{referralCode}</span></p>
-                    <p className="text-xs mt-1">Ваш друг получит 600 баллов</p>
+                    <p className="text-xs mt-1">Вы получите 500 баллов, ваш друг — 250 баллов</p>
                   </div>
                 </div>
               </div>

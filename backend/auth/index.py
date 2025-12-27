@@ -220,23 +220,24 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
             RETURNING id
             """,
-            (username, email, password_hash, referral_code, 0, security_question, security_answer_hash, ip_address, referrer_id)
+            (username, email, password_hash, referral_code, 500 if referrer_id else 0, security_question, security_answer_hash, ip_address, referrer_id)
         )
         user_id = cur.fetchone()[0]
         
-        # Бонус при регистрации отключен
-        # cur.execute(
-        #     """
-        #     INSERT INTO t_p63326274_course_download_plat.transactions 
-        #     (user_id, type, amount, description) 
-        #     VALUES (%s, %s, %s, %s)
-        #     """,
-        #     (user_id, 'refill', 0, 'Регистрация')
-        # )
-        
-        # ✅ Если был реферал, начисляем бонус рефереру
+        # ✅ Реферальная система: новый пользователь получает 500 баллов, реферер - 250 баллов
         if referrer_id:
-            REFERRAL_BONUS = 600
+            WELCOME_BONUS = 500  # Бонус новому пользователю
+            REFERRAL_BONUS = 250  # Бонус рефереру
+            
+            # Создаем транзакцию приветственного бонуса новому пользователю
+            cur.execute(
+                """
+                INSERT INTO t_p63326274_course_download_plat.transactions 
+                (user_id, type, amount, description) 
+                VALUES (%s, %s, %s, %s)
+                """,
+                (user_id, 'welcome_bonus', WELCOME_BONUS, 'Приветственный бонус по реферальной ссылке')
+            )
             
             # Начисляем баллы рефереру
             cur.execute(
@@ -258,7 +259,7 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 (referrer_id, 'referral_bonus', REFERRAL_BONUS, f'Реферальный бонус за пользователя {username}')
             )
             
-            print(f"✅ Referral bonus {REFERRAL_BONUS} credited to user_id={referrer_id} for referring {username}")
+            print(f"✅ Welcome bonus {WELCOME_BONUS} to new user_id={user_id}, referral bonus {REFERRAL_BONUS} to referrer_id={referrer_id}")
         
         conn.commit()
         

@@ -16,8 +16,7 @@ import { useScrollTracking } from '@/hooks/useScrollTracking';
 import CatalogHeader from '@/components/catalog/CatalogHeader';
 import CatalogLoadingState from '@/components/catalog/CatalogLoadingState';
 import CatalogWorkCard from '@/components/catalog/CatalogWorkCard';
-import NewYearSnow from '@/components/NewYearSnow';
-import NewYearBanner from '@/components/NewYearBanner';
+
 
 interface Work {
   id: string;
@@ -478,8 +477,6 @@ export default function CatalogPage() {
       </Helmet>
 
       <ExitIntentModal />
-      <NewYearSnow />
-      <NewYearBanner />
       <div className="min-h-screen bg-gradient-to-b from-white via-slate-50/30 to-white">
       <Navigation isLoggedIn={isLoggedIn} />
       

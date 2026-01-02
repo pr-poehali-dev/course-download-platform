@@ -51,8 +51,7 @@ const PopularSearches = lazy(() => import('@/components/seo/PopularSearches'));
 const BlogSection = lazy(() => import('@/components/home/BlogSection'));
 const Footer = lazy(() => import('@/components/Footer'));
 import { useScrollTracking } from '@/hooks/useScrollTracking';
-const NewYearSnow = lazy(() => import('@/components/NewYearSnow'));
-const NewYearBanner = lazy(() => import('@/components/NewYearBanner'));
+
 
 
 
@@ -603,8 +602,7 @@ export default function Index() {
       <Suspense fallback={<div />}>
         <ExitIntentModal />
       </Suspense>
-      <NewYearSnow />
-      <NewYearBanner onBuyPoints={() => setPaymentDialogOpen(true)} />
+
       <div className="min-h-screen w-full overflow-x-hidden bg-background">
         <header className="glass-card border-b border-border sticky top-0 z-50 w-full backdrop-blur-md shadow-sm">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4">

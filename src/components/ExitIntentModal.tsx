@@ -57,7 +57,7 @@ export default function ExitIntentModal() {
             <Icon name="AlertCircle" size={40} className="text-white" />
           </div>
           <h2 className="text-3xl font-bold mb-3 text-gray-900">
-            Подождите! 🎁
+            Подождите!
           </h2>
           <p className="text-lg text-gray-600 mb-2">
             Не упустите специальное предложение

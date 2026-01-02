@@ -32,10 +32,8 @@ export default function Navigation({
       <div className="container mx-auto px-3 md:px-4 py-3 md:py-4">
         <div className="flex items-center justify-between">
           <a href="/" className="flex items-center gap-2 md:gap-3 relative group">
-            <span className="absolute -top-2 -left-2 text-xl animate-bounce">🎄</span>
             <Icon name="Cpu" size={24} className="text-primary md:w-8 md:h-8" />
             <div className="text-lg md:text-2xl font-bold">Tech Forma</div>
-            <span className="absolute -top-2 -right-2 text-xl animate-pulse">⭐</span>
           </a>
           
           <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm">

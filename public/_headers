@@ -133,6 +133,12 @@
 /*/
   X-Robots-Tag: noindex, nofollow
 
+# 404 страница
+/404.html
+  Content-Type: text/html; charset=utf-8
+  X-Robots-Tag: noindex, nofollow
+  Cache-Control: no-cache, no-store, must-revalidate
+
 # Служебные файлы
 /yandex_*.html
   Content-Type: text/html; charset=utf-8

@@ -5,6 +5,13 @@ import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import Icon from "@/components/ui/icon";
 
+// Типы для Яндекс.Метрики
+declare global {
+  interface Window {
+    ym?: (counterId: number, event: string, goal: string, params?: Record<string, unknown>) => void;
+  }
+}
+
 const NotFoundPage = () => {
   const location = useLocation();
 
@@ -18,16 +25,29 @@ const NotFoundPage = () => {
   useEffect(() => {
     // Устанавливаем правильный статус 404 для страницы
     if (typeof window !== 'undefined') {
+      // Добавляем meta-тег со статусом 404
       const metaStatus = document.createElement('meta');
       metaStatus.httpEquiv = 'status';
       metaStatus.content = '404';
+      metaStatus.id = 'meta-status-404';
+      
+      // Удаляем старый если есть
+      const oldMeta = document.getElementById('meta-status-404');
+      if (oldMeta) oldMeta.remove();
+      
       document.head.appendChild(metaStatus);
       
+      // Отправляем событие в аналитику
+      if (window.ym) {
+        window.ym(99299244, 'reachGoal', '404_error', { url: location.pathname });
+      }
+      
       return () => {
-        document.head.removeChild(metaStatus);
+        const meta = document.getElementById('meta-status-404');
+        if (meta) meta.remove();
       };
     }
-  }, []);
+  }, [location.pathname]);
 
   return (
     <>

@@ -5,14 +5,6 @@
 https://www.techforma.pro/* https://techforma.pro/:splat 301!
 http://www.techforma.pro/* https://techforma.pro/:splat 301!
 
-# Редирект с techforma.ru на techforma.pro
-https://techforma.ru/* https://techforma.pro/:splat 301!
-http://techforma.ru/* https://techforma.pro/:splat 301!
-
-# Редирект с www.techforma.ru на techforma.pro
-https://www.techforma.ru/* https://techforma.pro/:splat 301!
-http://www.techforma.ru/* https://techforma.pro/:splat 301!
-
 # Редирект с HTTP на HTTPS для основного домена
 http://techforma.pro/* https://techforma.pro/:splat 301!
 

@@ -6,12 +6,29 @@ export default function SEOGuard() {
 
   useEffect(() => {
     const path = location.pathname;
+    const mainDomain = 'https://techforma.pro';
     
     // Проверяем наличие технических расширений в URL
     const hasTechExtension = /\.(php|html|aspx|htm)($|\/)/.test(path);
     
     // Проверяем trailing slash (кроме корня)
     const hasTrailingSlash = path.length > 1 && path.endsWith('/');
+    
+    // Формируем канонический URL (чистый, без расширений и слешей)
+    let cleanPath = path;
+    cleanPath = cleanPath.replace(/\.(php|html|aspx|htm)(\/|$)/g, '$2');
+    if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
+      cleanPath = cleanPath.slice(0, -1);
+    }
+    
+    // Обновляем или создаём canonical link
+    let canonicalLink = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonicalLink) {
+      canonicalLink = document.createElement('link');
+      canonicalLink.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonicalLink);
+    }
+    canonicalLink.href = mainDomain + cleanPath;
     
     // Если URL содержит технические расширения или лишний слеш
     if (hasTechExtension || hasTrailingSlash) {
@@ -24,18 +41,7 @@ export default function SEOGuard() {
       }
       metaRobots.setAttribute('content', 'noindex, nofollow');
       
-      // Пытаемся очистить URL
-      let cleanPath = path;
-      
-      // Удаляем технические расширения
-      cleanPath = cleanPath.replace(/\.(php|html|aspx|htm)(\/|$)/g, '$2');
-      
-      // Удаляем trailing slash
-      if (cleanPath.length > 1 && cleanPath.endsWith('/')) {
-        cleanPath = cleanPath.slice(0, -1);
-      }
-      
-      // Если путь изменился, делаем редирект
+      // Делаем редирект на чистый URL
       if (cleanPath !== path) {
         window.location.replace(cleanPath + location.search + location.hash);
       }

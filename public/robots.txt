@@ -32,11 +32,24 @@ Disallow: /*.htm$
 Disallow: /index.php
 Disallow: /index.html
 Disallow: /default.aspx
+
+# Блокируем дубли с trailing slash (кроме разрешённых разделов)
+Disallow: /catalog/
+Disallow: /marketplace/
+Disallow: /contacts/
+Disallow: /buy-points/
+Disallow: /defense-kit/
+Disallow: /privacy-policy/
+Disallow: /terms-of-service/
+Disallow: /usage-rules/
+Disallow: /offer/
+Disallow: /requisites/
 Disallow: /page/
 Disallow: /homepage/
 Disallow: /category/
 Disallow: /product/
 Disallow: /linkexchange/
+Disallow: /shop/
 
 # Блокируем дубли с параметрами (кроме каталога)
 Disallow: /*?*utm_

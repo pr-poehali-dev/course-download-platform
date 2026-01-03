@@ -37,18 +37,8 @@ http://techforma.pro/* https://techforma.pro/:splat 301!
 /*.aspx /:splat 301!
 /*.htm /:splat 301!
 
-# Удаление trailing slash (слеша в конце) для всех URL кроме корня
-/catalog/ /catalog 301!
-/marketplace/ /marketplace 301!
-/contacts/ /contacts 301!
-/buy-points/ /buy-points 301!
-/defense-kit/ /defense-kit 301!
-/blog/ /blog 301!
-/privacy-policy/ /privacy-policy 301!
-/terms-of-service/ /terms-of-service 301!
-/usage-rules/ /usage-rules 301!
-/offer/ /offer 301!
-/requisites/ /requisites 301!
+# Удаление trailing slash (слеша в конце) для ВСЕХ URL кроме корня (универсальное правило)
+/*/ /:splat 301!
 
 # Удаление UTM-меток и рекламных параметров (очистка дублей)
 /*?utm_source=* /:splat 301

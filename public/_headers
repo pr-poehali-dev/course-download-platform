@@ -116,6 +116,23 @@
   Cache-Control: public, max-age=3600
   Link: <https://techforma.pro/defense-kit>; rel="canonical"
 
+# Блокируем дубли с техническими расширениями от индексации
+/*.php
+  X-Robots-Tag: noindex, nofollow
+
+/*.html
+  X-Robots-Tag: noindex, nofollow
+
+/*.aspx
+  X-Robots-Tag: noindex, nofollow
+
+/*.htm
+  X-Robots-Tag: noindex, nofollow
+
+# Блокируем дубли с trailing slash от индексации (кроме root)
+/*/
+  X-Robots-Tag: noindex, nofollow
+
 # Служебные файлы
 /yandex_*.html
   Content-Type: text/html; charset=utf-8

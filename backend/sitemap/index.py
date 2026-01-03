@@ -75,9 +75,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             {'loc': f'{base_url}/marketplace', 'lastmod': today, 'changefreq': 'weekly', 'priority': '0.8'},
             {'loc': f'{base_url}/defense-kit', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.7'},
             {'loc': f'{base_url}/buy-points', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.6'},
-            {'loc': f'{base_url}/upload', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.6'},
-            {'loc': f'{base_url}/register', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.7'},
-            {'loc': f'{base_url}/login', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.6'},
+            {'loc': f'{base_url}/contacts', 'lastmod': today, 'changefreq': 'monthly', 'priority': '0.6'},
             {'loc': f'{base_url}/offer', 'lastmod': today, 'changefreq': 'yearly', 'priority': '0.5'},
             {'loc': f'{base_url}/privacy-policy', 'lastmod': today, 'changefreq': 'yearly', 'priority': '0.5'},
             {'loc': f'{base_url}/terms-of-service', 'lastmod': today, 'changefreq': 'yearly', 'priority': '0.5'},
@@ -85,8 +83,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             {'loc': f'{base_url}/requisites', 'lastmod': today, 'changefreq': 'yearly', 'priority': '0.3'},
         ]
         
-        # Категории
-        categories = ['курсовая', 'диплом', 'реферат', 'контрольная', 'эссе', 'отчет']
+        # Категории каталога (реальные категории Tech Forma)
+        categories = ['drawings', '3d-models', 'calculations', 'projects']
         for category in categories:
             static_urls.append({
                 'loc': f'{base_url}/catalog?category={category}',

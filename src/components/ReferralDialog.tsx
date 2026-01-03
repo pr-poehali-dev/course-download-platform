@@ -62,7 +62,7 @@ export default function ReferralDialog({
   const handleShare = async () => {
     const shareData = {
       title: 'Присоединяйся к Tech Forma!',
-      text: `Зарегистрируйся по моей ссылке и получи 1000 баллов бонусом!`,
+      text: `Зарегистрируйся по моей ссылке и получи 500 баллов бонусом!`,
       url: referralLink
     };
 
@@ -99,7 +99,7 @@ export default function ReferralDialog({
                 <Icon name="Gift" size={48} className="mx-auto text-primary" />
                 <h3 className="text-2xl font-bold">Приглашай друзей</h3>
                 <p className="text-muted-foreground">
-                  Получай <span className="font-bold text-primary">600 баллов</span> за каждого приглашенного друга
+                  Получай <span className="font-bold text-primary">250 баллов</span> за каждого приглашенного друга
                 </p>
               </div>
             </CardContent>
@@ -138,8 +138,8 @@ export default function ReferralDialog({
               <li>Скопируйте реферальную ссылку</li>
               <li>Отправьте ссылку другу</li>
               <li>Друг переходит по ссылке и регистрируется</li>
-              <li>Вы получаете 600 баллов на счёт</li>
-              <li>Друг получает стартовый бонус 1000 баллов</li>
+              <li>Вы получаете 250 баллов на счёт</li>
+              <li>Друг получает стартовый бонус 500 баллов</li>
             </ol>
           </div>
 

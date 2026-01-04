@@ -149,6 +149,19 @@
             cleanPath = cleanPath.slice(0, -1);
           }
           
+          // Редирект дублей главной страницы на корень
+          const duplicatePaths = [
+            '/index', '/home', '/homepage', '/page', 
+            '/product', '/category', '/linkexchange',
+            '/shop/page', '/shop', '/index.php/page', '/index.php/homepage'
+          ];
+          
+          if (duplicatePaths.includes(cleanPath)) {
+            const newUrl = 'https://' + mainDomain + '/' + window.location.search + window.location.hash;
+            window.location.replace(newUrl);
+            return;
+          }
+          
           // Если путь изменился - редиректим
           if (cleanPath !== currentPath) {
             const newUrl = 'https://' + mainDomain + cleanPath + window.location.search + window.location.hash;

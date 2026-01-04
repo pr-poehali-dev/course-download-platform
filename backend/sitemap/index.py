@@ -93,6 +93,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'priority': '0.8'
             })
         
+        # Популярные поисковые запросы (целевые страницы из рекламы)
+        popular_searches = [
+            'тепло',
+            'курсовая',
+            'чертежи',
+            '3d модель',
+            'расчет',
+            'проект',
+            'dwg',
+            'autocad',
+            'solidworks',
+            'компас',
+            'детали',
+            'механизм',
+            'редуктор',
+            'вал',
+            'подшипник'
+        ]
+        
+        for search_query in popular_searches:
+            static_urls.append({
+                'loc': f'{base_url}/catalog?search={search_query}',
+                'lastmod': today,
+                'changefreq': 'weekly',
+                'priority': '0.7'
+            })
+        
         # SEO статьи блога (актуальные из seoArticles.ts)
         blog_articles = [
             {'slug': 'kak-vybrat-kursovuyu-rabotu', 'date': '2025-11-30'},

@@ -1,5 +1,5 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -14,6 +14,22 @@ declare global {
 
 const NotFoundPage = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/catalog?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  const popularCategories = [
+    { name: 'Чертежи DWG', url: '/catalog?category=dwg', icon: 'Ruler' },
+    { name: '3D-модели', url: '/catalog?category=3d', icon: 'Box' },
+    { name: 'Расчёты', url: '/catalog?category=calc', icon: 'Calculator' },
+    { name: 'Документация', url: '/catalog?category=docs', icon: 'FileText' },
+  ];
 
   useEffect(() => {
     console.error(
@@ -89,6 +105,27 @@ const NotFoundPage = () => {
               Вернитесь на главную или воспользуйтесь каталогом работ.
             </p>
             
+            {/* Поиск по сайту */}
+            <form onSubmit={handleSearch} className="mb-8 max-w-md mx-auto">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Поиск по каталогу работ..."
+                  className="w-full px-4 py-3 pr-12 rounded-lg border-2 border-border bg-background text-foreground focus:outline-none focus:border-primary transition-colors"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-accent rounded-md transition-colors"
+                  aria-label="Поиск"
+                >
+                  <Icon name="Search" size={20} className="text-muted-foreground" />
+                </button>
+              </div>
+            </form>
+
+            {/* Основные кнопки */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <a
                 href="/"
@@ -101,8 +138,41 @@ const NotFoundPage = () => {
                 href="/catalog"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-border rounded-lg hover:bg-accent transition-colors font-semibold text-foreground"
               >
-                <Icon name="Search" size={20} />
-                Каталог работ
+                <Icon name="FolderOpen" size={20} />
+                Весь каталог
+              </a>
+            </div>
+
+            {/* Популярные категории */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-4 text-foreground">Популярные категории:</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {popularCategories.map((category) => (
+                  <a
+                    key={category.url}
+                    href={category.url}
+                    className="flex flex-col items-center gap-2 p-4 rounded-lg border border-border hover:border-primary hover:bg-accent/50 transition-all group"
+                  >
+                    <Icon name={category.icon as any} size={28} className="text-primary group-hover:scale-110 transition-transform" />
+                    <span className="text-sm font-medium text-center text-foreground">{category.name}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Дополнительные ссылки */}
+            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
+              <a href="/blog" className="hover:text-primary transition-colors flex items-center gap-1">
+                <Icon name="BookOpen" size={16} />
+                Блог
+              </a>
+              <a href="/contacts" className="hover:text-primary transition-colors flex items-center gap-1">
+                <Icon name="Mail" size={16} />
+                Контакты
+              </a>
+              <a href="/marketplace" className="hover:text-primary transition-colors flex items-center gap-1">
+                <Icon name="Store" size={16} />
+                Маркетплейс
               </a>
             </div>
             

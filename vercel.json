@@ -1,8 +1,194 @@
 {
+  "redirects": [
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.html/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.php",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.php/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.php/page",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.php/page/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.php/homepage",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/index.php/homepage/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/page",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/page/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/shop/page",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/shop/page/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/product",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/product/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/category",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/category/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/linkexchange",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/linkexchange/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/catalog/",
+      "destination": "/catalog",
+      "permanent": true
+    },
+    {
+      "source": "/blog/",
+      "destination": "/blog",
+      "permanent": true
+    },
+    {
+      "source": "/profile/",
+      "destination": "/profile",
+      "permanent": true
+    },
+    {
+      "source": "/login/",
+      "destination": "/login",
+      "permanent": true
+    },
+    {
+      "source": "/register/",
+      "destination": "/register",
+      "permanent": true
+    },
+    {
+      "source": "/contacts/",
+      "destination": "/contacts",
+      "permanent": true
+    },
+    {
+      "source": "/marketplace/",
+      "destination": "/marketplace",
+      "permanent": true
+    },
+    {
+      "source": "/buy-points/",
+      "destination": "/buy-points",
+      "permanent": true
+    },
+    {
+      "source": "/defense-kit/",
+      "destination": "/defense-kit",
+      "permanent": true
+    },
+    {
+      "source": "/privacy-policy/",
+      "destination": "/privacy-policy",
+      "permanent": true
+    },
+    {
+      "source": "/terms-of-service/",
+      "destination": "/terms-of-service",
+      "permanent": true
+    },
+    {
+      "source": "/usage-rules/",
+      "destination": "/usage-rules",
+      "permanent": true
+    },
+    {
+      "source": "/offer/",
+      "destination": "/offer",
+      "permanent": true
+    },
+    {
+      "source": "/requisites/",
+      "destination": "/requisites",
+      "permanent": true
+    }
+  ],
   "rewrites": [
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://functions.poehali.dev/e0e04210-74c2-4c83-8e1b-1d8541942972"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ],
+  "trailingSlash": false
 }

@@ -33,7 +33,7 @@ Disallow: /index.php
 Disallow: /index.html
 Disallow: /default.aspx
 
-# Блокируем дубли с trailing slash (кроме разрешённых разделов)
+# Блокируем дубли с trailing slash
 Disallow: /catalog/
 Disallow: /marketplace/
 Disallow: /contacts/
@@ -44,12 +44,24 @@ Disallow: /terms-of-service/
 Disallow: /usage-rules/
 Disallow: /offer/
 Disallow: /requisites/
+Disallow: /login/
+Disallow: /register/
+Disallow: /profile/
+Disallow: /blog/
+
+# Блокируем несуществующие технические пути
+Disallow: /page
 Disallow: /page/
 Disallow: /homepage/
+Disallow: /category
 Disallow: /category/
+Disallow: /product
 Disallow: /product/
+Disallow: /linkexchange
 Disallow: /linkexchange/
 Disallow: /shop/
+Disallow: /index.php/page
+Disallow: /index.php/homepage
 
 # Блокируем дубли с параметрами (кроме каталога)
 Disallow: /*?*utm_

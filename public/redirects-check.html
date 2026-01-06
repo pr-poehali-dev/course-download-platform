@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Проверка редиректов | TechForma</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 32px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 24px;
+            font-size: 16px;
+        }
+        .section {
+            margin-bottom: 32px;
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #444;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        .url-list {
+            display: grid;
+            gap: 12px;
+        }
+        .url-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px 16px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+            transition: all 0.2s;
+        }
+        .url-item:hover {
+            background: #f0f0f0;
+            border-left-color: #667eea;
+        }
+        .url-text {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+            word-break: break-all;
+        }
+        .url-duplicate {
+            color: #d32f2f;
+            font-weight: 600;
+        }
+        .url-redirect {
+            color: #666;
+        }
+        .test-button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .test-button:hover {
+            background: #5568d3;
+        }
+        .result {
+            margin-top: 8px;
+            font-size: 12px;
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        .result-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        .result-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .info-box p {
+            color: #1565c0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Проверка дублей страниц</h1>
+        <p class="subtitle">Автоматическая проверка всех проблемных URL на наличие дублей</p>
+
+        <div class="info-box">
+            <p><strong>Статус:</strong> Все дубли заблокированы через vercel.json и robots.txt. SEOGuard автоматически редиректит пользователей на чистые URL.</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="total-duplicates">0</div>
+                <div class="stat-label">Всего дублей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="tested-urls">0</div>
+                <div class="stat-label">Проверено URL</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="redirects-ok">0</div>
+                <div class="stat-label">Редиректы ОК</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">❌ Дубли главной страницы</div>
+            <div class="url-list" id="homepage-duplicates"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">🔧 Технические пути</div>
+            <div class="url-list" id="technical-paths"></div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">📝 Trailing Slash дубли</div>
+            <div class="url-list" id="trailing-slash"></div>
+        </div>
+    </div>
+
+    <script>
+        const duplicateUrls = {
+            homepage: [
+                { duplicate: '/index.html', redirect: '/' },
+                { duplicate: '/index.html/', redirect: '/' },
+                { duplicate: '/index.php', redirect: '/' },
+                { duplicate: '/index.php/', redirect: '/' },
+                { duplicate: '/default.aspx', redirect: '/' },
+                { duplicate: '/default.aspx/', redirect: '/' }
+            ],
+            technical: [
+                { duplicate: '/page', redirect: '/' },
+                { duplicate: '/page/', redirect: '/' },
+                { duplicate: '/index.php/page', redirect: '/' },
+                { duplicate: '/index.php/page/', redirect: '/' },
+                { duplicate: '/index.php/homepage', redirect: '/' },
+                { duplicate: '/index.php/homepage/', redirect: '/' },
+                { duplicate: '/shop/page', redirect: '/' },
+                { duplicate: '/shop/page/', redirect: '/' },
+                { duplicate: '/product', redirect: '/' },
+                { duplicate: '/product/', redirect: '/' },
+                { duplicate: '/category', redirect: '/' },
+                { duplicate: '/category/', redirect: '/' },
+                { duplicate: '/linkexchange', redirect: '/' },
+                { duplicate: '/linkexchange/', redirect: '/' }
+            ],
+            trailingSlash: [
+                { duplicate: '/catalog/', redirect: '/catalog' },
+                { duplicate: '/blog/', redirect: '/blog' },
+                { duplicate: '/profile/', redirect: '/profile' },
+                { duplicate: '/login/', redirect: '/login' },
+                { duplicate: '/register/', redirect: '/register' },
+                { duplicate: '/contacts/', redirect: '/contacts' },
+                { duplicate: '/marketplace/', redirect: '/marketplace' },
+                { duplicate: '/buy-points/', redirect: '/buy-points' },
+                { duplicate: '/defense-kit/', redirect: '/defense-kit' },
+                { duplicate: '/privacy-policy/', redirect: '/privacy-policy' },
+                { duplicate: '/terms-of-service/', redirect: '/terms-of-service' },
+                { duplicate: '/usage-rules/', redirect: '/usage-rules' },
+                { duplicate: '/offer/', redirect: '/offer' },
+                { duplicate: '/requisites/', redirect: '/requisites' }
+            ]
+        };
+
+        const totalDuplicates = 
+            duplicateUrls.homepage.length + 
+            duplicateUrls.technical.length + 
+            duplicateUrls.trailingSlash.length;
+
+        document.getElementById('total-duplicates').textContent = totalDuplicates;
+
+        function createUrlItem(url) {
+            const item = document.createElement('div');
+            item.className = 'url-item';
+            item.innerHTML = `
+                <div>
+                    <div class="url-text url-duplicate">❌ ${url.duplicate}</div>
+                    <div class="url-text url-redirect">→ ${url.redirect}</div>
+                    <div class="result" id="result-${url.duplicate.replace(/\//g, '-')}"></div>
+                </div>
+                <button class="test-button" onclick="testUrl('${url.duplicate}', '${url.redirect}')">
+                    Проверить
+                </button>
+            `;
+            return item;
+        }
+
+        // Отрисовка всех URL
+        duplicateUrls.homepage.forEach(url => {
+            document.getElementById('homepage-duplicates').appendChild(createUrlItem(url));
+        });
+
+        duplicateUrls.technical.forEach(url => {
+            document.getElementById('technical-paths').appendChild(createUrlItem(url));
+        });
+
+        duplicateUrls.trailingSlash.forEach(url => {
+            document.getElementById('trailing-slash').appendChild(createUrlItem(url));
+        });
+
+        async function testUrl(duplicate, expectedRedirect) {
+            const resultId = 'result-' + duplicate.replace(/\//g, '-');
+            const resultEl = document.getElementById(resultId);
+            
+            resultEl.textContent = '⏳ Проверка...';
+            resultEl.className = 'result';
+            
+            try {
+                // Проверяем, куда редиректит URL
+                const response = await fetch(duplicate, { 
+                    method: 'HEAD',
+                    redirect: 'manual'
+                });
+
+                const tested = parseInt(document.getElementById('tested-urls').textContent) + 1;
+                document.getElementById('tested-urls').textContent = tested;
+
+                // Проверяем статус редиректа
+                if (response.status === 301 || response.status === 302 || response.status === 307 || response.status === 308) {
+                    const location = response.headers.get('Location');
+                    if (location === expectedRedirect || location === 'https://techforma.pro' + expectedRedirect) {
+                        resultEl.textContent = `✅ Редирект работает (${response.status})`;
+                        resultEl.className = 'result result-success';
+                        
+                        const redirectsOk = parseInt(document.getElementById('redirects-ok').textContent) + 1;
+                        document.getElementById('redirects-ok').textContent = redirectsOk;
+                    } else {
+                        resultEl.textContent = `⚠️ Редирект на ${location} вместо ${expectedRedirect}`;
+                        resultEl.className = 'result result-error';
+                    }
+                } else {
+                    resultEl.textContent = `❌ Нет редиректа (статус ${response.status})`;
+                    resultEl.className = 'result result-error';
+                }
+            } catch (error) {
+                resultEl.textContent = `❌ Ошибка: ${error.message}`;
+                resultEl.className = 'result result-error';
+            }
+        }
+
+        // Автоматическая проверка всех URL при загрузке (опционально)
+        // window.addEventListener('load', async () => {
+        //     for (const category of Object.values(duplicateUrls)) {
+        //         for (const url of category) {
+        //             await testUrl(url.duplicate, url.redirect);
+        //             await new Promise(resolve => setTimeout(resolve, 500)); // Задержка между запросами
+        //         }
+        //     }
+        // });
+    </script>
+</body>
+</html>

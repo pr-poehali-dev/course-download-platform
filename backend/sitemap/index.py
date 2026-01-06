@@ -127,7 +127,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             {'slug': 'gde-kupit-kursovuyu-rabotu', 'date': '2025-11-28'},
             {'slug': 'ai-v-proektirovanii-2025', 'date': '2025-12-07'},
             {'slug': 'bim-tekhnologii-2025', 'date': '2025-12-06'},
-            {'slug': '3d-pechat-v-inzhenerii-2025', 'date': '2025-12-05'}
+            {'slug': '3d-pechat-v-inzhenerii-2025', 'date': '2025-12-05'},
+            {'slug': 'inzhenernoe-obrazovanie-2026-trendy', 'date': '2026-01-04'}
         ]
         
         for article in blog_articles:

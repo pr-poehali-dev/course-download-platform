@@ -179,9 +179,14 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/index.html",
+      "statusCode": 200
     }
   ],
+  "cleanUrls": true,
+  "error": {
+    "404": "/404.html"
+  },
   "headers": [
     {
       "source": "/(.*)",

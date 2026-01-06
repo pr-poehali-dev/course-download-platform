@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
@@ -5,7 +6,8 @@ interface CatalogHeaderProps {
   worksCount: number;
 }
 
-export default function CatalogHeader({ worksCount }: CatalogHeaderProps) {
+// ✅ Мемоизация для предотвращения лишних ререндеров
+const CatalogHeader = memo(function CatalogHeader({ worksCount }: CatalogHeaderProps) {
   return (
     <div className="mb-8 text-center">
       <h1 className="text-3xl md:text-4xl font-bold mb-3">
@@ -20,4 +22,6 @@ export default function CatalogHeader({ worksCount }: CatalogHeaderProps) {
       </Badge>
     </div>
   );
-}
+});
+
+export default CatalogHeader;

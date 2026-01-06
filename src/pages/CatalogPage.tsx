@@ -62,6 +62,8 @@ export default function CatalogPage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userBalance, setUserBalance] = useState(0);
   const userDiscount = getUserDiscount(userBalance);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 24;
 
   useEffect(() => {
     trackEvent(metrikaEvents.CATALOG_OPEN);
@@ -270,6 +272,18 @@ export default function CatalogPage() {
       setLoadingProgress(10);
       
       try {
+        // ✅ Пробуем загрузить из кеша для мгновенного отображения
+        const cachedWorks = localStorage.getItem('catalog_cache');
+        const cacheTime = localStorage.getItem('catalog_cache_time');
+        const now = Date.now();
+        
+        // Если кеш свежий (меньше 5 минут), показываем его сразу
+        if (cachedWorks && cacheTime && (now - parseInt(cacheTime) < 5 * 60 * 1000)) {
+          setWorks(JSON.parse(cachedWorks));
+          setLoading(false);
+          setLoadingProgress(0);
+        }
+        
         const response = await fetch(func2url.works);
         setLoadingProgress(40);
         
@@ -304,6 +318,10 @@ export default function CatalogPage() {
           });
           
           setWorks(processedWorks);
+          
+          // ✅ Сохраняем в кеш для следующего визита
+          localStorage.setItem('catalog_cache', JSON.stringify(processedWorks));
+          localStorage.setItem('catalog_cache_time', Date.now().toString());
         }
         
         setLoadingProgress(100);
@@ -370,6 +388,20 @@ export default function CatalogPage() {
   // ✅ Мемоизируем список предметов
   const subjects = useMemo(() => Array.from(new Set(works.map(w => w.subject))), [works]);
 
+  // ✅ Пагинация для быстрой загрузки (показываем только 24 работы за раз)
+  const paginatedWorks = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredWorks.slice(startIndex, endIndex);
+  }, [filteredWorks, currentPage, ITEMS_PER_PAGE]);
+
+  const totalPages = Math.ceil(filteredWorks.length / ITEMS_PER_PAGE);
+
+  // Сбрасываем страницу при изменении фильтров
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filterSubject, priceRange, sortBy]);
+
   const getCategoryTitle = () => {
     if (filterSubject && filterSubject !== 'all') {
       return `${filterSubject} — купить готовые работы от 200₽`;
@@ -390,7 +422,8 @@ export default function CatalogPage() {
     return 'Купить курсовые работы и дипломы в каталоге. 500+ готовых студенческих работ по всем предметам от 200₽. Гарантия уникальности 95%, мгновенное скачивание после оплаты';
   };
 
-  const jsonLdSchema = {
+  // ✅ Мемоизируем JSON-LD схему - пересчитывается только при изменении работ
+  const jsonLdSchema = useMemo(() => ({
     '@context': 'https://schema.org',
     '@graph': [
       {
@@ -411,42 +444,13 @@ export default function CatalogPage() {
         ]
       },
       {
-        '@type': 'ItemList',
+        '@type': 'CollectionPage',
         'name': 'Каталог инженерных материалов',
-        'description': 'Чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты и проектная документация от 200₽',
-        'numberOfItems': filteredWorks.length,
-        'itemListElement': filteredWorks.slice(0, 20).map((work, index) => ({
-          '@type': 'ListItem',
-          'position': index + 1,
-          'item': {
-            '@type': 'Product',
-            'name': work.title,
-            'description': work.description,
-            'category': work.workType,
-            'url': `https://techforma.pro/work/${work.id}`,
-            'image': work.previewUrl || undefined,
-            'offers': {
-              '@type': 'Offer',
-              'price': work.price,
-              'priceCurrency': 'RUB',
-              'availability': 'https://schema.org/InStock',
-              'seller': {
-                '@type': 'Organization',
-                'name': 'Tech Forma'
-              }
-            },
-            'aggregateRating': work.rating > 0 ? {
-              '@type': 'AggregateRating',
-              'ratingValue': work.rating,
-              'bestRating': 5,
-              'worstRating': 1,
-              'ratingCount': work.purchaseCount || 1
-            } : undefined
-          }
-        }))
+        'description': 'Чертежи DWG/DXF, 3D-модели STEP/STL, технические расчёты от 200₽',
+        'numberOfItems': filteredWorks.length
       }
     ]
-  };
+  }), [filteredWorks.length]);
 
   const getCatalogSEOTitle = () => {
     if (filterSubject !== 'all') {
@@ -518,7 +522,7 @@ export default function CatalogPage() {
           <>
             <TooltipProvider>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {filteredWorks.map((work) => (
+                {paginatedWorks.map((work) => (
                   <CatalogWorkCard
                     key={work.id}
                     work={work}
@@ -531,6 +535,63 @@ export default function CatalogPage() {
                 ))}
               </div>
             </TooltipProvider>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-2 mt-12 mb-8">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCurrentPage(p => Math.max(1, p - 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === 1}
+                >
+                  <Icon name="ChevronLeft" size={20} />
+                  Назад
+                </Button>
+                
+                <div className="flex gap-2">
+                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={currentPage === pageNum ? 'default' : 'outline'}
+                        onClick={() => {
+                          setCurrentPage(pageNum);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="w-10 h-10"
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                </div>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setCurrentPage(p => Math.min(totalPages, p + 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === totalPages}
+                >
+                  Вперёд
+                  <Icon name="ChevronRight" size={20} />
+                </Button>
+              </div>
+            )}
             
             <QuickViewModal
               work={quickViewWork}

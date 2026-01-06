@@ -26,8 +26,8 @@ export const seoArticles: SEOArticle[] = [
       'STEM образование',
       'подготовка инженеров'
     ],
-    publishedAt: '2026-01-04',
-    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/e25efd0b-8d04-4b71-b6d0-2a3a0d0123a4.jpg',
+    publishedAt: '2026-01-06',
+    coverImage: 'https://cdn.poehali.dev/projects/ec3b8f42-ccbd-48be-bf66-8de3931d3384/files/29f30260-44fa-4dbc-baab-0e6f932e2d3f.jpg',
     content: `# Инженерное образование в 2026: тренды, вызовы и возможности для студентов
 
 ## Введение

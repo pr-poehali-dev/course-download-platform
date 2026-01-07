@@ -41,8 +41,10 @@ export default function PaymentPage() {
         }
       })
       .catch(() => {
-        setStatus('error');
-        setMessage('Ошибка загрузки информации о заказе');
+        // ✅ Пробуем перезагрузить через 2 секунды
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       });
   }, [orderId]);
 
@@ -81,8 +83,10 @@ export default function PaymentPage() {
         setMessage(data.error || 'Не удалось подтвердить оплату');
       }
     } catch (error) {
-      setStatus('error');
-      setMessage('Ошибка при обработке оплаты');
+      // ✅ Пробуем ещё раз через 2 секунды
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     }
   };
 

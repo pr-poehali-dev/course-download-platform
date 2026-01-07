@@ -168,6 +168,13 @@ export default function DefenseKitBuilder() {
         description: 'Файлы для защиты успешно созданы'
       });
       
+      // ✅ Возвращаемся к работе после успешной генерации
+      if (workId) {
+        setTimeout(() => {
+          navigate(`/work/${workId}`);
+        }, 2000);
+      }
+      
     } catch (error) {
       toast({
         title: 'Ошибка генерации',
@@ -361,6 +368,17 @@ export default function DefenseKitBuilder() {
                 <p className="text-sm text-gray-500 text-center mt-2">
                   Генерация займёт 5-10 секунд
                 </p>
+                {workId && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full mt-4"
+                    onClick={() => navigate(`/work/${workId}`)}
+                  >
+                    <Icon name="ArrowLeft" size={20} className="mr-2" />
+                    Вернуться к работе
+                  </Button>
+                )}
               </div>
             </div>
           </div>

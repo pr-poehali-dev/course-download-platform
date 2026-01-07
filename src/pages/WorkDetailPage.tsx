@@ -350,6 +350,27 @@ export default function WorkDetailPage() {
         return;
       }
 
+      // ✅ Проверяем кеш - если работа недавно просматривалась, показываем мгновенно
+      const cachedWork = localStorage.getItem(`work_cache_${actualWorkId}`);
+      const cacheTime = localStorage.getItem(`work_cache_time_${actualWorkId}`);
+      const CACHE_LIFETIME = 5 * 60 * 1000; // 5 минут
+      
+      if (cachedWork && cacheTime) {
+        const age = Date.now() - parseInt(cacheTime);
+        if (age < CACHE_LIFETIME) {
+          const workData = JSON.parse(cachedWork);
+          setWork(workData);
+          setLoading(false);
+          
+          if (workData.previewUrl || (workData.coverImages && workData.coverImages.length > 0)) {
+            setGallery(workData.coverImages || [workData.previewUrl]);
+          }
+          
+          console.log('✅ Loaded from cache:', workData.title);
+          // Продолжаем фоновую загрузку свежих данных
+        }
+      }
+
       try {
         const response = await fetch(
           `https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413?id=${actualWorkId}`
@@ -436,6 +457,10 @@ export default function WorkDetailPage() {
           
           setWork(workData);
           
+          // ✅ Кешируем данные работы для быстрого возврата
+          localStorage.setItem(`work_cache_${workData.id}`, JSON.stringify(workData));
+          localStorage.setItem(`work_cache_time_${workData.id}`, Date.now().toString());
+          
           // Увеличиваем счетчик просмотров
           incrementViewCount(workData.id);
           
@@ -460,12 +485,10 @@ export default function WorkDetailPage() {
         }
       } catch (error: any) {
         console.error('Error fetching work:', error);
-        toast({
-          title: 'Ошибка загрузки',
-          description: error.message || 'Не удалось загрузить информацию о работе',
-          variant: 'destructive'
-        });
-        navigate('/404');
+        // ✅ НЕ показываем ошибку, просто пробуем перезагрузить через 2 секунды
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
       } finally {
         setLoading(false);
       }
@@ -935,6 +958,9 @@ export default function WorkDetailPage() {
       if (!isAlreadyPurchased) {
         setIsPurchased(true);
       }
+      
+      // ✅ СОХРАНЯЕМ что пользователь только что купил работу
+      sessionStorage.setItem('justPurchased', actualWorkId);
       
       // Открываем защитный пакет после успешной покупки
       navigate(`/defense-kit?workId=${actualWorkId}`);

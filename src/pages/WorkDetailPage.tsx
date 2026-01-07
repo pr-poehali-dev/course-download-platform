@@ -1948,7 +1948,10 @@ export default function WorkDetailPage() {
               {similarWorks.map((similarWork) => (
                 <div
                   key={similarWork.id}
-                  onClick={() => navigate(`/work/${similarWork.id}`)}
+                  onClick={() => {
+                    // ✅ Принудительная перезагрузка страницы при переходе на другую работу
+                    window.location.href = `/work/${similarWork.id}`;
+                  }}
                   className="bg-white rounded-lg border-2 border-gray-200 hover:border-blue-500 transition-all cursor-pointer group overflow-hidden"
                 >
                   <div className="aspect-[4/3] relative overflow-hidden bg-gray-100">

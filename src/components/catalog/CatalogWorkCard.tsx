@@ -218,6 +218,10 @@ const CatalogWorkCard = memo(function CatalogWorkCard({
   ) : (
     <Link
       to={`/work/${work.id}`}
+      onClick={() => {
+        // ✅ Сохраняем позицию скролла перед переходом
+        sessionStorage.setItem('catalog_scroll_position', window.scrollY.toString());
+      }}
       className="group glass-card tech-border rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] block"
     >
       {cardContent}

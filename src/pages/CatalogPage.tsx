@@ -338,6 +338,19 @@ export default function CatalogPage() {
     loadWorks();
   }, []);
 
+  // ✅ Восстанавливаем позицию скролла при возврате из работы
+  useEffect(() => {
+    const savedPosition = sessionStorage.getItem('catalog_scroll_position');
+    if (savedPosition && !loading) {
+      // Даём время на рендер, затем скроллим
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(savedPosition));
+        // Удаляем сохранённую позицию
+        sessionStorage.removeItem('catalog_scroll_position');
+      }, 100);
+    }
+  }, [loading]);
+
   // ✅ Оптимизированная фильтрация с useMemo для мгновенного поиска
   const filteredWorks = useMemo(() => {
     const searchLower = searchQuery.toLowerCase();
@@ -530,7 +543,11 @@ export default function CatalogPage() {
                     isFavorite={favorites.has(work.id)}
                     userDiscount={userDiscount}
                     onToggleFavorite={toggleFavorite}
-                    onNavigate={(workId) => navigate(`/work/${workId}`)}
+                    onNavigate={(workId) => {
+                      // ✅ Сохраняем позицию скролла для админов
+                      sessionStorage.setItem('catalog_scroll_position', window.scrollY.toString());
+                      navigate(`/work/${workId}`);
+                    }}
                   />
                 ))}
               </div>

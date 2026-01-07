@@ -19,6 +19,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
           context - объект с request_id
     Returns: HTTP response с JWT токеном или данными пользователя
     '''
+    print("🚀 AUTH v2.0 - Password Reset via Email Enabled")
     method: str = event.get('httpMethod', 'GET')
     
     if method == 'OPTIONS':
@@ -98,7 +99,7 @@ def send_email(to_email: str, subject: str, html_body: str) -> bool:
     """Send email using Yandex SMTP"""
     try:
         smtp_host = os.environ.get('SMTP_HOST')
-        smtp_port = int(os.environ.get('SMTP_PORTSMTP_PORT', '465'))
+        smtp_port = int(os.environ.get('SMTP_PORT', '465'))
         smtp_user = os.environ.get('SMTP_USER')
         smtp_pass = os.environ.get('SMTP_PASS')
         

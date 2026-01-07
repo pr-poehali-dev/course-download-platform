@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import func2url from '../../backend/func2url.json';
 import SEO from '@/components/SEO';
 import Breadcrumbs from '@/components/Breadcrumbs';
-import { hashSecurityAnswer } from '@/utils/securityUtils';
+
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -20,17 +20,13 @@ export default function RegisterPage() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    security_question: '',
-    security_answer: ''
+    confirmPassword: ''
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   
-  const [captchaNum1] = useState(() => Math.floor(Math.random() * 10) + 1);
-  const [captchaNum2] = useState(() => Math.floor(Math.random() * 10) + 1);
-  const [captchaAnswer, setCaptchaAnswer] = useState('');
+
 
   // Показываем уведомление, если пришли по реферальной ссылке
   useEffect(() => {
@@ -64,15 +60,6 @@ export default function RegisterPage() {
       return;
     }
 
-    if (parseInt(captchaAnswer) !== captchaNum1 + captchaNum2) {
-      toast({
-        title: 'Ошибка',
-        description: 'Неверный ответ на математический вопрос',
-        variant: 'destructive'
-      });
-      return;
-    }
-
     if (formData.password.length < 8) {
       toast({
         title: 'Ошибка',
@@ -85,8 +72,6 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      const hashedAnswer = await hashSecurityAnswer(formData.security_answer);
-      
       const response = await fetch(`${func2url.auth}?action=register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,9 +79,7 @@ export default function RegisterPage() {
           username: formData.name,
           email: formData.email,
           password: formData.password,
-          security_question: formData.security_question,
-          security_answer: hashedAnswer,
-          referral_code: referralCode  // ✅ Передаем реферальный код
+          referral_code: referralCode
         })
       });
 
@@ -251,50 +234,6 @@ export default function RegisterPage() {
                     required
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="security_question">Секретный вопрос</Label>
-                <select
-                  id="security_question"
-                  value={formData.security_question}
-                  onChange={(e) => setFormData({ ...formData, security_question: e.target.value })}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  required
-                >
-                  <option value="">Выберите вопрос</option>
-                  <option value="Девичья фамилия матери?">Девичья фамилия матери?</option>
-                  <option value="Город вашего рождения?">Город вашего рождения?</option>
-                  <option value="Кличка первого питомца?">Кличка первого питомца?</option>
-                  <option value="Название первой школы?">Название первой школы?</option>
-                  <option value="Любимый цвет?">Любимый цвет?</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="security_answer">Ответ на секретный вопрос</Label>
-                <Input
-                  id="security_answer"
-                  type="text"
-                  placeholder="Ваш ответ"
-                  value={formData.security_answer}
-                  onChange={(e) => setFormData({ ...formData, security_answer: e.target.value })}
-                  required
-                />
-                <p className="text-xs text-muted-foreground">Используется для восстановления пароля</p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="captcha">Проверка: Сколько будет {captchaNum1} + {captchaNum2}?</Label>
-                <Input
-                  id="captcha"
-                  type="number"
-                  placeholder="Введите ответ"
-                  value={captchaAnswer}
-                  onChange={(e) => setCaptchaAnswer(e.target.value)}
-                  required
-                />
-                <p className="text-xs text-muted-foreground">Введите сумму чисел выше</p>
               </div>
 
               <div className="flex items-start gap-2">

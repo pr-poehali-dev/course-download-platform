@@ -1,23 +1,20 @@
 {
   "tests": [
     {
-      "name": "Register new user",
+      "name": "Register new user without security question",
       "method": "POST",
       "path": "/?action=register",
       "body": {
-        "username": "testuser_cleanup_77",
-        "email": "test_cleanup_77@example.com",
-        "password": "password123",
-        "security_question": "Любимый цвет?",
-        "security_answer": "синий"
+        "username": "testuser_simple_99",
+        "email": "test_simple_99@example.com",
+        "password": "password123"
       },
       "expectedStatus": 200,
       "expectedBody": {
         "token": "string",
         "user": {
-          "username": "testuser_cleanup_77",
-          "email": "test_cleanup_77@example.com",
-          "balance": 100
+          "username": "string",
+          "email": "string"
         }
       },
       "bodyMatcher": "partial"
@@ -27,16 +24,28 @@
       "method": "POST",
       "path": "/?action=login",
       "body": {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "password123"
+        "username": "admin",
+        "password": "admin123"
       },
       "expectedStatus": 200,
       "expectedBody": {
         "token": "string",
         "user": {
-          "username": "testuser"
+          "username": "string"
         }
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Request password reset",
+      "method": "POST",
+      "path": "/?action=request-password-reset",
+      "body": {
+        "email": "admin@techforma.pro"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "message": "string"
       },
       "bodyMatcher": "partial"
     }

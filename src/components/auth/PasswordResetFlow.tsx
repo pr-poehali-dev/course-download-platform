@@ -14,262 +14,161 @@ interface PasswordResetFlowProps {
 }
 
 export default function PasswordResetFlow({ open, onOpenChange, onBack }: PasswordResetFlowProps) {
-  const [resetStep, setResetStep] = useState<'email' | 'security' | 'newPassword'>('email');
-  const [resetEmail, setResetEmail] = useState('');
-  const [userSecurityQuestion, setUserSecurityQuestion] = useState('');
-  const [securityAnswer, setSecurityAnswer] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
-  const handleCheckEmail = async (e: React.FormEvent) => {
+  const handleRequestReset = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!resetEmail) {
+    if (!email) {
       toast({
         title: 'Ошибка',
         description: 'Введите email',
-        variant: 'destructive',
+        variant: 'destructive'
       });
       return;
     }
 
+    setLoading(true);
+
     try {
-      const response = await fetch(`${func2url.auth}?action=get-security-question`, {
+      const response = await fetch(`${func2url.auth}?action=request-password-reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: resetEmail })
+        body: JSON.stringify({ email })
       });
 
       const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Пользователь не найден');
+      if (response.ok) {
+        setEmailSent(true);
+        toast({
+          title: 'Письмо отправлено',
+          description: 'Новый пароль отправлен на ваш email'
+        });
+      } else {
+        toast({
+          title: 'Ошибка',
+          description: data.error || 'Не удалось отправить письмо',
+          variant: 'destructive'
+        });
       }
-
-      setUserSecurityQuestion(data.security_question);
-      setResetStep('security');
-    } catch (error: any) {
+    } catch (error) {
       toast({
         title: 'Ошибка',
-        description: error.message,
-        variant: 'destructive',
+        description: 'Не удалось подключиться к серверу',
+        variant: 'destructive'
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleVerifySecurityAnswer = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!securityAnswer) {
-      toast({
-        title: 'Ошибка',
-        description: 'Введите ответ на секретный вопрос',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      const response = await fetch(`${func2url.auth}?action=verify-security-answer`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: resetEmail, security_answer: securityAnswer })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Неверный ответ');
-      }
-
-      setResetStep('newPassword');
-    } catch (error: any) {
-      toast({
-        title: 'Ошибка',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
+  const handleClose = () => {
+    setEmail('');
+    setEmailSent(false);
+    setLoading(false);
+    onOpenChange(false);
   };
 
-  const handleSetNewPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!newPassword || !confirmNewPassword) {
-      toast({
-        title: 'Ошибка',
-        description: 'Заполните все поля',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-      toast({
-        title: 'Ошибка',
-        description: 'Пароли не совпадают',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      toast({
-        title: 'Ошибка',
-        description: 'Пароль должен быть не менее 6 символов',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      const response = await fetch(`${func2url.auth}?action=reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: resetEmail, new_password: newPassword })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ошибка смены пароля');
-      }
-
-      toast({
-        title: 'Пароль изменён!',
-        description: 'Теперь вы можете войти с новым паролем',
-      });
-
-      setResetStep('email');
-      setResetEmail('');
-      setSecurityAnswer('');
-      setNewPassword('');
-      setConfirmNewPassword('');
-      onBack();
-    } catch (error: any) {
-      toast({
-        title: 'Ошибка',
-        description: error.message,
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleBackToEmail = () => {
-    setResetStep('email');
-    setSecurityAnswer('');
-    setNewPassword('');
-    setConfirmNewPassword('');
+  const handleBackClick = () => {
+    setEmail('');
+    setEmailSent(false);
+    setLoading(false);
+    onBack();
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Icon name="KeyRound" size={24} className="text-primary" />
-            Восстановление пароля
-          </DialogTitle>
+          <DialogTitle>Восстановление пароля</DialogTitle>
           <DialogDescription>
-            {resetStep === 'email' && 'Введите email, указанный при регистрации'}
-            {resetStep === 'security' && 'Ответьте на секретный вопрос'}
-            {resetStep === 'newPassword' && 'Установите новый пароль'}
+            {!emailSent 
+              ? 'Введите email, и мы отправим вам новый пароль'
+              : 'Проверьте вашу почту'
+            }
           </DialogDescription>
         </DialogHeader>
-        
-        {resetStep === 'email' && (
-          <form onSubmit={handleCheckEmail} className="space-y-4 pt-4">
+
+        {!emailSent ? (
+          <form onSubmit={handleRequestReset} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="reset-email">Email</Label>
-              <Input
-                id="reset-email"
-                type="email"
-                placeholder="example@mail.ru"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-              />
+              <div className="relative">
+                <Icon name="Mail" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="reset-email"
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-10"
+                  required
+                />
+              </div>
             </div>
 
             <div className="flex gap-2">
-              <Button type="submit" className="flex-1">
-                <Icon name="ArrowRight" size={18} className="mr-2" />
-                Продолжить
-              </Button>
               <Button 
                 type="button" 
                 variant="outline" 
-                onClick={onBack}
+                onClick={handleBackClick}
+                className="flex-1"
               >
+                <Icon name="ArrowLeft" className="mr-2 h-4 w-4" />
                 Назад
+              </Button>
+              <Button type="submit" className="flex-1" disabled={loading}>
+                {loading ? (
+                  <>
+                    <Icon name="Loader2" className="mr-2 h-4 w-4 animate-spin" />
+                    Отправка...
+                  </>
+                ) : (
+                  <>
+                    <Icon name="Send" className="mr-2 h-4 w-4" />
+                    Отправить
+                  </>
+                )}
               </Button>
             </div>
           </form>
-        )}
-
-        {resetStep === 'security' && (
-          <form onSubmit={handleVerifySecurityAnswer} className="space-y-4 pt-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm font-medium text-blue-900 mb-2">Секретный вопрос:</p>
-              <p className="text-sm text-blue-700">{userSecurityQuestion}</p>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Icon name="CheckCircle" size={24} className="text-green-600 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-green-900 mb-1">Письмо отправлено!</p>
+                  <p className="text-sm text-green-700">
+                    Новый временный пароль отправлен на <strong>{email}</strong>
+                  </p>
+                  <p className="text-sm text-green-700 mt-2">
+                    Проверьте папку "Спам", если письмо не пришло
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="security-answer">Ваш ответ</Label>
-              <Input
-                id="security-answer"
-                type="text"
-                placeholder="Введите ответ"
-                value={securityAnswer}
-                onChange={(e) => setSecurityAnswer(e.target.value)}
-              />
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Icon name="AlertTriangle" size={20} className="text-amber-600 mt-0.5" />
+                <p className="text-sm text-amber-800">
+                  <strong>Важно:</strong> Рекомендуем сменить пароль после входа
+                </p>
+              </div>
             </div>
 
-            <div className="flex gap-2">
-              <Button type="submit" className="flex-1">
-                <Icon name="CheckCircle" size={18} className="mr-2" />
-                Проверить
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={handleBackToEmail}
-              >
-                <Icon name="ArrowLeft" size={18} className="mr-2" />
-                Назад
-              </Button>
-            </div>
-          </form>
-        )}
-
-        {resetStep === 'newPassword' && (
-          <form onSubmit={handleSetNewPassword} className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="new-password">Новый пароль</Label>
-              <Input
-                id="new-password"
-                type="password"
-                placeholder="••••••••"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirm-new-password">Подтвердите пароль</Label>
-              <Input
-                id="confirm-new-password"
-                type="password"
-                placeholder="••••••••"
-                value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
-              />
-            </div>
-
-            <Button type="submit" className="w-full">
-              <Icon name="Save" size={18} className="mr-2" />
-              Сохранить новый пароль
+            <Button 
+              onClick={handleBackClick}
+              className="w-full"
+            >
+              <Icon name="LogIn" className="mr-2 h-4 w-4" />
+              Вернуться к входу
             </Button>
-          </form>
+          </div>
         )}
       </DialogContent>
     </Dialog>

@@ -4,12 +4,17 @@ import hashlib
 import psycopg2
 import bcrypt
 import jwt
+import string
+import secrets
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
-    Business: Регистрация, авторизация и проверка сессий пользователей
+    Business: Регистрация, авторизация и восстановление пароля пользователей
     Args: event - dict с httpMethod, body, headers
           context - объект с request_id
     Returns: HTTP response с JWT токеном или данными пользователя
@@ -36,12 +41,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return register_user(event)
         elif path == 'login':
             return login_user(event)
-        elif path == 'get-security-question':
-            return get_security_question(event)
-        elif path == 'verify-security-answer':
-            return verify_security_answer(event)
-        elif path == 'reset-password':
-            return reset_password(event)
+        elif path == 'request-password-reset':
+            return request_password_reset(event)
     
     if method == 'GET' and path == 'verify':
         return verify_token(event)
@@ -59,24 +60,6 @@ def get_db_connection():
     conn.autocommit = False
     return conn
 
-def cleanup_expired_tokens(conn):
-    """Clean up expired and used password reset tokens"""
-    try:
-        cur = conn.cursor()
-        cur.execute(
-            """
-            DELETE FROM t_p63326274_course_download_plat.password_reset_tokens 
-            WHERE expires_at < NOW() OR used = true
-            """
-        )
-        deleted_count = cur.rowcount
-        conn.commit()
-        cur.close()
-        print(f"Cleaned up {deleted_count} expired/used tokens")
-    except Exception as e:
-        print(f"Token cleanup error: {repr(e)}")
-        conn.rollback()
-
 def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
     return bcrypt.hashpw(password.encode(), salt).decode('utf-8')
@@ -86,16 +69,13 @@ def verify_password(password: str, password_hash: str) -> bool:
     if password_hash.startswith('$2b$') or password_hash.startswith('$2a$'):
         try:
             result = bcrypt.checkpw(password.encode(), password_hash.encode())
-            print(f"VERIFY: bcrypt check result={result}")
             return result
         except Exception as e:
             print(f"VERIFY: bcrypt error={e}")
             return False
     else:
         sha_hash = hashlib.sha256(password.encode()).hexdigest()
-        result = sha_hash == password_hash
-        print(f"VERIFY: sha256 check result={result}")
-        return result
+        return sha_hash == password_hash
 
 def generate_referral_code(username: str) -> str:
     return hashlib.md5(username.encode()).hexdigest()[:8].upper()
@@ -109,7 +89,36 @@ def generate_jwt_token(user_id: int, username: str) -> str:
     }
     return jwt.encode(payload, secret, algorithm='HS256')
 
+def generate_temporary_password(length: int = 12) -> str:
+    """Generate a secure random password"""
+    alphabet = string.ascii_letters + string.digits + "!@#$%"
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
 
+def send_email(to_email: str, subject: str, html_body: str) -> bool:
+    """Send email using Yandex SMTP"""
+    try:
+        smtp_host = os.environ.get('SMTP_HOST')
+        smtp_port = int(os.environ.get('SMTP_PORTSMTP_PORT', '465'))
+        smtp_user = os.environ.get('SMTP_USER')
+        smtp_pass = os.environ.get('SMTP_PASS')
+        
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = smtp_user
+        msg['To'] = to_email
+        
+        html_part = MIMEText(html_body, 'html', 'utf-8')
+        msg.attach(html_part)
+        
+        with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+            server.login(smtp_user, smtp_pass)
+            server.send_message(msg)
+        
+        print(f"✅ Email sent to {to_email}")
+        return True
+    except Exception as e:
+        print(f"❌ Email error: {repr(e)}")
+        return False
 
 def _norm(s: str) -> str:
     return (s or "").strip()
@@ -125,15 +134,13 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
     username = _norm_username(body_data.get('username', ''))
     email = _norm_email(body_data.get('email', ''))
     password = body_data.get('password', '')
-    security_question = body_data.get('security_question', '')
-    security_answer = body_data.get('security_answer', '')
-    referred_by_code = body_data.get('referral_code', '').strip().upper()  # ✅ Реферальный код
+    referred_by_code = body_data.get('referral_code', '').strip().upper()
     
-    if not username or not email or not password or not security_question or not security_answer:
+    if not username or not email or not password:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Заполните все поля, включая секретный вопрос'}),
+            'body': json.dumps({'error': 'Заполните все поля'}),
             'isBase64Encoded': False
         }
     
@@ -145,14 +152,12 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    # Получаем IP адрес пользователя
     ip_address = event.get('requestContext', {}).get('identity', {}).get('sourceIp', 'unknown')
     
     conn = get_db_connection()
     cur = conn.cursor()
     
     try:
-        # КРИТИЧНО: Проверка на дубликат username/email
         cur.execute(
             "SELECT id FROM t_p63326274_course_download_plat.users WHERE lower(username) = lower(%s) OR lower(email) = lower(%s)",
             (username, email)
@@ -167,7 +172,6 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        # КРИТИЧНО: Анти-фрод - лимит 3 регистрации с одного IP за 24 часа
         cur.execute(
             """SELECT COUNT(*) FROM t_p63326274_course_download_plat.users 
             WHERE registration_ip = %s AND created_at > NOW() - INTERVAL '24 hours'""",
@@ -176,7 +180,6 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
         recent_registrations = cur.fetchone()[0]
         
         if recent_registrations >= 3:
-            # Логируем подозрительную активность
             cur.execute(
                 """INSERT INTO t_p63326274_course_download_plat.security_logs 
                 (user_id, event_type, details, ip_address) 
@@ -193,7 +196,6 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        # ✅ Проверяем реферальный код (если указан)
         referrer_id = None
         if referred_by_code:
             cur.execute(
@@ -208,63 +210,47 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 print(f"⚠️ Invalid referral code: {referred_by_code}")
         
         password_hash = hash_password(password)
-        # КРИТИЧНО: security_answer уже хеширован на клиенте, не хешируем повторно
-        security_answer_hash = security_answer  # Уже SHA256 хеш с клиента
         referral_code = generate_referral_code(username)
         
-        # ✅ Сохраняем referred_by при регистрации
         cur.execute(
             """
             INSERT INTO t_p63326274_course_download_plat.users 
-            (username, email, password_hash, referral_code, balance, security_question, security_answer_hash, registration_ip, referred_by) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) 
+            (username, email, password_hash, referral_code, balance, registration_ip, referred_by) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s) 
             RETURNING id
             """,
-            (username, email, password_hash, referral_code, 500 if referrer_id else 0, security_question, security_answer_hash, ip_address, referrer_id)
+            (username, email, password_hash, referral_code, 0, ip_address, referrer_id)
         )
         user_id = cur.fetchone()[0]
         
-        # ✅ Реферальная система: новый пользователь получает 500 баллов, реферер - 250 баллов
         if referrer_id:
-            WELCOME_BONUS = 500  # Бонус новому пользователю
-            REFERRAL_BONUS = 250  # Бонус рефереру
-            
-            # Создаем транзакцию приветственного бонуса новому пользователю
             cur.execute(
-                """
-                INSERT INTO t_p63326274_course_download_plat.transactions 
-                (user_id, type, amount, description) 
-                VALUES (%s, %s, %s, %s)
-                """,
-                (user_id, 'welcome_bonus', WELCOME_BONUS, 'Приветственный бонус по реферальной ссылке')
+                """UPDATE t_p63326274_course_download_plat.users 
+                SET balance = balance + 500 
+                WHERE id = %s""",
+                (user_id,)
             )
             
-            # Начисляем баллы рефереру
             cur.execute(
-                """
-                UPDATE t_p63326274_course_download_plat.users 
-                SET balance = balance + %s 
-                WHERE id = %s
-                """,
-                (REFERRAL_BONUS, referrer_id)
+                """UPDATE t_p63326274_course_download_plat.users 
+                SET balance = balance + 250 
+                WHERE id = %s""",
+                (referrer_id,)
             )
             
-            # Записываем транзакцию рефереру
             cur.execute(
-                """
-                INSERT INTO t_p63326274_course_download_plat.transactions 
-                (user_id, type, amount, description) 
-                VALUES (%s, %s, %s, %s)
-                """,
-                (referrer_id, 'referral_bonus', REFERRAL_BONUS, f'Реферальный бонус за пользователя {username}')
+                """INSERT INTO t_p63326274_course_download_plat.transactions 
+                (user_id, amount, type, description, created_at) 
+                VALUES 
+                (%s, %s, %s, %s, NOW()),
+                (%s, %s, %s, %s, NOW())""",
+                (
+                    user_id, 500, 'referral_bonus', 'Бонус за регистрацию по реферальной ссылке',
+                    referrer_id, 250, 'referral_reward', f'Награда за приглашение пользователя {username}'
+                )
             )
-            
-            print(f"✅ Welcome bonus {WELCOME_BONUS} to new user_id={user_id}, referral bonus {REFERRAL_BONUS} to referrer_id={referrer_id}")
         
         conn.commit()
-        
-        cleanup_expired_tokens(conn)
-        
         cur.close()
         conn.close()
         
@@ -279,32 +265,29 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                     'id': user_id,
                     'username': username,
                     'email': email,
-                    'balance': 1000,
                     'referral_code': referral_code
                 }
             }),
             'isBase64Encoded': False
         }
+        
     except Exception as e:
         conn.rollback()
         cur.close()
         conn.close()
-        print(f"Registration error: {repr(e)}")
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Ошибка регистрации'}),
+            'body': json.dumps({'error': f'Database error: {repr(e)}'}),
             'isBase64Encoded': False
         }
 
 def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     body_data = json.loads(event.get('body', '{}'))
-    login = _norm(body_data.get('username', ''))
+    username = _norm_username(body_data.get('username', ''))
     password = body_data.get('password', '')
     
-    print(f"LOGIN: login={login}, password_len={len(password)}")
-    
-    if not login or not password:
+    if not username or not password:
         return {
             'statusCode': 400,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
@@ -315,320 +298,238 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     conn = get_db_connection()
     cur = conn.cursor()
     
-    cur.execute(
-        """
-        SELECT id, username, email, password_hash, balance, referral_code, created_at, role 
-        FROM t_p63326274_course_download_plat.users 
-        WHERE lower(username) = lower(%s) OR lower(email) = lower(%s)
-        """,
-        (login, login)
-    )
-    user = cur.fetchone()
-    cur.close()
-    conn.close()
-    
-    if not user:
-        print(f"LOGIN FAIL: user not found for {login}")
-        return {
-            'statusCode': 401,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Неверный логин или пароль'}),
-            'isBase64Encoded': False
-        }
-    
-    user_id, db_username, email, password_hash, balance, referral_code, created_at, role = user
-    print(f"LOGIN: found user_id={user_id}, hash_start={password_hash[:20]}")
-    
-    verified = verify_password(password, password_hash)
-    print(f"LOGIN: password verified={verified}")
-    
-    if not verified:
-        return {
-            'statusCode': 401,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Неверный логин или пароль'}),
-            'isBase64Encoded': False
-        }
-    
-    token = generate_jwt_token(user_id, db_username)
-    
-    return {
-        'statusCode': 200,
-        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-        'body': json.dumps({
-            'token': token,
-            'user': {
-                'id': user_id,
-                'username': db_username,
-                'email': email,
-                'balance': balance,
-                'referral_code': referral_code,
-                'role': role,
-                'created_at': created_at.isoformat() if created_at else None
+    try:
+        cur.execute(
+            """
+            SELECT id, username, email, password_hash, is_admin, referral_code 
+            FROM t_p63326274_course_download_plat.users 
+            WHERE lower(username) = lower(%s) OR lower(email) = lower(%s)
+            """,
+            (username, username)
+        )
+        user = cur.fetchone()
+        
+        if not user:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 401,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Неверное имя пользователя или пароль'}),
+                'isBase64Encoded': False
             }
-        }),
-        'isBase64Encoded': False
-    }
+        
+        user_id, db_username, db_email, password_hash, is_admin, referral_code = user
+        
+        if not verify_password(password, password_hash):
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 401,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Неверное имя пользователя или пароль'}),
+                'isBase64Encoded': False
+            }
+        
+        cur.close()
+        conn.close()
+        
+        token = generate_jwt_token(user_id, db_username)
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({
+                'token': token,
+                'user': {
+                    'id': user_id,
+                    'username': db_username,
+                    'email': db_email,
+                    'is_admin': is_admin,
+                    'referral_code': referral_code
+                }
+            }),
+            'isBase64Encoded': False
+        }
+        
+    except Exception as e:
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': f'Database error: {repr(e)}'}),
+            'isBase64Encoded': False
+        }
+
+def request_password_reset(event: Dict[str, Any]) -> Dict[str, Any]:
+    """Генерация временного пароля и отправка на email"""
+    body_data = json.loads(event.get('body', '{}'))
+    email = _norm_email(body_data.get('email', ''))
+    
+    if not email:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Введите email'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        cur.execute(
+            "SELECT id, username FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
+            (email,)
+        )
+        user = cur.fetchone()
+        
+        if not user:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'message': 'Если email существует, на него отправлен новый пароль'}),
+                'isBase64Encoded': False
+            }
+        
+        user_id, username = user
+        
+        new_password = generate_temporary_password()
+        password_hash = hash_password(new_password)
+        
+        cur.execute(
+            "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s WHERE id = %s",
+            (password_hash, user_id)
+        )
+        
+        conn.commit()
+        
+        html_body = f"""
+        <html>
+          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+              <h2 style="color: #2563eb;">Восстановление пароля Tech Forma</h2>
+              <p>Здравствуйте, <strong>{username}</strong>!</p>
+              <p>Ваш новый временный пароль:</p>
+              <div style="background: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0; font-family: monospace; font-size: 18px; text-align: center; letter-spacing: 2px;">
+                <strong>{new_password}</strong>
+              </div>
+              <p style="color: #dc2626; font-weight: bold;">⚠️ Рекомендуем сменить пароль после входа в личном кабинете</p>
+              <p>Если вы не запрашивали восстановление пароля, проигнорируйте это письмо.</p>
+              <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+              <p style="font-size: 12px; color: #666;">С уважением,<br>Команда Tech Forma</p>
+            </div>
+          </body>
+        </html>
+        """
+        
+        email_sent = send_email(email, "Восстановление пароля Tech Forma", html_body)
+        
+        cur.close()
+        conn.close()
+        
+        if email_sent:
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'message': 'Новый пароль отправлен на ваш email'}),
+                'isBase64Encoded': False
+            }
+        else:
+            return {
+                'statusCode': 500,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Не удалось отправить email. Попробуйте позже'}),
+                'isBase64Encoded': False
+            }
+        
+    except Exception as e:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': f'Ошибка восстановления пароля: {repr(e)}'}),
+            'isBase64Encoded': False
+        }
 
 def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
-    headers = event.get('headers', {})
-    token = headers.get('X-Auth-Token') or headers.get('x-auth-token')
+    auth_header = event.get('headers', {}).get('X-Auth-Token', '')
     
-    if not token:
+    if not auth_header:
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Токен не предоставлен'}),
+            'body': json.dumps({'error': 'No token provided'}),
             'isBase64Encoded': False
         }
     
     try:
         secret = os.environ.get('JWT_SECRET')
-        payload = jwt.decode(token, secret, algorithms=['HS256'])
+        payload = jwt.decode(auth_header, secret, algorithms=['HS256'])
+        
+        user_id = payload.get('user_id')
+        username = payload.get('username')
         
         conn = get_db_connection()
         cur = conn.cursor()
+        
         cur.execute(
             """
-            SELECT id, username, email, balance, referral_code, is_premium, premium_expires_at, created_at, role
+            SELECT id, username, email, is_admin, balance, referral_code 
             FROM t_p63326274_course_download_plat.users 
             WHERE id = %s
             """,
-            (payload['user_id'],)
+            (user_id,)
         )
         user = cur.fetchone()
-        cur.close()
-        conn.close()
         
         if not user:
+            cur.close()
+            conn.close()
             return {
                 'statusCode': 401,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Пользователь не найден'}),
+                'body': json.dumps({'error': 'User not found'}),
                 'isBase64Encoded': False
             }
         
-        user_id, username, email, balance, referral_code, is_premium, premium_expires_at, created_at, role = user
+        db_user_id, db_username, db_email, is_admin, balance, referral_code = user
+        
+        cur.close()
+        conn.close()
         
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({
                 'user': {
-                    'id': user_id,
-                    'username': username,
-                    'email': email,
+                    'id': db_user_id,
+                    'username': db_username,
+                    'email': db_email,
+                    'is_admin': is_admin,
                     'balance': balance,
-                    'referral_code': referral_code,
-                    'role': role,
-                    'is_premium': is_premium,
-                    'premium_expires_at': premium_expires_at.isoformat() if premium_expires_at else None,
-                    'created_at': created_at.isoformat() if created_at else None
+                    'referral_code': referral_code
                 }
             }),
             'isBase64Encoded': False
         }
+        
     except jwt.ExpiredSignatureError:
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Токен истёк'}),
+            'body': json.dumps({'error': 'Token expired'}),
             'isBase64Encoded': False
         }
     except jwt.InvalidTokenError:
         return {
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Недействительный токен'}),
-            'isBase64Encoded': False
-        }
-
-def get_security_question(event: Dict[str, Any]) -> Dict[str, Any]:
-    '''Get security question for user by email'''
-    body_data = json.loads(event.get('body', '{}'))
-    email = _norm_email(body_data.get('email', ''))
-    
-    if not email:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Email обязателен'}),
-            'isBase64Encoded': False
-        }
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    cur.execute(
-        "SELECT id, security_question FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
-        (email,)
-    )
-    user = cur.fetchone()
-    cur.close()
-    conn.close()
-    
-    if not user:
-        return {
-            'statusCode': 404,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Пользователь не найден'}),
-            'isBase64Encoded': False
-        }
-    
-    user_id, security_question = user
-    
-    return {
-        'statusCode': 200,
-        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-        'body': json.dumps({'security_question': security_question}),
-        'isBase64Encoded': False
-    }
-
-def verify_security_answer(event: Dict[str, Any]) -> Dict[str, Any]:
-    '''Verify security answer and reset password with new one'''
-    body_data = json.loads(event.get('body', '{}'))
-    email = _norm_email(body_data.get('email', ''))
-    security_answer = body_data.get('security_answer', '').strip()
-    new_password = body_data.get('new_password', '')
-    
-    if not email or not security_answer or not new_password:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Все поля обязательны'}),
-            'isBase64Encoded': False
-        }
-    
-    if len(new_password) < 8:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Пароль должен быть не короче 8 символов'}),
-            'isBase64Encoded': False
-        }
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    try:
-        cur.execute(
-            "SELECT id, username, security_answer_hash FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
-            (email,)
-        )
-        user = cur.fetchone()
-        
-        if not user:
-            cur.close()
-            conn.close()
-            return {
-                'statusCode': 404,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Пользователь не найден'}),
-                'isBase64Encoded': False
-            }
-        
-        user_id, username, security_answer_hash = user
-        
-        # КРИТИЧНО: security_answer уже хеширован на клиенте
-        if security_answer != security_answer_hash:
-            cur.close()
-            conn.close()
-            return {
-                'statusCode': 403,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Неверный ответ на секретный вопрос'}),
-                'isBase64Encoded': False
-            }
-        
-        new_password_hash = hash_password(new_password)
-        
-        cur.execute(
-            "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s WHERE id = %s",
-            (new_password_hash, user_id)
-        )
-        conn.commit()
-        
-        token = generate_jwt_token(user_id, username)
-        
-        cur.close()
-        conn.close()
-        
-        return {
-            'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({
-                'message': 'Пароль успешно изменен',
-                'token': token
-            }),
-            'isBase64Encoded': False
-        }
-    except Exception as e:
-        conn.rollback()
-        cur.close()
-        conn.close()
-        print(f"Verify security answer error: {repr(e)}")
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Ошибка при проверке ответа и смене пароля'}),
-            'isBase64Encoded': False
-        }
-
-def reset_password(event: Dict[str, Any]) -> Dict[str, Any]:
-    '''Get security question by email (step 1 of password reset)'''
-    body_data = json.loads(event.get('body', '{}'))
-    email = _norm_email(body_data.get('email', ''))
-    
-    if not email:
-        return {
-            'statusCode': 400,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Email обязателен'}),
-            'isBase64Encoded': False
-        }
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    try:
-        cur.execute(
-            "SELECT id, security_question FROM t_p63326274_course_download_plat.users WHERE lower(email) = lower(%s)",
-            (email,)
-        )
-        user = cur.fetchone()
-        
-        if not user:
-            cur.close()
-            conn.close()
-            return {
-                'statusCode': 404,
-                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({'error': 'Пользователь с таким email не найден'}),
-                'isBase64Encoded': False
-            }
-        
-        user_id, security_question = user
-        
-        cur.close()
-        conn.close()
-        
-        return {
-            'statusCode': 200,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({
-                'security_question': security_question,
-                'message': 'Секретный вопрос получен'
-            }),
-            'isBase64Encoded': False
-        }
-    except Exception as e:
-        conn.rollback()
-        cur.close()
-        conn.close()
-        print(f"Reset password error: {repr(e)}")
-        return {
-            'statusCode': 500,
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Ошибка при получении секретного вопроса'}),
+            'body': json.dumps({'error': 'Invalid token'}),
             'isBase64Encoded': False
         }

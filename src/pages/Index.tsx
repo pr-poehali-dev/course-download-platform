@@ -210,9 +210,9 @@ export default function Index() {
     loadUserData();
   }, [currentUser]);
 
-  const handleRegister = async (username: string, email: string, password: string, securityQuestion: string, securityAnswer: string) => {
+  const handleRegister = async (username: string, email: string, password: string) => {
     try {
-      const data = await authService.register(username, email, password, securityQuestion, securityAnswer);
+      const data = await authService.register(username, email, password);
       setCurrentUser(data.user);
       setAuthDialogOpen(false);
       toast({

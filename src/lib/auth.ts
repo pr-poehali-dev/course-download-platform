@@ -20,13 +20,13 @@ export interface AuthResponse {
 }
 
 export const authService = {
-  async register(username: string, email: string, password: string, securityQuestion: string, securityAnswer: string): Promise<AuthResponse> {
+  async register(username: string, email: string, password: string): Promise<AuthResponse> {
     const response = await fetch(`${AUTH_API}?action=register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ username, email, password, security_question: securityQuestion, security_answer: securityAnswer }),
+      body: JSON.stringify({ username, email, password }),
     });
 
     const data = await response.json();

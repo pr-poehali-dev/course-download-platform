@@ -252,6 +252,13 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
             )
         
         conn.commit()
+        
+        cur.execute(
+            "SELECT balance FROM t_p63326274_course_download_plat.users WHERE id = %s",
+            (user_id,)
+        )
+        balance = cur.fetchone()[0]
+        
         cur.close()
         conn.close()
         
@@ -266,7 +273,8 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
                     'id': user_id,
                     'username': username,
                     'email': email,
-                    'referral_code': referral_code
+                    'referral_code': referral_code,
+                    'balance': balance
                 }
             }),
             'isBase64Encoded': False

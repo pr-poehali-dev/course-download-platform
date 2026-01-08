@@ -50,10 +50,20 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
       return;
     }
 
-    if (registerData.password.length < 6) {
+    if (registerData.password.length < 8) {
       toast({
         title: 'Ошибка',
-        description: 'Пароль должен быть не менее 6 символов',
+        description: 'Пароль должен быть не менее 8 символов',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(registerData.email)) {
+      toast({
+        title: 'Ошибка',
+        description: 'Введите корректный email адрес',
         variant: 'destructive',
       });
       return;
@@ -83,7 +93,9 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
           placeholder="example@mail.ru"
           value={registerData.email}
           onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+          required
         />
+        <p className="text-xs text-muted-foreground">Для восстановления пароля</p>
       </div>
 
       <div className="space-y-2">
@@ -95,6 +107,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
           value={registerData.password}
           onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
         />
+        <p className="text-xs text-muted-foreground">Минимум 8 символов. Используйте буквы и цифры</p>
       </div>
 
       <div className="space-y-2">

@@ -111,23 +111,23 @@
       <script defer src="https://cdn.poehali.dev/intertnal/js/inspector-min.js" fetchpriority="low"></script>
       
       <script>
-        // Редирект с зеркал на основной домен techforma.pro
+        // Редирект с зеркал на основной домен techforma.pro (временно отключён)
         (function() {
           const currentHost = window.location.hostname.toLowerCase();
           const currentProtocol = window.location.protocol;
           const currentPath = window.location.pathname;
           const mainDomain = 'techforma.pro';
           
-          // Проверяем, находимся ли мы НЕ на главном домене
-          if (currentHost !== mainDomain) {
-            const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
-            window.location.replace(newUrl);
-            return;
-          }
+          // ОТКЛЮЧЕНО: редирект на основной домен
+          // if (currentHost !== mainDomain) {
+          //   const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
+          //   window.location.replace(newUrl);
+          //   return;
+          // }
           
-          // Проверяем HTTP -> HTTPS редирект для главного домена
-          if (currentHost === mainDomain && currentProtocol === 'http:') {
-            const newUrl = 'https://' + mainDomain + currentPath + window.location.search + window.location.hash;
+          // Проверяем HTTP -> HTTPS редирект только для текущего домена
+          if (currentProtocol === 'http:') {
+            const newUrl = 'https://' + currentHost + currentPath + window.location.search + window.location.hash;
             window.location.replace(newUrl);
             return;
           }

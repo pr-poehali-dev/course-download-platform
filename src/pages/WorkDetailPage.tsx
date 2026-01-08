@@ -1979,7 +1979,7 @@ export default function WorkDetailPage() {
                         {similarWork.subject}
                       </Badge>
                       <div className="text-sm font-bold text-primary">
-                        {similarWork.price} ₽
+                        {similarWork.price} баллов
                       </div>
                     </div>
                   </div>

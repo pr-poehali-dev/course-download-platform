@@ -19,12 +19,10 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    confirmPassword: ''
+    password: ''
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
   
 
 
@@ -41,24 +39,6 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: 'Ошибка',
-        description: 'Пароли не совпадают',
-        variant: 'destructive'
-      });
-      return;
-    }
-
-    if (!agreedToTerms) {
-      toast({
-        title: 'Ошибка',
-        description: 'Необходимо принять условия использования',
-        variant: 'destructive'
-      });
-      return;
-    }
 
     if (formData.password.length < 8) {
       toast({
@@ -193,7 +173,12 @@ export default function RegisterPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Пароль</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Пароль</Label>
+                  <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                    Забыли пароль?
+                  </Link>
+                </div>
                 <div className="relative">
                   <Icon name="Lock" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -216,44 +201,6 @@ export default function RegisterPage() {
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground">Минимум 8 символов</p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
-                <div className="relative">
-                  <Icon name="Lock" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="confirmPassword"
-                    name="password-confirm"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="pl-10"
-                    autoComplete="new-password"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2">
-                <input
-                  type="checkbox"
-                  id="terms"
-                  checked={agreedToTerms}
-                  onChange={(e) => setAgreedToTerms(e.target.checked)}
-                  className="mt-1 rounded"
-                />
-                <label htmlFor="terms" className="text-sm text-muted-foreground">
-                  Я принимаю{' '}
-                  <Link to="/terms-of-service" className="text-primary hover:underline">
-                    условия использования
-                  </Link>{' '}
-                  и{' '}
-                  <Link to="/privacy-policy" className="text-primary hover:underline">
-                    политику конфиденциальности
-                  </Link>
-                </label>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>

@@ -527,6 +527,14 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Token expired'}),
             'isBase64Encoded': False
         }
+    except Exception as e:
+        print(f"❌ Verify token error: {repr(e)}")
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Invalid token'}),
+            'isBase64Encoded': False
+        }
     except jwt.InvalidTokenError:
         return {
             'statusCode': 401,

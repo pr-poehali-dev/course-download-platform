@@ -8,6 +8,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import CatalogFilters from '@/components/catalog/CatalogFilters';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import Icon from '@/components/ui/icon';
 import Footer from '@/components/Footer';
 import { Helmet } from 'react-helmet-async';
 import ExitIntentModal from '@/components/ExitIntentModal';

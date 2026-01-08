@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 
@@ -12,18 +10,17 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({ onRegister }: RegisterFormProps) {
-  const [registerData, setRegisterData] = useState({ 
-    username: '', 
+  const [formData, setFormData] = useState({ 
+    name: '', 
     email: '', 
-    password: '', 
-    confirmPassword: '',
-    agreeToPrivacy: false
+    password: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!registerData.username || !registerData.email || !registerData.password || !registerData.confirmPassword) {
+    if (!formData.name || !formData.email || !formData.password) {
       toast({
         title: 'Ошибка',
         description: 'Заполните все поля',
@@ -32,25 +29,7 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
       return;
     }
 
-    if (!registerData.agreeToPrivacy) {
-      toast({
-        title: 'Ошибка',
-        description: 'Необходимо согласие на обработку персональных данных',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (registerData.password !== registerData.confirmPassword) {
-      toast({
-        title: 'Ошибка',
-        description: 'Пароли не совпадают',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (registerData.password.length < 8) {
+    if (formData.password.length < 8) {
       toast({
         title: 'Ошибка',
         description: 'Пароль должен быть не менее 8 символов',
@@ -58,88 +37,66 @@ export default function RegisterForm({ onRegister }: RegisterFormProps) {
       });
       return;
     }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(registerData.email)) {
-      toast({
-        title: 'Ошибка',
-        description: 'Введите корректный email адрес',
-        variant: 'destructive',
-      });
-      return;
-    }
 
-    onRegister(registerData.username, registerData.email, registerData.password);
+    onRegister(formData.name, formData.email, formData.password);
   };
 
   return (
     <form onSubmit={handleRegister} className="space-y-4 pt-4">
       <div className="space-y-2">
-        <Label htmlFor="reg-username">Имя пользователя</Label>
-        <Input
-          id="reg-username"
-          type="text"
-          placeholder="ivan_ivanov"
-          value={registerData.username}
-          onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
-        />
+        <Label htmlFor="reg-username">Никнейм</Label>
+        <div className="relative">
+          <Icon name="User" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="reg-username"
+            type="text"
+            placeholder="techmaster2025"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            className="pl-10"
+            required
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="reg-email">Email</Label>
-        <Input
-          id="reg-email"
-          type="email"
-          placeholder="example@mail.ru"
-          value={registerData.email}
-          onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-          required
-        />
-        <p className="text-xs text-muted-foreground">Для восстановления пароля</p>
+        <div className="relative">
+          <Icon name="Mail" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="reg-email"
+            type="email"
+            placeholder="your@email.com"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            className="pl-10"
+            required
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="reg-password">Пароль</Label>
-        <Input
-          id="reg-password"
-          type="password"
-          placeholder="••••••••"
-          value={registerData.password}
-          onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-        />
-        <p className="text-xs text-muted-foreground">Минимум 8 символов. Используйте буквы и цифры</p>
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="reg-confirm-password">Подтвердите пароль</Label>
-        <Input
-          id="reg-confirm-password"
-          type="password"
-          placeholder="••••••••"
-          value={registerData.confirmPassword}
-          onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
-        />
-      </div>
-
-      <div className="flex items-start space-x-2 pt-2">
-        <Checkbox 
-          id="privacy-agree" 
-          checked={registerData.agreeToPrivacy}
-          onCheckedChange={(checked) => setRegisterData({ ...registerData, agreeToPrivacy: checked as boolean })}
-        />
-        <label 
-          htmlFor="privacy-agree" 
-          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-        >
-          Я согласен на{' '}
-          <a href="/privacy-policy" target="_blank" className="text-primary hover:underline">
-            обработку персональных данных
-          </a>
-          {' '}и принимаю{' '}
-          <a href="/terms-of-service" target="_blank" className="text-primary hover:underline">
-            условия использования
-          </a>
-        </label>
+        <div className="relative">
+          <Icon name="Lock" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            id="reg-password"
+            type={showPassword ? 'text' : 'password'}
+            placeholder="••••••••"
+            value={formData.password}
+            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            className="pl-10 pr-10"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <Icon name={showPassword ? "EyeOff" : "Eye"} size={18} />
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">Минимум 8 символов</p>
       </div>
 
       <Button type="submit" className="w-full">

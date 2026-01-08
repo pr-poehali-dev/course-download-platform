@@ -218,29 +218,18 @@ export default function RegisterPage() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Уже есть аккаунт? </span>
-              <Link to="/login" className="text-primary hover:underline font-medium">
-                Войти
-              </Link>
-            </div>
-
-            <div className="mt-6 relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">или</span>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center">
-              <Button variant="outline" className="w-full" asChild>
-                <Link to="/">
-                  <Icon name="Home" className="mr-2 h-4 w-4" />
-                  На главную
+            <div className="mt-6 text-center text-sm space-y-2">
+              <div>
+                <span className="text-muted-foreground">Уже есть аккаунт? </span>
+                <Link to="/login" className="text-primary hover:underline font-medium">
+                  Войти
                 </Link>
-              </Button>
+              </div>
+              <div>
+                <Link to="/forgot-password" className="text-primary hover:underline text-sm">
+                  Забыли пароль?
+                </Link>
+              </div>
             </div>
           </CardContent>
         </Card>

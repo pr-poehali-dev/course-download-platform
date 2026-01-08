@@ -11,7 +11,7 @@ interface AuthDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onLogin: (username: string, password: string) => void;
-  onRegister: (username: string, email: string, password: string, securityQuestion: string, securityAnswer: string) => void;
+  onRegister: (username: string, email: string, password: string) => void;
 }
 
 export default function AuthDialog({ open, onOpenChange, onLogin, onRegister }: AuthDialogProps) {

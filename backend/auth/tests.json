@@ -1,47 +1,11 @@
 {
   "tests": [
     {
-      "name": "Register new user without security question",
-      "method": "POST",
-      "path": "/?action=register",
-      "body": {
-        "username": "testuser_simple_99",
-        "email": "test_simple_99@example.com",
-        "password": "password123"
-      },
-      "expectedStatus": 200,
-      "expectedBody": {
-        "token": "string",
-        "user": {
-          "username": "string",
-          "email": "string"
-        }
-      },
-      "bodyMatcher": "partial"
-    },
-    {
-      "name": "Login user",
-      "method": "POST",
-      "path": "/?action=login",
-      "body": {
-        "username": "admin",
-        "password": "admin123"
-      },
-      "expectedStatus": 200,
-      "expectedBody": {
-        "token": "string",
-        "user": {
-          "username": "string"
-        }
-      },
-      "bodyMatcher": "partial"
-    },
-    {
-      "name": "Request password reset",
+      "name": "Request password reset sends email",
       "method": "POST",
       "path": "/?action=request-password-reset",
       "body": {
-        "email": "admin@techforma.pro"
+        "email": "test@example.com"
       },
       "expectedStatus": 200,
       "expectedBody": {

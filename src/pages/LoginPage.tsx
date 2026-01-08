@@ -189,7 +189,7 @@ function LoginPageContent({ navigate }: { navigate: any }) {
                 </div>
               )}
 
-              <div className="flex items-center text-sm">
+              <div className="flex items-center justify-between text-sm">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input 
                     type="checkbox" 
@@ -199,6 +199,9 @@ function LoginPageContent({ navigate }: { navigate: any }) {
                   />
                   <span className="text-muted-foreground">Запомнить меня</span>
                 </label>
+                <Link to="/forgot-password" className="text-primary hover:underline">
+                  Забыли пароль?
+                </Link>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>

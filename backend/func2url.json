@@ -20,6 +20,7 @@
   "get-work-files": "https://functions.poehali.dev/ec3bbe78-f975-4ae0-9b3f-3a3fc67dd7d1",
   "purchase-work": "https://functions.poehali.dev/7f219e70-5e9f-44d1-9011-e6246d4274a9",
   "download-work": "https://functions.poehali.dev/5898b2f2-c4d9-4ff7-bd15-9600829fed08",
+  "auth": "https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46",
   "works": "https://functions.poehali.dev/a16a43fc-fa7d-4c72-ad15-ba566d2c7413",
   "payment": "https://functions.poehali.dev/4b9b82b8-34d8-43e7-a9ac-c3cb0bd67fb1",
   "support": "https://functions.poehali.dev/c13b3d8d-6ee7-416d-9f1f-0350aae86e61"

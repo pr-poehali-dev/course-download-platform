@@ -904,7 +904,7 @@ export default function Index() {
 
 
 
-        <section className="py-20 bg-muted/30">
+        <section className="hidden py-20 bg-muted/30">
           <div className="container mx-auto px-4">
             <div className="w-full">
               <div className="text-center mb-8">

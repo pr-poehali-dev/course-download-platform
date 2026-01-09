@@ -914,15 +914,15 @@ export default function Index() {
 
         <section className="py-20 bg-muted/30">
           <div className="container mx-auto px-4">
-            <Tabs defaultValue="catalog" className="w-full">
-              <TabsList className="grid w-full max-w-md mx-auto grid-cols-1 mb-8">
-                <TabsTrigger value="catalog">
-                  <Icon name="BookOpen" size={18} className="mr-2" />
+            <div className="w-full">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold flex items-center justify-center gap-2">
+                  <Icon name="BookOpen" size={28} />
                   Каталог работ
-                </TabsTrigger>
-              </TabsList>
+                </h2>
+              </div>
 
-              <TabsContent value="catalog" className="hidden">
+              <div>
                 <div className="mb-6 flex flex-wrap gap-4 items-center justify-between bg-muted/30 p-4 rounded-lg">
                   <div className="flex gap-2 items-center">
                     <Label className="text-sm">Сортировка:</Label>
@@ -1092,9 +1092,12 @@ export default function Index() {
                 })}
                 </div>
                 )}
-              </TabsContent>
+              </div>
+            </div>
+          </div>
+        </section>
 
-              <TabsContent value="catalog-removed">
+        <section className="hidden">
                 <Card className="max-w-2xl mx-auto">
                   <CardHeader>
                     <CardTitle>Загрузить свою работу</CardTitle>
@@ -1342,9 +1345,6 @@ export default function Index() {
                     </Button>
                   </CardFooter>
                 </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
         </section>
 
 

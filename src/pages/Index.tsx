@@ -801,14 +801,6 @@ export default function Index() {
 
         <SEOHeroSection onCatalogClick={() => window.location.href = '/catalog'} />
 
-        <WorkCategoriesSection onCatalogClick={(category) => {
-          if (category) {
-            window.location.href = `/catalog?category=${category}`;
-          } else {
-            window.location.href = '/catalog';
-          }
-        }} />
-
         <section className="relative py-20 bg-background border-b border-border">
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
             <div className="text-center mb-16">

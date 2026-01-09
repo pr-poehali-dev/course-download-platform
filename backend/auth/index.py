@@ -6,9 +6,7 @@ import bcrypt
 import jwt
 import string
 import secrets
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import requests
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
@@ -96,27 +94,36 @@ def generate_temporary_password(length: int = 12) -> str:
     return ''.join(secrets.choice(alphabet) for _ in range(length))
 
 def send_email(to_email: str, subject: str, html_body: str) -> bool:
-    """Send email using Yandex SMTP"""
+    """Send email using Resend API"""
     try:
-        smtp_host = os.environ.get('SMTP_HOST')
-        smtp_port = int(os.environ.get('SMTP_PORT', '465'))
-        smtp_user = os.environ.get('SMTP_USER')
-        smtp_pass = os.environ.get('SMTP_PASS')
+        resend_api_key = os.environ.get('RESEND_API_KEY')
+        mail_from = os.environ.get('MAIL_FROM', 'TechForma <onboarding@resend.dev>')
         
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
-        msg['From'] = smtp_user
-        msg['To'] = to_email
+        if not resend_api_key:
+            print("❌ RESEND_API_KEY not configured")
+            return False
         
-        html_part = MIMEText(html_body, 'html', 'utf-8')
-        msg.attach(html_part)
+        response = requests.post(
+            'https://api.resend.com/emails',
+            headers={
+                'Authorization': f'Bearer {resend_api_key}',
+                'Content-Type': 'application/json'
+            },
+            json={
+                'from': mail_from,
+                'to': [to_email],
+                'subject': subject,
+                'html': html_body
+            },
+            timeout=10
+        )
         
-        with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
-            server.login(smtp_user, smtp_pass)
-            server.send_message(msg)
-        
-        print(f"✅ Email sent to {to_email}")
-        return True
+        if response.status_code == 200:
+            print(f"✅ Email sent to {to_email}")
+            return True
+        else:
+            print(f"❌ Resend API error: {response.status_code} {response.text}")
+            return False
     except Exception as e:
         print(f"❌ Email error: {repr(e)}")
         return False

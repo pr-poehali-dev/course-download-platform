@@ -9,73 +9,67 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { HelmetProvider } from 'react-helmet-async';
 import SEOGuard from '@/components/SEOGuard';
 
-// Retry helper for lazy imports with proper error handling
-const lazyRetry = (componentImport: () => Promise<any>, retries = 3) => 
+// Улучшенная загрузка с очисткой кэша при ошибке
+const lazyWithReload = (componentImport: () => Promise<any>) => 
   lazy(async () => {
-    for (let i = 0; i < retries; i++) {
-      try {
-        return await componentImport();
-      } catch (error) {
-        if (i === retries - 1) {
-          console.error('Failed to load component after retries:', error);
-          throw error;
-        }
-        // Wait before retry (exponential backoff)
-        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
-      }
+    try {
+      return await componentImport();
+    } catch (error) {
+      console.error('Component load failed, reloading page...', error);
+      // При ошибке загрузки перезагружаем страницу для сброса кэша
+      window.location.reload();
+      throw error;
     }
-    // Fallback return (TypeScript требует)
-    return await componentImport();
   });
 
-const Index = lazyRetry(() => import("./pages/Index"));
-const NotFoundPage = lazyRetry(() => import("./pages/NotFoundPage"));
-const CatalogPage = lazyRetry(() => import("./pages/CatalogPage"));
-const WorkDetailPage = lazyRetry(() => import("./pages/WorkDetailPage"));
-const LoginPage = lazyRetry(() => import("./pages/LoginPage"));
-const RegisterPage = lazyRetry(() => import("./pages/RegisterPage"));
-const ProfilePage = lazyRetry(() => import("./pages/ProfilePage"));
-const BlogListPage = lazyRetry(() => import("./pages/BlogListPage"));
-const BlogPost = lazyRetry(() => import("./pages/BlogPost"));
+const Index = lazyWithReload(() => import("./pages/Index"));
+const NotFoundPage = lazyWithReload(() => import("./pages/NotFoundPage"));
+const CatalogPage = lazyWithReload(() => import("./pages/CatalogPage"));
+const WorkDetailPage = lazyWithReload(() => import("./pages/WorkDetailPage"));
+const LoginPage = lazyWithReload(() => import("./pages/LoginPage"));
+const RegisterPage = lazyWithReload(() => import("./pages/RegisterPage"));
+const ProfilePage = lazyWithReload(() => import("./pages/ProfilePage"));
+const BlogListPage = lazyWithReload(() => import("./pages/BlogListPage"));
+const BlogPost = lazyWithReload(() => import("./pages/BlogPost"));
 
-const PrivacyPolicyPage = lazyRetry(() => import("./pages/PrivacyPolicyPage"));
-const TermsOfServicePage = lazyRetry(() => import("./pages/TermsOfServicePage"));
-const UsageRulesPage = lazyRetry(() => import("./pages/UsageRulesPage"));
-const OfferPage = lazyRetry(() => import("./pages/OfferPage"));
-const Requisites = lazyRetry(() => import("./pages/Requisites"));
-const ContactsPage = lazyRetry(() => import("./pages/ContactsPage"));
+const PrivacyPolicyPage = lazyWithReload(() => import("./pages/PrivacyPolicyPage"));
+const TermsOfServicePage = lazyWithReload(() => import("./pages/TermsOfServicePage"));
+const UsageRulesPage = lazyWithReload(() => import("./pages/UsageRulesPage"));
+const OfferPage = lazyWithReload(() => import("./pages/OfferPage"));
+const Requisites = lazyWithReload(() => import("./pages/Requisites"));
+const ContactsPage = lazyWithReload(() => import("./pages/ContactsPage"));
 
-const AdminPage = lazyRetry(() => import("./pages/AdminPage"));
-const AdminBlogPage = lazyRetry(() => import("./pages/AdminBlogPage"));
-const SupportAdmin = lazyRetry(() => import("./components/SupportAdmin"));
-const SecurityLogsPage = lazyRetry(() => import("./pages/SecurityLogsPage"));
-const PointsAuditPage = lazyRetry(() => import("./pages/PointsAuditPage"));
-const GenerateReviewsPage = lazyRetry(() => import("./pages/GenerateReviewsPage"));
-const BulkGenerateReviewsPage = lazyRetry(() => import("./pages/BulkGenerateReviewsPage"));
-const AutoGenerateReviewsPage = lazyRetry(() => import("./pages/AutoGenerateReviewsPage"));
-const ReviewsCleanupPage = lazyRetry(() => import("./pages/ReviewsCleanupPage"));
-const SitemapViewPage = lazyRetry(() => import("./pages/SitemapViewPage"));
-const ModerationPage = lazyRetry(() => import("./pages/ModerationPage"));
+const AdminPage = lazyWithReload(() => import("./pages/AdminPage"));
+const AdminBlogPage = lazyWithReload(() => import("./pages/AdminBlogPage"));
+const SupportAdmin = lazyWithReload(() => import("./components/SupportAdmin"));
+const SecurityLogsPage = lazyWithReload(() => import("./pages/SecurityLogsPage"));
+const PointsAuditPage = lazyWithReload(() => import("./pages/PointsAuditPage"));
+const GenerateReviewsPage = lazyWithReload(() => import("./pages/GenerateReviewsPage"));
+const BulkGenerateReviewsPage = lazyWithReload(() => import("./pages/BulkGenerateReviewsPage"));
+const AutoGenerateReviewsPage = lazyWithReload(() => import("./pages/AutoGenerateReviewsPage"));
+const ReviewsCleanupPage = lazyWithReload(() => import("./pages/ReviewsCleanupPage"));
+const SitemapViewPage = lazyWithReload(() => import("./pages/SitemapViewPage"));
+const ModerationPage = lazyWithReload(() => import("./pages/ModerationPage"));
 
-const BuyPointsPage = lazyRetry(() => import("./pages/BuyPointsPage"));
-const UploadWorkPage = lazyRetry(() => import("./pages/UploadWorkPage"));
-const EditWorkPage = lazyRetry(() => import("./pages/EditWorkPage"));
-const AuthorMarketplacePage = lazyRetry(() => import("./pages/AuthorMarketplacePage"));
-const SyncPreviewsPage = lazyRetry(() => import("./pages/SyncPreviewsPage"));
-const FullSyncPage = lazyRetry(() => import("./pages/FullSyncPage"));
-const BatchUploadPage = lazyRetry(() => import("./pages/BatchUploadPage"));
-const ExtractPreviews = lazyRetry(() => import("./pages/ExtractPreviews"));
+const BuyPointsPage = lazyWithReload(() => import("./pages/BuyPointsPage"));
+const UploadWorkPage = lazyWithReload(() => import("./pages/UploadWorkPage"));
+const EditWorkPage = lazyWithReload(() => import("./pages/EditWorkPage"));
+const AuthorMarketplacePage = lazyWithReload(() => import("./pages/AuthorMarketplacePage"));
+const SyncPreviewsPage = lazyWithReload(() => import("./pages/SyncPreviewsPage"));
+const FullSyncPage = lazyWithReload(() => import("./pages/FullSyncPage"));
+const BatchUploadPage = lazyWithReload(() => import("./pages/BatchUploadPage"));
+const ExtractPreviews = lazyWithReload(() => import("./pages/ExtractPreviews"));
 
-const ForgotPasswordPage = lazyRetry(() => import("./pages/ForgotPasswordPage"));
-const ResetPasswordPage = lazyRetry(() => import("./pages/ResetPasswordPage"));
-const TestLoginPage = lazyRetry(() => import("./pages/TestLoginPage"));
+const ForgotPasswordPage = lazyWithReload(() => import("./pages/ForgotPasswordPage"));
+const ResetPasswordPage = lazyWithReload(() => import("./pages/ResetPasswordPage"));
+const TestLoginPage = lazyWithReload(() => import("./pages/TestLoginPage"));
 
-const PaymentPage = lazyRetry(() => import("./pages/PaymentPage"));
-const PaymentSuccessPage = lazyRetry(() => import("./pages/PaymentSuccessPage"));
-const PaymentFailedPage = lazyRetry(() => import("./pages/PaymentFailedPage"));
-const DefenseKitBuilder = lazyRetry(() => import("./pages/DefenseKitBuilder"));
+const PaymentPage = lazyWithReload(() => import("./pages/PaymentPage"));
+const PaymentSuccessPage = lazyWithReload(() => import("./pages/PaymentSuccessPage"));
+const PaymentFailedPage = lazyWithReload(() => import("./pages/PaymentFailedPage"));
+const DefenseKitBuilder = lazyWithReload(() => import("./pages/DefenseKitBuilder"));
 
-const YandexVerification = lazyRetry(() => import("./pages/YandexVerification"));
+const YandexVerification = lazyWithReload(() => import("./pages/YandexVerification"));
 
 const LoadingFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white via-slate-50/30 to-white">

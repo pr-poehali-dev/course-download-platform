@@ -6,51 +6,46 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import func2url from '../../backend/func2url.json';
-
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
-// Lazy загрузка диалогов для уменьшения начального бандла
-const AuthDialog = lazy(() => import('@/components/AuthDialog'));
-const ProfileDialog = lazy(() => import('@/components/ProfileDialog'));
-const PaymentDialog = lazy(() => import('@/components/PaymentDialog'));
-const CartDialog = lazy(() => import('@/components/CartDialog'));
-const FavoritesDialog = lazy(() => import('@/components/FavoritesDialog'));
-const PromoCodeDialog = lazy(() => import('@/components/PromoCodeDialog'));
-const ReferralDialog = lazy(() => import('@/components/ReferralDialog'));
-const ExitIntentModal = lazy(() => import('@/components/ExitIntentModal'));
-const ThemeToggle = lazy(() => import('@/components/ThemeToggle').then(m => ({ default: m.ThemeToggle })));
-const SupportPage = lazy(() => import('@/components/SupportPage'));
-const AdminPanel = lazy(() => import('@/components/AdminPanel'));
-const Breadcrumbs = lazy(() => import('@/components/Breadcrumbs'));
-
-
-// Lazy loading для некритичных секций
-const AboutSection = lazy(() => import('@/components/AboutSection'));
-const RecentlyViewed = lazy(() => import('@/components/RecentlyViewed'));
-const FAQSection = lazy(() => import('@/components/FAQSection'));
-const CookieBanner = lazy(() => import('@/components/CookieBanner'));
 import { notifyPurchaseSuccess, notifyPromoActivated } from '@/utils/emailNotifications';
 import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
-import HomeHeader from '@/components/home/HomeHeader';
-const RotatingText = lazy(() => import('@/components/home/RotatingText'));
-const NewsSection = lazy(() => import('@/components/NewsSection'));
-
-
-const SEOHeroSection = lazy(() => import('@/components/home/SEOHeroSection'));
-const WorkCategoriesSection = lazy(() => import('@/components/home/WorkCategoriesSection'));
-const SEOContentSection = lazy(() => import('@/components/home/SEOContentSection'));
-const SEOFAQSection = lazy(() => import('@/components/home/SEOFAQSection'));
-const PopularCategoriesLinks = lazy(() => import('@/components/home/PopularCategoriesLinks'));
-const CategoryLinksSection = lazy(() => import('@/components/seo/CategoryLinksSection'));
-const PopularSearches = lazy(() => import('@/components/seo/PopularSearches'));
-const BlogSection = lazy(() => import('@/components/home/BlogSection'));
-const Footer = lazy(() => import('@/components/Footer'));
 import { useScrollTracking } from '@/hooks/useScrollTracking';
+
+// Только критичные lazy imports
+import AuthDialog from '@/components/AuthDialog';
+import ProfileDialog from '@/components/ProfileDialog';
+import PaymentDialog from '@/components/PaymentDialog';
+import CartDialog from '@/components/CartDialog';
+import FavoritesDialog from '@/components/FavoritesDialog';
+import PromoCodeDialog from '@/components/PromoCodeDialog';
+import ReferralDialog from '@/components/ReferralDialog';
+import ExitIntentModal from '@/components/ExitIntentModal';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import SupportPage from '@/components/SupportPage';
+import AdminPanel from '@/components/AdminPanel';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import AboutSection from '@/components/AboutSection';
+import RecentlyViewed from '@/components/RecentlyViewed';
+import FAQSection from '@/components/FAQSection';
+import CookieBanner from '@/components/CookieBanner';
+import HomeHeader from '@/components/home/HomeHeader';
+import RotatingText from '@/components/home/RotatingText';
+import NewsSection from '@/components/NewsSection';
+import SEOHeroSection from '@/components/home/SEOHeroSection';
+import WorkCategoriesSection from '@/components/home/WorkCategoriesSection';
+import SEOContentSection from '@/components/home/SEOContentSection';
+import SEOFAQSection from '@/components/home/SEOFAQSection';
+import PopularCategoriesLinks from '@/components/home/PopularCategoriesLinks';
+import CategoryLinksSection from '@/components/seo/CategoryLinksSection';
+import PopularSearches from '@/components/seo/PopularSearches';
+import BlogSection from '@/components/home/BlogSection';
+import Footer from '@/components/Footer';
 
 
 

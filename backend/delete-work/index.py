@@ -63,16 +63,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         work_id_int = int(work_id)
         
-        # Удаляем все связанные записи в правильном порядке (учитывая внешние ключи)
-        # Сначала удаляем зависимые записи, потом purchases, потом работу
+        # Удаляем все связанные записи в правильном порядке
+        # Важно: сначала download_tokens, потом purchases, в конце works
         tables_to_clean = [
-            'download_tokens',  # Ссылается на purchases
-            'purchases',        # Ссылается на works
-            'defense_kits',
-            'favorites', 
-            'reviews',
-            'user_downloads',
-            'work_stats'
+            'download_tokens',  # Связан с work_id
+            'defense_kits',     # Связан с work_id
+            'favorites',        # Связан с work_id
+            'reviews',          # Связан с work_id
+            'user_downloads',   # Связан с work_id
+            'work_stats',       # Связан с work_id
+            'purchases'         # ПОСЛЕДНИЙ перед works (ссылается на works)
         ]
         
         for table in tables_to_clean:

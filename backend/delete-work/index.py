@@ -63,30 +63,37 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     try:
         work_id_int = int(work_id)
         
-        # Удаляем все связанные записи (игнорируем ошибки для несуществующих записей)
+        # Удаляем все связанные записи в правильном порядке (учитывая внешние ключи)
+        # Сначала удаляем зависимые записи, потом purchases, потом работу
         tables_to_clean = [
+            'download_tokens',  # Ссылается на purchases
+            'purchases',        # Ссылается на works
             'defense_kits',
             'favorites', 
             'reviews',
             'user_downloads',
-            'work_stats',
-            'download_tokens',
-            'purchases'
+            'work_stats'
         ]
         
         for table in tables_to_clean:
             try:
                 cursor.execute(
-                    f"DELETE FROM t_p63326274_course_download_plat.{table} WHERE work_id = {work_id_int}"
+                    f"DELETE FROM t_p63326274_course_download_plat.{table} WHERE work_id = %s",
+                    (work_id_int,)
                 )
+                deleted_rows = cursor.rowcount
+                if deleted_rows > 0:
+                    print(f"✅ Deleted {deleted_rows} rows from {table}")
             except Exception as table_error:
-                # Игнорируем ошибки для таблиц без данных
-                print(f"Warning: Could not delete from {table}: {table_error}")
+                print(f"⚠️ Could not delete from {table}: {table_error}")
+                # Продолжаем, даже если есть ошибки
         
         # Наконец удаляем саму работу
         cursor.execute(
-            f"DELETE FROM t_p63326274_course_download_plat.works WHERE id = {work_id_int}"
+            "DELETE FROM t_p63326274_course_download_plat.works WHERE id = %s",
+            (work_id_int,)
         )
+        print(f"✅ Work {work_id_int} deleted successfully")
         
         conn.commit()
     except Exception as e:

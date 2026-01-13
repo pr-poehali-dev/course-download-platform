@@ -5,7 +5,7 @@
       "method": "POST",
       "path": "/?action=request-password-reset",
       "body": {
-        "email": "test@example.com"
+        "email": "rekrutivmaksim@gmail.com"
       },
       "expectedStatus": 200,
       "expectedBody": {

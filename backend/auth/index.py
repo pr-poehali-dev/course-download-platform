@@ -33,7 +33,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
     
-    path = event.get('queryStringParameters', {}).get('action', 'login')
+    query_params = event.get('queryStringParameters') or {}
+    path = query_params.get('action', 'login')
+    
+    print(f"DEBUG: method={method}, path={path}, query_params={query_params}")
     
     if method == 'POST':
         if path == 'register':
@@ -99,6 +102,10 @@ def send_email(to_email: str, subject: str, html_body: str) -> bool:
         resend_key = os.environ.get('RESEND_API_KEY')
         mail_from = os.environ.get('MAIL_FROM', 'TechForma <onboarding@resend.dev>')
         
+        print(f"📧 Attempting to send email to {to_email}")
+        print(f"📧 MAIL_FROM: {mail_from}")
+        print(f"📧 RESEND_API_KEY present: {bool(resend_key)}")
+        
         if not resend_key:
             print("❌ RESEND_API_KEY not configured")
             return False
@@ -113,10 +120,11 @@ def send_email(to_email: str, subject: str, html_body: str) -> bool:
         }
         
         email_response = resend.Emails.send(params)
-        print(f"✅ Email sent to {to_email}, id={email_response.get('id')}")
+        print(f"✅ Email sent to {to_email}, response={email_response}")
         return True
     except Exception as e:
-        print(f"❌ Email error: {repr(e)}")
+        print(f"❌ Email error: {type(e).__name__}: {str(e)}")
+        print(f"❌ Full error: {repr(e)}")
         return False
 
 def _norm(s: str) -> str:
@@ -373,6 +381,7 @@ def request_password_reset(event: Dict[str, Any]) -> Dict[str, Any]:
     """Генерация временного пароля и отправка на email"""
     body_data = json.loads(event.get('body', '{}'))
     email = _norm_email(body_data.get('email', ''))
+    print(f"🔐 Password reset request for: {email}")
     
     if not email:
         return {

@@ -316,15 +316,18 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     cur = conn.cursor()
     
     try:
+        print(f"🔍 Searching user in DB: {username}")
         cur.execute(
             """
             SELECT id, username, email, password_hash, is_admin, referral_code 
             FROM t_p63326274_course_download_plat.users 
-            WHERE lower(username) = lower(%s) OR lower(email) = lower(%s)
+            WHERE username = %s OR email = %s
             """,
             (username, username)
         )
+        print(f"🔍 Query executed, fetching result...")
         user = cur.fetchone()
+        print(f"🔍 Fetch result: {user is not None}")
         
         if not user:
             cur.close()

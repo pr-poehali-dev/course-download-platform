@@ -580,7 +580,16 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
 
 def change_password(event: Dict[str, Any]) -> Dict[str, Any]:
     """Смена пароля пользователя"""
-    auth_token = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
+    headers = event.get('headers', {})
+    auth_token = (
+        headers.get('X-Auth-Token') or 
+        headers.get('x-auth-token') or
+        headers.get('X-Authorization', '').replace('Bearer ', '') or
+        headers.get('x-authorization', '').replace('Bearer ', '')
+    )
+    
+    print(f"🔑 Change password: headers={headers}")
+    print(f"🔑 Token found: {bool(auth_token)}")
     
     if not auth_token:
         return {

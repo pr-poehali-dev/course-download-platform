@@ -442,20 +442,106 @@ def request_password_reset(event: Dict[str, Any]) -> Dict[str, Any]:
         conn.commit()
         
         html_body = f"""
+        <!DOCTYPE html>
         <html>
-          <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-            <div style="max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-              <h2 style="color: #2563eb;">Восстановление пароля Tech Forma</h2>
-              <p>Здравствуйте, <strong>{username}</strong>!</p>
-              <p>Ваш новый временный пароль:</p>
-              <div style="background: #f3f4f6; padding: 15px; border-radius: 6px; margin: 20px 0; font-family: monospace; font-size: 18px; text-align: center; letter-spacing: 2px;">
-                <strong>{new_password}</strong>
-              </div>
-              <p style="color: #dc2626; font-weight: bold;">⚠️ Рекомендуем сменить пароль после входа в личном кабинете</p>
-              <p>Если вы не запрашивали восстановление пароля, проигнорируйте это письмо.</p>
-              <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
-              <p style="font-size: 12px; color: #666;">С уважением,<br>Команда Tech Forma</p>
-            </div>
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="min-height: 100vh;">
+              <tr>
+                <td align="center" style="padding: 40px 20px;">
+                  <!-- Main Container -->
+                  <table width="600" cellpadding="0" cellspacing="0" style="background: #ffffff; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;">
+                    <!-- Header with Gradient -->
+                    <tr>
+                      <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 50px 40px; text-align: center;">
+                        <div style="display: inline-block; background: rgba(255,255,255,0.2); width: 80px; height: 80px; border-radius: 50%; margin-bottom: 20px; line-height: 80px; font-size: 40px; backdrop-filter: blur(10px);">
+                          🔐
+                        </div>
+                        <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 700; letter-spacing: -0.5px;">Восстановление доступа</h1>
+                        <p style="margin: 10px 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">Tech Forma — Инженерная платформа</p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                      <td style="padding: 50px 40px;">
+                        <p style="margin: 0 0 25px; font-size: 18px; color: #333; line-height: 1.6;">
+                          Здравствуйте, <strong style="color: #667eea;">{username}</strong>!
+                        </p>
+                        
+                        <p style="margin: 0 0 30px; font-size: 16px; color: #555; line-height: 1.6;">
+                          Мы получили запрос на восстановление пароля для вашего аккаунта. Ваш новый временный пароль:
+                        </p>
+                        
+                        <!-- Password Box -->
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 35px;">
+                          <tr>
+                            <td style="background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%); border: 2px dashed #667eea; border-radius: 12px; padding: 30px 20px; text-align: center;">
+                              <div style="font-family: 'Courier New', monospace; font-size: 28px; font-weight: bold; color: #333; letter-spacing: 3px; word-break: break-all;">
+                                {new_password}
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                        
+                        <!-- Warning Box -->
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 30px;">
+                          <tr>
+                            <td style="background: linear-gradient(135deg, #fff3cd 0%, #ffe5a0 100%); border-left: 4px solid #ff9800; border-radius: 8px; padding: 20px;">
+                              <p style="margin: 0; font-size: 15px; color: #856404; line-height: 1.5;">
+                                <strong>⚠️ Важно:</strong> Этот пароль временный. После входа в систему обязательно смените его на постоянный в настройках личного кабинета.
+                              </p>
+                            </td>
+                          </tr>
+                        </table>
+                        
+                        <!-- CTA Button -->
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 30px;">
+                          <tr>
+                            <td align="center">
+                              <a href="https://preview--course-download-platform.poehali.dev/" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 10px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); transition: transform 0.2s;">
+                                Войти в систему →
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+                        
+                        <p style="margin: 0; font-size: 14px; color: #777; line-height: 1.6;">
+                          Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо. Ваш аккаунт останется в безопасности.
+                        </p>
+                      </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                      <td style="background: #f8f9fa; padding: 30px 40px; border-top: 1px solid #e9ecef;">
+                        <p style="margin: 0 0 10px; font-size: 14px; color: #666; text-align: center;">
+                          С уважением,<br>
+                          <strong style="color: #333;">Команда Tech Forma</strong>
+                        </p>
+                        <p style="margin: 0; font-size: 12px; color: #999; text-align: center;">
+                          Это автоматическое письмо. Пожалуйста, не отвечайте на него.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                  
+                  <!-- Bottom Spacing -->
+                  <table width="600" cellpadding="0" cellspacing="0" style="margin-top: 20px;">
+                    <tr>
+                      <td align="center" style="padding: 20px;">
+                        <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.8);">
+                          © 2026 Tech Forma. Все права защищены.
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </table>
           </body>
         </html>
         """

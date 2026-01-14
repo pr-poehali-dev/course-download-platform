@@ -36,7 +36,7 @@ export default function ChangePasswordModal({ isOpen, onClose, isTemporaryPasswo
     setLoading(true);
 
     try {
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('auth_token');
       console.log('🔐 Change password request:', { token, isTemporaryPassword });
       
       const response = await fetch('https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46?action=change-password', {

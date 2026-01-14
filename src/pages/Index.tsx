@@ -131,30 +131,25 @@ export default function Index() {
 
   useEffect(() => {
     const initAuth = async () => {
+      // Сразу берём из кэша для быстрого старта
+      const cachedUserStr = localStorage.getItem('user');
+      const cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null;
+      
+      if (cachedUser) {
+        setCurrentUser(cachedUser);
+      }
+      
+      // В фоне проверяем актуальность токена (не блокируем UI)
       try {
-        // Сначала проверяем localStorage на случай если backend недоступен
-        const cachedUserStr = localStorage.getItem('user');
-        const cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null;
-        
-        // Пытаемся получить свежие данные
         const freshUser = await authService.verify();
-        
-        // Используем свежие данные если есть, иначе кэш
-        const currentUser = freshUser || cachedUser;
-        
-        setCurrentUser(currentUser);
-        
-        // Обновляем кэш если получили свежие данные
         if (freshUser) {
+          setCurrentUser(freshUser);
           localStorage.setItem('user', JSON.stringify(freshUser));
         }
       } catch (error) {
         console.error('Auth verification failed:', error);
-        // При ошибке пытаемся использовать кэш
-        const cachedUserStr = localStorage.getItem('user');
-        if (cachedUserStr) {
-          setCurrentUser(JSON.parse(cachedUserStr));
-        } else {
+        // Если токен невалиден и нет кэша - разлогиниваем
+        if (!cachedUser) {
           setCurrentUser(null);
         }
       }
@@ -227,6 +222,7 @@ export default function Index() {
     try {
       const data = await authService.login(user, password);
       setCurrentUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
       setAuthDialogOpen(false);
       toast({
         title: 'Вход выполнен',

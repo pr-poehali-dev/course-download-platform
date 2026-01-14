@@ -67,7 +67,7 @@ export const authService = {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 сек таймаут
+      const timeoutId = setTimeout(() => controller.abort(), 2000); // 2 сек таймаут
       
       const response = await fetch(`${AUTH_API}?action=verify`, {
         method: 'GET',

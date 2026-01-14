@@ -17,35 +17,27 @@ import SEO from '@/components/SEO';
 import { Helmet } from 'react-helmet-async';
 import { useScrollTracking } from '@/hooks/useScrollTracking';
 
-// Только критичные lazy imports
-import AuthDialog from '@/components/AuthDialog';
-import ProfileDialog from '@/components/ProfileDialog';
-import PaymentDialog from '@/components/PaymentDialog';
-import CartDialog from '@/components/CartDialog';
-import FavoritesDialog from '@/components/FavoritesDialog';
-import PromoCodeDialog from '@/components/PromoCodeDialog';
-import ReferralDialog from '@/components/ReferralDialog';
-import ExitIntentModal from '@/components/ExitIntentModal';
+// Критичные компоненты — загружаем сразу
 import { ThemeToggle } from '@/components/ThemeToggle';
-import SupportPage from '@/components/SupportPage';
-import AdminPanel from '@/components/AdminPanel';
-import Breadcrumbs from '@/components/Breadcrumbs';
-import AboutSection from '@/components/AboutSection';
-import RecentlyViewed from '@/components/RecentlyViewed';
-import FAQSection from '@/components/FAQSection';
-import CookieBanner from '@/components/CookieBanner';
-import HomeHeader from '@/components/home/HomeHeader';
-import RotatingText from '@/components/home/RotatingText';
-import NewsSection from '@/components/NewsSection';
 import SEOHeroSection from '@/components/home/SEOHeroSection';
-import WorkCategoriesSection from '@/components/home/WorkCategoriesSection';
-import SEOContentSection from '@/components/home/SEOContentSection';
-import SEOFAQSection from '@/components/home/SEOFAQSection';
-import PopularCategoriesLinks from '@/components/home/PopularCategoriesLinks';
-import CategoryLinksSection from '@/components/seo/CategoryLinksSection';
-import PopularSearches from '@/components/seo/PopularSearches';
-import BlogSection from '@/components/home/BlogSection';
 import Footer from '@/components/Footer';
+
+// Все остальные через lazy для быстрой загрузки
+const AuthDialog = lazy(() => import('@/components/AuthDialog'));
+const ProfileDialog = lazy(() => import('@/components/ProfileDialog'));
+const PaymentDialog = lazy(() => import('@/components/PaymentDialog'));
+const CartDialog = lazy(() => import('@/components/CartDialog'));
+const FavoritesDialog = lazy(() => import('@/components/FavoritesDialog'));
+const PromoCodeDialog = lazy(() => import('@/components/PromoCodeDialog'));
+const ReferralDialog = lazy(() => import('@/components/ReferralDialog'));
+const ExitIntentModal = lazy(() => import('@/components/ExitIntentModal'));
+const AboutSection = lazy(() => import('@/components/AboutSection'));
+const NewsSection = lazy(() => import('@/components/NewsSection'));
+const CategoryLinksSection = lazy(() => import('@/components/seo/CategoryLinksSection'));
+const PopularSearches = lazy(() => import('@/components/seo/PopularSearches'));
+const BlogSection = lazy(() => import('@/components/home/BlogSection'));
+const SEOContentSection = lazy(() => import('@/components/home/SEOContentSection'));
+const CookieBanner = lazy(() => import('@/components/CookieBanner'));
 
 
 
@@ -94,93 +86,104 @@ export default function Index() {
   const userBalance = currentUser?.balance || 0;
   const availableWorks = realWorks.filter(work => (work.price_points || work.price || 0) <= userBalance).length;
 
-  // ✅ Функция для обновления баланса из backend
-  const refreshBalance = async () => {
-    try {
-      const freshUser = await authService.verify();
-      if (freshUser) {
-        setCurrentUser(freshUser);
-        localStorage.setItem('user', JSON.stringify(freshUser));
-        toast({
-          title: '✅ Баланс обновлён',
-          description: `Текущий баланс: ${freshUser.balance} баллов`,
-          duration: 2000,
-        });
-      } else {
-        // Если не удалось получить данные с сервера, используем кэш
-        const cachedUserStr = localStorage.getItem('user');
-        if (cachedUserStr) {
-          const cachedUser = JSON.parse(cachedUserStr);
-          toast({
-            title: '⚠️ Кэшированные данные',
-            description: `Баланс (кэш): ${cachedUser.balance} баллов`,
-            duration: 2000,
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Failed to refresh balance:', error);
-      toast({
-        title: '❌ Ошибка',
-        description: 'Не удалось обновить баланс',
-        variant: 'destructive',
-        duration: 2000,
-      });
-    }
-  };
-
-  useEffect(() => {
-    const initAuth = async () => {
-      // Сразу берём из кэша для быстрого старта
-      const cachedUserStr = localStorage.getItem('user');
-      const cachedUser = cachedUserStr ? JSON.parse(cachedUserStr) : null;
-      
-      if (cachedUser) {
-        setCurrentUser(cachedUser);
-      }
-      
-      // В фоне проверяем актуальность токена (не блокируем UI)
-      try {
-        const freshUser = await authService.verify();
+  // ✅ Функция для обновления баланса из backend (не блокирует UI)
+  const refreshBalance = () => {
+    toast({
+      title: '🔄 Обновление...',
+      description: 'Получаем актуальный баланс',
+      duration: 1000,
+    });
+    
+    authService.verify()
+      .then(freshUser => {
         if (freshUser) {
           setCurrentUser(freshUser);
           localStorage.setItem('user', JSON.stringify(freshUser));
+          toast({
+            title: '✅ Баланс обновлён',
+            description: `Текущий баланс: ${freshUser.balance} баллов`,
+            duration: 2000,
+          });
+        } else {
+          const cachedUserStr = localStorage.getItem('user');
+          if (cachedUserStr) {
+            const cachedUser = JSON.parse(cachedUserStr);
+            toast({
+              title: '⚠️ Кэшированные данные',
+              description: `Баланс (кэш): ${cachedUser.balance} баллов`,
+              duration: 2000,
+            });
+          }
         }
-      } catch (error) {
-        console.error('Auth verification failed:', error);
-        // Если токен невалиден и нет кэша - разлогиниваем
-        if (!cachedUser) {
-          setCurrentUser(null);
-        }
+      })
+      .catch(error => {
+        console.error('Failed to refresh balance:', error);
+        toast({
+          title: '❌ Ошибка',
+          description: 'Не удалось обновить баланс',
+          variant: 'destructive',
+          duration: 2000,
+        });
+      });
+  };
+
+  useEffect(() => {
+    // Мгновенно показываем кэш (синхронно, без async)
+    const cachedUserStr = localStorage.getItem('user');
+    if (cachedUserStr) {
+      try {
+        setCurrentUser(JSON.parse(cachedUserStr));
+      } catch (e) {
+        console.error('Failed to parse cached user:', e);
       }
-    };
-    initAuth();
+    }
+    
+    // В фоне (через 100мс) проверяем токен — не блокируем первый рендер
+    const verifyTimer = setTimeout(() => {
+      authService.verify()
+        .then(freshUser => {
+          if (freshUser) {
+            setCurrentUser(freshUser);
+            localStorage.setItem('user', JSON.stringify(freshUser));
+          } else if (!cachedUserStr) {
+            setCurrentUser(null);
+          }
+        })
+        .catch(err => {
+          console.error('Auth verification failed:', err);
+        });
+    }, 100);
+    
+    return () => clearTimeout(verifyTimer);
   }, []);
 
   useEffect(() => {
-    const loadWorks = async () => {
+    // Мгновенно показываем кэш (синхронно)
+    const cachedWorks = sessionStorage.getItem('works_cache');
+    if (cachedWorks) {
       try {
-        // Проверяем кэш
-        const cachedWorks = sessionStorage.getItem('works_cache');
-        if (cachedWorks) {
-          setRealWorks(JSON.parse(cachedWorks));
-          setWorksLoading(false);
-        }
-        
-        // Загружаем с сервера
-        const response = await fetch(func2url.works);
-        const data = await response.json();
-        if (data.works) {
-          setRealWorks(data.works);
-          sessionStorage.setItem('works_cache', JSON.stringify(data.works));
-        }
-      } catch (error) {
-        console.error('Failed to load works:', error);
-      } finally {
+        setRealWorks(JSON.parse(cachedWorks));
         setWorksLoading(false);
+      } catch (e) {
+        console.error('Failed to parse cached works:', e);
       }
-    };
-    loadWorks();
+    }
+    
+    // В фоне обновляем данные (через 200мс, чтобы не блокировать UI)
+    const loadTimer = setTimeout(() => {
+      fetch(func2url.works)
+        .then(res => res.json())
+        .then(data => {
+          if (data.works) {
+            setRealWorks(data.works);
+            sessionStorage.setItem('works_cache', JSON.stringify(data.works));
+          }
+        })
+        .catch(error => console.error('Failed to load works:', error))
+        .finally(() => setWorksLoading(false));
+    }, 200);
+    
+    return () => clearTimeout(loadTimer);
   }, []);
 
   useEffect(() => {

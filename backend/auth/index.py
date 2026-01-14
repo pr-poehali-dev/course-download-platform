@@ -319,7 +319,7 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
         print(f"🔍 Searching user in DB: {username}")
         cur.execute(
             """
-            SELECT id, username, email, password_hash, is_admin, referral_code 
+            SELECT id, username, email, password_hash, role, referral_code, balance
             FROM t_p63326274_course_download_plat.users 
             WHERE username = %s OR email = %s
             """,
@@ -339,7 +339,8 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        user_id, db_username, db_email, password_hash, is_admin, referral_code = user
+        user_id, db_username, db_email, password_hash, role, referral_code, balance = user
+        is_admin = (role == 'admin')
         
         print(f"✅ User found: id={user_id}, username={db_username}")
         print(f"🔑 Password check: input='{password}' (len={len(password)})")
@@ -372,7 +373,8 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
                     'username': db_username,
                     'email': db_email,
                     'is_admin': is_admin,
-                    'referral_code': referral_code
+                    'referral_code': referral_code,
+                    'balance': balance
                 }
             }),
             'isBase64Encoded': False
@@ -509,7 +511,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
         
         cur.execute(
             """
-            SELECT id, username, email, is_admin, balance, referral_code 
+            SELECT id, username, email, role, balance, referral_code 
             FROM t_p63326274_course_download_plat.users 
             WHERE id = %s
             """,
@@ -527,7 +529,8 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        db_user_id, db_username, db_email, is_admin, balance, referral_code = user
+        db_user_id, db_username, db_email, role, balance, referral_code = user
+        is_admin = (role == 'admin')
         
         cur.close()
         conn.close()

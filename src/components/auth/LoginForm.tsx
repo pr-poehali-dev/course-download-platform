@@ -6,14 +6,15 @@ import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
 
 interface LoginFormProps {
-  onLogin: (username: string, password: string) => void;
+  onLogin: (username: string, password: string) => Promise<void> | void;
   onForgotPassword: () => void;
 }
 
 export default function LoginForm({ onLogin, onForgotPassword }: LoginFormProps) {
   const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!loginData.email || !loginData.password) {
@@ -25,7 +26,12 @@ export default function LoginForm({ onLogin, onForgotPassword }: LoginFormProps)
       return;
     }
 
-    onLogin(loginData.email, loginData.password);
+    setLoading(true);
+    try {
+      await onLogin(loginData.email, loginData.password);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -63,9 +69,18 @@ export default function LoginForm({ onLogin, onForgotPassword }: LoginFormProps)
         </Button>
       </div>
 
-      <Button type="submit" className="w-full">
-        <Icon name="LogIn" size={18} className="mr-2" />
-        Войти
+      <Button type="submit" className="w-full" disabled={loading}>
+        {loading ? (
+          <>
+            <Icon name="Loader2" size={18} className="mr-2 animate-spin" />
+            Вход...
+          </>
+        ) : (
+          <>
+            <Icon name="LogIn" size={18} className="mr-2" />
+            Войти
+          </>
+        )}
       </Button>
     </form>
   );

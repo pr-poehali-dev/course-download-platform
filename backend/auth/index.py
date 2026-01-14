@@ -376,6 +376,8 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
         }
         
     except Exception as e:
+        print(f"❌ LOGIN ERROR: {type(e).__name__}: {str(e)}")
+        print(f"❌ Full error: {repr(e)}")
         cur.close()
         conn.close()
         return {

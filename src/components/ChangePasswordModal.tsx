@@ -37,6 +37,8 @@ export default function ChangePasswordModal({ isOpen, onClose, isTemporaryPasswo
 
     try {
       const token = localStorage.getItem('authToken');
+      console.log('🔐 Change password request:', { token, isTemporaryPassword });
+      
       const response = await fetch('https://functions.poehali.dev/48e96862-17ab-4f46-a6b8-f123b2e32e46?action=change-password', {
         method: 'POST',
         headers: {
@@ -51,9 +53,22 @@ export default function ChangePasswordModal({ isOpen, onClose, isTemporaryPasswo
         }),
       });
 
-      const data = await response.json();
+      console.log('📡 Response status:', response.status);
+      const responseText = await response.text();
+      console.log('📡 Response text:', responseText);
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('❌ JSON parse error:', parseError);
+        setError('Неверный формат ответа сервера');
+        setLoading(false);
+        return;
+      }
 
       if (!response.ok) {
+        console.error('❌ Response not ok:', data);
         setError(data.error || 'Ошибка смены пароля');
         setLoading(false);
         return;
@@ -73,6 +88,7 @@ export default function ChangePasswordModal({ isOpen, onClose, isTemporaryPasswo
       // Перезагружаем страницу чтобы убрать предупреждение
       window.location.reload();
     } catch (err) {
+      console.error('❌ Change password error:', err);
       setError('Ошибка соединения с сервером');
       setLoading(false);
     }

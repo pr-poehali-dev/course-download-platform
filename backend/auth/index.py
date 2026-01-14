@@ -447,6 +447,42 @@ def request_password_reset(event: Dict[str, Any]) -> Dict[str, Any]:
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              @keyframes slideDown {{
+                from {{ opacity: 0; transform: translateX(-50%) translateY(-20px); }}
+                to {{ opacity: 1; transform: translateX(-50%) translateY(0); }}
+              }}
+              @keyframes slideUp {{
+                from {{ opacity: 1; transform: translateX(-50%) translateY(0); }}
+                to {{ opacity: 0; transform: translateX(-50%) translateY(-20px); }}
+              }}
+            </style>
+            <script>
+              function copyPassword() {{
+                const password = "{new_password}";
+                const tempInput = document.createElement('input');
+                tempInput.value = password;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                
+                try {{
+                  document.execCommand('copy');
+                  const notification = document.createElement('div');
+                  notification.innerHTML = '✅ Пароль скопирован!';
+                  notification.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px 32px; border-radius: 10px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4); font-weight: 600; z-index: 10000; animation: slideDown 0.3s ease;';
+                  document.body.appendChild(notification);
+                  
+                  setTimeout(() => {{
+                    notification.style.animation = 'slideUp 0.3s ease';
+                    setTimeout(() => document.body.removeChild(notification), 300);
+                  }}, 2000);
+                }} catch (err) {{
+                  console.error('Ошибка:', err);
+                }}
+                
+                document.body.removeChild(tempInput);
+              }}
+            </script>
           </head>
           <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
             <table width="100%" cellpadding="0" cellspacing="0" style="min-height: 100vh;">
@@ -477,12 +513,25 @@ def request_password_reset(event: Dict[str, Any]) -> Dict[str, Any]:
                         </p>
                         
                         <!-- Password Box -->
-                        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 35px;">
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 15px;">
                           <tr>
-                            <td style="background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%); border: 2px dashed #667eea; border-radius: 12px; padding: 30px 20px; text-align: center;">
+                            <td style="background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%); border: 2px dashed #667eea; border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s;" onclick="copyPassword()" onmouseover="this.style.borderColor='#764ba2'; this.style.boxShadow='0 4px 15px rgba(102, 126, 234, 0.3)'" onmouseout="this.style.borderColor='#667eea'; this.style.boxShadow='none'">
                               <div style="font-family: 'Courier New', monospace; font-size: 28px; font-weight: bold; color: #333; letter-spacing: 3px; word-break: break-all;">
                                 {new_password}
                               </div>
+                            </td>
+                          </tr>
+                        </table>
+                        
+                        <!-- Copy Hint -->
+                        <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 35px;">
+                          <tr>
+                            <td align="center">
+                              <p style="margin: 0; font-size: 13px; color: #999;">
+                                <span style="display: inline-block; background: #e8ecf1; padding: 8px 16px; border-radius: 20px; cursor: pointer;" onclick="copyPassword()">
+                                  📋 Нажмите на пароль, чтобы скопировать
+                                </span>
+                              </p>
                             </td>
                           </tr>
                         </table>

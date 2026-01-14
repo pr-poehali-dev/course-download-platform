@@ -45,6 +45,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             return login_user(event)
         elif path == 'request-password-reset':
             return request_password_reset(event)
+        elif path == 'change-password':
+            return change_password(event)
     
     if method == 'GET' and path == 'verify':
         return verify_token(event)
@@ -319,7 +321,7 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
         print(f"🔍 Searching user in DB: {username}")
         cur.execute(
             """
-            SELECT id, username, email, password_hash, role, referral_code, balance
+            SELECT id, username, email, password_hash, role, referral_code, balance, is_temporary_password
             FROM t_p63326274_course_download_plat.users 
             WHERE username = %s OR email = %s
             """,
@@ -339,7 +341,7 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        user_id, db_username, db_email, password_hash, role, referral_code, balance = user
+        user_id, db_username, db_email, password_hash, role, referral_code, balance, is_temporary_password = user
         is_admin = (role == 'admin')
         
         print(f"✅ User found: id={user_id}, username={db_username}")
@@ -374,7 +376,8 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
                     'email': db_email,
                     'is_admin': is_admin,
                     'referral_code': referral_code,
-                    'balance': balance
+                    'balance': balance,
+                    'is_temporary_password': is_temporary_password
                 }
             }),
             'isBase64Encoded': False
@@ -432,7 +435,7 @@ def request_password_reset(event: Dict[str, Any]) -> Dict[str, Any]:
         password_hash = hash_password(new_password)
         
         cur.execute(
-            "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s WHERE id = %s",
+            "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s, is_temporary_password = TRUE WHERE id = %s",
             (password_hash, user_id)
         )
         
@@ -511,7 +514,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
         
         cur.execute(
             """
-            SELECT id, username, email, role, balance, referral_code 
+            SELECT id, username, email, role, balance, referral_code, is_temporary_password
             FROM t_p63326274_course_download_plat.users 
             WHERE id = %s
             """,
@@ -529,7 +532,7 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
-        db_user_id, db_username, db_email, role, balance, referral_code = user
+        db_user_id, db_username, db_email, role, balance, referral_code, is_temporary_password = user
         is_admin = (role == 'admin')
         
         cur.close()
@@ -545,7 +548,8 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
                     'email': db_email,
                     'is_admin': is_admin,
                     'balance': balance,
-                    'referral_code': referral_code
+                    'referral_code': referral_code,
+                    'is_temporary_password': is_temporary_password
                 }
             }),
             'isBase64Encoded': False
@@ -571,5 +575,111 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
             'statusCode': 401,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
             'body': json.dumps({'error': 'Invalid token'}),
+            'isBase64Encoded': False
+        }
+
+def change_password(event: Dict[str, Any]) -> Dict[str, Any]:
+    """Смена пароля пользователя"""
+    auth_token = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
+    
+    if not auth_token:
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Требуется авторизация'}),
+            'isBase64Encoded': False
+        }
+    
+    try:
+        secret = os.environ.get('JWT_SECRET')
+        payload = jwt.decode(auth_token, secret, algorithms=['HS256'])
+        user_id = payload.get('user_id')
+    except:
+        return {
+            'statusCode': 401,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Неверный токен'}),
+            'isBase64Encoded': False
+        }
+    
+    body_data = json.loads(event.get('body', '{}'))
+    current_password = body_data.get('current_password', '')
+    new_password = body_data.get('new_password', '')
+    
+    if not new_password:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Введите новый пароль'}),
+            'isBase64Encoded': False
+        }
+    
+    if len(new_password) < 8:
+        return {
+            'statusCode': 400,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Пароль должен быть не короче 8 символов'}),
+            'isBase64Encoded': False
+        }
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    try:
+        cur.execute(
+            "SELECT password_hash, is_temporary_password FROM t_p63326274_course_download_plat.users WHERE id = %s",
+            (user_id,)
+        )
+        user = cur.fetchone()
+        
+        if not user:
+            cur.close()
+            conn.close()
+            return {
+                'statusCode': 404,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Пользователь не найден'}),
+                'isBase64Encoded': False
+            }
+        
+        password_hash, is_temporary_password = user
+        
+        if current_password and not is_temporary_password:
+            if not verify_password(current_password, password_hash):
+                cur.close()
+                conn.close()
+                return {
+                    'statusCode': 401,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'error': 'Неверный текущий пароль'}),
+                    'isBase64Encoded': False
+                }
+        
+        new_password_hash = hash_password(new_password)
+        
+        cur.execute(
+            "UPDATE t_p63326274_course_download_plat.users SET password_hash = %s, is_temporary_password = FALSE WHERE id = %s",
+            (new_password_hash, user_id)
+        )
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        
+        return {
+            'statusCode': 200,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'success': True, 'message': 'Пароль успешно изменён'}),
+            'isBase64Encoded': False
+        }
+        
+    except Exception as e:
+        conn.rollback()
+        cur.close()
+        conn.close()
+        return {
+            'statusCode': 500,
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': f'Ошибка сервера: {str(e)}'}),
             'isBase64Encoded': False
         }

@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { HelmetProvider } from 'react-helmet-async';
 import SEOGuard from '@/components/SEOGuard';
+import AppWrapper from '@/components/AppWrapper';
 
 // Улучшенная загрузка с очисткой кэша при ошибке
 const lazyWithReload = (componentImport: () => Promise<any>) => 
@@ -147,8 +148,9 @@ const App = () => (
           <Sonner />
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <SEOGuard />
-            <ErrorBoundary>
-              <Suspense fallback={<LoadingFallback />}>
+            <AppWrapper>
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingFallback />}>
                 <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
@@ -198,6 +200,7 @@ const App = () => (
               </Routes>
             </Suspense>
           </ErrorBoundary>
+            </AppWrapper>
           </BrowserRouter>
     </TooltipProvider>
     </ThemeProvider>

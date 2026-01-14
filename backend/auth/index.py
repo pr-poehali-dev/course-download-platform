@@ -302,6 +302,8 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
     username = _norm_username(body_data.get('username', ''))
     password = body_data.get('password', '')
     
+    print(f"🔐 LOGIN attempt: username='{username}', password_length={len(password)}")
+    
     if not username or not password:
         return {
             'statusCode': 400,
@@ -336,7 +338,11 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
         
         user_id, db_username, db_email, password_hash, is_admin, referral_code = user
         
+        print(f"✅ User found: id={user_id}, username={db_username}")
+        print(f"🔑 Password check: input='{password}' (len={len(password)})")
+        
         if not verify_password(password, password_hash):
+            print(f"❌ Password verification FAILED")
             cur.close()
             conn.close()
             return {
@@ -345,6 +351,8 @@ def login_user(event: Dict[str, Any]) -> Dict[str, Any]:
                 'body': json.dumps({'error': 'Неверное имя пользователя или пароль'}),
                 'isBase64Encoded': False
             }
+        
+        print(f"✅ Password verification SUCCESS")
         
         cur.close()
         conn.close()

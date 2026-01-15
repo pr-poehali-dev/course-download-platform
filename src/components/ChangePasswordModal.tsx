@@ -43,10 +43,9 @@ export default function ChangePasswordModal({ isOpen, onClose, isTemporaryPasswo
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token || ''}`,
           'X-Auth-Token': token || '',
+          'X-Authorization': `Bearer ${token || ''}`,
         },
-        credentials: 'include',
         body: JSON.stringify({
           current_password: isTemporaryPassword ? '' : currentPassword,
           new_password: newPassword,

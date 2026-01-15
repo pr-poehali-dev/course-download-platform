@@ -716,6 +716,8 @@ def verify_token(event: Dict[str, Any]) -> Dict[str, Any]:
 def change_password(event: Dict[str, Any]) -> Dict[str, Any]:
     """Смена пароля пользователя"""
     headers = event.get('headers', {})
+    
+    # Cloud Provider фильтрует Authorization, поэтому читаем X-Authorization
     auth_token = (
         headers.get('X-Auth-Token') or 
         headers.get('x-auth-token') or
@@ -723,8 +725,9 @@ def change_password(event: Dict[str, Any]) -> Dict[str, Any]:
         headers.get('x-authorization', '').replace('Bearer ', '')
     )
     
-    print(f"🔑 Change password: headers={headers}")
-    print(f"🔑 Token found: {bool(auth_token)}")
+    print(f"🔑 Change password request")
+    print(f"🔑 Headers: {list(headers.keys())}")
+    print(f"🔑 Token found: {bool(auth_token)}, length: {len(auth_token) if auth_token else 0}")
     
     if not auth_token:
         return {

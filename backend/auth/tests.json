@@ -12,6 +12,19 @@
         "message": "string"
       },
       "bodyMatcher": "partial"
+    },
+    {
+      "name": "Change password requires auth",
+      "method": "POST",
+      "path": "/?action=change-password",
+      "body": {
+        "new_password": "NewPassword123"
+      },
+      "expectedStatus": 401,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
     }
   ]
 }

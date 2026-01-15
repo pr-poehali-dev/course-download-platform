@@ -12,6 +12,7 @@ import psycopg2
 from typing import Dict, Any
 from yookassa import Configuration, Payment
 import urllib.request
+import urllib.error
 
 SHOP_ID = os.environ.get('YOOKASSA_SHOP_ID', '')
 SECRET_KEY = os.environ.get('YOOKASSA_SECRET_KEY', '')
@@ -59,8 +60,19 @@ def tinkoff_request(endpoint: str, data: Dict[str, Any]) -> Dict[str, Any]:
         headers={'Content-Type': 'application/json'}
     )
     
-    with urllib.request.urlopen(req) as response:
-        return json.loads(response.read().decode('utf-8'))
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            return json.loads(response.read().decode('utf-8'))
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8')
+        print(f"[TINKOFF] HTTP Error {e.code}: {error_body}")
+        try:
+            return json.loads(error_body)
+        except:
+            raise Exception(f"HTTP {e.code}: {error_body}")
+    except urllib.error.URLError as e:
+        print(f"[TINKOFF] URL Error: {str(e)}")
+        raise Exception(f"Не удалось подключиться к Тинькофф API: {str(e)}")
 
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     method: str = event.get('httpMethod', 'GET')
@@ -174,35 +186,51 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             print(f"[TINKOFF] Init request params: {json.dumps({k: v for k, v in init_params.items() if k not in ['Token', 'Receipt']}, ensure_ascii=False)}")
             
-            result = tinkoff_request('Init', init_params)
-            
-            print(f"[TINKOFF] Init response: {json.dumps(result, ensure_ascii=False)}")
-            
-            if result.get('Success'):
+            try:
+                result = tinkoff_request('Init', init_params)
+                print(f"[TINKOFF] Init response: {json.dumps(result, ensure_ascii=False)}")
+                
+                if result.get('Success'):
+                    return {
+                        'statusCode': 200,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'isBase64Encoded': False,
+                        'body': json.dumps({
+                            'payment_id': result.get('PaymentId'),
+                            'payment_url': result.get('PaymentURL'),
+                            'order_id': order_id,
+                            'status': result.get('Status')
+                        })
+                    }
+                else:
+                    return {
+                        'statusCode': 400,
+                        'headers': {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*'
+                        },
+                        'isBase64Encoded': False,
+                        'body': json.dumps({
+                            'error': result.get('Message', 'Payment init failed'),
+                            'details': result.get('Details'),
+                            'error_code': result.get('ErrorCode')
+                        })
+                    }
+            except Exception as e:
+                print(f"[TINKOFF] Init error: {str(e)}")
                 return {
-                    'statusCode': 200,
+                    'statusCode': 500,
                     'headers': {
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
+                    'isBase64Encoded': False,
                     'body': json.dumps({
-                        'payment_id': result.get('PaymentId'),
-                        'payment_url': result.get('PaymentURL'),
-                        'order_id': order_id,
-                        'status': result.get('Status')
-                    })
-                }
-            else:
-                return {
-                    'statusCode': 400,
-                    'headers': {
-                        'Content-Type': 'application/json',
-                        'Access-Control-Allow-Origin': '*'
-                    },
-                    'body': json.dumps({
-                        'error': result.get('Message', 'Payment init failed'),
-                        'details': result.get('Details'),
-                        'error_code': result.get('ErrorCode')
+                        'error': 'Не удалось создать платеж',
+                        'details': str(e)
                     })
                 }
         
@@ -217,6 +245,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
+                    'isBase64Encoded': False,
                     'body': json.dumps({'error': 'payment_id is required'})
                 }
             
@@ -235,6 +264,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
+                'isBase64Encoded': False,
                 'body': json.dumps(result)
             }
         
@@ -303,6 +333,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             return {
                                 'statusCode': 200,
                                 'headers': {'Content-Type': 'text/plain'},
+                                'isBase64Encoded': False,
                                 'body': 'OK (already processed)'
                             }
                         
@@ -451,6 +482,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
+                    'isBase64Encoded': False,
                     'body': json.dumps({'error': 'Missing required fields'})
                 }
             
@@ -486,6 +518,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
+                'isBase64Encoded': False,
                 'body': json.dumps({
                     'payment_id': payment.id,
                     'confirmation_url': payment.confirmation.confirmation_url,
@@ -563,6 +596,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
+                    'isBase64Encoded': False,
                     'body': json.dumps({'status': 'ok'})
                 }
             
@@ -572,6 +606,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
+                'isBase64Encoded': False,
                 'body': json.dumps({'status': 'ok'})
             }
         
@@ -588,6 +623,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
+                    'isBase64Encoded': False,
                     'body': json.dumps({'error': 'user_id и transaction_id обязательны'})
                 }
             
@@ -612,6 +648,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({'error': 'Транзакция не найдена'})
                     }
                 
@@ -626,6 +663,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({'error': 'Прошло более 24 часов с момента покупки. Возврат невозможен.'})
                     }
                 
@@ -637,6 +675,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({'error': 'Баллы уже были частично использованы. Возврат невозможен.'})
                     }
                 
@@ -657,6 +696,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
+                    'isBase64Encoded': False,
                     'body': json.dumps({
                         'success': True,
                         'refund_request_id': refund_request_id,
@@ -691,6 +731,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
+                    'isBase64Encoded': False,
                     'body': json.dumps({'error': 'Недостаточно параметров'})
                 }
             
@@ -711,6 +752,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({'error': 'Недостаточно прав'})
                     }
                 
@@ -729,6 +771,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({'error': 'Запрос на возврат не найден'})
                     }
                 
@@ -741,6 +784,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({'error': 'Запрос уже обработан'})
                     }
                 
@@ -759,6 +803,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                 'Content-Type': 'application/json',
                                 'Access-Control-Allow-Origin': '*'
                             },
+                            'isBase64Encoded': False,
                             'body': json.dumps({'error': 'Недостаточно баллов на балансе'})
                         }
                     
@@ -784,6 +829,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({
                             'success': True,
                             'message': f'Возврат одобрен. {amount} баллов списано с баланса пользователя.'
@@ -805,6 +851,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({
                             'success': True,
                             'message': 'Запрос на возврат отклонён.'
@@ -817,6 +864,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*'
                         },
+                        'isBase64Encoded': False,
                         'body': json.dumps({'error': 'Неверное решение'})
                     }
             except Exception as e:
@@ -827,6 +875,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'Content-Type': 'application/json',
                         'Access-Control-Allow-Origin': '*'
                     },
+                    'isBase64Encoded': False,
                     'body': json.dumps({'error': f'Ошибка: {str(e)}'})
                 }
             finally:
@@ -839,6 +888,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
+            'isBase64Encoded': False,
             'body': json.dumps({'error': 'Unknown action'})
         }
     
@@ -848,5 +898,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*'
         },
+        'isBase64Encoded': False,
         'body': json.dumps({'error': 'Method not allowed'})
     }

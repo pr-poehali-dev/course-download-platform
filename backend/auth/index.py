@@ -143,7 +143,7 @@ def send_welcome_email(email: str, username: str) -> None:
                             <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 25px 0 0 0; padding-top: 25px; border-top: 1px solid #e0e0e0;">
                                 <strong>Нужна помощь?</strong><br/>
                                 Пиши нам: <a href="mailto:tech.forma@yandex.ru" style="color: #667eea; text-decoration: none;">tech.forma@yandex.ru</a><br/>
-                                Или в Telegram: <a href="https://t.me/techforma_support" style="color: #667eea; text-decoration: none;">@techforma_support</a>
+                                Группа ВКонтакте: <a href="https://vk.com/club234274626" style="color: #667eea; text-decoration: none;">vk.com/club234274626</a>
                             </p>
                             
                         </td>

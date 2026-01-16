@@ -56,12 +56,6 @@ export default function Footer() {
                   Группа ВКонтакте
                 </a>
               </li>
-              <li className="flex items-center gap-2 pt-2 border-t border-border">
-                <Icon name="Shield" size={16} className="text-purple-600 flex-shrink-0" />
-                <Link to="/admin" className="hover:text-purple-600 transition-colors font-medium">
-                  Админ-панель
-                </Link>
-              </li>
             </ul>
           </div>
         </div>

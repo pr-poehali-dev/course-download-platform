@@ -364,25 +364,35 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         
                         print(f"[TINKOFF] Updated balance for user_id={user_id}, added {points} points")
                         
-                        # 🎁 Если это первое пополнение от 500₽, создаём промокод на -20%
+                        # 🎁 Если это первое пополнение от 500₽, начисляем +20% бонус и создаём промокод на 100 баллов
                         if is_first_payment and amount_rubles >= 500:
                             import secrets
+                            
+                            # Бонус +20% к пополнению
+                            bonus_points = int(points * 0.2)
+                            
+                            cur.execute("""
+                                UPDATE t_p63326274_course_download_plat.users 
+                                SET balance = balance + %s 
+                                WHERE id = %s
+                            """, (bonus_points, int(user_id)))
+                            
+                            print(f"[BONUS] Added {bonus_points} bonus points (+20%) to user_id={user_id}")
+                            
+                            # Создаём промокод на дополнительные 100 баллов (для будущих покупок)
                             promo_code = f"WELCOME{secrets.token_hex(3).upper()}"
+                            promo_bonus = 100
                             
                             cur.execute("""
                                 INSERT INTO t_p63326274_course_download_plat.promo_codes 
-                                (code, discount_percent, max_uses, expires_at, created_at) 
-                                VALUES (%s, %s, %s, NOW() + INTERVAL '7 days', NOW())
-                            """, (promo_code, 20, 1))
+                                (code, bonus_points, max_uses, expires_at, created_at) 
+                                VALUES (%s, %s, %s, NOW() + INTERVAL '30 days', NOW())
+                                RETURNING id
+                            """, (promo_code, promo_bonus, 1))
                             
-                            cur.execute("""
-                                INSERT INTO t_p63326274_course_download_plat.user_promo_codes 
-                                (user_id, promo_code_id) 
-                                SELECT %s, id FROM t_p63326274_course_download_plat.promo_codes 
-                                WHERE code = %s
-                            """, (int(user_id), promo_code))
+                            promo_id = cur.fetchone()[0]
                             
-                            print(f"[PROMO] Created welcome promo code {promo_code} for user_id={user_id}")
+                            print(f"[PROMO] Created welcome promo code {promo_code} (+{promo_bonus} баллов) for user_id={user_id}")
                             
                             # Отправляем email с промокодом
                             try:
@@ -392,6 +402,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                 cur.execute("SELECT username FROM t_p63326274_course_download_plat.users WHERE id = %s", (int(user_id),))
                                 username = cur.fetchone()[0]
                                 
+                                total_received = points + bonus_points
+                                
                                 html_promo = f"""
 <!DOCTYPE html>
 <html>
@@ -400,40 +412,56 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     <table width="600" cellpadding="0" cellspacing="0" style="margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
         <tr>
             <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0;">
-                <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🎉 Спасибо за пополнение!</h1>
+                <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🎉 Спасибо за первое пополнение!</h1>
             </td>
         </tr>
         <tr>
             <td style="padding: 40px 30px;">
                 <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Привет, {username}!</p>
-                <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">
-                    Ты пополнил баланс на <strong>{int(amount_rubles)}₽</strong> и получил <strong>{points} баллов</strong>! 🎯
-                </p>
+                
+                <div style="background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); border-radius: 12px; padding: 30px; text-align: center; margin: 30px 0;">
+                    <p style="color: #1a1a1a; font-size: 18px; margin: 0 0 15px 0;">Ты пополнил баланс на <strong>{int(amount_rubles)}₽</strong></p>
+                    <div style="background: rgba(255,255,255,0.9); border-radius: 8px; padding: 20px; margin: 15px 0;">
+                        <p style="color: #333; font-size: 16px; margin: 0 0 10px 0;">Базовое начисление: <strong>{points} баллов</strong></p>
+                        <p style="color: #27ae60; font-size: 20px; font-weight: 700; margin: 0;">+ Бонус первого пополнения: <strong>{bonus_points} баллов (+20%)</strong> 🎁</p>
+                    </div>
+                    <p style="color: #1a1a1a; font-size: 22px; font-weight: 700; margin: 15px 0 0 0;">
+                        Итого на счету: <span style="color: #27ae60;">{total_received} баллов</span> 🎯
+                    </p>
+                </div>
                 
                 <div style="background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); border-radius: 8px; padding: 30px; text-align: center; margin: 30px 0;">
-                    <h2 style="color: #ffffff; margin: 0 0 15px 0; font-size: 24px;">🎁 Твой персональный промокод:</h2>
+                    <h2 style="color: #ffffff; margin: 0 0 15px 0; font-size: 24px;">🎁 Подарок — промокод на будущее:</h2>
                     <div style="background: rgba(255,255,255,0.2); border: 2px dashed #ffffff; border-radius: 8px; padding: 20px; margin: 15px 0;">
                         <p style="color: #ffffff; font-size: 32px; font-weight: 700; margin: 0; letter-spacing: 3px;">{promo_code}</p>
                     </div>
                     <p style="color: rgba(255,255,255,0.95); margin: 15px 0 0 0; font-size: 16px;">
-                        <strong>Скидка 20%</strong> на любую работу<br/>
-                        Действует 7 дней
+                        Дополнительные <strong>+{promo_bonus} баллов</strong> к следующему пополнению<br/>
+                        <span style="font-size: 14px;">Действует 30 дней</span>
                     </p>
                 </div>
                 
-                <p style="font-size: 15px; color: #555; margin: 25px 0;">
-                    Примени промокод при покупке любой работы и получи скидку 20%! 💰
-                </p>
+                <h3 style="color: #333; font-size: 20px; margin: 30px 0 15px 0;">💡 Что можно купить сейчас:</h3>
+                <ul style="color: #555; font-size: 15px; line-height: 1.8; padding-left: 20px;">
+                    <li><strong>Курсовая работа</strong> — от 300 баллов</li>
+                    <li><strong>Чертежи DWG</strong> — от 200 баллов</li>
+                    <li><strong>3D-модель CAD</strong> — от 250 баллов</li>
+                    <li><strong>Расчёты и пояснительные</strong> — от 400 баллов</li>
+                </ul>
                 
                 <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
                     <tr>
                         <td align="center">
-                            <a href="https://techforma.pro" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600;">
-                                Выбрать работу →
+                            <a href="https://techforma.pro" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(102,126,234,0.4);">
+                                🚀 Выбрать работу сейчас
                             </a>
                         </td>
                     </tr>
                 </table>
+                
+                <p style="color: #999; font-size: 13px; margin: 30px 0 0 0; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
+                    Есть вопросы? Пиши нам: <a href="mailto:tech.forma@yandex.ru" style="color: #667eea; text-decoration: none;">tech.forma@yandex.ru</a>
+                </p>
             </td>
         </tr>
     </table>

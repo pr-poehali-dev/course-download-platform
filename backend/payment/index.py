@@ -460,7 +460,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 </table>
                 
                 <p style="color: #999; font-size: 13px; margin: 30px 0 0 0; padding-top: 20px; border-top: 1px solid #eee; text-align: center;">
-                    Есть вопросы? Пиши нам: <a href="mailto:tech.forma@yandex.ru" style="color: #667eea; text-decoration: none;">tech.forma@yandex.ru</a>
+                    Есть вопросы? Пиши нам: <a href="mailto:tech.forma@yandex.ru" style="color: #667eea; text-decoration: none;">tech.forma@yandex.ru</a><br/>
+                    Группа ВК: <a href="https://vk.com/club234274626" style="color: #667eea; text-decoration: none;">vk.com/club234274626</a>
                 </p>
             </td>
         </tr>

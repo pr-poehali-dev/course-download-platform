@@ -9,7 +9,7 @@ export default function ContactsPage() {
     <>
       <Helmet>
         <title>Контакты - TechForma | Инженерная платформа</title>
-        <meta name="description" content="Свяжитесь с TechForma: email tech.forma@yandex.ru, телефон +7 (999) 123-45-67, Telegram поддержка. Мы всегда на связи!" />
+        <meta name="description" content="Свяжитесь с TechForma: email tech.forma@yandex.ru, группа ВКонтакте. Мы всегда на связи!" />
         <meta name="keywords" content="контакты techforma, связаться с techforma, поддержка techforma, email techforma" />
         <link rel="canonical" href="https://techforma.pro/contacts" />
         <script type="application/ld+json">
@@ -23,10 +23,9 @@ export default function ContactsPage() {
               "@type": "Organization",
               "name": "TechForma",
               "email": "tech.forma@yandex.ru",
-              "telephone": "+79991234567",
               "address": {
                 "@type": "PostalAddress",
-                "addressLocality": "Архангельск",
+                "addressLocality": "Коряжма",
                 "addressCountry": "RU"
               }
             }
@@ -64,51 +63,6 @@ export default function ContactsPage() {
                 </a>
                 <p className="text-sm text-muted-foreground mt-2">
                   Отвечаем в течение 24 часов
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icon name="MessageCircle" size={24} className="text-primary" />
-                  Telegram
-                </CardTitle>
-                <CardDescription>Быстрая поддержка в мессенджере</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a 
-                  href="https://t.me/techforma_support" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-lg font-semibold text-primary hover:underline"
-                >
-                  @techforma_support
-                </a>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Онлайн с 9:00 до 21:00 (МСК)
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icon name="Phone" size={24} className="text-primary" />
-                  Телефон
-                </CardTitle>
-                <CardDescription>Позвоните нам напрямую</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <a 
-                  href="tel:+79991234567" 
-                  className="text-lg font-semibold text-primary hover:underline"
-                  itemProp="telephone"
-                >
-                  +7 (999) 123-45-67
-                </a>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Пн-Пт: 9:00 - 18:00 (МСК)
                 </p>
               </CardContent>
             </Card>
@@ -166,7 +120,7 @@ export default function ContactsPage() {
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Юридический адрес:</p>
-                  <p className="text-muted-foreground" itemProp="address">г. Архангельск, Россия</p>
+                  <p className="text-muted-foreground" itemProp="address">г. Коряжма, Россия</p>
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">Email для документов:</p>

@@ -212,21 +212,13 @@ export default function ModerationPanel() {
         throw new Error('Файл не найден');
       }
 
-      const fileResponse = await fetch(data.download_url);
-      const blob = await fileResponse.blob();
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = data.filename || work.file_name || `${work.title}.rar`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Используем прямое перенаправление вместо fetch (избегаем CORS проблем)
+      console.log('📥 Admin downloading from:', data.download_url);
+      window.location.href = data.download_url;
 
       toast({
-        title: '✅ Файл скачан',
-        description: `${data.filename || work.file_name} сохранён в папку "Загрузки"`
+        title: '✅ Скачивание началось',
+        description: `Файл сохранится в папку "Загрузки"`
       });
     } catch (error: any) {
       console.error('Download error:', error);

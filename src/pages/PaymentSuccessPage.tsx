@@ -130,22 +130,9 @@ export default function PaymentSuccessPage() {
       
       const downloadData = await downloadResponse.json();
       
-      // Скачиваем файл
-      try {
-        const fileResponse = await fetch(downloadData.download_url);
-        const blob = await fileResponse.blob();
-        
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = downloadData.filename || `work_${workId}.rar`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } catch (fetchError) {
-        window.location.href = downloadData.download_url;
-      }
+      // Используем прямое перенаправление вместо fetch (избегаем CORS проблем)
+      console.log('📥 Starting download from:', downloadData.download_url);
+      window.location.href = downloadData.download_url;
       
       trackEvent(metrikaEvents.WORK_DOWNLOAD, {
         work_id: workId,

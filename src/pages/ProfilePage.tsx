@@ -138,26 +138,14 @@ export default function ProfilePage() {
       
       const downloadData = await downloadResponse.json();
       
-      try {
-        const fileResponse = await fetch(downloadData.download_url);
-        const blob = await fileResponse.blob();
-        
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = downloadData.filename || `${workTitle.substring(0, 50)}.rar`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        toast({
-          title: '✅ Скачивание началось',
-          description: 'Файл сохранится в папку "Загрузки"'
-        });
-      } catch (fetchError) {
-        window.location.href = downloadData.download_url;
-      }
+      // Используем прямое перенаправление вместо fetch (избегаем CORS проблем)
+      console.log('📥 Starting download from:', downloadData.download_url);
+      window.location.href = downloadData.download_url;
+      
+      toast({
+        title: '✅ Скачивание началось',
+        description: 'Файл сохранится в папку "Загрузки"'
+      });
       
     } catch (error) {
       console.error('Download error:', error);

@@ -881,47 +881,24 @@ export default function WorkDetailPage() {
       
       const downloadData = await downloadResponse.json();
       
-      // Скачиваем файл напрямую (работает на всех устройствах)
-      try {
-        const fileResponse = await fetch(downloadData.download_url);
-        const blob = await fileResponse.blob();
-        
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = downloadData.filename || `${work.title.substring(0, 50)}.rar`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        // Отслеживаем скачивание
-        trackEvent(metrikaEvents.WORK_DOWNLOAD, { 
-          work_id: actualWorkId, 
-          work_title: work?.title,
-          price: work?.price 
-        });
-        fetch(func2url['work-stats'], {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ work_id: parseInt(actualWorkId), action: 'download' })
-        }).catch(err => console.error('Failed to track download:', err));
-      } catch (fetchError) {
-        // Если fetch не сработал, открываем в новой вкладке
-        window.location.href = downloadData.download_url;
-        
-        // Отслеживаем скачивание
-        trackEvent(metrikaEvents.WORK_DOWNLOAD, { 
-          work_id: actualWorkId, 
-          work_title: work?.title,
-          price: work?.price 
-        });
-        fetch(func2url['work-stats'], {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ work_id: parseInt(actualWorkId), action: 'download' })
-        }).catch(err => console.error('Failed to track download:', err));
-      }
+      // Скачиваем файл напрямую
+      console.log('📥 Starting download from:', downloadData.download_url);
+      
+      // Используем прямое перенаправление вместо fetch (избегаем CORS проблем)
+      window.location.href = downloadData.download_url;
+      
+      // Отслеживаем скачивание
+      trackEvent(metrikaEvents.WORK_DOWNLOAD, { 
+        work_id: actualWorkId, 
+        work_title: work?.title,
+        price: work?.price 
+      });
+      
+      fetch(func2url['work-stats'], {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ work_id: parseInt(actualWorkId), action: 'download' })
+      }).catch(err => console.error('Failed to track download:', err));
       
       console.log('📢 Showing notification:', { isAlreadyPurchased, userRole: freshUser.role, isAdmin: freshUser.role === 'admin' });
       

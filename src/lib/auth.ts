@@ -67,7 +67,7 @@ export const authService = {
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1000); // 1 сек таймаут
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 сек таймаут (было 1 сек)
       
       const response = await fetch(`${AUTH_API}?action=verify`, {
         method: 'GET',
@@ -89,6 +89,8 @@ export const authService = {
 
       return data.user;
     } catch (error) {
+      // Не логаутим при network error или timeout
+      console.warn('Auth verify failed:', error);
       return null;
     }
   },

@@ -337,7 +337,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                 'body': 'OK (already processed)'
                             }
                         
-                        # Получаем email пользователя
+                        # Получаем email пользователя и проверяем, первое ли это пополнение
                         cur.execute("""
                             SELECT email FROM t_p63326274_course_download_plat.users 
                             WHERE id = %s
@@ -345,6 +345,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         
                         user_record = cur.fetchone()
                         user_email = user_record[0] if user_record else ''
+                        
+                        # Проверяем, есть ли у пользователя предыдущие успешные платежи
+                        cur.execute("""
+                            SELECT COUNT(*) FROM t_p63326274_course_download_plat.payments 
+                            WHERE user_email = %s AND status = 'succeeded'
+                        """, (user_email,))
+                        
+                        previous_payments = cur.fetchone()[0]
+                        is_first_payment = (previous_payments == 0)
                         
                         # Начисляем баллы
                         cur.execute("""
@@ -354,6 +363,94 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         """, (points, int(user_id)))
                         
                         print(f"[TINKOFF] Updated balance for user_id={user_id}, added {points} points")
+                        
+                        # 🎁 Если это первое пополнение от 500₽, создаём промокод на -20%
+                        if is_first_payment and amount_rubles >= 500:
+                            import secrets
+                            promo_code = f"WELCOME{secrets.token_hex(3).upper()}"
+                            
+                            cur.execute("""
+                                INSERT INTO t_p63326274_course_download_plat.promo_codes 
+                                (code, discount_percent, max_uses, expires_at, created_at) 
+                                VALUES (%s, %s, %s, NOW() + INTERVAL '7 days', NOW())
+                            """, (promo_code, 20, 1))
+                            
+                            cur.execute("""
+                                INSERT INTO t_p63326274_course_download_plat.user_promo_codes 
+                                (user_id, promo_code_id) 
+                                SELECT %s, id FROM t_p63326274_course_download_plat.promo_codes 
+                                WHERE code = %s
+                            """, (int(user_id), promo_code))
+                            
+                            print(f"[PROMO] Created welcome promo code {promo_code} for user_id={user_id}")
+                            
+                            # Отправляем email с промокодом
+                            try:
+                                import resend
+                                resend.api_key = os.environ.get('RESEND_API_KEY')
+                                
+                                cur.execute("SELECT username FROM t_p63326274_course_download_plat.users WHERE id = %s", (int(user_id),))
+                                username = cur.fetchone()[0]
+                                
+                                html_promo = f"""
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; margin: 0; padding: 40px 20px;">
+    <table width="600" cellpadding="0" cellspacing="0" style="margin: 0 auto; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <tr>
+            <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center; border-radius: 12px 12px 0 0;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🎉 Спасибо за пополнение!</h1>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 40px 30px;">
+                <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">Привет, {username}!</p>
+                <p style="font-size: 16px; color: #333; margin: 0 0 20px 0;">
+                    Ты пополнил баланс на <strong>{int(amount_rubles)}₽</strong> и получил <strong>{points} баллов</strong>! 🎯
+                </p>
+                
+                <div style="background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); border-radius: 8px; padding: 30px; text-align: center; margin: 30px 0;">
+                    <h2 style="color: #ffffff; margin: 0 0 15px 0; font-size: 24px;">🎁 Твой персональный промокод:</h2>
+                    <div style="background: rgba(255,255,255,0.2); border: 2px dashed #ffffff; border-radius: 8px; padding: 20px; margin: 15px 0;">
+                        <p style="color: #ffffff; font-size: 32px; font-weight: 700; margin: 0; letter-spacing: 3px;">{promo_code}</p>
+                    </div>
+                    <p style="color: rgba(255,255,255,0.95); margin: 15px 0 0 0; font-size: 16px;">
+                        <strong>Скидка 20%</strong> на любую работу<br/>
+                        Действует 7 дней
+                    </p>
+                </div>
+                
+                <p style="font-size: 15px; color: #555; margin: 25px 0;">
+                    Примени промокод при покупке любой работы и получи скидку 20%! 💰
+                </p>
+                
+                <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+                    <tr>
+                        <td align="center">
+                            <a href="https://techforma.pro" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600;">
+                                Выбрать работу →
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+                                """
+                                
+                                resend.Emails.send({
+                                    "from": os.environ.get('MAIL_FROM', 'Tech Forma <noreply@techforma.pro>'),
+                                    "to": user_email,
+                                    "subject": f"🎁 Твой промокод -20% — {promo_code}",
+                                    "html": html_promo
+                                })
+                                
+                                print(f"[EMAIL] Promo code email sent to {user_email}")
+                            except Exception as email_error:
+                                print(f"[WARN] Failed to send promo email: {repr(email_error)}")
                         
                         # Записываем транзакцию
                         cur.execute("""

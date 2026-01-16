@@ -10,6 +10,179 @@ import resend
 from datetime import datetime, timedelta
 from typing import Dict, Any
 
+def send_welcome_email(email: str, username: str) -> None:
+    """Отправка приветственного письма новому пользователю"""
+    try:
+        resend.api_key = os.environ.get('RESEND_API_KEY')
+        
+        html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добро пожаловать в Tech Forma!</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+        <tr>
+            <td align="center">
+                <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden;">
+                    
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 30px; text-align: center;">
+                            <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">
+                                🚀 Добро пожаловать в Tech Forma!
+                            </h1>
+                            <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">
+                                Привет, {username}! Рады видеть тебя на платформе
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="padding: 40px 30px;">
+                            
+                            <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+                                Tech Forma — это <strong>инженерная платформа</strong> с готовыми техническими работами: 
+                                чертежами DWG/DXF, 3D-моделями CAD, курсовыми и дипломными проектами.
+                            </p>
+                            
+                            <!-- Stats Block -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0; background-color: #f8f9fa; border-radius: 8px; overflow: hidden;">
+                                <tr>
+                                    <td style="padding: 25px; text-align: center; border-right: 1px solid #e0e0e0;" width="50%">
+                                        <div style="font-size: 32px; font-weight: 700; color: #667eea; margin-bottom: 8px;">500+</div>
+                                        <div style="font-size: 14px; color: #666;">Готовых работ</div>
+                                    </td>
+                                    <td style="padding: 25px; text-align: center;" width="50%">
+                                        <div style="font-size: 32px; font-weight: 700; color: #667eea; margin-bottom: 8px;">1000+</div>
+                                        <div style="font-size: 14px; color: #666;">Довольных студентов</div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <h2 style="color: #333; font-size: 20px; font-weight: 700; margin: 30px 0 15px 0;">
+                                💡 Зачем покупать работы на Tech Forma?
+                            </h2>
+                            
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;" width="40">
+                                        <span style="font-size: 20px;">✅</span>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333;">Готовые примеры</strong> — используй как основу или справочный материал
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;">
+                                        <span style="font-size: 20px;">💰</span>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333;">Дешевле заказа</strong> — работы от 200₽, заказ новой — от 5000₽
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;">
+                                        <span style="font-size: 20px;">⚡</span>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333;">Мгновенно</strong> — скачивай сразу после оплаты, не жди неделями
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px 0; vertical-align: top;">
+                                        <span style="font-size: 20px;">📐</span>
+                                    </td>
+                                    <td style="padding: 12px 0;">
+                                        <strong style="color: #333;">Профессионально</strong> — все работы проверены модераторами
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Promo Block -->
+                            <div style="background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%); border-radius: 8px; padding: 25px; margin: 30px 0; text-align: center;">
+                                <h3 style="color: #ffffff; margin: 0 0 10px 0; font-size: 22px; font-weight: 700;">
+                                    🎁 Специальное предложение!
+                                </h3>
+                                <p style="color: rgba(255,255,255,0.95); margin: 0 0 15px 0; font-size: 16px; line-height: 1.5;">
+                                    При первом пополнении баланса от <strong>500 рублей</strong><br/>
+                                    получи промокод на <strong style="font-size: 20px;">-20% скидку</strong> на любую работу!
+                                </p>
+                                <p style="color: rgba(255,255,255,0.85); margin: 0; font-size: 14px;">
+                                    ⏰ Акция действует первые 7 дней после регистрации
+                                </p>
+                            </div>
+                            
+                            <h2 style="color: #333; font-size: 20px; font-weight: 700; margin: 30px 0 15px 0;">
+                                🔥 Популярные категории работ:
+                            </h2>
+                            
+                            <ul style="color: #555; font-size: 15px; line-height: 1.8; margin: 0 0 25px 0; padding-left: 20px;">
+                                <li><strong>Строительство</strong> — чертежи зданий, расчёты конструкций</li>
+                                <li><strong>Машиностроение</strong> — 3D-модели деталей, сборочные чертежи</li>
+                                <li><strong>Электроснабжение</strong> — схемы электрооборудования, расчёты сетей</li>
+                                <li><strong>Газоснабжение</strong> — проекты газопроводов, технологические карты</li>
+                                <li><strong>Теплоснабжение</strong> — расчёты систем отопления, котельные</li>
+                            </ul>
+                            
+                            <!-- CTA Button -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin: 35px 0 25px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <a href="https://techforma.pro" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-size: 16px; font-weight: 600; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                                            🚀 Начать искать работы
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="color: #666; font-size: 14px; line-height: 1.6; margin: 25px 0 0 0; padding-top: 25px; border-top: 1px solid #e0e0e0;">
+                                <strong>Нужна помощь?</strong><br/>
+                                Пиши нам: <a href="mailto:tech.forma@yandex.ru" style="color: #667eea; text-decoration: none;">tech.forma@yandex.ru</a><br/>
+                                Или в Telegram: <a href="https://t.me/techforma_support" style="color: #667eea; text-decoration: none;">@techforma_support</a>
+                            </p>
+                            
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 25px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
+                            <p style="color: #999; font-size: 13px; margin: 0 0 10px 0;">
+                                Tech Forma — Инженерная платформа для студентов и специалистов
+                            </p>
+                            <p style="color: #999; font-size: 13px; margin: 0;">
+                                <a href="https://techforma.pro" style="color: #667eea; text-decoration: none; margin: 0 10px;">Каталог работ</a> | 
+                                <a href="https://techforma.pro/upload" style="color: #667eea; text-decoration: none; margin: 0 10px;">Загрузить работу</a> | 
+                                <a href="https://techforma.pro/profile" style="color: #667eea; text-decoration: none; margin: 0 10px;">Мой профиль</a>
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+        """
+        
+        resend.Emails.send({
+            "from": os.environ.get('MAIL_FROM', 'Tech Forma <noreply@techforma.pro>'),
+            "to": email,
+            "subject": f"🚀 Добро пожаловать в Tech Forma, {username}!",
+            "html": html_content
+        })
+        
+        print(f"✅ Welcome email sent to {email}")
+        
+    except Exception as e:
+        print(f"⚠️ Failed to send welcome email to {email}: {repr(e)}")
+
 def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     '''
     Business: Регистрация, авторизация и восстановление пароля пользователей
@@ -271,6 +444,12 @@ def register_user(event: Dict[str, Any]) -> Dict[str, Any]:
         conn.close()
         
         token = generate_jwt_token(user_id, username)
+        
+        # 🎉 Отправляем приветственное письмо новому пользователю
+        try:
+            send_welcome_email(email, username)
+        except Exception as email_error:
+            print(f"⚠️ Welcome email failed but registration successful: {repr(email_error)}")
         
         return {
             'statusCode': 200,

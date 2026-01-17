@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import { toast } from '@/components/ui/use-toast';
+import func2url from '../../../backend/func2url.json';
 
 export default function EmailCampaignsTab() {
   const [sendingPayment, setSendingPayment] = useState(false);
@@ -23,24 +24,52 @@ export default function EmailCampaignsTab() {
     setLoading(true);
 
     try {
-      // Вызываем Python скрипт через простой HTTP запрос (если задеплоено)
-      // Или показываем инструкцию для ручного запуска
+      console.log(`📧 Отправка триггерных писем типа: ${type}`);
       
-      toast({
-        title: '📧 Триггерные письма',
-        description: `Для запуска триггерных писем типа "${type}" используй Python скрипт:\n\npython trigger-emails-cron.py ${type}`,
-        duration: 10000,
+      const response = await fetch(func2url['trigger-emails'], {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Token': 'admin_secret_token_2024'
+        },
+        body: JSON.stringify({ type })
       });
 
-      // Здесь можно добавить реальный вызов API если функция задеплоена
-      // const response = await fetch(`/api/trigger-emails?type=${type}`, {
-      //   method: 'POST',
-      //   headers: { 'X-Admin-Token': 'trigger_emails_secret_2024' }
-      // });
+      const data = await response.json();
+      
+      console.log('Ответ от сервера:', data);
+
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP ${response.status}`);
+      }
+
+      // Показываем результаты
+      const results = data.results || {};
+      const totalSent = Object.values(results).reduce((sum: number, r: any) => sum + (r.sent || 0), 0);
+      const totalFound = Object.values(results).reduce((sum: number, r: any) => sum + (r.total || 0), 0);
+      
+      let message = `✅ Отправлено ${totalSent} из ${totalFound} писем\n\n`;
+      
+      if (results.payment) {
+        message += `⏰ Напоминание о пополнении: ${results.payment.sent}/${results.payment.total}\n`;
+      }
+      if (results.favorites) {
+        message += `💝 Брошенное избранное: ${results.favorites.sent}/${results.favorites.total}\n`;
+      }
+      if (results.inactive) {
+        message += `👋 Реактивация: ${results.inactive.sent}/${results.inactive.total}\n`;
+      }
+
+      toast({
+        title: '📧 Рассылка завершена!',
+        description: message,
+        duration: 8000,
+      });
 
     } catch (error) {
+      console.error('Ошибка отправки триггерных писем:', error);
       toast({
-        title: 'Ошибка',
+        title: '❌ Ошибка отправки',
         description: error instanceof Error ? error.message : 'Не удалось запустить рассылку',
         variant: 'destructive',
       });

@@ -1,0 +1,43 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS request (CORS)",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedHeaders": {
+        "Access-Control-Allow-Origin": "*"
+      }
+    },
+    {
+      "name": "POST without admin token",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "type": "all"
+      },
+      "expectedStatus": 403,
+      "expectedBody": {
+        "error": "string"
+      },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Send all trigger emails",
+      "method": "POST",
+      "path": "/",
+      "headers": {
+        "X-Admin-Token": "admin_secret_token_2024"
+      },
+      "body": {
+        "type": "all"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "success": true,
+        "results": "object"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

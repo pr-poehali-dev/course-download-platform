@@ -1,6 +1,6 @@
 {
+  "trigger-emails": "https://functions.poehali.dev/2dbbd1dd-8f54-48b6-98b2-e4b4e003fa46",
   "auto-generate-reviews": "https://functions.poehali.dev/d9886c33-1db5-46c5-bbbb-fb69e13ad178",
-  "sitemap": "https://functions.poehali.dev/e0e04210-74c2-4c83-8e1b-1d8541942972",
   "delete-work": "https://functions.poehali.dev/8de851cd-a14b-43d8-b101-ef1ae691c01a",
   "work-stats": "https://functions.poehali.dev/f7e83e1c-d991-4958-84e8-124335dc8a7b",
   "reviews": "https://functions.poehali.dev/9a0fbcbb-2123-4282-9dd4-7ccfbf787be9",

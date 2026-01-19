@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "Returns 404 HTML page",
+      "method": "GET",
+      "expectedStatus": 404,
+      "expectedHeaders": {
+        "Content-Type": "text/html; charset=utf-8"
+      }
+    }
+  ]
+}

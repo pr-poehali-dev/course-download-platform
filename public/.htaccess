@@ -13,7 +13,7 @@ RewriteCond %{REQUEST_URI} (.+)/$
 RewriteRule ^ %1 [R=301,L]
 
 # Обработка 404 ошибки
-ErrorDocument 404 /index.html
+ErrorDocument 404 /404.html
 
 # Кеширование статических файлов
 <IfModule mod_expires.c>

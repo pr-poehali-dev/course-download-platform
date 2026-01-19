@@ -179,15 +179,20 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/index.html",
-      "statusCode": 200
+      "destination": "/index.html"
     }
   ],
   "cleanUrls": true,
-  "error": {
-    "404": "/404.html"
-  },
   "headers": [
+    {
+      "source": "/404.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [

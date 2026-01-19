@@ -68,7 +68,7 @@ const NotFoundPage = () => {
   return (
     <>
       <Helmet>
-        <title>404 - Страница не найдена | Tech Forma</title>
+        <title>Ошибка 404: Страница не найдена</title>
         <meta name="description" content="Запрашиваемая страница не найдена. Вернитесь на главную или перейдите в каталог чертежей и 3D-моделей." />
         <meta name="robots" content="noindex, nofollow" />
         <meta httpEquiv="status" content="404 Not Found" />
@@ -76,7 +76,7 @@ const NotFoundPage = () => {
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": "404 - Страница не найдена",
+            "name": "Ошибка 404: Страница не найдена",
             "description": "Запрашиваемая страница не существует",
             "url": `https://techforma.pro${location.pathname}`
           })}

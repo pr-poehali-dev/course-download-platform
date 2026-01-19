@@ -75,10 +75,12 @@ export default function CatalogPage() {
 
   // Сбрасываем на первую страницу при изменении фильтров
   useEffect(() => {
-    if (currentPage !== 1) {
+    const params = new URLSearchParams(location.search);
+    const page = params.get('page');
+    if (page && page !== '1') {
       setSearchParams({});
     }
-  }, [searchQuery, filterSubject, priceRange, sortBy, currentPage, setSearchParams]);
+  }, [searchQuery, filterSubject, priceRange, sortBy]);
 
   useEffect(() => {
     const checkAuth = async () => {

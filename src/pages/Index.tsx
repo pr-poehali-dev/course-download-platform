@@ -914,7 +914,7 @@ export default function Index() {
                     <Label className="text-sm">Сортировка:</Label>
                     <Select value={sortBy} onValueChange={setSortBy}>
                       <SelectTrigger className="w-[180px]">
-                        <SelectValue />
+                        <SelectValue placeholder="Выберите сортировку" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="rating">По рейтингу</SelectItem>

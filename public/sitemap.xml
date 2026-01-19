@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
-  <!--  Главная страница  -->
+  <!-- Главная страница -->
   <url>
     <loc>https://techforma.pro/</loc>
     <lastmod>2025-12-23</lastmod>
@@ -9,98 +9,112 @@
     <priority>1.0</priority>
   </url>
   
-  <!--  Каталог  -->
+  <!-- Каталог -->
   <url>
     <loc>https://techforma.pro/catalog</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
-  <!--  Категории каталога  -->
+
+  <!-- Категории каталога -->
   <url>
     <loc>https://techforma.pro/catalog?category=drawings</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
   <url>
     <loc>https://techforma.pro/catalog?category=3d-models</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
   <url>
     <loc>https://techforma.pro/catalog?category=calculations</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
   <url>
     <loc>https://techforma.pro/catalog?category=projects</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  <!--  Блог  -->
+  
+  <!-- Блог -->
   <url>
     <loc>https://techforma.pro/blog</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
-  <!--  Маркетплейс  -->
+  
+  <!-- Маркетплейс -->
   <url>
     <loc>https://techforma.pro/marketplace</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
-  <!--  Статические страницы  -->
+  
+  <!-- Статические страницы -->
   <url>
     <loc>https://techforma.pro/privacy-policy</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  
   <url>
     <loc>https://techforma.pro/terms-of-service</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  
   <url>
     <loc>https://techforma.pro/usage-rules</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  
   <url>
     <loc>https://techforma.pro/offer</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  
   <url>
     <loc>https://techforma.pro/requisites</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.2</priority>
   </url>
-  <!--  Контакты  -->
+  
+  <!-- Контакты -->
   <url>
     <loc>https://techforma.pro/contacts</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
-  <!--  Покупка баллов  -->
+  
+  <!-- Покупка баллов -->
   <url>
     <loc>https://techforma.pro/buy-points</loc>
     <lastmod>2025-12-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  <!--  Конструктор пакета защиты  -->
+  
+  <!-- Конструктор пакета защиты -->
   <url>
     <loc>https://techforma.pro/defense-kit</loc>
     <lastmod>2025-12-23</lastmod>

@@ -34,9 +34,6 @@ STATIC_PAGES = [
     ('/roskomnadzor-guide', '0.3', 'yearly'),
 ]
 
-# Pagination configuration
-ITEMS_PER_PAGE = 24  # Количество элементов на странице каталога
-
 def fetch_approved_work_ids():
     """Fetch all approved work IDs from database"""
     conn = psycopg2.connect(DATABASE_URL)
@@ -67,17 +64,6 @@ def generate_sitemap(work_ids):
         xml_lines.append(f'    <lastmod>{TODAY}</lastmod>')
         xml_lines.append(f'    <changefreq>{changefreq}</changefreq>')
         xml_lines.append(f'    <priority>{priority}</priority>')
-        xml_lines.append('  </url>')
-    
-    # Add pagination pages для каталога
-    total_works = len(work_ids)
-    total_pages = (total_works + ITEMS_PER_PAGE - 1) // ITEMS_PER_PAGE
-    for page in range(2, total_pages + 1):  # Страница 1 уже есть как /catalog
-        xml_lines.append('  <url>')
-        xml_lines.append(f'    <loc>{BASE_URL}/catalog?page={page}</loc>')
-        xml_lines.append(f'    <lastmod>{TODAY}</lastmod>')
-        xml_lines.append('    <changefreq>daily</changefreq>')
-        xml_lines.append('    <priority>0.7</priority>')
         xml_lines.append('  </url>')
     
     # Add work pages

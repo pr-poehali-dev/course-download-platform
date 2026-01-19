@@ -73,15 +73,6 @@ export default function CatalogPage() {
     trackEvent(metrikaEvents.CATALOG_OPEN);
   }, []);
 
-  // Сбрасываем на первую страницу при изменении фильтров
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const page = params.get('page');
-    if (page && page !== '1') {
-      setSearchParams({});
-    }
-  }, [searchQuery, filterSubject, priceRange, sortBy]);
-
   useEffect(() => {
     const checkAuth = async () => {
       // Сначала проверяем localStorage на случай если backend недоступен

@@ -73,6 +73,13 @@ export default function CatalogPage() {
     trackEvent(metrikaEvents.CATALOG_OPEN);
   }, []);
 
+  // Сбрасываем на первую страницу при изменении фильтров
+  useEffect(() => {
+    if (currentPage !== 1) {
+      setSearchParams({});
+    }
+  }, [searchQuery, filterSubject, priceRange, sortBy]);
+
   useEffect(() => {
     const checkAuth = async () => {
       // Сначала проверяем localStorage на случай если backend недоступен
@@ -615,8 +622,11 @@ export default function CatalogPage() {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
                         className="w-10 h-10"
+                        asChild
                       >
-                        {pageNum}
+                        <a href={pageNum === 1 ? '/catalog' : `/catalog?page=${pageNum}`}>
+                          {pageNum}
+                        </a>
                       </Button>
                     );
                   })}

@@ -78,7 +78,7 @@ export default function CatalogPage() {
     if (currentPage !== 1) {
       setSearchParams({});
     }
-  }, [searchQuery, filterSubject, priceRange, sortBy]);
+  }, [searchQuery, filterSubject, priceRange, sortBy, currentPage, setSearchParams]);
 
   useEffect(() => {
     const checkAuth = async () => {

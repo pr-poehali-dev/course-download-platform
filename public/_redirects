@@ -71,20 +71,20 @@ http://techforma.pro/* https://techforma.pro/:splat 301!
 
 # ====================================================================
 # Существующие маршруты SPA (возвращают 200)
+# ВАЖНО: Конкретные маршруты ПЕРЕД catch-all правилом!
 # ====================================================================
 
 / /index.html 200
 /catalog /index.html 200
-/catalog/* /index.html 200
-/work/* /index.html 200
+/work/:id /index.html 200
 /blog /index.html 200
-/blog/* /index.html 200
+/blog/:slug /index.html 200
 /marketplace /index.html 200
 /buy-points /index.html 200
 /defense-kit /index.html 200
 /contacts /index.html 200
 /profile /index.html 200
-/profile/* /index.html 200
+/profile/:tab /index.html 200
 /login /index.html 200
 /register /index.html 200
 /forgot-password /index.html 200
@@ -94,11 +94,31 @@ http://techforma.pro/* https://techforma.pro/:splat 301!
 /usage-rules /index.html 200
 /offer /index.html 200
 /requisites /index.html 200
+/upload /index.html 200
+/payment /index.html 200
+/payment-success /index.html 200
+/payment-failed /index.html 200
+/test-login /index.html 200
+/yandex-verification /index.html 200
 /admin /index.html 200
-/admin/* /index.html 200
+/admin/blog /index.html 200
+/admin/support /index.html 200
+/admin/security-logs /index.html 200
+/admin/points-audit /index.html 200
+/admin/generate-reviews /index.html 200
+/admin/bulk-generate-reviews /index.html 200
+/admin/auto-generate-reviews /index.html 200
+/admin/reviews-cleanup /index.html 200
+/admin/sitemap-view /index.html 200
+/admin/moderation /index.html 200
+/sync-previews /index.html 200
+/full-sync /index.html 200
+/batch-upload /index.html 200
+/extract-previews /index.html 200
 
 # ====================================================================
 # Все остальные несуществующие страницы - 404
+# КРИТИЧНО: Это правило должно быть ПОСЛЕДНИМ!
 # ====================================================================
 
 /* /404.html 404

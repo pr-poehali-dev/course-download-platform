@@ -1,9 +1,7 @@
 # robots.txt для TechForma
 # Оптимизировано для поисковых систем
-# Обновлено: 2025-12-21
+# Обновлено: 2026-01-16
 
-# Основное зеркало сайта (указание главного домена)
-Host: https://techforma.pro
 
 # Правила для всех поисковых роботов
 User-agent: *
@@ -33,21 +31,6 @@ Disallow: /index.php
 Disallow: /index.html
 Disallow: /default.aspx
 
-# Блокируем дубли с trailing slash
-Disallow: /catalog/
-Disallow: /marketplace/
-Disallow: /contacts/
-Disallow: /buy-points/
-Disallow: /defense-kit/
-Disallow: /privacy-policy/
-Disallow: /terms-of-service/
-Disallow: /usage-rules/
-Disallow: /offer/
-Disallow: /requisites/
-Disallow: /login/
-Disallow: /register/
-Disallow: /profile/
-Disallow: /blog/
 
 # Блокируем несуществующие технические пути
 Disallow: /page
@@ -73,6 +56,8 @@ Disallow: /*?*source=
 Disallow: /*&utm_
 Disallow: /*&fbclid
 Disallow: /*&gclid
+Disallow: /*?sort
+Disallow: /*?filter
 
 # Разрешаем статические ресурсы
 Allow: /*.css$
@@ -101,18 +86,30 @@ Disallow: /sync-previews
 Disallow: /full-sync
 Disallow: /batch-upload
 Disallow: /extract-previews
+Disallow: /*print
+Disallow: /*session_id
 
 # Специальные правила для Яндекса
 User-agent: Yandex
 Allow: /
 Crawl-delay: 0.5
-Clean-param: utm_source&utm_medium&utm_campaign&fbclid&gclid&_ym_uid&_ym_d /
-Clean-param: search&category&subject&sort /catalog
+Clean-param: utm_source&utm_medium&utm_campaign&utm_term&utm_content&utm_id /
+Clean-param: gclid&yclid&ysclid&fbclid /
+Clean-param: _ym_uid&_ym_d&_ym_isad /
+Clean-param: _openstat /
+Clean-param: ref&source&from /
 
 # Специальные правила для Google
 User-agent: Googlebot
 Allow: /
 Crawl-delay: 0.3
+Allow: /*.css
+Allow: /*.js
+Allow: /*.jpg
+Allow: /*.png
+Allow: /*.gif
+Sitemap: https://techforma.pro/sitemap.xml
+
 
 # Блокируем плохих ботов
 User-agent: AhrefsBot

@@ -21,15 +21,15 @@ import { useScrollTracking } from '@/hooks/useScrollTracking';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import SEOHeroSection from '@/components/home/SEOHeroSection';
 import Footer from '@/components/Footer';
+import AuthDialog from '@/components/AuthDialog';
+import ProfileDialog from '@/components/ProfileDialog';
+import PaymentDialog from '@/components/PaymentDialog';
+import CartDialog from '@/components/CartDialog';
+import FavoritesDialog from '@/components/FavoritesDialog';
+import PromoCodeDialog from '@/components/PromoCodeDialog';
+import ReferralDialog from '@/components/ReferralDialog';
 
-// Все остальные через lazy для быстрой загрузки
-const AuthDialog = lazy(() => import('@/components/AuthDialog'));
-const ProfileDialog = lazy(() => import('@/components/ProfileDialog'));
-const PaymentDialog = lazy(() => import('@/components/PaymentDialog'));
-const CartDialog = lazy(() => import('@/components/CartDialog'));
-const FavoritesDialog = lazy(() => import('@/components/FavoritesDialog'));
-const PromoCodeDialog = lazy(() => import('@/components/PromoCodeDialog'));
-const ReferralDialog = lazy(() => import('@/components/ReferralDialog'));
+// Второстепенные компоненты через lazy
 const ExitIntentModal = lazy(() => import('@/components/ExitIntentModal'));
 const AboutSection = lazy(() => import('@/components/AboutSection'));
 const NewsSection = lazy(() => import('@/components/NewsSection'));
@@ -1430,81 +1430,67 @@ export default function Index() {
         </Suspense>
       </div>
 
-      <Suspense fallback={<div />}>
-        <AuthDialog 
-          open={authDialogOpen} 
-          onOpenChange={setAuthDialogOpen}
-          onLogin={handleLogin}
-          onRegister={handleRegister}
-        />
-      </Suspense>
+      <AuthDialog 
+        open={authDialogOpen} 
+        onOpenChange={setAuthDialogOpen}
+        onLogin={handleLogin}
+        onRegister={handleRegister}
+      />
 
-      <Suspense fallback={<div />}>
-        <ProfileDialog
-          open={profileDialogOpen}
-          onOpenChange={setProfileDialogOpen}
-          username={username}
-          email={email}
-          balance={userBalance}
-          onLogout={handleLogout}
-          purchases={purchases}
-          onOpenReferral={() => setReferralDialogOpen(true)}
-          userId={currentUser?.id || null}
-          onBalanceUpdate={(newBalance) => {
-            if (currentUser) {
-              setCurrentUser({ ...currentUser, balance: newBalance });
-            }
-          }}
-        />
-      </Suspense>
+      <ProfileDialog
+        open={profileDialogOpen}
+        onOpenChange={setProfileDialogOpen}
+        username={username}
+        email={email}
+        balance={userBalance}
+        onLogout={handleLogout}
+        purchases={purchases}
+        onOpenReferral={() => setReferralDialogOpen(true)}
+        userId={currentUser?.id || null}
+        onBalanceUpdate={(newBalance) => {
+          if (currentUser) {
+            setCurrentUser({ ...currentUser, balance: newBalance });
+          }
+        }}
+      />
 
-      <Suspense fallback={<div />}>
-        <PaymentDialog
-          open={paymentDialogOpen}
-          onOpenChange={setPaymentDialogOpen}
-          onSuccess={handlePaymentSuccess}
-          userEmail={email}
-        />
-      </Suspense>
+      <PaymentDialog
+        open={paymentDialogOpen}
+        onOpenChange={setPaymentDialogOpen}
+        onSuccess={handlePaymentSuccess}
+        userEmail={email}
+      />
 
-      <Suspense fallback={<div />}>
-        <CartDialog
-          open={cartDialogOpen}
-          onOpenChange={setCartDialogOpen}
-          items={cartItems}
-          onRemoveItem={handleRemoveFromCart}
-          onCheckout={handleCheckout}
-          userBalance={userBalance}
-        />
-      </Suspense>
+      <CartDialog
+        open={cartDialogOpen}
+        onOpenChange={setCartDialogOpen}
+        items={cartItems}
+        onRemoveItem={handleRemoveFromCart}
+        onCheckout={handleCheckout}
+        userBalance={userBalance}
+      />
 
-      <Suspense fallback={<div />}>
-        <FavoritesDialog
-          open={favoritesDialogOpen}
-          onOpenChange={setFavoritesDialogOpen}
-          items={favoriteItems}
-          onRemoveItem={handleRemoveFromFavorites}
-          onAddToCart={handleAddToCart}
-        />
-      </Suspense>
+      <FavoritesDialog
+        open={favoritesDialogOpen}
+        onOpenChange={setFavoritesDialogOpen}
+        items={favoriteItems}
+        onRemoveItem={handleRemoveFromFavorites}
+        onAddToCart={handleAddToCart}
+      />
 
-      <Suspense fallback={<div />}>
-        <PromoCodeDialog
-          open={promoDialogOpen}
-          onOpenChange={setPromoDialogOpen}
-          onApplyPromo={handleApplyPromo}
-          userId={currentUser?.id}
-        />
-      </Suspense>
+      <PromoCodeDialog
+        open={promoDialogOpen}
+        onOpenChange={setPromoDialogOpen}
+        onApplyPromo={handleApplyPromo}
+        userId={currentUser?.id}
+      />
 
-      <Suspense fallback={<div />}>
-        <ReferralDialog
-          open={referralDialogOpen}
-          onOpenChange={setReferralDialogOpen}
-          username={username}
-          userId={currentUser?.id}
-        />
-      </Suspense>
+      <ReferralDialog
+        open={referralDialogOpen}
+        onOpenChange={setReferralDialogOpen}
+        username={username}
+        userId={currentUser?.id}
+      />
 
       {currentUser?.role === 'admin' && (
         <section className="py-8 bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900 border-t-2 border-purple-500">

@@ -104,7 +104,7 @@ export default function RegisterPage() {
         title="Регистрация"
         description="Создайте аккаунт Tech Forma. Покупайте и продавайте студенческие работы"
         noindex={true}
-        canonical="https://techforma.pro/"
+        canonical="https://techforma.pro/register"
       />
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">

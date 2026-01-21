@@ -408,6 +408,27 @@ export default function CatalogPage() {
   // ✅ Мемоизируем список предметов
   const subjects = useMemo(() => Array.from(new Set(works.map(w => w.subject))), [works]);
 
+  // Обработчики фильтров с автосбросом страницы
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    if (currentPage !== 1) setSearchParams({});
+  }, [currentPage, setSearchParams]);
+
+  const handleFilterSubjectChange = useCallback((value: string) => {
+    setFilterSubject(value);
+    if (currentPage !== 1) setSearchParams({});
+  }, [currentPage, setSearchParams]);
+
+  const handlePriceRangeChange = useCallback((value: string) => {
+    setPriceRange(value);
+    if (currentPage !== 1) setSearchParams({});
+  }, [currentPage, setSearchParams]);
+
+  const handleSortByChange = useCallback((value: string) => {
+    setSortBy(value);
+    if (currentPage !== 1) setSearchParams({});
+  }, [currentPage, setSearchParams]);
+
   // ✅ Пагинация для быстрой загрузки (показываем только 24 работы за раз)
   const paginatedWorks = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -423,24 +444,6 @@ export default function CatalogPage() {
       setSearchParams({});
     }
   }, [totalPages, currentPage, setSearchParams]);
-
-  // Сбрасываем страницу на 1 при изменении фильтров (но НЕ при изменении самой страницы)
-  const prevFiltersRef = useRef({ searchQuery, filterSubject, priceRange, sortBy });
-  
-  useEffect(() => {
-    const prev = prevFiltersRef.current;
-    const filtersChanged = 
-      prev.searchQuery !== searchQuery ||
-      prev.filterSubject !== filterSubject ||
-      prev.priceRange !== priceRange ||
-      prev.sortBy !== sortBy;
-    
-    if (filtersChanged && currentPage !== 1) {
-      setSearchParams({});
-    }
-    
-    prevFiltersRef.current = { searchQuery, filterSubject, priceRange, sortBy };
-  }, [searchQuery, filterSubject, priceRange, sortBy, currentPage, setSearchParams]);
 
   const getCategoryTitle = () => {
     if (filterSubject && filterSubject !== 'all') {
@@ -556,19 +559,20 @@ export default function CatalogPage() {
           
           <CatalogFilters
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={handleSearchChange}
             filterSubject={filterSubject}
-            onFilterSubjectChange={setFilterSubject}
+            onFilterSubjectChange={handleFilterSubjectChange}
             priceRange={priceRange}
-            onPriceRangeChange={setPriceRange}
+            onPriceRangeChange={handlePriceRangeChange}
             sortBy={sortBy}
-            onSortByChange={setSortBy}
+            onSortByChange={handleSortByChange}
             subjects={subjects}
             onResetFilters={() => {
               setSearchQuery('');
               setFilterSubject('all');
               setPriceRange('all');
               setSortBy('default');
+              setSearchParams({});
             }}
           />
         </div>

@@ -627,11 +627,8 @@ export default function CatalogPage() {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
                         className="w-10 h-10"
-                        asChild
                       >
-                        <a href={pageNum === 1 ? '/catalog' : `/catalog?page=${pageNum}`}>
-                          {pageNum}
-                        </a>
+                        {pageNum}
                       </Button>
                     );
                   })}

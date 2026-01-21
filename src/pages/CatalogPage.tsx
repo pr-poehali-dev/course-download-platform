@@ -424,9 +424,12 @@ export default function CatalogPage() {
     }
   }, [totalPages, currentPage]);
 
-  // Сбрасываем страницу при изменении фильтров
+  // Сбрасываем страницу при изменении фильтров (но не при изменении самой страницы)
   useEffect(() => {
-    if (currentPage !== 1) {
+    // Сбрасываем страницу только если мы не на первой странице И изменились фильтры
+    const params = new URLSearchParams(window.location.search);
+    const urlPage = params.get('page');
+    if (urlPage && urlPage !== '1') {
       setSearchParams({});
     }
   }, [searchQuery, filterSubject, priceRange, sortBy]);

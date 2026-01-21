@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
@@ -64,15 +64,7 @@ export default function CatalogPage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userBalance, setUserBalance] = useState(0);
   const userDiscount = getUserDiscount(userBalance);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const pageParam = parseInt(searchParams.get('page') || '1', 10);
-  const currentPage = isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
-  const ITEMS_PER_PAGE = 24;
-
-  // Отладка: смотрим текущую страницу
-  useEffect(() => {
-    console.log('📄 Текущая страница:', currentPage, 'URL params:', searchParams.toString());
-  }, [currentPage, searchParams]);
+  const [visibleCount, setVisibleCount] = useState(24); // Сколько работ показываем
 
   useEffect(() => {
     trackEvent(metrikaEvents.CATALOG_OPEN);
@@ -413,42 +405,38 @@ export default function CatalogPage() {
   // ✅ Мемоизируем список предметов
   const subjects = useMemo(() => Array.from(new Set(works.map(w => w.subject))), [works]);
 
-  // Обработчики фильтров с автосбросом страницы
+  // Обработчики фильтров с автосбросом видимого количества
   const handleSearchChange = useCallback((value: string) => {
     setSearchQuery(value);
-    setSearchParams({});
-  }, [setSearchParams]);
+    setVisibleCount(24); // Сбрасываем к начальному количеству
+  }, []);
 
   const handleFilterSubjectChange = useCallback((value: string) => {
     setFilterSubject(value);
-    setSearchParams({});
-  }, [setSearchParams]);
+    setVisibleCount(24);
+  }, []);
 
   const handlePriceRangeChange = useCallback((value: string) => {
     setPriceRange(value);
-    setSearchParams({});
-  }, [setSearchParams]);
+    setVisibleCount(24);
+  }, []);
 
   const handleSortByChange = useCallback((value: string) => {
     setSortBy(value);
-    setSearchParams({});
-  }, [setSearchParams]);
+    setVisibleCount(24);
+  }, []);
 
-  // ✅ Пагинация для быстрой загрузки (показываем только 24 работы за раз)
-  const paginatedWorks = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredWorks.slice(startIndex, endIndex);
-  }, [filteredWorks, currentPage, ITEMS_PER_PAGE]);
+  // Показываем только видимое количество работ
+  const visibleWorks = useMemo(() => {
+    return filteredWorks.slice(0, visibleCount);
+  }, [filteredWorks, visibleCount]);
 
-  const totalPages = Math.ceil(filteredWorks.length / ITEMS_PER_PAGE);
+  const hasMore = filteredWorks.length > visibleCount;
 
-  // Проверяем, что текущая страница не превышает максимальную
-  useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) {
-      setSearchParams({});
-    }
-  }, [totalPages, currentPage, setSearchParams]);
+  // Функция подгрузки ещё работ
+  const loadMore = useCallback(() => {
+    setVisibleCount(prev => prev + 24);
+  }, []);
 
   const getCategoryTitle = () => {
     if (filterSubject && filterSubject !== 'all') {
@@ -501,38 +489,21 @@ export default function CatalogPage() {
   }), [filteredWorks.length]);
 
   const getCatalogSEOTitle = () => {
-    const pageText = currentPage > 1 ? ` — Страница ${currentPage}` : '';
     if (filterSubject !== 'all') {
-      return `Чертежи ${filterSubject}${pageText} | Tech Forma`;
+      return `Чертежи ${filterSubject} | Tech Forma`;
     }
-    return `Каталог чертежей DWG${pageText} | Tech Forma`;
+    return `Каталог чертежей DWG | Tech Forma`;
   };
 
   const getCatalogSEODescription = () => {
-    const pageText = currentPage > 1 ? ` Страница ${currentPage}.` : '';
     if (filterSubject !== 'all') {
-      return `Скачать чертежи DWG и 3D-модели по ${filterSubject}. ${filteredWorks.length} материалов для студентов и инженеров.${pageText} Мгновенный доступ после оплаты.`;
+      return `Скачать чертежи DWG и 3D-модели по ${filterSubject}. ${filteredWorks.length} материалов для студентов и инженеров. Мгновенный доступ после оплаты.`;
     }
-    return `Каталог из ${filteredWorks.length}+ чертежей DWG, 3D-моделей и технических расчётов. Для студентов и инженеров.${pageText} Скачать материалы сразу после оплаты.`;
+    return `Каталог из ${filteredWorks.length}+ чертежей DWG, 3D-моделей и технических расчётов. Для студентов и инженеров. Скачать материалы сразу после оплаты.`;
   };
 
   const hasQueryParams = searchQuery || filterSubject !== 'all' || priceRange !== 'all' || sortBy !== 'default';
-
-  // Canonical URL: для страницы 1 - без page, для остальных - с page
-  const canonicalUrl = currentPage === 1 
-    ? 'https://techforma.pro/catalog'
-    : `https://techforma.pro/catalog?page=${currentPage}`;
-
-  // Prev/Next для пагинации
-  const prevUrl = currentPage > 2 
-    ? `https://techforma.pro/catalog?page=${currentPage - 1}`
-    : currentPage === 2 
-    ? 'https://techforma.pro/catalog'
-    : null;
-  
-  const nextUrl = currentPage < totalPages 
-    ? `https://techforma.pro/catalog?page=${currentPage + 1}`
-    : null;
+  const canonicalUrl = 'https://techforma.pro/catalog';
 
   return (
     <>
@@ -540,10 +511,7 @@ export default function CatalogPage() {
         <title>{getCatalogSEOTitle()}</title>
         <meta name="description" content={getCatalogSEODescription()} />
         <link rel="canonical" href={canonicalUrl} />
-        {prevUrl && <link rel="prev" href={prevUrl} />}
-        {nextUrl && <link rel="next" href={nextUrl} />}
-        {hasQueryParams && currentPage === 1 && <meta name="robots" content="noindex, follow" />}
-        {currentPage > 1 && <meta name="robots" content="noindex, follow" />}
+        {hasQueryParams && <meta name="robots" content="noindex, follow" />}
         <script type="application/ld+json">
           {JSON.stringify(jsonLdSchema)}
         </script>
@@ -577,7 +545,7 @@ export default function CatalogPage() {
               setFilterSubject('all');
               setPriceRange('all');
               setSortBy('default');
-              setSearchParams({});
+              setVisibleCount(24);
             }}
           />
         </div>
@@ -592,7 +560,7 @@ export default function CatalogPage() {
           <>
             <TooltipProvider>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {paginatedWorks.map((work) => (
+                {visibleWorks.map((work) => (
                   <CatalogWorkCard
                     key={work.id}
                     work={work}
@@ -610,105 +578,23 @@ export default function CatalogPage() {
               </div>
             </TooltipProvider>
 
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-12 mb-8 flex-wrap">
+            {hasMore && (
+              <div className="flex justify-center mt-12 mb-8">
                 <Button
+                  onClick={loadMore}
+                  size="lg"
                   variant="outline"
-                  onClick={() => {
-                    const newPage = currentPage - 1;
-                    console.log('Назад: новая страница', newPage, 'текущая', currentPage);
-                    setSearchParams(newPage === 1 ? {} : { page: String(newPage) });
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  disabled={currentPage === 1}
+                  className="min-w-[200px]"
                 >
-                  <Icon name="ChevronLeft" size={20} />
-                  Назад
+                  Показать ещё
+                  <Icon name="ChevronDown" size={20} className="ml-2" />
                 </Button>
-                
-                <div className="flex gap-2 items-center">
-                  {/* Первая страница */}
-                  {currentPage > 3 && (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setSearchParams({});
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="w-10 h-10"
-                      >
-                        1
-                      </Button>
-                      {currentPage > 4 && <span className="px-2">...</span>}
-                    </>
-                  )}
-                  
-                  {/* Окно из 5 страниц вокруг текущей */}
-                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    // Пропускаем если это первая страница и мы уже показали её выше
-                    if (pageNum === 1 && currentPage > 3) return null;
-                    // Пропускаем если это последняя страница и мы покажем её ниже
-                    if (pageNum === totalPages && currentPage < totalPages - 2) return null;
-                    
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={currentPage === pageNum ? 'default' : 'outline'}
-                        onClick={() => {
-                          console.log('Клик на страницу:', pageNum, 'Текущая:', currentPage);
-                          setSearchParams(pageNum === 1 ? {} : { page: String(pageNum) });
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="w-10 h-10"
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                  
-                  {/* Последняя страница */}
-                  {currentPage < totalPages - 2 && (
-                    <>
-                      {currentPage < totalPages - 3 && <span className="px-2">...</span>}
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setSearchParams({ page: String(totalPages) });
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="w-10 h-10"
-                      >
-                        {totalPages}
-                      </Button>
-                    </>
-                  )}
-                </div>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    const newPage = currentPage + 1;
-                    console.log('Вперёд: новая страница', newPage, 'текущая', currentPage);
-                    setSearchParams({ page: String(newPage) });
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  disabled={currentPage === totalPages}
-                >
-                  Вперёд
-                  <Icon name="ChevronRight" size={20} />
-                </Button>
+              </div>
+            )}
+
+            {!hasMore && filteredWorks.length > 24 && (
+              <div className="text-center text-muted-foreground mt-12 mb-8">
+                Показаны все работы ({filteredWorks.length})
               </div>
             )}
             

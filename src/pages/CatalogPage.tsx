@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { authService } from '@/lib/auth';
 import func2url from '../../backend/func2url.json';
@@ -64,9 +64,7 @@ export default function CatalogPage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userBalance, setUserBalance] = useState(0);
   const userDiscount = getUserDiscount(userBalance);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const pageParam = parseInt(searchParams.get('page') || '1', 10);
-  const currentPage = isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
+  const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 24;
 
   useEffect(() => {
@@ -352,11 +350,8 @@ export default function CatalogPage() {
         // Удаляем сохранённую позицию
         sessionStorage.removeItem('catalog_scroll_position');
       }, 100);
-    } else if (!loading) {
-      // При смене страницы через URL скроллим вверх
-      window.scrollTo(0, 0);
     }
-  }, [loading, currentPage]);
+  }, [loading]);
 
   // ✅ Оптимизированная фильтрация с useMemo для мгновенного поиска
   const filteredWorks = useMemo(() => {
@@ -417,18 +412,9 @@ export default function CatalogPage() {
 
   const totalPages = Math.ceil(filteredWorks.length / ITEMS_PER_PAGE);
 
-  // Проверяем, что текущая страница не превышает максимальную
-  useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) {
-      setSearchParams({});
-    }
-  }, [totalPages, currentPage]);
-
   // Сбрасываем страницу при изменении фильтров
   useEffect(() => {
-    if (currentPage !== 1) {
-      setSearchParams({});
-    }
+    setCurrentPage(1);
   }, [searchQuery, filterSubject, priceRange, sortBy]);
 
   const getCategoryTitle = () => {
@@ -482,49 +468,28 @@ export default function CatalogPage() {
   }), [filteredWorks.length]);
 
   const getCatalogSEOTitle = () => {
-    const pageText = currentPage > 1 ? ` — Страница ${currentPage}` : '';
     if (filterSubject !== 'all') {
-      return `Чертежи ${filterSubject}${pageText} | Tech Forma`;
+      return `Чертежи ${filterSubject} | Tech Forma`;
     }
-    return `Каталог чертежей DWG${pageText} | Tech Forma`;
+    return 'Каталог чертежей DWG | Tech Forma';
   };
 
   const getCatalogSEODescription = () => {
-    const pageText = currentPage > 1 ? ` Страница ${currentPage}.` : '';
     if (filterSubject !== 'all') {
-      return `Скачать чертежи DWG и 3D-модели по ${filterSubject}. ${filteredWorks.length} материалов для студентов и инженеров.${pageText} Мгновенный доступ после оплаты.`;
+      return `Скачать чертежи DWG и 3D-модели по ${filterSubject}. ${filteredWorks.length} материалов для студентов и инженеров. Мгновенный доступ после оплаты.`;
     }
-    return `Каталог из ${filteredWorks.length}+ чертежей DWG, 3D-моделей и технических расчётов. Для студентов и инженеров.${pageText} Скачать материалы сразу после оплаты.`;
+    return `Каталог из ${filteredWorks.length}+ чертежей DWG, 3D-моделей и технических расчётов. Для студентов и инженеров. Скачать материалы сразу после оплаты.`;
   };
 
   const hasQueryParams = searchQuery || filterSubject !== 'all' || priceRange !== 'all' || sortBy !== 'default';
-
-  // Canonical URL: для страницы 1 - без page, для остальных - с page
-  const canonicalUrl = currentPage === 1 
-    ? 'https://techforma.pro/catalog'
-    : `https://techforma.pro/catalog?page=${currentPage}`;
-
-  // Prev/Next для пагинации
-  const prevUrl = currentPage > 2 
-    ? `https://techforma.pro/catalog?page=${currentPage - 1}`
-    : currentPage === 2 
-    ? 'https://techforma.pro/catalog'
-    : null;
-  
-  const nextUrl = currentPage < totalPages 
-    ? `https://techforma.pro/catalog?page=${currentPage + 1}`
-    : null;
 
   return (
     <>
       <Helmet>
         <title>{getCatalogSEOTitle()}</title>
         <meta name="description" content={getCatalogSEODescription()} />
-        <link rel="canonical" href={canonicalUrl} />
-        {prevUrl && <link rel="prev" href={prevUrl} />}
-        {nextUrl && <link rel="next" href={nextUrl} />}
-        {hasQueryParams && currentPage === 1 && <meta name="robots" content="noindex, follow" />}
-        {currentPage > 1 && <meta name="robots" content="noindex, follow" />}
+        <link rel="canonical" href="https://techforma.pro/catalog" />
+        {hasQueryParams && <meta name="robots" content="noindex, follow" />}
         <script type="application/ld+json">
           {JSON.stringify(jsonLdSchema)}
         </script>
@@ -595,8 +560,7 @@ export default function CatalogPage() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const newPage = Math.max(1, currentPage - 1);
-                    setSearchParams(newPage === 1 ? {} : { page: String(newPage) });
+                    setCurrentPage(p => Math.max(1, p - 1));
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   disabled={currentPage === 1}
@@ -623,15 +587,12 @@ export default function CatalogPage() {
                         key={pageNum}
                         variant={currentPage === pageNum ? 'default' : 'outline'}
                         onClick={() => {
-                          setSearchParams(pageNum === 1 ? {} : { page: String(pageNum) });
+                          setCurrentPage(pageNum);
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
                         className="w-10 h-10"
-                        asChild
                       >
-                        <a href={pageNum === 1 ? '/catalog' : `/catalog?page=${pageNum}`}>
-                          {pageNum}
-                        </a>
+                        {pageNum}
                       </Button>
                     );
                   })}
@@ -640,8 +601,7 @@ export default function CatalogPage() {
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const newPage = Math.min(totalPages, currentPage + 1);
-                    setSearchParams({ page: String(newPage) });
+                    setCurrentPage(p => Math.min(totalPages, p + 1));
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
                   disabled={currentPage === totalPages}

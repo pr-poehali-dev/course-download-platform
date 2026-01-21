@@ -594,11 +594,11 @@ export default function CatalogPage() {
             </TooltipProvider>
 
             {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-12 mb-8">
+              <div className="flex justify-center items-center gap-2 mt-12 mb-8 flex-wrap">
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const newPage = Math.max(1, currentPage - 1);
+                    const newPage = currentPage - 1;
                     setSearchParams(newPage === 1 ? {} : { page: String(newPage) });
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
@@ -608,7 +608,25 @@ export default function CatalogPage() {
                   Назад
                 </Button>
                 
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  {/* Первая страница */}
+                  {currentPage > 3 && (
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSearchParams({});
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="w-10 h-10"
+                      >
+                        1
+                      </Button>
+                      {currentPage > 4 && <span className="px-2">...</span>}
+                    </>
+                  )}
+                  
+                  {/* Окно из 5 страниц вокруг текущей */}
                   {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                     let pageNum;
                     if (totalPages <= 5) {
@@ -620,6 +638,11 @@ export default function CatalogPage() {
                     } else {
                       pageNum = currentPage - 2 + i;
                     }
+                    
+                    // Пропускаем если это первая страница и мы уже показали её выше
+                    if (pageNum === 1 && currentPage > 3) return null;
+                    // Пропускаем если это последняя страница и мы покажем её ниже
+                    if (pageNum === totalPages && currentPage < totalPages - 2) return null;
                     
                     return (
                       <Button
@@ -635,12 +658,29 @@ export default function CatalogPage() {
                       </Button>
                     );
                   })}
+                  
+                  {/* Последняя страница */}
+                  {currentPage < totalPages - 2 && (
+                    <>
+                      {currentPage < totalPages - 3 && <span className="px-2">...</span>}
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setSearchParams({ page: String(totalPages) });
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="w-10 h-10"
+                      >
+                        {totalPages}
+                      </Button>
+                    </>
+                  )}
                 </div>
                 
                 <Button
                   variant="outline"
                   onClick={() => {
-                    const newPage = Math.min(totalPages, currentPage + 1);
+                    const newPage = currentPage + 1;
                     setSearchParams({ page: String(newPage) });
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}

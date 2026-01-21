@@ -411,23 +411,23 @@ export default function CatalogPage() {
   // Обработчики фильтров с автосбросом страницы
   const handleSearchChange = useCallback((value: string) => {
     setSearchQuery(value);
-    if (currentPage !== 1) setSearchParams({});
-  }, [currentPage, setSearchParams]);
+    setSearchParams({});
+  }, [setSearchParams]);
 
   const handleFilterSubjectChange = useCallback((value: string) => {
     setFilterSubject(value);
-    if (currentPage !== 1) setSearchParams({});
-  }, [currentPage, setSearchParams]);
+    setSearchParams({});
+  }, [setSearchParams]);
 
   const handlePriceRangeChange = useCallback((value: string) => {
     setPriceRange(value);
-    if (currentPage !== 1) setSearchParams({});
-  }, [currentPage, setSearchParams]);
+    setSearchParams({});
+  }, [setSearchParams]);
 
   const handleSortByChange = useCallback((value: string) => {
     setSortBy(value);
-    if (currentPage !== 1) setSearchParams({});
-  }, [currentPage, setSearchParams]);
+    setSearchParams({});
+  }, [setSearchParams]);
 
   // ✅ Пагинация для быстрой загрузки (показываем только 24 работы за раз)
   const paginatedWorks = useMemo(() => {

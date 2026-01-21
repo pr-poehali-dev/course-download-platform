@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
         title="Восстановление пароля"
         description="Восстановите доступ к аккаунту Tech Forma"
         noindex={true}
-        canonical="https://techforma.pro/forgot-password"
+        canonical="https://techforma.pro/"
       />
       <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 flex items-center justify-center p-4">
         <div className="w-full max-w-md">

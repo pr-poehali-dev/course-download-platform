@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import { authService } from '@/lib/auth';
@@ -422,17 +422,25 @@ export default function CatalogPage() {
     if (totalPages > 0 && currentPage > totalPages) {
       setSearchParams({});
     }
-  }, [totalPages, currentPage]);
+  }, [totalPages, currentPage, setSearchParams]);
 
-  // Сбрасываем страницу при изменении фильтров (но не при изменении самой страницы)
+  // Сбрасываем страницу на 1 при изменении фильтров (но НЕ при изменении самой страницы)
+  const prevFiltersRef = useRef({ searchQuery, filterSubject, priceRange, sortBy });
+  
   useEffect(() => {
-    // Сбрасываем страницу только если мы не на первой странице И изменились фильтры
-    const params = new URLSearchParams(window.location.search);
-    const urlPage = params.get('page');
-    if (urlPage && urlPage !== '1') {
+    const prev = prevFiltersRef.current;
+    const filtersChanged = 
+      prev.searchQuery !== searchQuery ||
+      prev.filterSubject !== filterSubject ||
+      prev.priceRange !== priceRange ||
+      prev.sortBy !== sortBy;
+    
+    if (filtersChanged && currentPage !== 1) {
       setSearchParams({});
     }
-  }, [searchQuery, filterSubject, priceRange, sortBy]);
+    
+    prevFiltersRef.current = { searchQuery, filterSubject, priceRange, sortBy };
+  }, [searchQuery, filterSubject, priceRange, sortBy, currentPage, setSearchParams]);
 
   const getCategoryTitle = () => {
     if (filterSubject && filterSubject !== 'all') {

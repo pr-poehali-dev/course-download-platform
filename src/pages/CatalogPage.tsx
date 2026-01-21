@@ -69,6 +69,11 @@ export default function CatalogPage() {
   const currentPage = isNaN(pageParam) || pageParam < 1 ? 1 : pageParam;
   const ITEMS_PER_PAGE = 24;
 
+  // Отладка: смотрим текущую страницу
+  useEffect(() => {
+    console.log('📄 Текущая страница:', currentPage, 'URL params:', searchParams.toString());
+  }, [currentPage, searchParams]);
+
   useEffect(() => {
     trackEvent(metrikaEvents.CATALOG_OPEN);
   }, []);
@@ -611,6 +616,7 @@ export default function CatalogPage() {
                   variant="outline"
                   onClick={() => {
                     const newPage = currentPage - 1;
+                    console.log('Назад: новая страница', newPage, 'текущая', currentPage);
                     setSearchParams(newPage === 1 ? {} : { page: String(newPage) });
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
@@ -661,6 +667,7 @@ export default function CatalogPage() {
                         key={pageNum}
                         variant={currentPage === pageNum ? 'default' : 'outline'}
                         onClick={() => {
+                          console.log('Клик на страницу:', pageNum, 'Текущая:', currentPage);
                           setSearchParams(pageNum === 1 ? {} : { page: String(pageNum) });
                           window.scrollTo({ top: 0, behavior: 'smooth' });
                         }}
@@ -693,6 +700,7 @@ export default function CatalogPage() {
                   variant="outline"
                   onClick={() => {
                     const newPage = currentPage + 1;
+                    console.log('Вперёд: новая страница', newPage, 'текущая', currentPage);
                     setSearchParams({ page: String(newPage) });
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}

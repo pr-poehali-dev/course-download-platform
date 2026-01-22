@@ -22,7 +22,14 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import { trackEvent, metrikaEvents } from '@/utils/metrika';
 
 import WorkEditDialog from '@/components/WorkEditDialog';
+import FilesList from '@/components/catalog/FilesList';
 
+
+interface FileItem {
+  name: string;
+  type: string;
+  size: number;
+}
 
 interface Work {
   id: string;
@@ -46,6 +53,7 @@ interface Work {
   reviewsCount?: number;
   keywords?: string[];
   discount?: number;
+  filesList?: FileItem[];
 }
 
 export default function WorkDetailPage() {
@@ -432,6 +440,18 @@ export default function WorkDetailPage() {
             setGallery([previewUrl]);
           }
           
+          // Парсим files_list из JSON
+          let filesList: FileItem[] = [];
+          if (data.files_list) {
+            try {
+              filesList = typeof data.files_list === 'string' 
+                ? JSON.parse(data.files_list) 
+                : data.files_list;
+            } catch (e) {
+              console.error('Failed to parse files_list:', e);
+            }
+          }
+          
           const workData = {
             id: String(data.id),
             title,
@@ -452,7 +472,8 @@ export default function WorkDetailPage() {
             reviewsCount: data.reviews_count || 0,
             keywords: data.keywords || [],
             fileFormats: undefined,
-            authorId: data.author_id
+            authorId: data.author_id,
+            filesList: filesList
           };
           
           setWork(workData);
@@ -1682,14 +1703,18 @@ export default function WorkDetailPage() {
                   />
                 ) : (
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <ul className="space-y-2.5">
-                      {work.composition.map((item, index) => (
-                        <li key={index} className="flex items-start gap-3">
-                          <Icon name="FileText" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
-                          <span className="text-gray-700">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    {work.filesList && work.filesList.length > 0 ? (
+                      <FilesList files={work.filesList} maxFiles={10} />
+                    ) : (
+                      <ul className="space-y-2.5">
+                        {work.composition.map((item, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <Icon name="FileText" size={18} className="mt-0.5 flex-shrink-0 text-blue-600" />
+                            <span className="text-gray-700">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 )}
               </div>

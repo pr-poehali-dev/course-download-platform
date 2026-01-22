@@ -20,6 +20,12 @@ import CatalogLoadingState from '@/components/catalog/CatalogLoadingState';
 import CatalogWorkCard from '@/components/catalog/CatalogWorkCard';
 
 
+interface FileItem {
+  name: string;
+  type: string;
+  size: number;
+}
+
 interface Work {
   id: string;
   folderName: string;
@@ -44,6 +50,7 @@ interface Work {
   views?: number;
   downloads?: number;
   reviewsCount?: number;
+  filesList?: FileItem[];
 }
 
 export default function CatalogPage() {
@@ -297,6 +304,18 @@ export default function CatalogPage() {
             const { title, workType } = extractWorkInfo(work.title || work.folder_name);
             const hasRealCover = work.preview_image_url && !work.preview_image_url.includes('e0139de0-3660-402a-8d29-d07f5dac95b3.jpg');
             
+            // Парсим files_list из JSON строки или используем напрямую если уже массив
+            let filesList: FileItem[] = [];
+            if (work.files_list) {
+              try {
+                filesList = typeof work.files_list === 'string' 
+                  ? JSON.parse(work.files_list) 
+                  : work.files_list;
+              } catch (e) {
+                console.error('Failed to parse files_list:', e);
+              }
+            }
+            
             return {
               id: String(work.id),
               folderName: work.folder_name || work.title,
@@ -315,7 +334,8 @@ export default function CatalogPage() {
               isHit: false,
               isNew: false,
               discount: 0,
-              authorId: work.author_id || null
+              authorId: work.author_id || null,
+              filesList: filesList
             };
           });
           

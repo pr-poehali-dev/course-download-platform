@@ -1,0 +1,15 @@
+{
+  "tests": [
+    {
+      "name": "Populate files list for works",
+      "method": "POST",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {
+        "updated": "number",
+        "total": "number"
+      },
+      "bodyMatcher": "partial"
+    }
+  ]
+}

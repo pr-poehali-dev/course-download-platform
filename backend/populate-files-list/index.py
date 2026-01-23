@@ -92,7 +92,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     with zipfile.ZipFile(io.BytesIO(archive_data)) as zf:
                         for file_info in zf.filelist:
                             if not file_info.is_dir():
-                                file_name = file_info.filename.split('/')[-1]
+                                # Исправляем кодировку имени файла из ZIP
+                                try:
+                                    # Пробуем декодировать как UTF-8
+                                    file_name = file_info.filename.encode('cp437').decode('utf-8')
+                                except (UnicodeDecodeError, UnicodeEncodeError):
+                                    # Если не получилось, используем как есть
+                                    file_name = file_info.filename
+                                
+                                file_name = file_name.split('/')[-1]
                                 files_list.append({
                                     'name': file_name,
                                     'type': get_file_type(file_name),

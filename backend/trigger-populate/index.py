@@ -23,14 +23,30 @@ def handler(event, context):
     
     try:
         # URL функции populate-files-list
-        url = 'https://functions.poehali.dev/f223384a-8ec5-4596-8058-0031ec710c9e'
+        base_url = 'https://functions.poehali.dev/f223384a-8ec5-4596-8058-0031ec710c9e'
         
-        # Вызываем функцию через POST
-        req = urllib.request.Request(url, method='POST')
-        req.add_header('Content-Type', 'application/json')
+        # Вызываем функцию батчами (по 50 работ)
+        # Всего ~480 работ, значит нужно ~10 батчей
+        total_updated = 0
+        all_errors = []
         
-        with urllib.request.urlopen(req, timeout=600) as response:
-            result = response.read().decode('utf-8')
+        for batch in range(10):
+            url = f'{base_url}?batch={batch}'
+            
+            req = urllib.request.Request(url, method='POST')
+            req.add_header('Content-Type', 'application/json')
+            
+            try:
+                with urllib.request.urlopen(req, timeout=60) as response:
+                    result = json.loads(response.read().decode('utf-8'))
+                    total_updated += result.get('updated', 0)
+                    all_errors.extend(result.get('errors', []))
+                    
+                    # Если больше нет работ, прекращаем
+                    if result.get('total', 0) == 0:
+                        break
+            except Exception as e:
+                all_errors.append(f'Batch {batch}: {str(e)}')
         
         return {
             'statusCode': 200,
@@ -38,7 +54,11 @@ def handler(event, context):
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': result,
+            'body': json.dumps({
+                'success': True,
+                'total_updated': total_updated,
+                'errors': all_errors[:20]
+            }),
             'isBase64Encoded': False
         }
     

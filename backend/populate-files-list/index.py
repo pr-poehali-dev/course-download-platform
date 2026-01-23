@@ -48,13 +48,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = psycopg2.connect(dsn)
         cur = conn.cursor()
         
-        # Получаем все работы с download_url или file_url (обрабатываем все без лимита)
+        # Получаем работы батчами по 50 штук для избежания таймаута
+        # Читаем параметр batch из query string (по умолчанию 0)
+        query_params = event.get('queryStringParameters') or {}
+        batch_num = int(query_params.get('batch', 0))
+        batch_size = 50
+        offset = batch_num * batch_size
+        
         cur.execute("""
             SELECT id, title, download_url, file_url 
             FROM t_p63326274_course_download_plat.works 
             WHERE (download_url IS NOT NULL OR file_url IS NOT NULL)
             AND (files_list IS NULL OR files_list = '[]'::jsonb)
-        """)
+            ORDER BY id
+            LIMIT %s OFFSET %s
+        """, (batch_size, offset))
         
         works = cur.fetchall()
         updated_count = 0

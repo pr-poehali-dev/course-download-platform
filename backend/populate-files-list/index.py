@@ -48,13 +48,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = psycopg2.connect(dsn)
         cur = conn.cursor()
         
-        # Получаем все работы с download_url или file_url
+        # Получаем все работы с download_url или file_url (обрабатываем все без лимита)
         cur.execute("""
             SELECT id, title, download_url, file_url 
             FROM t_p63326274_course_download_plat.works 
             WHERE (download_url IS NOT NULL OR file_url IS NOT NULL)
             AND (files_list IS NULL OR files_list = '[]'::jsonb)
-            LIMIT 100
         """)
         
         works = cur.fetchall()
@@ -109,6 +108,15 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'size': len(archive_data)
                     })
                 
+                else:
+                    # Для не-архивных файлов (PNG, DOC, PDF и т.д.)
+                    file_name = archive_url.split('/')[-1]
+                    files_list.append({
+                        'name': file_name,
+                        'type': get_file_type(file_name),
+                        'size': len(archive_data)
+                    })
+                
                 # Обновляем БД
                 if files_list:
                     files_json = json.dumps(files_list, ensure_ascii=False)
@@ -120,9 +128,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     print(f"Updated work {work_id}: {len(files_list)} files")
             
             except Exception as e:
+                import traceback
                 error_msg = f"Work {work_id} ({title[:50]}): {str(e)}"
                 errors.append(error_msg)
                 print(f"Error: {error_msg}")
+                print(f"Traceback: {traceback.format_exc()}")
                 continue
         
         conn.commit()

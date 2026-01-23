@@ -1,0 +1,10 @@
+{
+  "tests": [
+    {
+      "name": "Trigger populate function",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200
+    }
+  ]
+}

@@ -1,4 +1,6 @@
 {
+  "populate-files-list": "https://functions.poehali.dev/f223384a-8ec5-4596-8058-0031ec710c9e",
+  "handle-404": "https://functions.poehali.dev/cfdba4c5-c77b-43e6-a837-282d5550fc3f",
   "trigger-emails": "https://functions.poehali.dev/2dbbd1dd-8f54-48b6-98b2-e4b4e003fa46",
   "auto-generate-reviews": "https://functions.poehali.dev/d9886c33-1db5-46c5-bbbb-fb69e13ad178",
   "delete-work": "https://functions.poehali.dev/8de851cd-a14b-43d8-b101-ef1ae691c01a",

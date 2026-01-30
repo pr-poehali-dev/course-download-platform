@@ -4,6 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import Icon from '@/components/ui/icon';
+import FilesList from './FilesList';
+
+interface FileItem {
+  name: string;
+  type: string;
+  size: number;
+}
 
 interface Work {
   id: string;
@@ -29,6 +36,7 @@ interface Work {
   views?: number;
   downloads?: number;
   reviewsCount?: number;
+  filesList?: FileItem[];
 }
 
 interface CatalogWorkCardProps {
@@ -146,15 +154,21 @@ const CatalogWorkCard = memo(function CatalogWorkCard({
         </p>
         
         <div className="space-y-2 mb-3">
-          <div className="flex items-center gap-2 text-xs text-gray-600">
-            <Icon name="Package" size={14} className="text-blue-600" />
-            <span className="line-clamp-1">{work.composition}</span>
-          </div>
-          
-          <div className="flex items-center gap-2 text-xs text-gray-600">
-            <Icon name="Tag" size={14} className="text-purple-600" />
-            <span className="font-medium">{work.subject}</span>
-          </div>
+          {work.filesList && work.filesList.length > 0 ? (
+            <FilesList files={work.filesList} maxFiles={3} />
+          ) : (
+            <>
+              <div className="flex items-center gap-2 text-xs text-gray-600">
+                <Icon name="Package" size={14} className="text-blue-600" />
+                <span className="line-clamp-1">{work.composition}</span>
+              </div>
+              
+              <div className="flex items-center gap-2 text-xs text-gray-600">
+                <Icon name="Tag" size={14} className="text-purple-600" />
+                <span className="font-medium">{work.subject}</span>
+              </div>
+            </>
+          )}
         </div>
 
         <div className="flex items-center justify-between pt-3 border-t">

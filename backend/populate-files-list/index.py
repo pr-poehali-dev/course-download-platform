@@ -48,21 +48,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         conn = psycopg2.connect(dsn)
         cur = conn.cursor()
         
-        # Получаем работы батчами по 50 штук для избежания таймаута
-        # Читаем параметр batch из query string (по умолчанию 0)
-        query_params = event.get('queryStringParameters') or {}
-        batch_num = int(query_params.get('batch', 0))
-        batch_size = 50
-        offset = batch_num * batch_size
-        
+        # Получаем все работы с download_url или file_url
         cur.execute("""
             SELECT id, title, download_url, file_url 
             FROM t_p63326274_course_download_plat.works 
             WHERE (download_url IS NOT NULL OR file_url IS NOT NULL)
             AND (files_list IS NULL OR files_list = '[]'::jsonb)
-            ORDER BY id
-            LIMIT %s OFFSET %s
-        """, (batch_size, offset))
+            LIMIT 100
+        """)
         
         works = cur.fetchall()
         updated_count = 0
@@ -100,15 +93,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     with zipfile.ZipFile(io.BytesIO(archive_data)) as zf:
                         for file_info in zf.filelist:
                             if not file_info.is_dir():
-                                # Исправляем кодировку имени файла из ZIP
-                                try:
-                                    # Пробуем декодировать как UTF-8
-                                    file_name = file_info.filename.encode('cp437').decode('utf-8')
-                                except (UnicodeDecodeError, UnicodeEncodeError):
-                                    # Если не получилось, используем как есть
-                                    file_name = file_info.filename
-                                
-                                file_name = file_name.split('/')[-1]
+                                file_name = file_info.filename.split('/')[-1]
                                 files_list.append({
                                     'name': file_name,
                                     'type': get_file_type(file_name),
@@ -124,15 +109,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'size': len(archive_data)
                     })
                 
-                else:
-                    # Для не-архивных файлов (PNG, DOC, PDF и т.д.)
-                    file_name = archive_url.split('/')[-1]
-                    files_list.append({
-                        'name': file_name,
-                        'type': get_file_type(file_name),
-                        'size': len(archive_data)
-                    })
-                
                 # Обновляем БД
                 if files_list:
                     files_json = json.dumps(files_list, ensure_ascii=False)
@@ -144,11 +120,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     print(f"Updated work {work_id}: {len(files_list)} files")
             
             except Exception as e:
-                import traceback
                 error_msg = f"Work {work_id} ({title[:50]}): {str(e)}"
                 errors.append(error_msg)
                 print(f"Error: {error_msg}")
-                print(f"Traceback: {traceback.format_exc()}")
                 continue
         
         conn.commit()

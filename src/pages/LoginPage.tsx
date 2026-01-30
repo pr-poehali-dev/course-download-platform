@@ -19,7 +19,7 @@ export default function LoginPage() {
         title="Вход в личный кабинет"
         description="Войдите в свой аккаунт Tech Forma для доступа к каталогу студенческих работ"
         noindex={true}
-        canonical="https://techforma.pro/login"
+        canonical="https://techforma.pro/"
       />
       <LoginPageContent navigate={navigate} />
     </>

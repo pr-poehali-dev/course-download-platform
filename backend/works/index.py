@@ -175,7 +175,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     SELECT id, title, work_type, subject, description, composition, 
                            price_points, rating, downloads, created_at, yandex_disk_link, 
                            preview_image_url, file_url, author_id, preview_urls,
-                           author_name, language, software, views_count, reviews_count, keywords, downloads_count, cover_images, discount, files_list
+                           author_name, language, software, views_count, reviews_count, keywords, downloads_count, cover_images, discount
                     FROM t_p63326274_course_download_plat.works WHERE id = {int(work_id)}
                 """)
                 row = cur.fetchone()
@@ -215,14 +215,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if not isinstance(cover_images, list):
                     cover_images = []
                 
-                files_list_str = row[24]
-                if isinstance(files_list_str, str):
-                    files_list = json.loads(files_list_str) if files_list_str and files_list_str != '[]' else []
-                elif isinstance(files_list_str, list):
-                    files_list = files_list_str
-                else:
-                    files_list = []
-                
                 work = {
                     'id': row[0],
                     'title': row[1],
@@ -247,8 +239,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'keywords': keywords,
                     'downloads_count': row[21] or 0,
                     'cover_images': cover_images,
-                    'discount': row[23] or 0,
-                    'files_list': files_list
+                    'discount': row[23] or 0
                 }
                 
                 cur.execute(f"""
@@ -324,7 +315,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 query = f"""
                     SELECT id, title, work_type, subject, description, 
                            price_points, rating, downloads, category, preview_image_url, author_id, preview_urls,
-                           author_name, language, software, views_count, reviews_count, keywords, file_url, downloads_count, discount, files_list
+                           author_name, language, software, views_count, reviews_count, keywords, file_url, downloads_count, discount
                     FROM t_p63326274_course_download_plat.works 
                     WHERE {where_sql}
                     ORDER BY created_at DESC
@@ -360,14 +351,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     else:
                         keywords = []
                     
-                    files_list_str = row[21]
-                    if isinstance(files_list_str, str):
-                        files_list = json.loads(files_list_str) if files_list_str and files_list_str != '[]' else []
-                    elif isinstance(files_list_str, list):
-                        files_list = files_list_str
-                    else:
-                        files_list = []
-                    
                     work = {
                         'id': work_id,
                         'title': row[1],
@@ -389,8 +372,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'keywords': keywords,
                         'file_url': row[18],
                         'downloads_count': row[19] or 0,
-                        'discount': row[20] or 0,
-                        'files_list': files_list
+                        'discount': row[20] or 0
                     }
                     works.append(work)
                 

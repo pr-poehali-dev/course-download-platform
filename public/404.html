@@ -4,8 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <meta http-equiv="status" content="404">
+    <meta http-equiv="status" content="404 Not Found">
     <title>Ошибка 404: Страница не найдена</title>
+    <meta name="description" content="Запрашиваемая страница не найдена. Вернитесь на главную или перейдите в каталог чертежей и 3D-моделей TechForma.">
+    
+    <!-- Яндекс.Метрика -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+        ym(99299244, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/99299244" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Ошибка 404: Страница не найдена",
+        "description": "Запрашиваемая страница не существует"
+    }
+    </script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -231,11 +260,18 @@
         </div>
     </div>
     <script>
+        // Показываем текущий URL
         document.getElementById('path').textContent = window.location.pathname;
         
-        // Отправка события в Яндекс.Метрику
+        // Логируем ошибку в консоль для отладки
+        console.error('404 Error: Page not found -', window.location.pathname);
+        
+        // Отправка события 404 в Яндекс.Метрику
         if (window.ym) {
-            ym(99299244, 'reachGoal', '404_error', { url: window.location.pathname });
+            ym(99299244, 'reachGoal', '404_error', { 
+                url: window.location.pathname,
+                referrer: document.referrer 
+            });
         }
     </script>
 </body>

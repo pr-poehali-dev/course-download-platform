@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { authService } from '@/lib/auth';
 import funcUrls from '../../backend/func2url.json';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import SEO from '@/components/SEO';
 
 export default function DefenseKitBuilder() {
   const [searchParams] = useSearchParams();
@@ -188,6 +189,10 @@ export default function DefenseKitBuilder() {
   
   return (
     <>
+      <SEO 
+        title="Конструктор защиты ВКР"
+        description="Автоматическое создание материалов для защиты дипломной работы: речь, презентация, раздаточный материал. Генерация за 2 минуты."
+      />
       <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-24 pb-12">
         <div className="container mx-auto px-4 max-w-4xl">

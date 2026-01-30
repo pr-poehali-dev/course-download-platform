@@ -10,6 +10,7 @@ import func2url from '../../backend/func2url.json';
 import { getTimeRemaining, formatTime } from '@/utils/urgencyTriggers';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { trackEvent, metrikaEvents } from '@/utils/metrika';
+import SEO from '@/components/SEO';
 
 interface PointsPackage {
   id: number;
@@ -149,9 +150,14 @@ export default function BuyPointsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-16 max-w-6xl">
-        <Breadcrumbs />
+    <>
+      <SEO 
+        title="Пополнение баланса"
+        description="Купить баллы для скачивания работ. Пакеты с бонусами от 200₽. 1 балл = 5₽. Оплата картой онлайн."
+      />
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-4 py-16 max-w-6xl">
+          <Breadcrumbs />
         <div className="mb-8">
           <Button variant="ghost" className="mb-4" asChild>
             <Link to="/profile">
@@ -344,5 +350,6 @@ export default function BuyPointsPage() {
         </Card>
       </div>
     </div>
+    </>
   );
 }

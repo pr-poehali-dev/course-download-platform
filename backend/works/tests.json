@@ -3,13 +3,12 @@
     {
       "name": "Get single work by ID",
       "method": "GET",
-      "path": "/?id=4861",
+      "path": "/?id=4856",
       "expectedStatus": 200,
       "expectedBody": {
         "id": "number",
         "title": "string",
-        "preview_image_url": "string",
-        "files_list": "array"
+        "preview_image_url": "string"
       },
       "bodyMatcher": "partial"
     },

@@ -20,12 +20,6 @@ import CatalogLoadingState from '@/components/catalog/CatalogLoadingState';
 import CatalogWorkCard from '@/components/catalog/CatalogWorkCard';
 
 
-interface FileItem {
-  name: string;
-  type: string;
-  size: number;
-}
-
 interface Work {
   id: string;
   folderName: string;
@@ -50,7 +44,6 @@ interface Work {
   views?: number;
   downloads?: number;
   reviewsCount?: number;
-  filesList?: FileItem[];
 }
 
 export default function CatalogPage() {
@@ -71,8 +64,7 @@ export default function CatalogPage() {
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [userBalance, setUserBalance] = useState(0);
   const userDiscount = getUserDiscount(userBalance);
-  const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 24;
+  const [visibleCount, setVisibleCount] = useState(24); // Сколько работ показываем
 
   useEffect(() => {
     trackEvent(metrikaEvents.CATALOG_OPEN);
@@ -304,18 +296,6 @@ export default function CatalogPage() {
             const { title, workType } = extractWorkInfo(work.title || work.folder_name);
             const hasRealCover = work.preview_image_url && !work.preview_image_url.includes('e0139de0-3660-402a-8d29-d07f5dac95b3.jpg');
             
-            // Парсим files_list из JSON строки или используем напрямую если уже массив
-            let filesList: FileItem[] = [];
-            if (work.files_list) {
-              try {
-                filesList = typeof work.files_list === 'string' 
-                  ? JSON.parse(work.files_list) 
-                  : work.files_list;
-              } catch (e) {
-                console.error('Failed to parse files_list:', e);
-              }
-            }
-            
             return {
               id: String(work.id),
               folderName: work.folder_name || work.title,
@@ -334,8 +314,7 @@ export default function CatalogPage() {
               isHit: false,
               isNew: false,
               discount: 0,
-              authorId: work.author_id || null,
-              filesList: filesList
+              authorId: work.author_id || null
             };
           });
           
@@ -370,8 +349,11 @@ export default function CatalogPage() {
         // Удаляем сохранённую позицию
         sessionStorage.removeItem('catalog_scroll_position');
       }, 100);
+    } else if (!loading) {
+      // При смене страницы через URL скроллим вверх
+      window.scrollTo(0, 0);
     }
-  }, [loading]);
+  }, [loading, currentPage]);
 
   // ✅ Оптимизированная фильтрация с useMemo для мгновенного поиска
   const filteredWorks = useMemo(() => {
@@ -423,19 +405,38 @@ export default function CatalogPage() {
   // ✅ Мемоизируем список предметов
   const subjects = useMemo(() => Array.from(new Set(works.map(w => w.subject))), [works]);
 
-  // ✅ Пагинация для быстрой загрузки (показываем только 24 работы за раз)
-  const paginatedWorks = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredWorks.slice(startIndex, endIndex);
-  }, [filteredWorks, currentPage, ITEMS_PER_PAGE]);
+  // Обработчики фильтров с автосбросом видимого количества
+  const handleSearchChange = useCallback((value: string) => {
+    setSearchQuery(value);
+    setVisibleCount(24); // Сбрасываем к начальному количеству
+  }, []);
 
-  const totalPages = Math.ceil(filteredWorks.length / ITEMS_PER_PAGE);
+  const handleFilterSubjectChange = useCallback((value: string) => {
+    setFilterSubject(value);
+    setVisibleCount(24);
+  }, []);
 
-  // Сбрасываем страницу при изменении фильтров
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, filterSubject, priceRange, sortBy]);
+  const handlePriceRangeChange = useCallback((value: string) => {
+    setPriceRange(value);
+    setVisibleCount(24);
+  }, []);
+
+  const handleSortByChange = useCallback((value: string) => {
+    setSortBy(value);
+    setVisibleCount(24);
+  }, []);
+
+  // Показываем только видимое количество работ
+  const visibleWorks = useMemo(() => {
+    return filteredWorks.slice(0, visibleCount);
+  }, [filteredWorks, visibleCount]);
+
+  const hasMore = filteredWorks.length > visibleCount;
+
+  // Функция подгрузки ещё работ
+  const loadMore = useCallback(() => {
+    setVisibleCount(prev => prev + 24);
+  }, []);
 
   const getCategoryTitle = () => {
     if (filterSubject && filterSubject !== 'all') {
@@ -491,7 +492,7 @@ export default function CatalogPage() {
     if (filterSubject !== 'all') {
       return `Чертежи ${filterSubject} | Tech Forma`;
     }
-    return 'Каталог чертежей DWG | Tech Forma';
+    return `Каталог чертежей DWG | Tech Forma`;
   };
 
   const getCatalogSEODescription = () => {
@@ -502,13 +503,14 @@ export default function CatalogPage() {
   };
 
   const hasQueryParams = searchQuery || filterSubject !== 'all' || priceRange !== 'all' || sortBy !== 'default';
+  const canonicalUrl = 'https://techforma.pro/catalog';
 
   return (
     <>
       <Helmet>
         <title>{getCatalogSEOTitle()}</title>
         <meta name="description" content={getCatalogSEODescription()} />
-        <link rel="canonical" href="https://techforma.pro/catalog" />
+        <link rel="canonical" href={canonicalUrl} />
         {hasQueryParams && <meta name="robots" content="noindex, follow" />}
         <script type="application/ld+json">
           {JSON.stringify(jsonLdSchema)}
@@ -530,19 +532,20 @@ export default function CatalogPage() {
           
           <CatalogFilters
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={handleSearchChange}
             filterSubject={filterSubject}
-            onFilterSubjectChange={setFilterSubject}
+            onFilterSubjectChange={handleFilterSubjectChange}
             priceRange={priceRange}
-            onPriceRangeChange={setPriceRange}
+            onPriceRangeChange={handlePriceRangeChange}
             sortBy={sortBy}
-            onSortByChange={setSortBy}
+            onSortByChange={handleSortByChange}
             subjects={subjects}
             onResetFilters={() => {
               setSearchQuery('');
               setFilterSubject('all');
               setPriceRange('all');
               setSortBy('default');
+              setVisibleCount(24);
             }}
           />
         </div>
@@ -557,7 +560,7 @@ export default function CatalogPage() {
           <>
             <TooltipProvider>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-                {paginatedWorks.map((work) => (
+                {visibleWorks.map((work) => (
                   <CatalogWorkCard
                     key={work.id}
                     work={work}
@@ -575,60 +578,23 @@ export default function CatalogPage() {
               </div>
             </TooltipProvider>
 
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-2 mt-12 mb-8">
+            {hasMore && (
+              <div className="flex justify-center mt-12 mb-8">
                 <Button
+                  onClick={loadMore}
+                  size="lg"
                   variant="outline"
-                  onClick={() => {
-                    setCurrentPage(p => Math.max(1, p - 1));
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  disabled={currentPage === 1}
+                  className="min-w-[200px]"
                 >
-                  <Icon name="ChevronLeft" size={20} />
-                  Назад
+                  Показать ещё
+                  <Icon name="ChevronDown" size={20} className="ml-2" />
                 </Button>
-                
-                <div className="flex gap-2">
-                  {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={currentPage === pageNum ? 'default' : 'outline'}
-                        onClick={() => {
-                          setCurrentPage(pageNum);
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="w-10 h-10"
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                </div>
-                
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setCurrentPage(p => Math.min(totalPages, p + 1));
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  disabled={currentPage === totalPages}
-                >
-                  Вперёд
-                  <Icon name="ChevronRight" size={20} />
-                </Button>
+              </div>
+            )}
+
+            {!hasMore && filteredWorks.length > 24 && (
+              <div className="text-center text-muted-foreground mt-12 mb-8">
+                Показаны все работы ({filteredWorks.length})
               </div>
             )}
             
